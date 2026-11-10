@@ -42,9 +42,9 @@ lepsze liczby pokrycia.
 ## CI i przyszłe wydania
 
 CI uruchamia kontrolę indeksu i testy bez danych gry dla PR do `main`, push na
-`main` oraz ręcznego uruchomienia. Testy powinny być powtarzalne i bez pominięć.
-CI ma tylko dostęp
-`contents: read` i **nie publikuje** wydań.
+`main` lub gałęzie `arena/**` oraz ręcznego uruchomienia. Testy powinny być
+powtarzalne i bez pominięć. CI ma tylko dostęp `contents: read` i **nie
+publikuje** wydań.
 
 Gdy powstanie patcher, zaprojektować osobno: build dla PR bez publikacji,
 sprawdzenie zawartości i sum, bezpieczne opisy wydań bez prywatnych danych oraz

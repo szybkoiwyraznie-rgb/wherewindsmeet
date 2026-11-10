@@ -12,8 +12,8 @@ rosnącym `AGENTS.md`.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md). Jego ustalenia dotyczące plików SRW nie są
   ustaleniami o Where Winds Meet.
-- Trwają prace nad dokumentacją, ochroną danych, kontrolami i CI. W repozytorium
-  nie ma danych gry ani tłumaczenia.
+- Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
+  W repozytorium nie ma danych gry ani tłumaczenia.
 
 | Obszar | Stan |
 |---|---|
