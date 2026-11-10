@@ -337,5 +337,9 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Regresje:** test symuluje przestarzałe metadane wpisu katalogu i pliku,
   rozbieżne czasy między API, rzeczywistą zmianę tej samej obserwacji oraz
   zmianę typu wpisu. Linux/Python 3.11.2 — **150/150** testów lokalnych;
-  `compileall` i sprawdzenie diffu OK. CI commita poprawki trzeba sprawdzić
-  osobno na Windows; testy CI nadal nie oznaczają testu na WWM.
+  `compileall` i sprawdzenie diffu OK. Dla poprawki
+  `1688eac56bc124a43418b8c36da9e404c78547d8` oba przebiegi CI:
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42883859227)
+  i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42883870587)
+  przeszły **4/4** (Linux/Windows × Python 3.11/3.12). Testy CI nie oznaczają
+  testu na WWM; wyniki kolejnego commita należy sprawdzić osobno.

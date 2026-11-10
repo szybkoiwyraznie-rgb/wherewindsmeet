@@ -37,7 +37,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 150 testów lokalnych; 4/4 konfiguracje CI przeszły dla `189c2c3`. Poprawkę skanera na Windows trzeba sprawdzić w CI bieżącego commita. |
+| Repozytorium i workflow | 150 testów lokalnych; 4/4 konfiguracje CI przeszły dla poprawki `1688eac` na Windows i Linuksie. Wyniki bieżącego commita sprawdzać osobno. |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Windows wybrano; Steam rekomendowano. Instalacja, build, zakres warunków i zgodność narzędzi pozostają niepotwierdzone; jest [narzędzie metadanych](INVENTORY.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
