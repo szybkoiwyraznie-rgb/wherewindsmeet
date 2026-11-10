@@ -20,7 +20,8 @@ Duże dane i generowane archiwa nie trafiają do Git bez uzasadnionej potrzeby.
 Kontrola repozytorium odrzuca obecnie pliki większe niż 10 MiB w indeksie. Jeśli
 w przyszłości większy, niebinarny materiał okaże się niezbędny, najpierw
 uzgodnić przechowywanie i świadomie zrewidować tę regułę; nie omijać jej przez
-`git add -f`.
+`git add -f`. Submoduły także wymagają osobnego przeglądu i są na razie
+odrzucane przez kontrolę indeksu.
 
 ## Katalogi i wymiana
 

@@ -62,5 +62,6 @@ __pycache__/
 .coverage
 coverage/
 .cache/
+node_modules/
 .DS_Store
 Thumbs.db
