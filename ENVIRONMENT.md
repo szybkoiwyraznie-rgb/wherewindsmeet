@@ -28,7 +28,9 @@ Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy ni
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
 metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); zakres jego
 późniejszego użycia na instalacji trzeba będzie uzgodnić. Prototyp pakietu
-na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md).
+na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md),
+a porównanie aktualizacji i model przywracania —
+[docs/UPDATES_AND_RESTORE.md](docs/UPDATES_AND_RESTORE.md).
 Opcjonalne odtworzenie zewnętrznego eksperymentu syntetycznego ma osobne
 zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
 

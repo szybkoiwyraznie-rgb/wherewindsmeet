@@ -61,8 +61,10 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
   bez modyfikowania kodu wykonywalnego, pamięci, zabezpieczeń ani podmieniania
   plików w trakcie uruchamiania lub rozgrywki. Tekst może być przechowywany w
   kontenerze binarnym; fizyczny sposób zapisu trzeba dopiero rozpoznać i uzgodnić.
-- Przyszły proces musi sprawdzać wersję, utrzymywać weryfikowane kopie i mieć
-  przetestowane przywracanie. Nie obchodzić kontroli integralności ani
+- Przyszły proces musi sprawdzać wersję i pliki, utrzymywać weryfikowane kopie
+  i mieć przetestowane przywracanie. Model decyzji i plan transakcji opisuje
+  [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md); sam model nie weryfikuje
+  instalacji ani niczego nie zapisuje. Nie obchodzić kontroli integralności ani
   automatycznego przywracania plików; jeśli klient cofa zmianę, jest to
   niepowodzenie testu, nie powód do obejścia.
 - Testować najpierw na syntetycznych danych, a na rzeczywistej instalacji
@@ -91,8 +93,10 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 ## 7. Aktualizacje gry i wydania
 
 - Porównywać wersje po zaufanych identyfikatorach i fingerprintach: nowe,
-  zmienione, usunięte i niepewne rekordy rozdzielać. Zachować poprzednie
-  zwrotki; przy zmianie źródła nie przypisywać tłumaczeń na ślepo.
+  zmienione, nieobecne i niepewne rekordy rozdzielać; usunięcie wymaga
+  osobnego potwierdzenia. Zachować poprzednie zwrotki; przy zmianie źródła nie
+  przypisywać tłumaczeń na ślepo. Prototyp [audytu](UPDATES_AND_RESTORE.md)
+  działa wyłącznie na małych, fikcyjnych źródłach i nie potwierdza stałości ID.
 - Niezgodną wersję gry wykrywać przed zapisem. Przygotować plan aktualizacji
   i cofnięcia, regresje oraz czytelną informację o obsługiwanych buildach.
 - W przyszłości PR ma testować i budować bez publikacji; publikacja jedynie po

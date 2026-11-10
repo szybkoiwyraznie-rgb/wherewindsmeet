@@ -25,6 +25,11 @@ standardowe wyjście: nie uruchamiaj go na tekstach gry ani nie kieruj prywatnyc
 wyników do publicznych logów, PR lub śledzonych plików. Raport walidacji nie
 zawiera tekstów ani ścieżek, ale zawiera wyliczone z danych skróty, które też
 mogą służyć jako identyfikatory; przed udostępnieniem oceń ich wrażliwość.
+Prototyp [audytu aktualizacji](UPDATES_AND_RESTORE.md) w trybach `todo` i
+`review` wypisuje tekst i ID, a `review` także poprzednie przekłady. Model
+przywracania w trybie `--details` wypisuje podane logiczne ID. Oba narzędzia
+są przeznaczone wyłącznie do fikcyjnych danych, nie do publicznych wyników
+zawierających prywatny materiał.
 
 Duże dane i generowane archiwa nie trafiają do Git bez uzasadnionej potrzeby.
 Kontrola repozytorium odrzuca obecnie pliki większe niż 10 MiB w indeksie. Jeśli

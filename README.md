@@ -9,17 +9,18 @@ wersję referencyjną rekomendujemy Steam. Właściciel nie zainstalował jeszcz
 Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
 planem awaryjnym. Właściciel wskazał kierunek ograniczony do zmian tekstu przy
 wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmian.
-Powstał [prototyp pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) na wymyślonych
-danych, ale nie ma ekstraktora, importera do gry, instalatora ani czytanki;
-działania w grze nie sprawdzono.
+Powstały prototypy [pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) oraz
+[audytu aktualizacji i modelu przywracania](docs/UPDATES_AND_RESTORE.md) na
+wymyślonych danych. Nie ma ekstraktora, importera do gry, instalatora ani
+czytanki; działania w grze nie sprawdzono.
 
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
-  [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md)
-  oraz [sposób pracy](docs/WORKFLOW.md)
+  [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md),
+  [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md) oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)

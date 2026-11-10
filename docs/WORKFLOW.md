@@ -35,8 +35,11 @@ test syntetyczny, test na kopii oraz test w prawdziwej grze.
 | Aktualizacja | stary i nowy build → plan różnic | niepewne dopasowania i zmiany źródła wymagają przeglądu |
 
 Obecny [prototyp pakietu JSON](TRANSLATION_BUNDLE.md) realizuje tylko
-przygotowanie szablonu i walidację fikcyjnej zwrotki. Nie zapisuje plików,
-nie importuje tekstu do gry i sprawdza tylko zadeklarowane literały.
+przygotowanie szablonu i walidację fikcyjnej zwrotki. [Audyt aktualizacji i
+model przywracania](UPDATES_AND_RESTORE.md) porównują fikcyjne wejścia, bez
+sprawdzania instalacji i bez jakiegokolwiek zapisu. Nie ma ekstraktora,
+importera tekstu do gry ani instalatora; walidacja sprawdza tylko
+zadeklarowane literały.
 
 Format, języki, sposób instalacji i praktyki współpracy z tłumaczem wymagają
 osobnych decyzji. Manifest ma pozwolić ustalić pochodzenie oraz wykryć zmianę

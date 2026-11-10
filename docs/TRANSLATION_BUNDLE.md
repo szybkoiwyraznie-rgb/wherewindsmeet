@@ -5,6 +5,8 @@ ją względem osobnego źródła. Przykładowe zdania i identyfikatory są wymy�
 nie pochodzą z *Where Winds Meet*. **Nie ma tu ekstrakcji, importu, instalacji
 ani zapisu do gry.** Format JSON v1 jest formatem roboczym tego prototypu, nie
 rozpoznanym formatem WWM ani obietnicą zgodności z przyszłym ekstraktorem.
+Na tej samej podstawie powstał [syntetyczny audyt aktualizacji](UPDATES_AND_RESTORE.md);
+nie importuje on zwrotki ani nie przenosi przekładów automatycznie.
 
 ## Uruchomienie przykładu
 

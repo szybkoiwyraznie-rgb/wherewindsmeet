@@ -9,8 +9,8 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 
 1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
    `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WINDOWS_OPTIONS.md`,
-   `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
-   `docs/EXPERIMENT_LOG.md`.
+   `docs/UPDATES_AND_RESTORE.md`, `docs/WORKFLOW.md`, `docs/DATA_POLICY.md`
+   oraz ostatnie wpisy w `docs/EXPERIMENT_LOG.md`.
    Zajrzyj do `docs/PRIOR_ART.md` przed
    ponownym badaniem problemów już opisanych w źródłach.
 2. Sprawdź bieżącą gałąź, `git status` i istniejący otwarty PR. Nie nadpisuj
@@ -71,8 +71,11 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 - Przyszły pakiet tłumacza, import, patcher i czytanka muszą mieć wiązanie z
   wersją źródła, testy na danych syntetycznych i jawne raporty. Prototyp
   `docs/TRANSLATION_BUNDLE.md` sprawdza tylko wymyślony format JSON i jawnie
-  podane literały; nie jest ekstraktorem ani importerem gry. Nie dopasowuj
-  niepewnego tłumaczenia ani kolejności zdarzeń przez zgadywanie. Błędy danych,
+  podane literały; nie jest ekstraktorem ani importerem gry. Syntetyczny audyt
+  `docs/UPDATES_AND_RESTORE.md` wymaga niezweryfikowanego założenia o ID i
+  zakresie, a model cofania nie sprawdza rzeczywistych plików ani nie upoważnia
+  do zapisu. Nie dopasowuj niepewnego tłumaczenia ani kolejności zdarzeń przez
+  zgadywanie. Błędy danych,
   tokenów lub niezgodności wersji mają zatrzymywać operację, nie powodować
   częściowego cichego zapisu.
 - Nie uruchamiaj automatycznej publikacji, dopóki nie powstanie i nie zostanie

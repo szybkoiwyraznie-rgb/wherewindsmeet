@@ -218,3 +218,56 @@ cudzego kodu ani nie wymagają tej procedury.
   wszystkie potencjalne znaczniki ani semantyka gry. Brak ekstrakcji,
   importu, testu na rzeczywistej grze, zgodności buildu i gwarancji konta.
   Windows/Python 3.12 należy sprawdzić w CI dla bieżącego commita.
+
+## 2026-11-10 — aktualizacje, audyt i model cofania
+
+- **Wejście i metoda badania:** publiczne, przypięte źródła podlinkowane w
+  [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md): projekt indonezyjski
+  `2289aacd076b7f7541e741760d6c18a0570b37a0`, wietnamski
+  `32efefe9dcb25baf56fe81a83c7186a881ad3e02`, instalator Arimy
+  `d0a32ee8938526b6fdf6d829bf00baa0fb86b4c3` i dokumenty SRW
+  `76f8471d13f2cef8700c703ab109de1962e7b8e8`. Przegląd statyczny kodu i
+  dokumentacji, bez uruchamiania tego kodu i bez pobrania obcych tłumaczeń ani
+  danych gry. Wnioski: osobny zakres i kontekst dla wariantów, pełne wejścia,
+  rozróżnianie braków/tombstone, kontrola buildu i hashy przed przywracaniem.
+  Nie kopiujemy zachowań obchodzących weryfikację ani pomijających błędy.
+- **Wynik przykładu:** wymyślone źródła `synthetic_update_old.json` i
+  `synthetic_update_new.json` mają po 7 rekordów. Audyt wykazał 3 identyczne,
+  2 zmienione, 2 ID tylko w nowym i 2 tylko w starym; 1 z tych ostatnich ma
+  możliwy odpowiednik po zmianie ID, co nie dowodzi tożsamości. Stara częściowa
+  zwrotka daje 1 niezweryfikowanego kandydata, 1 jawny `null` i 1 brak danych
+  wśród niezmienionych; `todo` ma 6 zadań, `review` 4 odniesienia. Kanoniczne
+  hashe całych znormalizowanych źródeł: stary
+  `e5ab29fe12e61b5b47d61f38708c9403ac7ce525eb539d34c044923fa3e07e00`, nowy
+  `bb00cf4bd99152af497d03d603d1144106bbac0a2ada66b97b5965956d6b0a34`.
+  To nie hashe plików ani rzeczywiste Build ID. `todo` przeszedł walidację v1
+  względem nowego źródła; poprzednie przekłady nie są automatycznie przenoszone.
+- **Przywracanie:** model dla dwóch fikcyjnych obserwacji wykazał zmianę etykiety
+  buildu, jeden plik zgodny ze starym patchem i jeden nierozpoznany:
+  `blocked_build_mismatch`, `write_authorized: false`. Model nigdy nie
+  sprawdza plików gry, nie uwierzytelnia danych ani nie wykonuje zapisu.
+- **Testy:** na Linux/Python 3.11.2 `python3 tools/run_tests.py` zakończyło się
+  **97/97**, bez pominięć; `python3 -m compileall -q tools tests` i
+  `git diff --check` przeszły. Sprawdzono m.in. zmianę kontekstu/tokenów,
+  duplikaty, brak jawnego założenia, zmanipulowaną zwrotkę, 100 generowanych
+  małych przypadków, limit 10 000 rekordów, 24 kombinacje stanów przywracania
+  oraz brak zmian plików. Nie użyto gry ani sieci w testach prototypów.
+- **Pomiar orientacyjny, nie test WWM:** jednorazowe wywołanie CLI `report` na
+  syntetycznych 10 000 → 10 000 rekordów, Linux/Python 3.11.2: **0,347 s**
+  czasu ściennego i **63 076 KiB** szczytowego RSS procesu potomnego. Kompaktowe
+  JSON: stare źródło 1 089 861 B, nowe 1 091 071 B, częściowa zwrotka
+  2 031 962 B. ID `bench/00000`–`bench/09999`, tekst `Invented sentence {i}.`,
+  kontekst `Synthetic group {i % 11}.`, bez tokenów; etykiety źródeł
+  `synthetic-benchmark-old`/`synthetic-benchmark-new`. Pominięto pierwszych 100
+  ID, dodano ID `bench/10000`–`bench/10099`, a do tekstu ID 100–199 dopisano
+  ` Updated.`. W zwrotce pominięto indeksy podzielne przez 10, dla pozostałych
+  podzielnych przez 4 użyto `null`, a dla innych przekładu `Wymyślony tekst.`.
+  JSON zapisano z `ensure_ascii=True` i zwartymi separatorami.
+  Raport: 9 800 niezmienionych, 100 zmienionych, 100 nowych ID,
+  100 tylko w starym, 3 140 zadań. Bez progu wydajności, jednorazowy pomiar
+  zależy od maszyny; nie ekstrapolować na dane gry. Dane tymczasowe usunięto.
+- **Ograniczenia:** prototyp wczytuje dane do pamięci i nie obsługuje pełnej
+  skali projektu opisywanego przez innych autorów. ID, kompletności, kolejności
+  warstw i formatu WWM nie zweryfikowano. Brak ekstraktora/importera, pamięci
+  zatwierdzeń, instalatora, rzeczywistego rollbacku oraz testów w grze;
+  Windows i Python 3.12 należy sprawdzić w CI dla aktualnego commita.

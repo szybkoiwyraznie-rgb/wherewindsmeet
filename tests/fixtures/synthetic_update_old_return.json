@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "source_id": "synthetic-build-one",
+  "source_digest": "e5ab29fe12e61b5b47d61f38708c9403ac7ce525eb539d34c044923fa3e07e00",
+  "items": [
+    {
+      "id": "demo/welcome",
+      "source": "Hello, {name}!",
+      "context": "An invented greeting.",
+      "protected_tokens": [
+        "{name}"
+      ],
+      "source_sha256": "48e1645a3bf4c08fc0e1819c5ba4813f9fb385f957556196a6aedb88721e2266",
+      "translation": "Cześć, {name}!"
+    },
+    {
+      "id": "demo/reward",
+      "source": "Found {n} pebbles.",
+      "context": "An invented inventory message.",
+      "protected_tokens": [
+        "{n}"
+      ],
+      "source_sha256": "147fd2bd488d62a984f2df25a6649b3121b1d8d9e57433491a56cbbc72095ff5",
+      "translation": "Znaleziono {n} kamyków."
+    },
+    {
+      "id": "demo/action",
+      "source": "Close",
+      "context": "A fictional button to close a window.",
+      "protected_tokens": [],
+      "source_sha256": "7d9eb7acb13e24625c404401d8e88b2350e32162455885f18276cf802f7701ed",
+      "translation": "Zamknij"
+    },
+    {
+      "id": "demo/pending",
+      "source": "A paper boat.",
+      "context": "An invented note.",
+      "protected_tokens": [],
+      "source_sha256": "0e13861f9115839380d6bb02959b1052a877555b67ad9f3c2b479cd7a454a5a3",
+      "translation": null
+    },
+    {
+      "id": "demo/retired",
+      "source": "Old imaginary message.",
+      "context": "An invented retired message.",
+      "protected_tokens": [],
+      "source_sha256": "f86b107f1bcc3134d2318c3b51a6b4e44f4269184c2210a77c5a148a266d4635",
+      "translation": "Stara fikcyjna wiadomość."
+    },
+    {
+      "id": "demo/old-position",
+      "source": "A forgotten ribbon.",
+      "context": "An invented note, identical after an ID change.",
+      "protected_tokens": [],
+      "source_sha256": "8349a53242235df9afa9fdc7a5b0e30801f42cca50f24207e12d1f84b3460503",
+      "translation": "Zapomniana wstążka."
+    }
+  ]
+}

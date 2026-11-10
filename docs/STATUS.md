@@ -21,6 +21,10 @@ rosnącym `AGENTS.md`.
 - Jest [prototyp pakietu tłumacza](TRANSLATION_BUNDLE.md): szablon i walidacja
   fikcyjnych rekordów w wymyślonym JSON. Nie obsługuje formatu plików gry ani
   nie wykonuje importu; wykrywa wyłącznie jawnie zadeklarowane literały.
+- Jest także [syntetyczny audyt aktualizacji i model cofania](UPDATES_AND_RESTORE.md).
+  Audyt wymaga jawnego, niesprawdzonego założenia o porównywalności ID i zakresu;
+  model nie sprawdza plików gry ani nie pozwala na zapis. Ani jeden, ani drugi
+  nie stanowi gotowego narzędzia do aktualizacji czy odinstalowania WWM.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md). Jego ustalenia dotyczące plików SRW nie są
   ustaleniami o Where Winds Meet.
@@ -31,12 +35,13 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 60 testów lokalnych; 4/4 konfiguracje CI przeszły dla `aa5af09`. Wyniki bieżącego commita sprawdzać osobno. |
+| Repozytorium i workflow | 97 testów lokalnych; 4/4 konfiguracje CI przeszły dla `08fa340`. Wyniki bieżącego commita sprawdzać osobno. |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Windows wybrano; Steam rekomendowano. Instalacja, build, zakres warunków i zgodność narzędzi pozostają niepotwierdzone; jest [narzędzie metadanych](INVENTORY.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu, atomowego zapisu i integracji z grą. |
-| Patcher, instalacja i przywracanie | Nie powstały; `runtime_tested: false`. |
-| Czytanka i aktualizacje gry | Planowane; brak implementacji. |
+| Patcher, instalacja i przywracanie | Nie powstały; jest tylko fikcyjny model decyzji bez zapisu. `runtime_tested: false`. |
+| Aktualizacje gry | Syntetyczny audyt małych źródeł; brak pamięci tłumaczeń, ekstrakcji i obsługi aktualizacji WWM. |
+| Czytanka | Planowana; brak implementacji. |
 
 ## Otwarte ustalenia
 
@@ -56,11 +61,13 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Kontynuować narzędzia i testy na próbkach syntetycznych: m.in. dokładniejsze
-reguły tokenów po poznaniu formatu oraz przyszły bezpieczny import. Właściciel
-może zainstalować niemodyfikowaną grę ze Steam; po instalacji przydadzą się
-wersja i Build ID. Przed rzeczywistymi plikami uzgodnić konkretny plan, kopię
-oraz przywracanie, a dopiero jeśli to potrzebne — minimalny raport metadanych.
+Kontynuować na próbkach syntetycznych: projekt strumieniowego indeksu, jawne
+zatwierdzanie przekładów oraz odzyskiwanie po przerwaniu wieloplikowej zmiany.
+Później potrzebne będą format i stabilność ID, dokładniejsze reguły tokenów oraz
+bezpieczny import. Właściciel może zainstalować niemodyfikowaną grę ze Steam;
+po instalacji przydadzą się wersja i Build ID. Przed rzeczywistymi plikami
+uzgodnić konkretny plan, kopię oraz przywracanie, a dopiero jeśli to potrzebne —
+minimalny raport metadanych.
 Nie żądać całej gry ani poświadczeń. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md)
 jest opcjonalny; wybranego kierunku nie trzeba ponownie potwierdzać. Szczegóły
 w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).

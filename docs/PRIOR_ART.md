@@ -29,4 +29,7 @@ Pierwszy przegląd oficjalnych warunków i wcześniejszych narzędzi zapisano w
 ograniczeniami i rozróżnieniem deklaracji społeczności od naszych testów.
 Analizę kodu instalatora Arimy i klienta Kaption, wraz z ograniczeniami licencji
 oraz rekomendacją Windows/Steam, zawiera [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md).
+Osobne [badanie aktualizacji, warstw i backupów](UPDATES_AND_RESTORE.md)
+porównuje przypięty kod projektów indonezyjskiego, wietnamskiego i Arimy z
+podejściem SRW. To analiza, nie test działania tych rozwiązań w grze.
 Żadne cudze narzędzie ani dane gry nie zostały skopiowane do repozytorium.

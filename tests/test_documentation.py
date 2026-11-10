@@ -18,6 +18,7 @@ GUIDES = (
     "docs/WINDOWS_OPTIONS.md",
     "docs/PUBLISHER_PERMISSION.md",
     "docs/TRANSLATION_BUNDLE.md",
+    "docs/UPDATES_AND_RESTORE.md",
     "docs/WORKFLOW.md",
     "docs/DATA_POLICY.md",
     "docs/EXPERIMENT_LOG.md",
