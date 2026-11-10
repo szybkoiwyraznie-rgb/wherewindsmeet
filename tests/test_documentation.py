@@ -15,6 +15,8 @@ GUIDES = (
     "docs/ROADMAP.md",
     "docs/FEASIBILITY.md",
     "docs/INVENTORY.md",
+    "docs/WINDOWS_OPTIONS.md",
+    "docs/PUBLISHER_PERMISSION.md",
     "docs/WORKFLOW.md",
     "docs/DATA_POLICY.md",
     "docs/EXPERIMENT_LOG.md",

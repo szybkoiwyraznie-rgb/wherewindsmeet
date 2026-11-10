@@ -2,16 +2,17 @@
 
 Stan: **2026-11-10**. To przegląd publicznych źródeł, bez dostępu do instalacji
 właściciela. Rozróżniamy deklaracje wydawcy, wyniki innych projektów oraz
-własny test na próbce syntetycznej. Nie wybrano jeszcze platformy ani wersji
-docelowej; nie przeprowadzono testu na plikach gry.
+własny test na próbce syntetycznej. Właściciel wybrał Windows; rekomendujemy
+Steam jako pierwszy punkt odniesienia, ale gry jeszcze nie zainstalował. Nie
+przeprowadzono testu na plikach gry.
 
 ## Fakty z oficjalnych źródeł
 
 - [Steam — karta gry](https://store.steampowered.com/app/3564740/Where_Winds_Meet/)
   (app ID `3564740`) podaje Windows 10/11 dla wersji PC, wymaga połączenia
   szerokopasmowego i wymienia tryby solo oraz sieciowe. Na dzień przeglądu w
-  wykazie języków interfejsu/napisów nie ma polskiego. To **nie** ustala, jaką
-  platformę lub edycję ma właściciel.
+  wykazie języków interfejsu/napisów nie ma polskiego. To **nie** potwierdza
+  aktywnych warstw tekstów ani konkretnego buildu przyszłej instalacji.
 - Ta sama karta opisuje także generowany w czasie rzeczywistym tekst i głos
   niektórych NPC. Nie wolno więc zakładać, że jednorazowy ekstrakt statycznych
   tekstów obejmie wszystkie możliwe wypowiedzi ani że sam zapewni czytankę.
@@ -33,8 +34,13 @@ docelowej; nie przeprowadzono testu na plikach gry.
 uruchomieniem zmodyfikowanego klienta ustalić właściwe warunki dla wydania i
 uzyskać decyzję właściciela co do dalszego postępowania; rekomendowany kontakt
 z wydawcą w sprawie zgody. Do tego czasu pracujemy na źródłach publicznych i
-próbkach syntetycznych, bez uruchamiania gry lub narzędzi społecznościowych na
-pliku właściciela. Decyzja właściciela sama w sobie nie jest zgodą wydawcy.
+próbkach syntetycznych, bez uruchamiania narzędzi na plikach właściciela ani
+zmodyfikowanego klienta. Właściciel może normalnie zainstalować i uruchamiać
+oryginalną grę. Jego decyzja sama w sobie nie jest zgodą wydawcy.
+
+Warianty Steam / launcher / Epic, polski instalator oraz Kaption porównano w
+[WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md). Użytkownik preferuje natywną polską
+wersję z własnym tłumaczeniem; nakładka jest tylko wariantem rezerwowym.
 
 ## Wcześniejsze prace społeczności — kandydaci, nie nasze potwierdzenia
 
@@ -75,8 +81,9 @@ narzędzia nie udziela praw do tekstów ani plików gry.
 
 ## Co trzeba rozstrzygnąć przed ekstrakcją
 
-- **Edycja:** PC/Steam, oficjalny launcher, inna platforma i region, numer
-  wersji/builda; ścieżki opisane dla jednego klienta nie muszą pasować do innego.
+- **Edycja:** zalecany na początek Windows/Steam, ale brak jeszcze instalacji,
+  regionu i numeru wersji/builda; ścieżki jednego klienta mogą nie pasować do
+  oficjalnego launchera ani Epic.
 - **Źródła:** czy potrzebne mapy rzeczywiście istnieją i które warstwy są
   aktywne; zgodność wersji, `_diff`, usunięć, wariantów i powtórzeń. Nie
   przypisywać rekordów wyłącznie po pozycji w pliku.

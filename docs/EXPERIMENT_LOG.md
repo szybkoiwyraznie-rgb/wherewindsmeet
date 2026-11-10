@@ -158,3 +158,34 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenie:** udane wyniki powyżej dotyczą wcześniejszego commita;
   aktualizację akcji trzeba zweryfikować we własnym przebiegu CI. Testy nadal
   nie potwierdzają działania gry ani zgodności formatu.
+
+## 2026-11-10 — CI po aktualizacji akcji
+
+- **Wejście:** commit `3a0a60c8b95536cfbebbc278d5a3543989e44cff`, akcje
+  `checkout` v7.0.1 i `setup-python` v7.1.0, bez plików gry.
+- **Metoda:** lokalny `action-validator` 0.6.0 oraz [GitHub Actions dla PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42848568860).
+- **Wynik:** walidacja workflow poprawna, 4/4 konfiguracje Linux/Windows ×
+  Python 3.11/3.12 przeszły. W tym przebiegu nie ma ostrzeżenia o Node.js 20;
+  pozostaje informacja o planowanej migracji `ubuntu-latest`.
+- **Ograniczenie:** wynik odnosi się do tego commita i testów repozytorium,
+  nie do instalacji lub działania gry.
+
+## 2026-11-10 — źródła wskazane przez właściciela i wybór Windows
+
+- **Wejście:** publiczne metadane drzew oraz wybrane README, pliki licencji,
+  kod i dokumentacja z `arimacold/wwm-spolszczenie` przy
+  `d0a32ee8938526b6fdf6d829bf00baa0fb86b4c3` oraz `wojciechowskiapp/Kaption`
+  przy `8f2475a72cb21ab6c95a2edede75834b98ec7e57`. Oficjalny poradnik
+  cross-progression i karta Steam są podlinkowane w [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md).
+- **Metoda:** statyczny przegląd nazw plików i wybranych źródeł; bez pobierania
+  lub uruchamiania binarnych instalatorów, modeli, plików gry i cudzych
+  tłumaczeń. Nie testowano żadnej wersji gry ani Kaption w środowisku Windows.
+- **Wynik:** właściciel wskazał Windows, własne tłumaczenie i preferencję
+  natywnego tekstu. Zarekomendowano Steam jako wersję referencyjną, nie jako
+  gwarancję łatwości czy bezpieczeństwa. Kod Arimy potwierdza znaczenie osobnych
+  warstw i operacji na plikach; Kaption opisuje OCR i dopasowanie do lokalnych
+  danych, a WWM znajduje się w jego kandydatach, nie obsługiwanych grach.
+- **Ograniczenie:** nie porównano aktualnych instalacji Steam/Epic/launchera,
+  nie sprawdzono zgodności zabezpieczeń ani praw. Przygotowano niewysłany
+  [szkic zapytania do wydawcy](PUBLISHER_PERMISSION.md); kodu i danych obcych
+  projektów nie skopiowano do repozytorium.

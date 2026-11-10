@@ -8,8 +8,9 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 ## Początek każdej sesji
 
 1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
-   `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WORKFLOW.md`,
-   `docs/DATA_POLICY.md` oraz ostatnie wpisy w `docs/EXPERIMENT_LOG.md`.
+   `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WINDOWS_OPTIONS.md`,
+   `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
+   `docs/EXPERIMENT_LOG.md`.
    Zajrzyj do `docs/PRIOR_ART.md` przed
    ponownym badaniem problemów już opisanych w źródłach.
 2. Sprawdź bieżącą gałąź, `git status` i istniejący otwarty PR. Nie nadpisuj
@@ -40,12 +41,19 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   katalog gry, dane logowania ani pliki, które nie są konieczne. Pliki wrażliwe
   trzymaj lokalnie; nie umieszczaj prywatnych linków ani identyfikatorów w
   publicznych opisach i logach.
-- Platforma, wydanie i język źródłowy właściciela pozostają nieustalone;
-  publiczne informacje o grze i istotne ograniczenia warunków są w
-  `docs/FEASIBILITY.md`. Nie obiecuj zgodności z aktualizacjami ani
-  bezpieczeństwa konta. Przed pracą na prawdziwej grze wyjaśnij zasady i ryzyko;
-  nie obchodź zabezpieczeń ani anti-cheat. Nie modyfikuj instalacji użytkownika
-  bez uzgodnionego planu, kopii i sposobu przywrócenia.
+- Platforma docelowa to Windows; Steam jest rekomendowany jako pierwszy klient
+  referencyjny, ale właściciel nie zainstalował jeszcze gry. Build, region i
+  język źródłowy pozostają nieustalone. Publiczne informacje o grze i istotne
+  ograniczenia warunków są w `docs/FEASIBILITY.md` i `docs/WINDOWS_OPTIONS.md`.
+  Nie obiecuj zgodności z aktualizacjami ani bezpieczeństwa konta. Przed pracą
+  na prawdziwej grze wyjaśnij zasady i ryzyko; nie obchodź zabezpieczeń ani
+  anti-cheat. Nie modyfikuj instalacji użytkownika bez uzgodnionego planu,
+  kopii i sposobu przywrócenia.
+- Właściciel chce samodzielnego tłumaczenia wspomaganego dobrym modelem oraz
+  preferuje tekst natywnie w grze; nakładka to wariant rezerwowy. Nie używaj
+  gotowego tłumaczenia Arimy ani innych niezweryfikowanych gotowych zwrotek;
+  wskazane projekty można analizować technicznie, nie kopiując ich danych.
+  Nie przesyłaj tekstów gry do dostawcy modelu przed uzgodnieniem praw i zasad.
 - Oddzielaj fakty, hipotezy i niewiadome. Dla badań zapisuj wejście, wersję,
   metody, liczby, hashe, wyniki i ograniczenia w `docs/EXPERIMENT_LOG.md`;
   `docs/STATUS.md` ma wskazywać aktualny stan i następny krok. Nie zgłaszaj

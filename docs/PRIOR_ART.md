@@ -18,12 +18,15 @@ Przejrzany stan `main`: commit
 
 W przejrzanym drzewie wzorca nie było pliku `ENVIRONMENT`; tutejszy
 `ENVIRONMENT.md` jest nową instrukcją dla tego projektu. Nie kopiujemy kodu,
-tekstów gry, kluczy, formatów ani szczegółowych decyzji SRW Y. Wybór języka
-źródłowego i techniki tłumaczenia tej gry nie został jeszcze dokonany.
+tekstów gry, kluczy, formatów ani szczegółowych decyzji SRW Y. Właściciel
+preferuje niezależne tłumaczenie z dobrym modelem; język źródłowy i konkretny
+model nie zostały jeszcze wybrane.
 
 ## Where Winds Meet
 
 Pierwszy przegląd oficjalnych warunków i wcześniejszych narzędzi zapisano w
 [FEASIBILITY.md](FEASIBILITY.md), wraz z przypiętymi commitami, licencjami,
-ograniczeniami i rozróżnieniem deklaracji społeczności od naszych testów. Żadne
-narzędzie ani dane gry nie zostały skopiowane do repozytorium.
+ograniczeniami i rozróżnieniem deklaracji społeczności od naszych testów.
+Analizę kodu instalatora Arimy i klienta Kaption, wraz z ograniczeniami licencji
+oraz rekomendacją Windows/Steam, zawiera [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md).
+Żadne cudze narzędzie ani dane gry nie zostały skopiowane do repozytorium.

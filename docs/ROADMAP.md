@@ -11,9 +11,10 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 
 ## 1. Rozpoznanie i wykonalność
 
-- Ustalić z właścicielem platformę, wydanie, region, wersję, język źródłowy
-  i zakres projektu. Sprawdzić wcześniejsze narzędzia i ich licencje, warunki
-  gry oraz ryzyko związane z trybami sieciowymi i zabezpieczeniami.
+- Celem jest Windows; [Steam rekomendowano na start](WINDOWS_OPTIONS.md). Po
+  instalacji ustalić wydanie, region, wersję, język źródłowy i zakres projektu.
+  Sprawdzić wcześniejsze narzędzia i ich licencje, warunki gry oraz ryzyko
+  związane z trybami sieciowymi i zabezpieczeniami.
 - Zacząć od metadanych: nazw, rozmiarów i identyfikatorów wersji; ustalić,
   co raport może bezpiecznie ujawniać. Nie zakładać silnika ani formatów.
 - Dla prób wybrać minimalny potrzebny materiał, ustalić prawa, kryterium
@@ -38,6 +39,9 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 - Przygotować czytelny pakiet z kontekstem, uzgodnionym źródłem/referencjami,
   identyfikatorami, słownikiem, regułami tokenów i ograniczeniami tam, gdzie są
   zmierzone. Format uzgodnić z tłumaczem, nie narzucać formatu SRW Y.
+- Właściciel chce niezależnej pracy z dobrym modelem, nie gotowej cudzej
+  polonizacji. Model wybrać po porównaniu jakości, kosztów i warunków
+  przetwarzania; przed wysłaniem tekstów gry ustalić prawa i prywatność.
 - Związać pakiet z dokładną wersją źródła i manifestem. Importować partiami;
   odróżniać brak tłumaczenia od rekordu usuniętego, sprawdzać tożsamość,
   strukturę i znaczniki. Konflikty kierować do przeglądu.
@@ -46,9 +50,11 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 
 ## 4. Integracja z grą i instalacja
 
-- Wybrać metodę dopiero po rozpoznaniu formatu i zasad gry. Patcher działa na
-  kopii lub własnych plikach użytkownika, po świadomej zgodzie; musi sprawdzać
-  wersję, utrzymywać weryfikowane kopie i umożliwić przywrócenie.
+- Preferowany jest natywny tekst w grze; nakładka OCR jest rezerwą, nie gotową
+  alternatywą. Metodę wybrać dopiero po rozpoznaniu formatu i zasad gry.
+  Patcher działa na kopii lub własnych plikach użytkownika, po świadomej
+  zgodzie; musi sprawdzać wersję, utrzymywać weryfikowane kopie i umożliwić
+  przywrócenie. Nie obchodzić kontroli integralności.
 - Testować najpierw na syntetycznych danych, potem na bezpiecznie uzgodnionej
   próbce. Nie rozprowadzać oryginalnych ani zmodyfikowanych plików gry.
 - **Wynik:** powtarzalny proces budowy i cofnięcia, bezpieczna odmowa przy

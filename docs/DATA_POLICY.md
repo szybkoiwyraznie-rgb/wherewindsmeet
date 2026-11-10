@@ -15,6 +15,9 @@ pozwolił także na tekstowe dane gry w repozytorium. To użyteczny wzorzec, ale
 **nie przesądza praw ani zakresu publikacji dla Where Winds Meet**: przed
 pierwszym publicznym commitem tekstu gry ustalić to z właścicielem i sprawdzić
 właściwe warunki. Do tego czasu rzeczywiste ekstrakty trzymać prywatnie.
+Właściciel wybrał niezależne tłumaczenie: nie używamy gotowej polonizacji Arimy
+ani innych niezweryfikowanych cudzych zwrotek. Przed przekazaniem tekstów gry
+zewnętrznemu modelowi ustalić prawa i zasady przetwarzania danych.
 
 Duże dane i generowane archiwa nie trafiają do Git bez uzasadnionej potrzeby.
 Kontrola repozytorium odrzuca obecnie pliki większe niż 10 MiB w indeksie. Jeśli

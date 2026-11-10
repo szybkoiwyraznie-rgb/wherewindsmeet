@@ -4,14 +4,17 @@ Nieoficjalny projekt polskiej wersji gry **Where Winds Meet**. Chcemy zbudować
 powtarzalny proces: teksty z gry → pakiet dla tłumacza → sprawdzony import →
 polska wersja w grze. W planie są również czytanka i obsługa aktualizacji gry.
 
-**Stan: organizacja projektu.** Nie ma jeszcze ekstraktora, pakietu dla tłumacza,
-patchera ani czytanki. Nie sprawdzono też działania w grze. Platforma, wydanie,
-wersja i język źródłowy tłumaczenia wymagają ustalenia.
+**Stan: rozpoznanie i organizacja projektu.** Celem jest Windows; jako pierwszą
+wersję referencyjną rekomendujemy Steam. Właściciel nie zainstalował jeszcze gry.
+Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
+planem awaryjnym. Nie ma jeszcze ekstraktora, pakietu dla tłumacza, patchera
+ani czytanki; działania w grze nie sprawdzono.
 
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
+  [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
   [raport metadanych](docs/INVENTORY.md) oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
