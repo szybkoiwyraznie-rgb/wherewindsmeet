@@ -88,19 +88,58 @@ class ReadOnlyScannerTests(unittest.TestCase):
         self.assertEqual(manifest["scan_status"], "complete", f"issues={manifest['issues']!r} differences={mismatches[:2]!r}")
         return manifest
 
-    def test_unchanged_file_metadata_across_directory_entry_and_open_handle(self):
+    def test_file_identity_across_fresh_path_and_open_handle(self):
         target = self.root / "empty.txt"
-        with os.scandir(self.root) as iterator:
-            initial = next(entry for entry in iterator if entry.name == target.name).stat(follow_symlinks=False)
+        path_info = os.lstat(target)
         fd = os.open(target, os.O_RDONLY | getattr(os, "O_BINARY", 0))
         try:
-            opened = os.fstat(fd)
+            handle_info = os.fstat(fd)
         finally:
             os.close(fd)
-        fields = ("st_mode", "st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_file_attributes")
-        differences = [(field, getattr(initial, field, None), getattr(opened, field, None))
-                       for field in fields if getattr(initial, field, None) != getattr(opened, field, None)]
-        self.assertTrue(scan._same_observation(initial, opened), f"synthetic metadata differences: {differences!r}")
+        self.assertTrue(scan._same_identity_across_sources(path_info, handle_info))
+        # Cross-API ctime/mtime can differ on Windows without any content change.
+        different_timestamps = StatProxy(handle_info, st_ctime_ns=handle_info.st_ctime_ns + 1,
+                                          st_mtime_ns=handle_info.st_mtime_ns + 1)
+        self.assertTrue(scan._same_identity_across_sources(path_info, different_timestamps))
+        self.assertFalse(scan._same_observation(handle_info, different_timestamps))
+        first = StatProxy(path_info, st_dev=10, st_ino=20)
+        other = StatProxy(handle_info, st_dev=10, st_ino=21)
+        self.assertFalse(scan._same_identity_across_sources(first, other))
+        self.assertFalse(scan._same_identity_across_sources(path_info, StatProxy(handle_info, st_size=1)))
+
+    def test_stale_cached_directory_entry_does_not_replace_fresh_lstat(self):
+        actual_scandir = os.scandir
+        def stale(path):
+            entry_name = "first.bin" if Path(path).name == "Package" else "Package"
+            return ScandirProxy(actual_scandir(path), entry_name, {
+                "st_mtime_ns": 0, "st_ctime_ns": 0, "st_dev": 0, "st_ino": 0,
+            })
+        with patch.object(scan.os, "scandir", side_effect=stale):
+            manifest = scan.scan_tree(self.root)
+        self.assertEqual(manifest["scan_status"], "complete", repr(manifest["issues"]))
+        self.assertEqual(len(manifest["files"]), 4)
+
+    def test_cross_api_timestamp_difference_does_not_mask_same_source_changes(self):
+        target = self.root / "Package" / "first.bin"
+        initial = os.lstat(target)
+        actual_fstat = os.fstat
+        def handle_timestamps(fd):
+            value = actual_fstat(fd)
+            return StatProxy(value, st_mtime_ns=value.st_mtime_ns + 5, st_ctime_ns=value.st_ctime_ns + 5)
+        with patch.object(scan.os, "fstat", side_effect=handle_timestamps):
+            digest, checked, problem = scan._hash_regular_file(target, initial)
+        self.assertIsNone(problem)
+        self.assertEqual(digest, hashlib.sha256(target.read_bytes()).hexdigest())
+        self.assertEqual(checked.st_mtime_ns, initial.st_mtime_ns)
+        calls = 0
+        def changing_handle(fd):
+            nonlocal calls
+            value = actual_fstat(fd)
+            calls += 1
+            return StatProxy(value, st_ctime_ns=value.st_ctime_ns + calls)
+        with patch.object(scan.os, "fstat", side_effect=changing_handle):
+            digest, checked, problem = scan._hash_regular_file(target, initial)
+        self.assertEqual((digest, checked, problem), (None, None, "file_changed"))
 
     def test_scans_every_regular_file_and_hashes_contents(self):
         first = scan.scan_tree(self.root)
@@ -233,6 +272,16 @@ class ReadOnlyScannerTests(unittest.TestCase):
                 self.assertIn({"path": target, "reason": reason}, result["issues"])
                 self.assertNotIn(target, {item["path"] for item in result["files"]})
 
+    def test_entry_type_changed_between_enumeration_and_lstat_blocks_comparison(self):
+        previous = scan.scan_tree(self.root)
+        actual_scandir = os.scandir
+        def mismatched_type(path):
+            return ScandirProxy(actual_scandir(path), "empty.txt", {"st_mode": stat.S_IFDIR | 0o700})
+        with patch.object(scan.os, "scandir", side_effect=mismatched_type):
+            current = scan.scan_tree(self.root)
+        self.assertIn({"path": "empty.txt", "reason": "entry_changed"}, current["issues"])
+        self.assertEqual(scan.compare_manifests(current, previous)[0]["status"], "blocked_incomplete_scan")
+
     def test_actual_link_when_supported_is_not_traversed(self):
         outside = self.base / "outside"
         outside.mkdir()
@@ -302,7 +351,9 @@ class ReadOnlyScannerTests(unittest.TestCase):
             result = actual_lstat(path, *args, **kwargs)
             if Path(path) == target:
                 calls += 1
-                if calls >= 2:
+                # fresh entry observation, post-open path, post-read path,
+                # then the final path recheck
+                if calls >= 4:
                     return StatProxy(result, st_mtime_ns=result.st_mtime_ns + 1000000000)
             return result
         with patch.object(scan.os, "lstat", side_effect=changed):
@@ -367,10 +418,11 @@ class ReadOnlyScannerTests(unittest.TestCase):
                 broken["scan_status"] = "incomplete"
             else:
                 broken["atomic_snapshot_verified"] = True
-            with self.subTest(mutation=mutation), self.assertRaises(bundles.BundleError) as caught:
-                scan.compare_manifests(manifest, broken)
-            self.assertNotIn("SECRET", str(caught.exception))
-            self.assertNotIn("private", str(caught.exception))
+            with self.subTest(mutation=mutation):
+                with self.assertRaises(bundles.BundleError) as caught:
+                    scan.compare_manifests(manifest, broken)
+                self.assertNotIn("SECRET", str(caught.exception))
+                self.assertNotIn("private", str(caught.exception))
 
     def test_root_link_or_reparse_point_is_rejected(self):
         actual_lstat = os.lstat

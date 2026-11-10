@@ -33,7 +33,7 @@ MANIFEST_KIND = "generic_read_only_sha256_manifest_v1"
 PRIVATE_RESULT_KIND = "generic_read_only_sha256_result_v1"
 REPORT_KIND = "generic_read_only_sha256_report_v1"
 ISSUE_REASONS = frozenset({
-    "link_or_reparse_skipped", "unsupported_entry", "entry_unavailable",
+    "link_or_reparse_skipped", "unsupported_entry", "entry_unavailable", "entry_changed",
     "file_unavailable", "file_changed", "directory_unavailable",
     "directory_changed", "node_limit_exceeded", "unrepresentable_path",
 })
@@ -49,7 +49,7 @@ def _is_link_or_reparse(info: os.stat_result) -> bool:
 
 
 def _same_observation(first: os.stat_result, second: os.stat_result) -> bool:
-    """Compare available identity and change metadata, deliberately not atime.
+    """Compare observations from the *same* API, deliberately excluding atime.
 
     Some Windows APIs return zero for device or inode; do not mistake zero for
     an identity guarantee. This is only a best-effort change detector, not a
@@ -67,6 +67,24 @@ def _same_observation(first: os.stat_result, second: os.stat_result) -> bool:
         and first.st_mtime_ns == second.st_mtime_ns
         and first.st_ctime_ns == second.st_ctime_ns
     )
+
+
+def _same_identity_across_sources(first: os.stat_result, second: os.stat_result) -> bool:
+    """Compare available file identity without mixing path/handle timestamps.
+
+    Path and descriptor APIs may expose incompatible timestamp semantics or
+    precision on Windows. Stability still requires full *same-source* checks
+    before/after the read. Zero device/inode values cannot prove identity.
+    """
+    if _is_link_or_reparse(first) or _is_link_or_reparse(second):
+        return False
+    if stat.S_IFMT(first.st_mode) != stat.S_IFMT(second.st_mode) or first.st_size != second.st_size:
+        return False
+    for field in ("st_dev", "st_ino"):
+        old, new = getattr(first, field, 0), getattr(second, field, 0)
+        if old and new and old != new:
+            return False
+    return True
 
 
 def _root_directory(root: Path) -> tuple[Path, os.stat_result]:
@@ -114,7 +132,12 @@ def _hash_regular_file(path: Path, initial: os.stat_result) -> tuple[str | None,
     try:
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
-        if not stat.S_ISREG(opened.st_mode) or not _same_observation(initial, opened):
+        named_opened = os.lstat(path)
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or not _same_observation(initial, named_opened)
+            or not _same_identity_across_sources(named_opened, opened)
+        ):
             return None, None, "file_changed"
         digest = hashlib.sha256()
         total = 0
@@ -125,14 +148,16 @@ def _hash_regular_file(path: Path, initial: os.stat_result) -> tuple[str | None,
             digest.update(block)
             total += len(block)
         finished = os.fstat(descriptor)
-        named = os.lstat(path)
+        named_finished = os.lstat(path)
         if (
             total != finished.st_size
             or not _same_observation(opened, finished)
-            or not _same_observation(finished, named)
+            or not _same_observation(initial, named_finished)
+            or not _same_identity_across_sources(named_finished, finished)
         ):
             return None, None, "file_changed"
-        return digest.hexdigest(), finished, None
+        # Keep the path observation: the final recheck also uses lstat.
+        return digest.hexdigest(), named_finished, None
     except OSError:
         return None, None, "file_unavailable"
     finally:
@@ -187,18 +212,33 @@ def scan_tree(root: Path) -> dict[str, Any]:
                         continue
                     if _is_link_or_reparse(info):
                         issues.add((relative, "link_or_reparse_skipped"))
-                    elif stat.S_ISDIR(info.st_mode):
-                        pending.append((Path(entry.path), relative, info))
-                    elif stat.S_ISREG(info.st_mode):
-                        digest, checked, problem = _hash_regular_file(Path(entry.path), info)
+                        continue
+                    if not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
+                        issues.add((relative, "unsupported_entry"))
+                        continue
+                    # DirEntry.stat can be cached/stale on Windows and has no
+                    # reliable inode. Obtain a fresh path observation and use
+                    # lstat consistently for subsequent path rechecks.
+                    path = Path(entry.path)
+                    try:
+                        fresh = os.lstat(path)
+                    except OSError:
+                        issues.add((relative, "entry_unavailable"))
+                        continue
+                    if _is_link_or_reparse(fresh):
+                        issues.add((relative, "link_or_reparse_skipped"))
+                    elif stat.S_IFMT(info.st_mode) != stat.S_IFMT(fresh.st_mode):
+                        issues.add((relative, "entry_changed"))
+                    elif stat.S_ISDIR(fresh.st_mode):
+                        pending.append((path, relative, fresh))
+                    else:
+                        digest, checked, problem = _hash_regular_file(path, fresh)
                         if problem is not None:
                             issues.add((relative, problem))
                         else:
                             assert digest is not None and checked is not None
                             record = {"path": relative, "size": checked.st_size, "sha256": digest}
-                            checked_files[relative] = (Path(entry.path), checked, record)
-                    else:
-                        issues.add((relative, "unsupported_entry"))
+                            checked_files[relative] = (path, checked, record)
         except OSError:
             issues.add((relative_directory, "directory_unavailable"))
 

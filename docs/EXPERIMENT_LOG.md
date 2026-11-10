@@ -319,3 +319,23 @@ cudzego kodu ani nie wymagają tej procedury.
   limit to 250 000 wpisów i 64 MiB wyniku/manifestu. Modele JSON są ograniczone
   do małych syntetycznych danych i nie tworzą patcha. Brak ekstraktora WWM,
   gotowych archiwów, prawdziwej rotacji kopii, importu oraz testu w grze.
+
+## 2026-11-10 — regresja metadanych skanera na Windows
+
+- **Zaobserwowany błąd:** CI dla `f2422d8` i następnych wersji diagnostycznych
+  przechodziło na Linuksie, ale nie na Windows/Python 3.11 i 3.12. Dla
+  sztucznego katalogu po zmianach `DirEntry.stat()` zwracał inne czasy katalogu
+  niż późniejszy `lstat`; skaner zachowawczo oznaczał go `directory_changed` i
+  blokował porównanie. Nie doszło do zapisów ani użycia plików gry. Zwracane
+  w Windows przez `DirEntry.stat()` zerowe `st_ino` i `st_dev` są opisane w
+  [dokumentacji Pythona](https://docs.python.org/3/library/os.html#os.DirEntry.stat).
+- **Poprawka:** po enumeracji należy pobrać świeży `lstat`, a weryfikację czasu
+  i rozmiaru wykonywać oddzielnie dla obserwacji ścieżki oraz uchwytu. Między
+  API porównuje się dostępne identyfikatory, typ i rozmiar, nie zakładając
+  identycznej semantyki ich znaczników czasu. Niedostępna identyfikacja nadal
+  nie dowodzi tożsamości; zastrzeżenia dotyczące wyścigów nie znikają.
+- **Regresje:** test symuluje przestarzałe metadane wpisu katalogu i pliku,
+  rozbieżne czasy między API, rzeczywistą zmianę tej samej obserwacji oraz
+  zmianę typu wpisu. Linux/Python 3.11.2 — **150/150** testów lokalnych;
+  `compileall` i sprawdzenie diffu OK. CI commita poprawki trzeba sprawdzić
+  osobno na Windows; testy CI nadal nie oznaczają testu na WWM.

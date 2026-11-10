@@ -177,9 +177,12 @@ python tools/scan_file_changes.py --root <sztuczny-katalog> --previous <prywatny
   poprawny skan/porównanie bez wykrytych problemów, **również przy braku
   baseline**; `2` oznacza niekompletność/blokadę, `1` — błędne wejście.
 - Kontrole statystyk przed i po odczycie oraz ponowny przegląd ścieżek wykrywają
-  część zmian w trakcie pracy, ale nie są atomowym snapshotem, blokadą ani
-  ochroną przed wrogimi podmianami i wyścigami na Windows. `complete` oznacza
-  brak wykrytych problemów, nie gwarancję spójnego obrazu. Nie sprawdza stanu
+  część zmian w trakcie pracy. Po enumeracji pobierane jest świeże `lstat`, a
+  czasy porównywane są w obrębie tego samego API (ścieżka ze ścieżką, uchwyt z
+  uchwytem). Gdy system nie udostępnia identyfikatora pliku, nie dowodzi to
+  jego tożsamości. Kontrole nie są atomowym snapshotem, blokadą ani ochroną
+  przed wrogimi podmianami i wyścigami na Windows. `complete` oznacza brak
+  wykrytych problemów, nie gwarancję spójnego obrazu. Nie sprawdza stanu
   gry/launchera, nie uwierzytelnia plików ani poprzedniego wyniku i nie
   upoważnia do zapisu. Pracuje w RAM, ma limit 250 000 wpisów i 64 MiB na wynik
   lub wczytany manifest; nie ma jeszcze paska postępu, cache ani wielu korzeni.
