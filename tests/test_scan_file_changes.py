@@ -73,6 +73,20 @@ class ReadOnlyScannerTests(unittest.TestCase):
         (self.root / "empty.txt").write_bytes(b"")
         (self.root / "tekst-zażółć.txt").write_bytes("wymyślony".encode("utf-8"))
 
+    def test_unchanged_file_metadata_across_directory_entry_and_open_handle(self):
+        target = self.root / "empty.txt"
+        with os.scandir(self.root) as iterator:
+            initial = next(entry for entry in iterator if entry.name == target.name).stat(follow_symlinks=False)
+        fd = os.open(target, os.O_RDONLY | getattr(os, "O_BINARY", 0))
+        try:
+            opened = os.fstat(fd)
+        finally:
+            os.close(fd)
+        fields = ("st_mode", "st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_file_attributes")
+        differences = [(field, getattr(initial, field, None), getattr(opened, field, None))
+                       for field in fields if getattr(initial, field, None) != getattr(opened, field, None)]
+        self.assertTrue(scan._same_observation(initial, opened), f"synthetic metadata differences: {differences!r}")
+
     def test_scans_every_regular_file_and_hashes_contents(self):
         first = scan.scan_tree(self.root)
         second = scan.scan_tree(self.root)
