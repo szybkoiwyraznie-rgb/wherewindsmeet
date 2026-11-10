@@ -141,17 +141,27 @@ class ReadOnlyScannerTests(unittest.TestCase):
         target.write_bytes(content)
         previous_bytes = target.read_bytes()
         actual_open, actual_read = os.open, os.read
-        sizes = []
+        actual_compare = scan._same_observation
+        sizes, mismatches = [], []
         def checked_open(path, flags, *args, **kwargs):
             self.assertFalse(flags & (os.O_WRONLY | os.O_RDWR))
             return actual_open(path, flags, *args, **kwargs)
         def counted_read(fd, size):
             sizes.append(size)
             return actual_read(fd, size)
+        def traced_compare(first, second):
+            matches = actual_compare(first, second)
+            if not matches:
+                fields = ("st_mode", "st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_file_attributes")
+                mismatches.append([(field, getattr(first, field, None), getattr(second, field, None))
+                                   for field in fields if getattr(first, field, None) != getattr(second, field, None)])
+            return matches
         with patch.object(scan, "CHUNK_BYTES", 4096), patch.object(scan.os, "open", side_effect=checked_open), \
              patch.object(scan.os, "read", side_effect=counted_read), \
+             patch.object(scan, "_same_observation", side_effect=traced_compare), \
              patch("socket.socket", side_effect=AssertionError("unexpected network")):
             manifest = scan.scan_tree(self.root)
+        self.assertEqual(manifest["scan_status"], "complete", f"issues={manifest['issues']!r} differences={mismatches!r}")
         result = next(item for item in manifest["files"] if item["path"] == "Package/big.bin")
         self.assertEqual(result["sha256"], hashlib.sha256(content).hexdigest())
         self.assertTrue(all(size == 4096 for size in sizes))
