@@ -21,22 +21,40 @@ przeprowadzono testu na plikach gry.
   (ostatnia aktualizacja podana w obu tekstach: 2024-12-15) w §3.2(b)(5)
   ograniczają m.in. modyfikację i tłumaczenie Software/Services, o ile warunki
   na to nie pozwalają; §4.5(a) zakazuje m.in. nieautoryzowanych narzędzi i
-  modyfikacji. Stosowanie do planowanego spolszczenia wymaga wyjaśnienia z
-  wydawcą lub osobą doradzającą prawnie — nie przesądzamy skuteczności tych
-  postanowień w konkretnej jurysdykcji.
+  modyfikacji. Nie wyjaśniliśmy niezależnie ich zastosowania do planowanego
+  spolszczenia ani zakresu ewentualnego wyjątku dla zmian tekstu. Wyjaśnienie
+  u wydawcy lub osoby doradzającej prawnie pozostaje opcją; nie przesądzamy
+  skuteczności tych postanowień w konkretnej jurysdykcji.
 - W [oficjalnym komunikacie o sankcjach](https://www.wherewindsmeetgame.com/news/official/Banreport727.html)
   wydawca opisuje reakcje na nieautoryzowane narzędzia i nieprawidłowe
   zachowania, włącznie z czasowymi lub stałymi blokadami. Komunikat **nie
   rozstrzyga**, czy konkretne spolszczenie zostanie wykryte lub ukarane.
   Nie wolno obiecywać bezpieczeństwa konta ani obchodzić zabezpieczeń.
 
-**Bramka:** przed użyciem narzędzi na rzeczywistej grze, zmianą plików lub
-uruchomieniem zmodyfikowanego klienta ustalić właściwe warunki dla wydania i
-uzyskać decyzję właściciela co do dalszego postępowania; rekomendowany kontakt
-z wydawcą w sprawie zgody. Do tego czasu pracujemy na źródłach publicznych i
-próbkach syntetycznych, bez uruchamiania narzędzi na plikach właściciela ani
-zmodyfikowanego klienta. Właściciel może normalnie zainstalować i uruchamiać
-oryginalną grę. Jego decyzja sama w sobie nie jest zgodą wydawcy.
+## Ustalenie właściciela i zakres prac
+
+Właściciel poinformował, że według jego sprawdzenia dozwolone są modyfikacje
+ograniczone do czystego tekstu, i wybrał je zamiast ingerencji w pamięć lub
+podmiany podczas gry. Nie przedstawił dokumentu zgody wydawcy; nie udało nam
+się niezależnie potwierdzić zakresu takiego wyjątku ani bezpieczeństwa konta.
+To jego zgłoszone ustalenie, nie nasze potwierdzenie stanowiska wydawcy.
+
+Przyjmujemy kierunek **zmiany wartości tekstowych przy wyłączonej grze**: bez
+wstrzykiwania, modyfikacji kodu wykonywalnego lub pamięci, obchodzenia
+zabezpieczeń i podmieniania plików w trakcie uruchamiania lub działania gry.
+Tekst nie musi znajdować się w zwykłym pliku `.txt`: może być wartością w
+kontenerze binarnym. Fizyczny sposób zapisu i jego skutki wymagają rozpoznania;
+nie zakładamy, że zmiana jedynie tekstowych wartości pozostawi resztę bajtów
+kontenera niezmienioną. Jeśli klient automatycznie przywraca plik, nie obchodzimy
+tego mechanizmu.
+
+Kontynuujemy na źródłach publicznych i próbkach syntetycznych. Rzeczywistych
+plików nie żądamy ani nie modyfikujemy bez uzgodnienia konkretnego planu, kopii
+i sposobu przywrócenia; gra nie jest jeszcze zainstalowana. Właściciel może
+normalnie zainstalować i uruchamiać oryginalną grę. Nie wymagamy ponownego
+potwierdzenia wybranego kierunku. Opcjonalny, niewysłany
+[szkic kontaktu z wydawcą](PUBLISHER_PERMISSION.md) może pomóc wyjaśnić zakres
+praw, ale nie jest warunkiem kontynuowania pracy syntetycznej.
 
 Warianty Steam / launcher / Epic, polski instalator oraz Kaption porównano w
 [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md). Użytkownik preferuje natywną polską
@@ -92,12 +110,12 @@ narzędzia nie udziela praw do tekstów ani plików gry.
   scen ani chronologii czytanki.
 - **Aktualizacje:** autorzy projektu indonezyjskiego raportują przywracanie
   części plików przy aktualizacjach, a dla Steam także `_diff` przy starcie.
-  Nie jest to nasz test. Potrzebny jawnie dozwolony sposób działania; nie
-  planujemy obchodzenia kontroli integralności.
+  Nie jest to nasz test. Potrzebna metoda zgodna z przyjętym zakresem prac;
+  nie planujemy obchodzenia kontroli integralności ani podmiany podczas startu.
 - **Jakość:** znaki polskie, tokeny, kontekst, limity, pełny backup/rollback i
   test w grze pozostają niezweryfikowane.
 
-Po decyzji o zakresie i sposobie pracy następnym wejściem powinien być możliwie
-mały [raport metadanych](INVENTORY.md), nie pełny katalog gry. Przed publicznym
-ujawnieniem jakichkolwiek danych tekstowych trzeba osobno ustalić prawa i zgodę
-właściciela.
+Po instalacji i uzgodnieniu konkretnego sposobu pracy ewentualnym pierwszym
+wejściem może być mały [raport metadanych](INVENTORY.md), nie pełny katalog
+gry. Na razie nie prosimy o pliki gry. Przed publicznym ujawnieniem danych
+tekstowych trzeba osobno ustalić prawa i zgodę właściciela.

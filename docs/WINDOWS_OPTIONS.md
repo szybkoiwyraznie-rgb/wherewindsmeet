@@ -2,9 +2,11 @@
 
 Stan: **2026-11-10**. Właściciel wskazał **Windows**, jeszcze nie zainstalował
 *Where Winds Meet*, chce niezależnego tłumaczenia wspomaganego dobrym modelem i
-preferuje tekst natywnie w grze. Nakładka ma być wariantem rezerwowym. Nie
-wykorzystujemy gotowego polskiego tłumaczenia Arimy ani innych niezweryfikowanych
-gotowych zwrotek; wskazane projekty badamy jako źródła informacji technicznych.
+preferuje tekst natywnie w grze. Według jego ustalenia modyfikacje ograniczone
+wyłącznie do tekstu są dozwolone; tego wyjątku nie potwierdziliśmy niezależnie.
+Nakładka ma być wariantem rezerwowym. Nie wykorzystujemy gotowego polskiego
+tłumaczenia Arimy ani innych niezweryfikowanych gotowych zwrotek; wskazane
+projekty badamy jako źródła informacji technicznych.
 
 ## Rekomendacja: Steam jako pierwsza wersja referencyjna
 
@@ -49,7 +51,7 @@ ani nie uruchomiono binarnego instalatora, plików gry ani jego tłumaczeń.
 - Funkcja nazywana przez autora „injectorem” w przejrzanym kodzie obserwuje i
   podmienia **plik** podczas startu; nie stwierdziliśmy tam wstrzykiwania kodu
   do pamięci gry. Nie przejmujemy tego mechanizmu ani nie zalecamy jego użycia:
-  próba utrzymania zmian mimo weryfikacji wymaga wyjaśnienia z wydawcą.
+  nie planujemy podmiany podczas startu gry ani obchodzenia weryfikacji plików.
 - Kod tworzy kopię plików, lecz pobiera bezpośrednio do celu i działa na wielu
   plikach kolejno. Widoczne są ryzyka niepełnej operacji, starego backupu po
   aktualizacji oraz porównywania rozmiaru zamiast tożsamości pliku. To powód,
@@ -85,20 +87,25 @@ regulaminem gry ani bezpieczeństwa konta nie sprawdziliśmy.
 ## Przyjęty kierunek
 
 1. **Główna droga:** niezależny obieg tekstów → własne tłumaczenie → walidacja →
-   dozwolona integracja z grą, jeśli zostanie potwierdzona. Kontrola wersji,
-   kontekstu, placeholderów, polskich znaków, kopii i odtwarzania to wymagania,
-   nie działające jeszcze funkcje.
+   zmiana wartości tekstowych przy wyłączonej grze. Bez wstrzykiwania kodu,
+   ingerencji w pamięć, obchodzenia zabezpieczeń i podmiany podczas startu lub
+   rozgrywki. Tekst może być w kontenerze binarnym; fizyczny sposób jego
+   zapisania i zgodność wymagają rozpoznania. Kontrola wersji gry, polskich
+   znaków, kopii i przywracania to wymagania, nie działające jeszcze funkcje.
+   [Prototyp pakietu](TRANSLATION_BUNDLE.md) sprawdza jedynie jawnie zadeklarowane
+   literały i nie obsługuje plików gry.
 2. **Model:** wybrać po poznaniu źródła, kontekstu, kosztu i zasad przesyłania
    danych. Porównać wyniki na małej, legalnie użytej próbce oraz ustalić
    słownik nazw i przegląd jakości; nie wysyłać tekstów gry do dostawców bez
    ustalenia praw i sposobu przetwarzania. Nie zakładamy dostępności lub
    automatycznego powiązania angielskiej i chińskiej wersji.
-3. **Plan B:** osobny wariant OCR + nakładka, gdy nie da się uzgodnić natywnej
-   integracji. Wymaga profilu WWM, danych tłumaczenia, oceny prywatności i zasad;
-   też nie daje gwarancji bezpieczeństwa konta ani pełnego pokrycia.
+3. **Plan B:** osobny wariant OCR + nakładka, gdy natywna integracja okaże się
+   niemożliwa w przyjętym zakresie. Wymaga profilu WWM, danych tłumaczenia oraz
+   oceny prywatności i zasad; nie daje gwarancji bezpieczeństwa konta ani
+   pełnego pokrycia.
 4. W obu wariantach dynamicznie generowany tekst NPC może nie występować w
    statycznym korpusie. Żaden wariant nie zapewnia dziś kompletności czytanki.
 
-Ograniczenia oficjalnych warunków oraz bramka przed testami na kliencie:
-[FEASIBILITY.md](FEASIBILITY.md). Gotowy do dostosowania, **niewysłany** szkic
-pytania do wydawcy: [PUBLISHER_PERMISSION.md](PUBLISHER_PERMISSION.md).
+Oficjalne warunki, ustalenie właściciela i ograniczenia testów na kliencie:
+[FEASIBILITY.md](FEASIBILITY.md). Opcjonalny, **niewysłany** szkic pytania do
+wydawcy: [PUBLISHER_PERMISSION.md](PUBLISHER_PERMISSION.md).

@@ -17,11 +17,14 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
   związane z trybami sieciowymi i zabezpieczeniami.
 - Zacząć od metadanych: nazw, rozmiarów i identyfikatorów wersji; ustalić,
   co raport może bezpiecznie ujawniać. Nie zakładać silnika ani formatów.
-- Dla prób wybrać minimalny potrzebny materiał, ustalić prawa, kryterium
-  powodzenia i sposób bezpiecznego testu. Nie obchodzić zabezpieczeń/anti-cheat.
-- **Wynik:** potwierdzone fakty i niewiadome, ocena ryzyka, warianty
-  rozwiązania oraz decyzja o dalszej pracy. Brak zgody lub dowodów to blokada,
-  a nie zgoda domniemana.
+- Właściciel zgłosił, że według jego ustalenia zmiany wyłącznie tekstowe są
+  dozwolone, i wybrał taki kierunek. Nie potwierdziliśmy niezależnie wyjątku w
+  warunkach wydawcy; kontakt w celu wyjaśnienia pozostaje opcjonalny.
+- Dla przyszłych prób ustalić minimalny materiał, prawa, kryterium powodzenia,
+  konkretny plan, kopię i przywracanie. Do tego czasu pracować na syntetycznych
+  danych. Nie obchodzić zabezpieczeń/anti-cheat.
+- **Wynik:** potwierdzone fakty oddzielone od ustaleń właściciela i niewiadomych,
+  ocena ryzyka oraz plan odpowiadający uzgodnionemu kierunkowi.
 
 ## 2. Lokalizacja i ekstrakcja tekstów
 
@@ -36,7 +39,10 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 
 ## 3. Pakiet dla tłumacza i bezpieczny import
 
-- Przygotować czytelny pakiet z kontekstem, uzgodnionym źródłem/referencjami,
+- Jest [prototyp znormalizowanego pakietu JSON](TRANSLATION_BUNDLE.md) na
+  fikcyjnych danych: tworzenie szablonu i walidacja zwrotki, bez zapisu plików.
+  Nie jest ekstraktorem, importerem ani formatem potwierdzonym dla gry.
+- Przygotować docelowo czytelny pakiet z kontekstem, uzgodnionym źródłem/referencjami,
   identyfikatorami, słownikiem, regułami tokenów i ograniczeniami tam, gdzie są
   zmierzone. Format uzgodnić z tłumaczem, nie narzucać formatu SRW Y.
 - Właściciel chce niezależnej pracy z dobrym modelem, nie gotowej cudzej
@@ -51,12 +57,17 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 ## 4. Integracja z grą i instalacja
 
 - Preferowany jest natywny tekst w grze; nakładka OCR jest rezerwą, nie gotową
-  alternatywą. Metodę wybrać dopiero po rozpoznaniu formatu i zasad gry.
-  Patcher działa na kopii lub własnych plikach użytkownika, po świadomej
-  zgodzie; musi sprawdzać wersję, utrzymywać weryfikowane kopie i umożliwić
-  przywrócenie. Nie obchodzić kontroli integralności.
-- Testować najpierw na syntetycznych danych, potem na bezpiecznie uzgodnionej
-  próbce. Nie rozprowadzać oryginalnych ani zmodyfikowanych plików gry.
+  alternatywą. Zakres to zmiana wartości tekstowych **przy wyłączonej grze**,
+  bez modyfikowania kodu wykonywalnego, pamięci, zabezpieczeń ani podmieniania
+  plików w trakcie uruchamiania lub rozgrywki. Tekst może być przechowywany w
+  kontenerze binarnym; fizyczny sposób zapisu trzeba dopiero rozpoznać i uzgodnić.
+- Przyszły proces musi sprawdzać wersję, utrzymywać weryfikowane kopie i mieć
+  przetestowane przywracanie. Nie obchodzić kontroli integralności ani
+  automatycznego przywracania plików; jeśli klient cofa zmianę, jest to
+  niepowodzenie testu, nie powód do obejścia.
+- Testować najpierw na syntetycznych danych, a na rzeczywistej instalacji
+  dopiero po uzgodnieniu konkretnego planu, kopii i przywracania. Nie
+  rozprowadzać oryginalnych ani zmodyfikowanych plików gry.
 - **Wynik:** powtarzalny proces budowy i cofnięcia, bezpieczna odmowa przy
   niezgodnym buildzie oraz osobno udokumentowany wynik rzeczywistego testu.
 

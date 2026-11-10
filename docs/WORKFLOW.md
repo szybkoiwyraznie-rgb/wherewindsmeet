@@ -26,13 +26,17 @@ test syntetyczny, test na kopii oraz test w prawdziwej grze.
 
 | Krok | Wejście → wynik | Bramka przed kolejnym krokiem |
 |---|---|---|
-| Rozpoznanie | platforma i build → raport faktów i ryzyk | zasady, prawa i bezpieczny sposób pracy wyjaśnione |
+| Rozpoznanie | platforma i build → raport faktów i ryzyk | zakres, ryzyka i konkretny plan pracy z kopią i przywracaniem |
 | Ekstrakcja | własne pliki gry → rekordy i manifest źródła | znana wersja, identyfikatory, kontekst i policzony zakres |
 | Przekazanie | rekordy → pakiet dla tłumacza | czytelne instrukcje, manifest wersji, uzgodniony format |
 | Zwrotka | partię tłumacza → zweryfikowane tłumaczenia | niezmienione źródła, poprawne znaczniki i atomowy import |
 | Instalacja | zweryfikowane dane + własna zgodna gra → lokalny patch | kontrola builda, kopia, przywracanie i testy |
 | Czytanka | przyjęte tłumaczenie + struktura źródła → dokument | dowody kolejności, jawne luki i raport |
 | Aktualizacja | stary i nowy build → plan różnic | niepewne dopasowania i zmiany źródła wymagają przeglądu |
+
+Obecny [prototyp pakietu JSON](TRANSLATION_BUNDLE.md) realizuje tylko
+przygotowanie szablonu i walidację fikcyjnej zwrotki. Nie zapisuje plików,
+nie importuje tekstu do gry i sprawdza tylko zadeklarowane literały.
 
 Format, języki, sposób instalacji i praktyki współpracy z tłumaczem wymagają
 osobnych decyzji. Manifest ma pozwolić ustalić pochodzenie oraz wykryć zmianę

@@ -1,4 +1,9 @@
-# Szkic zapytania do wydawcy — NIE WYSŁANO
+# Opcjonalny szkic zapytania do wydawcy — NIE WYSŁANO
+
+Właściciel poinformował, że według jego sprawdzenia dozwolone są modyfikacje
+czystego tekstu. Nie przedstawił dokumentu wydawcy i nie potwierdziliśmy
+niezależnie zakresu tego wyjątku. Ten szkic jest opcjonalny: nie trzeba go
+wysyłać, aby kontynuować pracę na próbkach syntetycznych.
 
 Celem jest ustalenie, co wydawca dopuszcza, a nie uzyskanie ogólnej obietnicy
 bezpieczeństwa konta. [Oficjalny poradnik pomocy](https://www.wherewindsmeetgame.com/news/official/GlobalLaunch/CrossPlatform.html)
@@ -24,9 +29,9 @@ what you authorize and under what conditions.
 2. May I provide excerpts to a third-party machine-translation or AI service for
    that purpose? If so, are there confidentiality or other requirements?
 3. Is there an approved way to display my own Polish text inside the game by
-   replacing or supplying localization data to an otherwise unmodified client?
-   I would not bypass security or integrity checks, inject code, or read or
-   modify game memory.
+   changing only localization text while the game is stopped? I would not
+   replace files during startup or gameplay, bypass security or integrity
+   checks, inject code, modify executables, or read or modify game memory.
 4. May I distribute an installer and translation-only data, without distributing
    original game assets? Please clarify any permitted scope and attribution.
 5. If native localization changes are not permitted, are screen-capture/OCR

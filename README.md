@@ -7,15 +7,19 @@ polska wersja w grze. W planie są również czytanka i obsługa aktualizacji gr
 **Stan: rozpoznanie i organizacja projektu.** Celem jest Windows; jako pierwszą
 wersję referencyjną rekomendujemy Steam. Właściciel nie zainstalował jeszcze gry.
 Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
-planem awaryjnym. Nie ma jeszcze ekstraktora, pakietu dla tłumacza, patchera
-ani czytanki; działania w grze nie sprawdzono.
+planem awaryjnym. Właściciel wskazał kierunek ograniczony do zmian tekstu przy
+wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmian.
+Powstał [prototyp pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) na wymyślonych
+danych, ale nie ma ekstraktora, importera do gry, instalatora ani czytanki;
+działania w grze nie sprawdzono.
 
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
-  [raport metadanych](docs/INVENTORY.md) oraz [sposób pracy](docs/WORKFLOW.md)
+  [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md)
+  oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)
@@ -33,8 +37,8 @@ python tools/run_tests.py
 ```text
 .github/       CI i szablony współpracy
 docs/          status, decyzje, plan i dziennik eksperymentów
-tools/         kontrole, ograniczony raport metadanych i eksperyment syntetyczny
-tests/         testy bez plików gry
+tools/         kontrole, raport metadanych i prototypy na fikcyjnych danych
+tests/         testy i syntetyczne przykłady bez plików gry
 local/         prywatny katalog roboczy, ignorowany przez Git
 build/         lokalne wyniki, ignorowane przez Git
 ```

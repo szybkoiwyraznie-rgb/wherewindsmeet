@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "source_id": "synthetic-demo-v1",
+  "source_digest": "ad3f5dafbd20d4eed6b0a1e7a129b9d7a7e7722cb0eebc752138b70565c94b01",
+  "items": [
+    {
+      "id": "demo/greeting",
+      "source": "Hello, {hero}! You have {count} stars.",
+      "context": "Invented greeting, not text from any game.",
+      "protected_tokens": [
+        "{count}",
+        "{hero}"
+      ],
+      "source_sha256": "eedd2de37d586445bf09831e640bb171acef4e71a2e1f9c3cd481cc02499917e",
+      "translation": "Witaj, {hero}! Masz {count} gwiazd."
+    },
+    {
+      "id": "demo/menu",
+      "source": "Line A<br>Line B<br>",
+      "context": "Invented menu with a repeated literal marker.",
+      "protected_tokens": [
+        "<br>"
+      ],
+      "source_sha256": "8d9fb5691f9aee3d385e5122377070ed15f4b5aebfb6701317773f86b6b1ae8c",
+      "translation": null
+    }
+  ]
+}

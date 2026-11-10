@@ -26,10 +26,11 @@ W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
 Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
-metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); przed użyciem na
-instalacji gry należy ustalić warunki i uprawnienia. Opcjonalne odtworzenie
-zewnętrznego eksperymentu syntetycznego ma osobne zależności i ostrzeżenia w
-[dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
+metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); zakres jego
+późniejszego użycia na instalacji trzeba będzie uzgodnić. Prototyp pakietu
+na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md).
+Opcjonalne odtworzenie zewnętrznego eksperymentu syntetycznego ma osobne
+zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
 
 ## Katalogi i wejścia
 

@@ -3,8 +3,10 @@
 `tools/inspect_localization.py` jest małym narzędziem rozpoznawczym, nie
 ekstraktorem ani patchem. Powstało na podstawie publicznie opisanych nazw plików
 z [FEASIBILITY.md](FEASIBILITY.md); zgodność z instalacją właściciela **nie
-została sprawdzona**. Przed uruchomieniem na rzeczywistej grze należy wyjaśnić
-warunki gry, potrzebne uprawnienia i uzgodnić dalsze działanie.
+została sprawdzona**. Na razie nie prosimy o uruchamianie go na instalacji.
+Ewentualny zakres takiej inwentaryzacji uzgodnimy po instalacji; ustalenie
+właściciela i nierozstrzygnięty zakres warunków opisuje
+[FEASIBILITY.md](FEASIBILITY.md).
 
 ## Co robi, a czego nie robi
 

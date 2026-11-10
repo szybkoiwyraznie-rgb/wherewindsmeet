@@ -19,6 +19,13 @@ Właściciel wybrał niezależne tłumaczenie: nie używamy gotowej polonizacji 
 ani innych niezweryfikowanych cudzych zwrotek. Przed przekazaniem tekstów gry
 zewnętrznemu modelowi ustalić prawa i zasady przetwarzania danych.
 
+[Prototyp pakietu](TRANSLATION_BUNDLE.md) jest obecnie testowany tylko na
+wymyślonych danych. Jego `prepare` wypisuje pełny tekst źródła i kontekst na
+standardowe wyjście: nie uruchamiaj go na tekstach gry ani nie kieruj prywatnych
+wyników do publicznych logów, PR lub śledzonych plików. Raport walidacji nie
+zawiera tekstów ani ścieżek, ale zawiera wyliczone z danych skróty, które też
+mogą służyć jako identyfikatory; przed udostępnieniem oceń ich wrażliwość.
+
 Duże dane i generowane archiwa nie trafiają do Git bez uzasadnionej potrzeby.
 Kontrola repozytorium odrzuca obecnie pliki większe niż 10 MiB w indeksie. Jeśli
 w przyszłości większy, niebinarny materiał okaże się niezbędny, najpierw

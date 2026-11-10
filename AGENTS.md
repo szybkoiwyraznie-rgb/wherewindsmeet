@@ -45,10 +45,20 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   referencyjny, ale właściciel nie zainstalował jeszcze gry. Build, region i
   język źródłowy pozostają nieustalone. Publiczne informacje o grze i istotne
   ograniczenia warunków są w `docs/FEASIBILITY.md` i `docs/WINDOWS_OPTIONS.md`.
-  Nie obiecuj zgodności z aktualizacjami ani bezpieczeństwa konta. Przed pracą
-  na prawdziwej grze wyjaśnij zasady i ryzyko; nie obchodź zabezpieczeń ani
-  anti-cheat. Nie modyfikuj instalacji użytkownika bez uzgodnionego planu,
-  kopii i sposobu przywrócenia.
+  Nie obiecuj zgodności z aktualizacjami ani bezpieczeństwa konta. Nie obchodź
+  zabezpieczeń ani anti-cheat. Nie modyfikuj instalacji użytkownika ani nie
+  żądaj rzeczywistych plików gry bez uzgodnionego planu, kopii i sprawdzonego
+  sposobu przywrócenia.
+- Właściciel poinformował, że według jego ustalenia dozwolone są modyfikacje
+  ograniczone do czystego tekstu; nie przedstawił dokumentu wydawcy, a zakresu
+  wyjątku nie potwierdziliśmy niezależnie. Przyjmij ten kierunek bez proszenia
+  o ponowne potwierdzenie samej decyzji: tylko zmiany wartości tekstowych przy
+  wyłączonej grze, bez wstrzykiwania, ingerencji w pamięć, pliki wykonywalne lub
+  zabezpieczenia i bez podmiany w trakcie startu lub działania klienta. Tekst
+  może być w kontenerze binarnym; szczegóły ewentualnego zapisu wymagają planu,
+  a nie założenia, że istnieje zwykły plik `.txt`. Gdy klient przywraca plik,
+  nie obchodź tego mechanizmu. Kontakt z wydawcą jest opcjonalny; nie jest
+  dowodem, że konto jest bezpieczne.
 - Właściciel chce samodzielnego tłumaczenia wspomaganego dobrym modelem oraz
   preferuje tekst natywnie w grze; nakładka to wariant rezerwowy. Nie używaj
   gotowego tłumaczenia Arimy ani innych niezweryfikowanych gotowych zwrotek;
@@ -59,7 +69,9 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   `docs/STATUS.md` ma wskazywać aktualny stan i następny krok. Nie zgłaszaj
   testu w grze, Windows ani skuteczności patcha bez odpowiednich dowodów.
 - Przyszły pakiet tłumacza, import, patcher i czytanka muszą mieć wiązanie z
-  wersją źródła, testy na danych syntetycznych i jawne raporty. Nie dopasowuj
+  wersją źródła, testy na danych syntetycznych i jawne raporty. Prototyp
+  `docs/TRANSLATION_BUNDLE.md` sprawdza tylko wymyślony format JSON i jawnie
+  podane literały; nie jest ekstraktorem ani importerem gry. Nie dopasowuj
   niepewnego tłumaczenia ani kolejności zdarzeń przez zgadywanie. Błędy danych,
   tokenów lub niezgodności wersji mają zatrzymywać operację, nie powodować
   częściowego cichego zapisu.

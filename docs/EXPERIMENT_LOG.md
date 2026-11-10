@@ -189,3 +189,32 @@ cudzego kodu ani nie wymagają tej procedury.
   nie sprawdzono zgodności zabezpieczeń ani praw. Przygotowano niewysłany
   [szkic zapytania do wydawcy](PUBLISHER_PERMISSION.md); kodu i danych obcych
   projektów nie skopiowano do repozytorium.
+
+## 2026-11-10 — zakres tekstowy i prototyp zwrotki
+
+- **Ustalenie właściciela:** według jego sprawdzenia dozwolone są zmiany
+  ograniczone do czystego tekstu; wybrał ten kierunek zamiast ingerencji w
+  pamięć lub podmiany podczas gry. Nie przedstawiono dokumentu wydawcy i nie
+  potwierdziliśmy niezależnie zakresu wyjątku. Szczegóły i ograniczenia:
+  [FEASIBILITY.md](FEASIBILITY.md).
+- **Wejście:** wyłącznie 3 wymyślone rekordy w
+  `tests/fixtures/synthetic_translation_source.json`: 631 B, SHA-256 surowego
+  pliku `64f25d3bad5d654aa7c4306915f0331b833853ca68f9a69745fabc8390d5b32e`.
+  Fikcyjna częściowa zwrotka ma 857 B, SHA-256 surowego pliku
+  `82e971706d5eea242d81e1bcd74b29679c2f5ba59b030b904b53c0615f052201`.
+  Żaden tekst nie pochodzi z gry. Kanoniczny skrót źródła prototypu to
+  `ad3f5dafbd20d4eed6b0a1e7a129b9d7a7e7722cb0eebc752138b70565c94b01`;
+  nie jest to hash pliku ani identyfikator buildu gry.
+- **Metoda:** polecenia `prepare` i `validate` oraz repozytoryjne
+  `python3 tools/run_tests.py` na Linux/Python 3.11.2. Sprawdzono m.in. brak
+  zmian wejścia, hashe, zduplikowane identyfikatory, przestarzałe źródło,
+  liczbę zadeklarowanych literałów, niepoprawny Unicode i niepełne zwrotki.
+  Test kombinacji z alfabetu `ab` (tekst do 6, literał do 3 znaków) wykrył
+  błąd liczenia nakładającego się `aba`; poprawiono go i ponowiono kontrolę.
+- **Wynik:** raport dla zwrotki: **3** rekordy źródła, **1** przetłumaczony,
+  **1** nieprzetłumaczony i **1** pominięty. Lokalnie **60/60 testów**, bez
+  pominięć. Narzędzie wypisuje wynik, samo nie zapisuje plików.
+- **Ograniczenie:** walidowane są tylko jawnie zadeklarowane literały, nie
+  wszystkie potencjalne znaczniki ani semantyka gry. Brak ekstrakcji,
+  importu, testu na rzeczywistej grze, zgodności buildu i gwarancji konta.
+  Windows/Python 3.12 należy sprawdzić w CI dla bieżącego commita.

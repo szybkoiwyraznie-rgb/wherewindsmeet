@@ -13,6 +13,14 @@ rosnącym `AGENTS.md`.
 - Preferuje własne tłumaczenie z dobrym modelem oraz tekst natywnie w grze;
   nakładka to plan awaryjny. Nie wykorzystujemy gotowego polskiego tłumaczenia
   Arimy ani innych niezweryfikowanych gotowych zwrotek.
+- Właściciel poinformował, że według jego sprawdzenia zmiany czystego tekstu
+  są dozwolone, i wybrał wyłącznie zmiany wartości tekstowych przy wyłączonej
+  grze. Nie potwierdziliśmy niezależnie wyjątku w warunkach wydawcy; brak
+  gwarancji bezpieczeństwa konta. Bez wstrzykiwania, zmian pamięci/kodu,
+  podmiany podczas startu/gry ani obchodzenia zabezpieczeń.
+- Jest [prototyp pakietu tłumacza](TRANSLATION_BUNDLE.md): szablon i walidacja
+  fikcyjnych rekordów w wymyślonym JSON. Nie obsługuje formatu plików gry ani
+  nie wykonuje importu; wykrywa wyłącznie jawnie zadeklarowane literały.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md). Jego ustalenia dotyczące plików SRW nie są
   ustaleniami o Where Winds Meet.
@@ -23,10 +31,10 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 34 testy lokalne; wcześniejsze 4/4 konfiguracje CI przeszły dla `3a0a60c`. Wyniki bieżącego commita sprawdzać osobno. |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Windows wybrano; Steam rekomendowano. Instalacja, build, uprawnienia i zgodność narzędzi pozostają niepotwierdzone; jest [narzędzie metadanych](INVENTORY.md). |
+| Repozytorium i workflow | 60 testów lokalnych; 4/4 konfiguracje CI przeszły dla `aa5af09`. Wyniki bieżącego commita sprawdzać osobno. |
+| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Windows wybrano; Steam rekomendowano. Instalacja, build, zakres warunków i zgodność narzędzi pozostają niepotwierdzone; jest [narzędzie metadanych](INVENTORY.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
-| Pakiet tłumacza i import | Nie powstały. |
+| Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu, atomowego zapisu i integracji z grą. |
 | Patcher, instalacja i przywracanie | Nie powstały; `runtime_tested: false`. |
 | Czytanka i aktualizacje gry | Planowane; brak implementacji. |
 
@@ -37,8 +45,9 @@ rosnącym `AGENTS.md`.
 2. Język źródłowy/referencyjny, wybór modelu, koszty, prawo i warunki
    przetwarzania oraz publikacji tekstu gry. Nie używamy cudzej gotowej
    polonizacji jako źródła tłumaczenia.
-3. Wpływ poznanych warunków gry i zabezpieczeń na wybraną edycję oraz
-   zgoda/bezpieczny sposób testowania zmian; patrz [FEASIBILITY.md](FEASIBILITY.md).
+3. Wpływ warunków gry i zabezpieczeń na wybraną edycję oraz techniczna
+   wykonalność zmian wyłącznie tekstowych; ustalenie właściciela nie zostało
+   przez nas niezależnie potwierdzone. Patrz [FEASIBILITY.md](FEASIBILITY.md).
 4. Formaty w wydaniu właściciela, aktywne warstwy, powierzchnie tekstowe,
    polskie glify i ograniczenia interfejsu — raporty społeczności wymagają
    weryfikacji.
@@ -47,8 +56,11 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Zalecić niemodyfikowaną instalację Steam, ustalić build i sposób postępowania
-wobec warunków gry; rozważyć [kontakt z wydawcą](PUBLISHER_PERMISSION.md).
-Dopiero po uzgodnieniu, jeśli to potrzebne, poprosić o minimalny raport
-metadanych. Kontynuować projekt na próbkach syntetycznych; nie żądać całej gry
-ani poświadczeń. Szczegóły w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
+Kontynuować narzędzia i testy na próbkach syntetycznych: m.in. dokładniejsze
+reguły tokenów po poznaniu formatu oraz przyszły bezpieczny import. Właściciel
+może zainstalować niemodyfikowaną grę ze Steam; po instalacji przydadzą się
+wersja i Build ID. Przed rzeczywistymi plikami uzgodnić konkretny plan, kopię
+oraz przywracanie, a dopiero jeśli to potrzebne — minimalny raport metadanych.
+Nie żądać całej gry ani poświadczeń. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md)
+jest opcjonalny; wybranego kierunku nie trzeba ponownie potwierdzać. Szczegóły
+w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
