@@ -17,7 +17,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | Przygotowywane w pierwszym PR. |
+| Repozytorium i workflow | Przygotowane w pierwszym PR; 15 testów lokalnych i 4/4 konfiguracje CI przeszły dla commita `bbd11be`. Wyniki kolejnych commitów sprawdzać osobno. |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Nie rozpoczęto. |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Nie powstały. |
@@ -34,6 +34,8 @@ rosnącym `AGENTS.md`.
    zabezpieczenia oraz bezpieczny, dozwolony sposób testowania zmian.
 4. Silnik, formaty, dostępne narzędzia, powierzchnie tekstowe, polskie glify
    i ograniczenia interfejsu — wszystko wymaga dowodu, nie analogii do SRW.
+5. Licencja własnego kodu, dokumentacji i tłumaczeń. Nie wybrano jej i nie
+   dodano pliku `LICENSE`.
 
 ## Następny krok
 

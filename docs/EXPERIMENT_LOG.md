@@ -34,3 +34,15 @@ sekretów ani identyfikatorów plików. Same planowane testy nie są wynikami.
 - **Ograniczenie:** nie jest to skan zawartości pod kątem sekretów ani praw do
   danych. Windows, Python 3.12 i wykonanie na GitHub Actions nie były częścią
   lokalnej próby; ich wyniki trzeba sprawdzić osobno.
+
+## 2026-11-10 — GitHub Actions: macierz kontroli
+
+- **Wejście:** repozytorium na commicie
+  `bbd11be8b7947181f744400891d8869068f1e7ba`; publiczny przebieg CI
+  [42842464649](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42842464649).
+- **Wynik:** 4/4 zadania zakończone sukcesem: `ubuntu-latest` i
+  `windows-latest`, każde z Pythonem 3.11 i 3.12. Uruchomiono kontrolę indeksu
+  oraz repozytoryjny zestaw testów; nie korzystano z plików gry.
+- **Ograniczenie:** to test narzędzi repozytorium, nie gry, patchera ani
+  instalacji. Przebieg dotyczy wskazanego commita; kolejne commity mają własne
+  wyniki CI.

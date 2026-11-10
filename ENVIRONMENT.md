@@ -7,9 +7,9 @@
   standardowej; nie trzeba instalować `pip`-em bibliotek ani mieć plików gry.
 - GitHub CLI (`gh`) jest potrzebne do obsługi PR, nie do uruchomienia testów.
 
-Lokalnie sprawdzono Linux i Python 3.11. CI jest przygotowane również dla
-Windows oraz Pythona 3.12; wynik konkretnego przebiegu należy sprawdzić w
-GitHub Actions, nie zakładać go z samej konfiguracji.
+Lokalnie sprawdzono Linux i Python 3.11. W GitHub Actions przeszły również
+kontrole na Windows i Pythonie 3.12 (szczegóły w `docs/EXPERIMENT_LOG.md`).
+Wynik konkretnego kolejnego commita należy sprawdzić osobno w GitHub Actions.
 
 ## Kontrole z katalogu repozytorium
 

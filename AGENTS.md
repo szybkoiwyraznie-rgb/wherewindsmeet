@@ -13,8 +13,9 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
    ponownym badaniem problemów już opisanych w źródłach.
 2. Sprawdź bieżącą gałąź, `git status` i istniejący otwarty PR. Nie nadpisuj
    cudzych lub niezacommitowanych zmian. W Arena pracuj i wypychaj **wyłącznie
-   na gałęzi przydzielonej bieżącej sesji**; nie zakładaj, że stara nazwa
-   gałęzi z dokumentacji nadal obowiązuje.
+   na gałęzi przydzielonej bieżącej sesji**, nie na `main`; nie przełączaj jej
+   ani nie twórz innej. Nie zakładaj, że stara nazwa gałęzi z dokumentacji nadal
+   obowiązuje.
 3. Jeśli nie ma PR z tej gałęzi, przygotuj najmniejszy sensowny checkpoint,
    wypchnij go i otwórz roboczy PR przed większą pracą. Wykorzystaj istniejący
    PR, jeśli jest. Commituj i wypychaj każdy spójny fragment pracy; przed
