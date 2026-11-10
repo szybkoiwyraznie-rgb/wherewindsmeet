@@ -23,6 +23,7 @@ tekstów gry, kluczy, formatów ani szczegółowych decyzji SRW Y. Wybór język
 
 ## Where Winds Meet
 
-Badanie wcześniejszych narzędzi, formatów oraz zasad gry **nie zostało jeszcze
-przeprowadzone**. Przyszłe ustalenia, źródła, licencje i daty zapisywać tutaj
-z rozróżnieniem faktów i hipotez.
+Pierwszy przegląd oficjalnych warunków i wcześniejszych narzędzi zapisano w
+[FEASIBILITY.md](FEASIBILITY.md), wraz z przypiętymi commitami, licencjami,
+ograniczeniami i rozróżnieniem deklaracji społeczności od naszych testów. Żadne
+narzędzie ani dane gry nie zostały skopiowane do repozytorium.

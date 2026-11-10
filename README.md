@@ -11,7 +11,8 @@ wersja i język źródłowy tłumaczenia wymagają ustalenia.
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
-- [Plan etapów](docs/ROADMAP.md) i [sposób pracy](docs/WORKFLOW.md)
+- [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md)
+  oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)

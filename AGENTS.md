@@ -8,8 +8,9 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 ## Początek każdej sesji
 
 1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
-   `docs/ROADMAP.md`, `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie
-   wpisy w `docs/EXPERIMENT_LOG.md`. Zajrzyj do `docs/PRIOR_ART.md` przed
+   `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WORKFLOW.md`,
+   `docs/DATA_POLICY.md` oraz ostatnie wpisy w `docs/EXPERIMENT_LOG.md`.
+   Zajrzyj do `docs/PRIOR_ART.md` przed
    ponownym badaniem problemów już opisanych w źródłach.
 2. Sprawdź bieżącą gałąź, `git status` i istniejący otwarty PR. Nie nadpisuj
    cudzych lub niezacommitowanych zmian. W Arena pracuj i wypychaj **wyłącznie
@@ -39,9 +40,10 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   katalog gry, dane logowania ani pliki, które nie są konieczne. Pliki wrażliwe
   trzymaj lokalnie; nie umieszczaj prywatnych linków ani identyfikatorów w
   publicznych opisach i logach.
-- Platforma, wydanie, język źródłowy, budowa danych, tryby sieciowe i ewentualne
-  zabezpieczenia nie są jeszcze ustalone. Nie obiecuj zgodności z aktualizacjami
-  ani bezpieczeństwa konta. Przed próbami modyfikacji sprawdź zasady gry i ryzyko;
+- Platforma, wydanie i język źródłowy właściciela pozostają nieustalone;
+  publiczne informacje o grze i istotne ograniczenia warunków są w
+  `docs/FEASIBILITY.md`. Nie obiecuj zgodności z aktualizacjami ani
+  bezpieczeństwa konta. Przed pracą na prawdziwej grze wyjaśnij zasady i ryzyko;
   nie obchodź zabezpieczeń ani anti-cheat. Nie modyfikuj instalacji użytkownika
   bez uzgodnionego planu, kopii i sposobu przywrócenia.
 - Oddzielaj fakty, hipotezy i niewiadome. Dla badań zapisuj wejście, wersję,

@@ -13,12 +13,14 @@ rosnącym `AGENTS.md`.
   [PRIOR_ART.md](PRIOR_ART.md). Jego ustalenia dotyczące plików SRW nie są
   ustaleniami o Where Winds Meet.
 - Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
-  W repozytorium nie ma danych gry ani tłumaczenia.
+  Publiczny [przegląd wykonalności](FEASIBILITY.md) wskazuje istniejące
+  narzędzia oraz ograniczenia oficjalnych warunków gry. Nie badano jeszcze
+  wydania właściciela; w repozytorium nie ma danych gry ani tłumaczenia.
 
 | Obszar | Stan |
 |---|---|
 | Repozytorium i workflow | Przygotowane w pierwszym PR; 15 testów lokalnych i 4/4 konfiguracje CI przeszły dla commita `bbd11be`. Wyniki kolejnych commitów sprawdzać osobno. |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Nie rozpoczęto. |
+| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Pierwszy przegląd publicznych źródeł gotowy; platforma właściciela, uprawnienia i zgodność narzędzi pozostają nieustalone. |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Nie powstały. |
 | Patcher, instalacja i przywracanie | Nie powstały; `runtime_tested: false`. |
@@ -30,17 +32,16 @@ rosnącym `AGENTS.md`.
    identyfikatora builda oraz obsługiwany zakres projektu.
 2. Język źródłowy i ewentualne języki referencyjne dla tłumacza; zasady
    korzystania z istniejących tłumaczeń i praw do publikacji tekstu gry.
-3. Tryby sieciowe, warunki korzystania z gry, integralność klienta i ewentualne
-   zabezpieczenia oraz bezpieczny, dozwolony sposób testowania zmian.
-4. Silnik, formaty, dostępne narzędzia, powierzchnie tekstowe, polskie glify
-   i ograniczenia interfejsu — wszystko wymaga dowodu, nie analogii do SRW.
+3. Wpływ poznanych warunków gry i zabezpieczeń na wybraną edycję oraz
+   zgoda/bezpieczny sposób testowania zmian; patrz [FEASIBILITY.md](FEASIBILITY.md).
+4. Silnik i formaty w wydaniu właściciela, powierzchnie tekstowe, polskie glify
+   i ograniczenia interfejsu — raporty społeczności wymagają weryfikacji.
 5. Licencja własnego kodu, dokumentacji i tłumaczeń. Nie wybrano jej i nie
    dodano pliku `LICENSE`.
 
 ## Następny krok
 
-Po ustaleniu platformy i wydania przeprowadzić osobny etap rozpoznawczy:
-przejrzeć dostępne źródła, ocenić warunki i ryzyko, a następnie — tylko jeśli
-potrzeba — poprosić o minimalny raport metadanych z instalacji. Najpierw
-udokumentować pytania i kryteria powodzenia; nie żądać całej gry. Szczegóły
-w [planie](ROADMAP.md).
+Ustalić platformę, wydanie i sposób postępowania wobec ograniczeń warunków gry.
+Dopiero potem, jeśli to potrzebne i uzgodnione, poprosić o minimalny raport
+metadanych z instalacji. Nie żądać całej gry ani poświadczeń. Szczegóły w
+[planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).

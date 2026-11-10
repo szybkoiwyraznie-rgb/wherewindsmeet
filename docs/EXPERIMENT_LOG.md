@@ -46,3 +46,19 @@ sekretów ani identyfikatorów plików. Same planowane testy nie są wynikami.
 - **Ograniczenie:** to test narzędzi repozytorium, nie gry, patchera ani
   instalacji. Przebieg dotyczy wskazanego commita; kolejne commity mają własne
   wyniki CI.
+
+## 2026-11-10 — publiczne źródła Where Winds Meet
+
+- **Wejście:** karta Steam, warunki na oficjalnej stronie i EULA Steam oraz
+  opisane w [FEASIBILITY.md](FEASIBILITY.md) publiczne repozytoria; projekty
+  przypięto do ich dokładnych commitów. Pobrano wyłącznie dokumentację i kod
+  narzędzi do prywatnego przeglądu, bez cudzych paczek lub plików gry.
+- **Metoda:** porównanie zakresu, licencji i ograniczeń narzędzi oraz przegląd
+  oficjalnych informacji o językach, usługach sieciowych i zasadach.
+- **Wynik:** znaleziono 3 kandydatów do analizy formatów (2 GPL-3.0, 1 MIT),
+  projekty opisują mapy lokalizacji, osobną warstwę `_diff` i różnice między
+  klientami. Warunki gry zawierają istotne ograniczenia dla modyfikacji i
+  nieautoryzowanych narzędzi. Steam opisuje także dynamiczny tekst NPC.
+- **Ograniczenie:** to deklaracje ich autorów, nie test w naszej grze. Nie
+  uruchomiono narzędzi na rzeczywistych danych, nie potwierdzono klienta ani
+  zgodności formatu. Ocena praw i decyzja o dalszym sposobie pracy są otwarte.
