@@ -19,7 +19,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 34 testy lokalne; wcześniejsze 4/4 konfiguracje CI przeszły dla `87ce177`. Wyniki bieżącego commita sprawdzać osobno. |
+| Repozytorium i workflow | 34 testy lokalne; wcześniejsze 4/4 konfiguracje CI przeszły dla `68cb24a`. Wyniki bieżącego commita sprawdzać osobno. |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Przegląd publicznych źródeł i [narzędzie metadanych](INVENTORY.md) gotowe; platforma właściciela, uprawnienia i zgodność narzędzi pozostają nieustalone. |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Nie powstały. |

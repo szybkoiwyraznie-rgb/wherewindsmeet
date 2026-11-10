@@ -141,3 +141,20 @@ cudzego kodu ani nie wymagają tej procedury.
   wejściowej ani zawartości plików.
 - **Ograniczenie:** nie uruchomiono na grze użytkownika. Raport nie rozpoznaje
   wersji ani nie potwierdza praw, formatu czy kompletności źródeł.
+
+## 2026-11-10 — CI narzędzi syntetycznych i aktualizacja akcji
+
+- **Wejście:** commit `68cb24a4e29a4530d83d2daa118a4a887d5024b1`; bez
+  danych gry. [Przebieg PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42846767665)
+  uruchomił kontrole indeksu i 34 testy.
+- **Wynik:** 4/4 konfiguracje Ubuntu/Windows × Python 3.11/3.12 przeszły.
+  Runner ostrzegł, że stare akcje deklarują Node.js 20 i są uruchamiane pod
+  Node.js 24; zapowiedział też migrację obrazu `ubuntu-latest` do Ubuntu 26.
+- **Działanie:** zaktualizowano przypięte po SHA akcje
+  `actions/checkout` do v7.0.1 (`3d3c42e5aac5ba805825da76410c181273ba90b1`)
+  i `actions/setup-python` do v7.1.0 (`6d4fd22b20465ccc0f7354476588e8df7c9ca0e0`).
+  Zweryfikowano tagi w GitHub API oraz `runs.using: node24` w obu manifestach.
+  Wydania wymagają runnera co najmniej 2.327.1; CI używa runnerów GitHub-hosted.
+- **Ograniczenie:** udane wyniki powyżej dotyczą wcześniejszego commita;
+  aktualizację akcji trzeba zweryfikować we własnym przebiegu CI. Testy nadal
+  nie potwierdzają działania gry ani zgodności formatu.
