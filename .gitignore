@@ -1,0 +1,66 @@
+# Prywatne dane, oryginały gry i lokalne wyniki (w dowolnym podkatalogu).
+local/
+google_drive/
+build/
+dist/
+out/
+artifacts/
+downloads/
+
+# Sekrety i środowiska lokalne.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.venv/
+venv/
+.direnv/
+
+# Typowe binaria gry, archiwa, kopie, zapisy i zrzuty.
+# Rozszerzenie nie gwarantuje wykrycia wszystkich chronionych plików.
+*.pak
+*.ucas
+*.utoc
+*.pck
+*.bundle
+*.assetbundle
+*.assets
+*.ba2
+*.bsa
+*.bin
+*.dat
+*.exe
+*.dll
+*.so
+*.dylib
+*.iso
+*.img
+*.sav
+*.save
+*.dmp
+*.bak
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.tgz
+*.bz2
+*.xz
+*.zst
+*.log
+
+# Python, edytory i system operacyjny.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage/
+.cache/
+.DS_Store
+Thumbs.db
