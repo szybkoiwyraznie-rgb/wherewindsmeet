@@ -39,7 +39,8 @@ przygotowanie szablonu i walidację fikcyjnej zwrotki. [Audyt aktualizacji i
 model przywracania](UPDATES_AND_RESTORE.md) porównują fikcyjne wejścia, bez
 sprawdzania instalacji i bez jakiegokolwiek zapisu. Nie ma ekstraktora,
 importera tekstu do gry ani instalatora; walidacja sprawdza tylko
-zadeklarowane literały.
+zadeklarowane literały. Docelowy podział na dwie aplikacje Windows, linie
+aktualizacji i rotację ostatnich kopii: [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md).
 
 Format, języki, sposób instalacji i praktyki współpracy z tłumaczem wymagają
 osobnych decyzji. Manifest ma pozwolić ustalić pochodzenie oraz wykryć zmianę

@@ -271,3 +271,51 @@ cudzego kodu ani nie wymagają tej procedury.
   warstw i formatu WWM nie zweryfikowano. Brak ekstraktora/importera, pamięci
   zatwierdzeń, instalatora, rzeczywistego rollbacku oraz testów w grze;
   Windows i Python 3.12 należy sprawdzić w CI dla aktualnego commita.
+
+## 2026-11-10 — dwie aplikacje: skan, pojedyncze linie i rotacja kopii
+
+- **Ustalenie:** docelowo dwa osobne ZIP-y Windows z BAT-ami: audytor wszystkich
+  plików i patcher instalujący/cofający. Zadania do przekładu obejmują tylko
+  nowe teksty i zmienione linie, a w stanie ustalonym na każdy podmieniany plik
+  przypada jedna kopia ostatniego potwierdzonego oryginału. Szczegółowy plan i
+  granice obecnej implementacji: [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md).
+- **Przegląd SRW:** statycznie przeanalizowano przypięty
+  [opis patchera Y](https://github.com/szybkoiwyraznie-rgb/mtgcrawler/blob/76f8471d13f2cef8700c703ab109de1962e7b8e8/srw-y-translation/docs/OWNER_STEPS_S9_PATCHER.md)
+  i jego [generator](https://github.com/szybkoiwyraznie-rgb/mtgcrawler/blob/76f8471d13f2cef8700c703ab109de1962e7b8e8/srw-y-translation/tools/build_patcher.py).
+  Wnioski to osobne BAT-y, sprawdzenie hashy i kopii oraz konwencja kodowania;
+  to nie dowód zgodności z WWM. Nie kopiowano kodu ani danych. Dokument SRW
+  sam wskazuje brak rzeczywistego testu Windows dla tamtej implementacji.
+- **Odczytowy skaner:** na sztucznym drzewie czterech plików po zmianie jednego,
+  dodaniu jednego i usunięciu jednego otrzymano **2 niezmienione, 1 zmieniony,
+  1 dodany, 1 nieobecny**. SHA-256 liczony jest blokami; test wymusza wiele
+  odczytów i sprawdza bajty niezależnym `hashlib`. Równe rozmiary i znaczniki
+  czasu nie ukrywają zmiany bajtów. Niedostępny/zmieniający się plik, katalog,
+  limit, link lub reparse blokują porównanie; testowano też prywatność stdout,
+  inny katalog, nieprawidłowy baseline i brak zapisów. Prawdziwy link testowano
+  tam, gdzie system na niego pozwala; brak uprawnień zastępuje symulacja.
+- **Linie:** fikcyjne źródła 7 → 7 dały **2** zadania (`delta`): jedno nowe i
+  jedno zmienione. Zmiana samego kontekstu, powtórzenie pod nowym ID, puste
+  pola i niezweryfikowane przekłady trafiają do przeglądu; wcześniejsze jawne
+  `null`/nieznane stany są osobnym backlogiem (w przykładzie **2**). Test sceny
+  zawierającej 100 linii potwierdza, że do `delta` nie trafiają sąsiednie
+  niezmienione linie. Wymagane założenie pojedynczych pól i stabilnych ID nie
+  zostało zweryfikowane dla WWM; kontekst jest emitowany tak, jak go podano.
+- **Rotacja:** nowe fikcyjne wejście `synthetic_refresh_reference.json` ma
+  567 B i SHA-256 surowego pliku
+  `9f70a08a95c94c2bdc62a8b6d0becea30a4d85ddd3e048220ba16f54d226b239`.
+  Deklarowany nowy build, identyfikatory i 64-znakowe, wymyślone hashe są
+  zgodne z wcześniejszymi fixture: jedna obserwacja przypomina stary patch z
+  tym samym oryginałem, druga nowy oryginał. Model hipotetycznie zachowuje
+  pierwszą kopię i przygotowuje drugą do rotacji; **nie wykonuje kopii ani
+  usuwania**. Stary patch nie może stać się nową kopią. Jeden nieznany plik,
+  zła kopia lub rozbieżny build blokuje całość. Testy obejmują 24 kombinacje
+  oraz `write_authorized: false` i `old_backup_deletion_authorized: false`.
+- **Kontrole:** Linux/Python 3.11.2, `python3 tools/run_tests.py` — **145/145**,
+  bez pominięć; `python3 -m compileall -q tools tests` i `git diff --check`
+  przeszły. CI aktualnego commita, w tym Windows/Python 3.11 i 3.12, należy
+  sprawdzić osobno. Nie pobierano ani nie skanowano danych gry.
+- **Ograniczenia:** skaner nie wykrywa stanu launchera, nie uwierzytelnia
+  referencji, nie daje atomowego snapshotu i nie jest utwardzony na wyścigi;
+  limit to 250 000 wpisów i 64 MiB wyniku/manifestu. Modele JSON są ograniczone
+  do małych syntetycznych danych i nie tworzą patcha. Brak ekstraktora WWM,
+  gotowych archiwów, prawdziwej rotacji kopii, importu oraz testu w grze.

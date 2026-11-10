@@ -19,6 +19,7 @@ GUIDES = (
     "docs/PUBLISHER_PERMISSION.md",
     "docs/TRANSLATION_BUNDLE.md",
     "docs/UPDATES_AND_RESTORE.md",
+    "docs/TWO_APPLICATIONS.md",
     "docs/WORKFLOW.md",
     "docs/DATA_POLICY.md",
     "docs/EXPERIMENT_LOG.md",

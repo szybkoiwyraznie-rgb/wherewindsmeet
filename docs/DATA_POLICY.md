@@ -29,7 +29,12 @@ Prototyp [audytu aktualizacji](UPDATES_AND_RESTORE.md) w trybach `todo` i
 `review` wypisuje tekst i ID, a `review` także poprzednie przekłady. Model
 przywracania w trybie `--details` wypisuje podane logiczne ID. Oba narzędzia
 są przeznaczone wyłącznie do fikcyjnych danych, nie do publicznych wyników
-zawierających prywatny materiał.
+zawierających prywatny materiał. Syntetyczny [model linii i rotacji kopii](TWO_APPLICATIONS.md)
+w trybach `delta`, `review`, `backlog` i `--details` także ujawnia podane
+teksty lub ID; jego manifestów nie należy mylić z bezpieczną referencją gry.
+Odczytowy skaner hashy w trybie `private` ujawnia względne ścieżki, rozmiary,
+hashe i pseudonim lokalizacji: jego wynik jest lokalny i prywatny, a sam
+skaner na razie testowany wyłącznie na sztucznych katalogach.
 
 Duże dane i generowane archiwa nie trafiają do Git bez uzasadnionej potrzeby.
 Kontrola repozytorium odrzuca obecnie pliki większe niż 10 MiB w indeksie. Jeśli

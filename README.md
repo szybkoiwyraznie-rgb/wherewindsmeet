@@ -10,9 +10,11 @@ Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
 planem awaryjnym. Właściciel wskazał kierunek ograniczony do zmian tekstu przy
 wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmian.
 Powstały prototypy [pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) oraz
-[audytu aktualizacji i modelu przywracania](docs/UPDATES_AND_RESTORE.md) na
-wymyślonych danych. Nie ma ekstraktora, importera do gry, instalatora ani
-czytanki; działania w grze nie sprawdzono.
+[audytu aktualizacji i modeli przywracania](docs/UPDATES_AND_RESTORE.md) na
+wymyślonych danych. Właściciel wybrał [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md):
+audytor i patcher. Jest ogólny skaner SHA-256 testowany na sztucznych katalogach;
+nie ma jeszcze ekstraktora, importera do gry, instalatora, archiwów aplikacji
+ani czytanki. Działania na grze nie sprawdzono.
 
 ## Od czego zacząć
 
@@ -20,7 +22,8 @@ czytanki; działania w grze nie sprawdzono.
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
   [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md),
-  [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md) oraz [sposób pracy](docs/WORKFLOW.md)
+  [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md),
+  [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md) oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)

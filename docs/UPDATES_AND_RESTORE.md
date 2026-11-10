@@ -6,7 +6,9 @@ odinstalatora. Nie badaliśmy instalacji właściciela, nie znamy stabilności I
 aktywnych warstw ani kompletnego zakresu tekstów. Poniższy proces docelowy
 wymaga ich potwierdzenia; zgodność z grą i bezpieczeństwo konta nie są dowiedzione.
 Kierunek wybrany przez właściciela to zmiana wyłącznie tekstu przy wyłączonej
-grze, bez zmian kodu/pamięci i obchodzenia kontroli integralności.
+grze, bez zmian kodu/pamięci i obchodzenia kontroli integralności. Docelowy
+podział na [audytor i patcher Windows](TWO_APPLICATIONS.md) oraz zasada jednej
+aktualnej kopii na plik są opisane osobno.
 
 ## Czego uczą inne projekty
 

@@ -29,8 +29,10 @@ uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narz�
 metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); zakres jego
 późniejszego użycia na instalacji trzeba będzie uzgodnić. Prototyp pakietu
 na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md),
-a porównanie aktualizacji i model przywracania —
-[docs/UPDATES_AND_RESTORE.md](docs/UPDATES_AND_RESTORE.md).
+a porównanie aktualizacji, odczytowy skaner plików oraz modele przywracania —
+[docs/UPDATES_AND_RESTORE.md](docs/UPDATES_AND_RESTORE.md) i
+[docs/TWO_APPLICATIONS.md](docs/TWO_APPLICATIONS.md). Skaner testujemy na razie
+wyłącznie na sztucznych katalogach; nie jest ekstraktorem ani patcherem WWM.
 Opcjonalne odtworzenie zewnętrznego eksperymentu syntetycznego ma osobne
 zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
 

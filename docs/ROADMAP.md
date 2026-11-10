@@ -99,5 +99,9 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
   działa wyłącznie na małych, fikcyjnych źródłach i nie potwierdza stałości ID.
 - Niezgodną wersję gry wykrywać przed zapisem. Przygotować plan aktualizacji
   i cofnięcia, regresje oraz czytelną informację o obsługiwanych buildach.
+- Przygotować dwa osobne narzędzia Windows w ZIP: [audytor wszystkich plików
+  z zadaniami tylko dla nowych/zmienionych linii oraz patcher z jedną aktualną
+  kopią na plik](TWO_APPLICATIONS.md). Ogólny skaner odczytowy oraz syntetyczne
+  modele nie są jeszcze tymi aplikacjami ani obsługą WWM.
 - W przyszłości PR ma testować i budować bez publikacji; publikacja jedynie po
   osobnym, uzgodnionym przeglądzie. Obecnie workflow wydań nie istnieje.
