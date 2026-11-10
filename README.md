@@ -11,8 +11,8 @@ wersja i język źródłowy tłumaczenia wymagają ustalenia.
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
-- [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md)
-  oraz [sposób pracy](docs/WORKFLOW.md)
+- [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
+  [raport metadanych](docs/INVENTORY.md) oraz [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
 - [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)
@@ -30,7 +30,7 @@ python tools/run_tests.py
 ```text
 .github/       CI i szablony współpracy
 docs/          status, decyzje, plan i dziennik eksperymentów
-tools/         narzędzia projektu; na razie tylko kontrole repozytorium
+tools/         kontrole, ograniczony raport metadanych i eksperyment syntetyczny
 tests/         testy bez plików gry
 local/         prywatny katalog roboczy, ignorowany przez Git
 build/         lokalne wyniki, ignorowane przez Git

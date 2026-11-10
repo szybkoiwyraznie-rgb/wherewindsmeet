@@ -2,8 +2,8 @@
 
 Stan: **2026-11-10**. To przegląd publicznych źródeł, bez dostępu do instalacji
 właściciela. Rozróżniamy deklaracje wydawcy, wyniki innych projektów oraz
-własne, jeszcze nieprzeprowadzone testy. Nie wybrano jeszcze platformy ani
-wersji docelowej.
+własny test na próbce syntetycznej. Nie wybrano jeszcze platformy ani wersji
+docelowej; nie przeprowadzono testu na plikach gry.
 
 ## Fakty z oficjalnych źródeł
 
@@ -45,7 +45,12 @@ pliku właściciela. Decyzja właściciela sama w sobie nie jest zgodą wydawcy.
    Autorzy opisują m.in. pliki `translate_words_map_en`, `_diff`, `__small`
    i `_mobile`, skompresowane bloki oraz adresowanie rekordów skrótami.
    Deklarują też round-trip i opisują różnice klientów. Ich liczby i wyniki
-   dotyczą **ich konkretnych wydań**, nie instalacji właściciela.
+   dotyczą **ich konkretnych wydań**, nie instalacji właściciela. Nasza próba
+   na syntetycznym kontenerze v1 (2 rekordy) potwierdziła prosty dump/patch i
+   odrzucenie błędnego hasha, ale wykazała, że duplikat edycji jest przyjmowany
+   z zasadą „ostatni wygrywa”, a hash nie jest obowiązkowy. Potrzebny jest więc
+   nasz ścisły importer i wiązanie całej zwrotki ze źródłem; szczegóły w
+   [dzienniku](EXPERIMENT_LOG.md). To nie jest test na grze.
 2. [`lehieugch68/WWM-Locale-Editor`](https://github.com/lehieugch68/WWM-Locale-Editor/tree/fc76ec74aed9b8e8435d035e0e389d05aa444eee)
    (commit `fc76ec74aed9b8e8435d035e0e389d05aa444eee`, **MIT**) deklaruje
    eksport do CSV i import dla plików lokalizacji. Jest starszy, korzysta z
@@ -86,5 +91,6 @@ narzędzia nie udziela praw do tekstów ani plików gry.
   test w grze pozostają niezweryfikowane.
 
 Po decyzji o zakresie i sposobie pracy następnym wejściem powinien być możliwie
-mały raport **metadanych**, nie pełny katalog gry. Przed publicznym ujawnieniem
-jakichkolwiek danych tekstowych trzeba osobno ustalić prawa i zgodę właściciela.
+mały [raport metadanych](INVENTORY.md), nie pełny katalog gry. Przed publicznym
+ujawnieniem jakichkolwiek danych tekstowych trzeba osobno ustalić prawa i zgodę
+właściciela.

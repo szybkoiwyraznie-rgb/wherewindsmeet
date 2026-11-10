@@ -62,3 +62,82 @@ sekretów ani identyfikatorów plików. Same planowane testy nie są wynikami.
 - **Ograniczenie:** to deklaracje ich autorów, nie test w naszej grze. Nie
   uruchomiono narzędzi na rzeczywistych danych, nie potwierdzono klienta ani
   zgodności formatu. Ocena praw i decyzja o dalszym sposobie pracy są otwarte.
+
+## 2026-11-10 — CI przeglądu wykonalności
+
+- **Wejście:** commit `87ce17764147589408a3a66452a270252a6d88ef`, bez plików
+  gry i bez dostępu do prywatnych danych.
+- **Metoda:** [GitHub Actions, zdarzenie PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42844576649).
+- **Wynik:** 4/4 konfiguracje Ubuntu/Windows × Python 3.11/3.12 zakończyły się
+  sukcesem. To wynik dla tego commita; kolejne mają osobne przebiegi.
+
+## 2026-11-10 — test istniejącego narzędzia na próbce syntetycznej
+
+- **Wejście:** własny, wymyślony kontener opisany jako v1: 163 B, SHA-256
+  `4dff1b482063e38e2e6eac33223ef22801456780dfc6153f7eaf155be75cf395`,
+  2 fikcyjne rekordy w 1 bloku danych. Żaden bajt nie pochodzi z gry.
+- **Narzędzie:** niezmodyfikowany `wwm_locmap.py` projektu indonezyjskiego,
+  commit `2289aacd076b7f7541e741760d6c18a0570b37a0`, GPL-3.0; zewnętrzne
+  środowisko testowe z `zstandard==0.24.0`, Linux/Python 3.11. Nie dodano
+  kodu ani zależności tego projektu do repozytorium.
+- **Metoda:** `info` → `dump` → częściowy `patch` → ponowny `dump`, następnie
+  osobne próby błędnego hasha, duplikatu wpisu oraz wpisu bez hasha.
+- **Wynik:** odczytano **2/2** rekordy; **1/1** zmiana zastosowana, drugi
+  rekord pozostał niezmieniony. Nieprawidłowy hash odrzucono bez pliku
+  wyjściowego. Jednak dwie edycje tego samego slotu przyjęto bez błędu
+  (wygrała ostatnia), a edycję bez hasha również przyjęto. Nie nadaje się to
+  bez dodatkowych bramek na nasz zaufany importer zwrotek.
+- **Ograniczenie:** nie testowano pliku gry, wersji v2 ani pełnego obiegu;
+  wynik nie potwierdza zgodności wydania właściciela, bezpieczeństwa konta,
+  poprawności wydania czy działania w grze. Źródło i zapis eksperymentu są
+  syntetyczne; format i implementacja wymagają dalszego niezależnego audytu.
+
+**Powtarzalność próby:** generator niezależnej sztucznej próbki
+`tests/synthetic_locmap.py` tworzy 404 B, SHA-256
+`74727d2426308ce1cbe3bf45041add58a7a9280688ac0e749a8aa9f18a91cd34`.
+Opcjonalny `tools/reproduce_synthetic_experiment.py` powtórzył test: 2/2
+rekordy, te same wyniki dla częściowej edycji, błędnego hasha i duplikatu;
+zwrotka bez hasha została nie tylko przyjęta, ale i zastosowana. Ramki
+Zstandard generatora sprawdzono także `zstandard==0.24.0` dla rozmiarów 0, 1,
+255, 256 i 65791 B. Generator zawiera tylko wymyślone ciągi, nie jest
+ekstraktorem i nie wymaga danych gry ani `zstandard` w CI.
+
+### Opcjonalne odtworzenie eksperymentu
+
+Eksperyment uruchamia **zewnętrzny kod GPL-3.0** jako oddzielny proces; jego
+kod nie jest dołączony do repozytorium. Kontrola hasha potwierdza identyczność
+badanego pliku, **nie bezpieczeństwo**. To nie jest piaskownica: przed użyciem
+należy przejrzeć kod i wybrać odizolowane środowisko. Kontrole CI nie uruchamiają
+cudzego kodu ani nie wymagają tej procedury.
+
+1. Po przeglądzie pobierz wyłącznie [surowy `wwm_locmap.py` z przypiętego
+   commita](https://github.com/oratakashi/where-winds-meet-indonesian-patch/blob/2289aacd076b7f7541e741760d6c18a0570b37a0/wwm_locmap.py)
+   do prywatnego katalogu pod tą nazwą, poza Git. Dokładny rozmiar: 13 934 B,
+   SHA-256: `84568408ac48a2eff9b11172c001e023f52892f925715dc6ae2fb92d0615f819`.
+2. W osobnym środowisku Python 3.11 zainstaluj `zstandard==0.24.0`; nie jest
+   to zależność podstawowych testów projektu.
+3. Z katalogu repozytorium, w tym środowisku uruchom:
+
+   ```sh
+   python tools/reproduce_synthetic_experiment.py --upstream-tool "ŚCIEŻKA_DO/wwm_locmap.py"
+   ```
+
+   Skrypt sprawdza nazwę, rozmiar i hash kodu oraz wersję `zstandard`, po czym
+   kopiuje wskazany kod do katalogu tymczasowego i testuje na wygenerowanej
+   próbce. Nie przyjmuje ścieżki do pliku gry jako wejścia testu. Przy błędzie
+   kończy się niezerowym kodem. Zmiana zawartości próbki lub narzędzia wymaga
+   nowej, osobno opisanej próby.
+
+## 2026-11-10 — raport metadanych na fikcyjnych plikach
+
+- **Wejście:** tymczasowe katalogi i pliki utworzone przez testy; żadnej
+  instalacji gry. Kod narzędzia: `tools/inspect_localization.py`.
+- **Metoda:** `python3 tools/check_repository.py` oraz `python3 tools/run_tests.py`
+  (Linux/Python 3.11). Testy blokują typowe funkcje otwierania plików,
+  listowania katalogów i tworzenia gniazd; sprawdzają również przypadki braku
+  dostępu, linków/reparse i zmiany katalogu.
+- **Wynik:** **34/34 testy**, bez pominięć; kontrola 30 wpisów indeksu
+  poprawna. Raport zawiera jedynie znane nazwy, stany i rozmiary, bez ścieżki
+  wejściowej ani zawartości plików.
+- **Ograniczenie:** nie uruchomiono na grze użytkownika. Raport nie rozpoznaje
+  wersji ani nie potwierdza praw, formatu czy kompletności źródeł.

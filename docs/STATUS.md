@@ -19,8 +19,8 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | Przygotowane w pierwszym PR; 15 testów lokalnych i 4/4 konfiguracje CI przeszły dla commita `bbd11be`. Wyniki kolejnych commitów sprawdzać osobno. |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Pierwszy przegląd publicznych źródeł gotowy; platforma właściciela, uprawnienia i zgodność narzędzi pozostają nieustalone. |
+| Repozytorium i workflow | 34 testy lokalne; wcześniejsze 4/4 konfiguracje CI przeszły dla `87ce177`. Wyniki bieżącego commita sprawdzać osobno. |
+| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Przegląd publicznych źródeł i [narzędzie metadanych](INVENTORY.md) gotowe; platforma właściciela, uprawnienia i zgodność narzędzi pozostają nieustalone. |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Nie powstały. |
 | Patcher, instalacja i przywracanie | Nie powstały; `runtime_tested: false`. |

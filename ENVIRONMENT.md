@@ -25,7 +25,11 @@ W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 `check_repository.py` sprawdza pliki **w indeksie Git**, więc nowe pliki trzeba
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
 Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
-uruchomiono żadnego testu lub któryś test został pominięty.
+uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
+metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); przed użyciem na
+instalacji gry należy ustalić warunki i uprawnienia. Opcjonalne odtworzenie
+zewnętrznego eksperymentu syntetycznego ma osobne zależności i ostrzeżenia w
+[dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
 
 ## Katalogi i wejścia
 

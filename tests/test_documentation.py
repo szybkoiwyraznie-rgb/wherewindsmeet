@@ -14,6 +14,7 @@ GUIDES = (
     "docs/STATUS.md",
     "docs/ROADMAP.md",
     "docs/FEASIBILITY.md",
+    "docs/INVENTORY.md",
     "docs/WORKFLOW.md",
     "docs/DATA_POLICY.md",
     "docs/EXPERIMENT_LOG.md",
