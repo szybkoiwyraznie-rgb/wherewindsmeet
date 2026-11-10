@@ -73,6 +73,21 @@ class ReadOnlyScannerTests(unittest.TestCase):
         (self.root / "empty.txt").write_bytes(b"")
         (self.root / "tekst-zażółć.txt").write_bytes("wymyślony".encode("utf-8"))
 
+    def scan_with_diagnostics(self):
+        original = scan._same_observation
+        mismatches = []
+        def traced(first, second):
+            matches = original(first, second)
+            if not matches:
+                fields = ("st_mode", "st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_file_attributes")
+                mismatches.append([(field, getattr(first, field, None), getattr(second, field, None))
+                                   for field in fields if getattr(first, field, None) != getattr(second, field, None)])
+            return matches
+        with patch.object(scan, "_same_observation", side_effect=traced):
+            manifest = scan.scan_tree(self.root)
+        self.assertEqual(manifest["scan_status"], "complete", f"issues={manifest['issues']!r} differences={mismatches[:2]!r}")
+        return manifest
+
     def test_unchanged_file_metadata_across_directory_entry_and_open_handle(self):
         target = self.root / "empty.txt"
         with os.scandir(self.root) as iterator:
@@ -109,11 +124,11 @@ class ReadOnlyScannerTests(unittest.TestCase):
         self.assertFalse(report["baseline_authenticated"])
 
     def test_compares_changed_unchanged_added_removed_not_whole_dialogues(self):
-        previous = scan.scan_tree(self.root)
+        previous = self.scan_with_diagnostics()
         (self.root / "Package" / "first.bin").write_bytes(b"New invented bytes!")
         (self.root / "empty.txt").unlink()
         (self.root / "Package" / "added.bin").write_bytes(b"Added invented bytes.")
-        current = scan.scan_tree(self.root)
+        current = self.scan_with_diagnostics()
         summary, changes = scan.compare_manifests(current, previous)
         self.assertEqual(summary, {"status": "compared", "counts": {
             "unchanged": 2, "changed": 1, "added": 1, "removed": 1,
@@ -126,11 +141,11 @@ class ReadOnlyScannerTests(unittest.TestCase):
 
     def test_same_size_and_timestamp_do_not_hide_changed_bytes(self):
         target = self.root / "Package" / "first.bin"
-        previous = scan.scan_tree(self.root)
+        previous = self.scan_with_diagnostics()
         old = target.stat()
         target.write_bytes(b"z" * old.st_size)
         os.utime(target, ns=(old.st_atime_ns, old.st_mtime_ns))
-        current = scan.scan_tree(self.root)
+        current = self.scan_with_diagnostics()
         report, changes = scan.make_report(current, previous)
         self.assertEqual(report["comparison"]["counts"]["changed"], 1)
         self.assertIn({"path": "Package/first.bin", "change": "changed"}, changes)
