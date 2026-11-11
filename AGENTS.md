@@ -9,8 +9,8 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 
 1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
    `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WINDOWS_OPTIONS.md`,
-   `docs/STEAM_REFERENCE.md`, `docs/UPDATES_AND_RESTORE.md`, `docs/TWO_APPLICATIONS.md`,
-   `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
+   `docs/STEAM_REFERENCE.md`, `docs/COLLECTOR.md`, `docs/UPDATES_AND_RESTORE.md`,
+   `docs/TWO_APPLICATIONS.md`, `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
    `docs/EXPERIMENT_LOG.md`.
    Zajrzyj do `docs/PRIOR_ART.md` przed
    ponownym badaniem problemów już opisanych w źródłach.
@@ -49,9 +49,11 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   Publiczne informacje o grze i istotne ograniczenia warunków są w
   `docs/FEASIBILITY.md` i `docs/WINDOWS_OPTIONS.md`.
   Nie obiecuj zgodności z aktualizacjami ani bezpieczeństwa konta. Nie obchodź
-  zabezpieczeń ani anti-cheat. Nie modyfikuj instalacji użytkownika ani nie
-  żądaj rzeczywistych plików gry bez uzgodnionego planu, kopii i sprawdzonego
-  sposobu przywrócenia.
+  zabezpieczeń ani anti-cheat. Właściciel wybrał odczytowy zbieracz z BAT-em i
+  prywatnym ZIP-em, opisany w `docs/COLLECTOR.md`; nie zastępuj go ręcznymi
+  oględzinami. Otrzymane dane umieszczaj w ignorowanym `local/` i sprawdzaj
+  prywatnie. To zgoda na opisane odczytanie, nie na modyfikowanie instalacji:
+  zapis wymaga odrębnego konkretnego planu, kopii i sprawdzonego przywracania.
 - Właściciel poinformował, że według jego ustalenia dozwolone są modyfikacje
   ograniczone do czystego tekstu; nie przedstawił dokumentu wydawcy, a zakresu
   wyjątku nie potwierdziliśmy niezależnie. Przyjmij ten kierunek bez proszenia

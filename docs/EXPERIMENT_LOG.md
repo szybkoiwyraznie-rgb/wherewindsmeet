@@ -382,3 +382,58 @@ cudzego kodu ani nie wymagają tej procedury.
   potwierdza autentyczności ani stanu plików. Nie ma ekstraktora, importera,
   działającego patchera ani gotowych ZIP-ów. Samo narzędzie metadanych nie
   weryfikuje formatu, kompletności, pochodzenia ani uprawnień do modyfikacji.
+
+## 2026-11-10 — odczytowy zbieracz Windows w układzie SRW Y
+
+- **Decyzja właściciela:** zamiast ręcznych oględzin ma być ZIP z BAT-em i
+  skryptem, który sam znajdzie instalację, zbierze odpowiednie pliki i zrobi
+  jeden ZIP do przekazania przez Drive. Jest to etap rozpoznania, odrębny od
+  dwóch planowanych aplikacji: audytora linii i patchera.
+- **Wzorzec SRW Y:** właściciel wskazał `SRW_Y_ZBIERZ_KOD.zip`. Połączony
+  Dysk zwrócił 404 dla trzech wskazanych plików i wyszukiwanie ich nazw nie
+  zwróciło wyników; nie zakładamy, że to ten sam rachunek. W publicznym
+  [repozytorium SRW Y](https://github.com/szybkoiwyraznie-rgb/mtgcrawler/blob/2b675b15e190248c47f0e30791b9dbbc46e08e04/srw-y-translation/tools/build_kod_kit.py)
+  znaleziono generator; sam ZIP z tego generatora jest produktem `build/`, a
+  nie śledzonym plikiem. W odtworzeniu uzyskano **3 810 B**, trzy pliki
+  (`CZYTAJ_TO.md`, BAT i PS1), SHA-256
+  `eabbfb7dad6a722d80f96bb756c8e6a217fe53bce970ac6e1482b592e8a0b847`,
+  poprawny odczyt i CRC. To odtworzenie z konkretnego commita, nie dowód, że
+  prywatny plik użytkownika ma identyczne bajty. Układ obsługi przeniesiono
+  koncepcyjnie, nie dane ani założenia formatu SRW.
+- **Implementacja:** `collector/` i `tools/build_collector_kit.py` budują
+  `WWM_ZBIERZ_DANE.zip` z instrukcją, BAT i PowerShell 5.1; bez Pythona na
+  komputerze właściciela i bez automatycznego wysyłania. Zbieracz inwentaryzuje
+  dwie gałęzie instalacji z wyłączeniami prywatności, kopiuje wskazane warianty
+  map, manifest i ograniczone kandydaty kontekstu, deduplikuje równe bajty,
+  podaje błędy, pominięcia, SHA-256 i powiązania w raporcie. Zapis odbywa się
+  poza instalacją. Limity i nieznaną kompletność opisuje [COLLECTOR.md](COLLECTOR.md).
+  `tools/validate_collector_return.py` kontroluje zwrotkę bez rozpakowania i
+  pokazuje wyłącznie agregaty; nie dowodzi autentyczności ani kompletności.
+- **Błąd i naprawa:** pierwsze przebiegi Windows CI dla `8005c59` i `6dc4147`
+  nie wykrywały `Get-FileHash` w środowisku z innym `PSModulePath`; Linux
+  przechodził. Zastąpiono to strumieniowym SHA-256 z .NET w `9a4971e`. Nie
+  dotyczyło to plików gry ani komputera właściciela.
+- **Testy:** Linux/Python 3.11 — **180/180**, bez pominięć. Dla kodu
+  `9a4971eea01ca99749aba78a557e59cd5ae25991` zarówno
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43053142995),
+  jak i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43053153094)
+  przeszły **4/4** konfiguracje Windows/Linux × Python 3.11/3.12. Na Windows
+  uruchomiono parser PowerShell, rozpakowany BAT i PS1 na sztucznych drzewach:
+  wykrywanie dodatkowej biblioteki Steam, polskie znaki i spacje w ścieżkach,
+  mapy i kontekst, brak map, deduplikacja/limit, link katalogowy, odmowa zapisu
+  w grze, niezmienność wejściowych plików i walidacja zwrotki. Linux dodatkowo
+  sprawdził powtarzalność archiwum, BOM/CRLF oraz błędne i niebezpieczne ZIP-y.
+  Dla kolejnego commita wyniki CI należy sprawdzić osobno.
+- **Artefakt:** build źródeł `9a4971e` wygenerował archiwum **30 669 B**, SHA-256
+  `8102c14724fcfba2a678d63daa54757709f9aabb6c7f54c00ae1ab03baa6f65b`,
+  odczyt i CRC poprawne; archiwum narzędzia pozostaje ignorowanym artefaktem,
+  nie zawiera plików gry. Próbne pobranie małego, 7 114-bajtowego ZIP-a z
+  podłączonego Dysku zapisało plik w workspace i przeszło CRC; tymczasową kopię
+  usunięto. Nie jest to test plików bliskich limitowi pobierania **100 MiB**.
+- **Ograniczenia:** prawdziwej instalacji użytkownika nie badano. Katalogi i
+  pliki kontekstu są tylko kandydatami; brak pełnego kontekstu, ekstraktora,
+  tłumaczenia, patchera i testu w grze. Raport może zawierać prywatne nazwy,
+  a ZIP — dane gry; trzymać prywatnie w ignorowanym `local/`, nie w Git.
+  SHA-256 nie gwarantuje autentyczności ani atomowej migawki; skan nie obejmuje
+  wyłączonych katalogów ani całej gry. W razie przekroczenia limitu odbioru
+  potrzebna będzie osobna decyzja co do dalszego przekazania.

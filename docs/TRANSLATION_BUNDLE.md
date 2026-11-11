@@ -90,7 +90,7 @@ zwraca kod niezerowy i nie wypisuje częściowego raportu; niczego nie importuje
   dzielić; limity nie są limitami gry. Powtórzone klucze JSON, niepoprawny
   Unicode i niestandardowe liczby JSON są odrzucane.
 - Nie istnieje jeszcze bezpieczny importer, zapis atomowy, powiązanie z
-  potwierdzonym buildem ani przetestowane przywracanie. Rzeczywistych plików
-  gry nie żądamy ani nie modyfikujemy bez uzgodnionego planu, kopii i sposobu
-  przywrócenia. Zasady i stan projektu: [STATUS.md](STATUS.md),
+  potwierdzonym buildem ani przetestowane przywracanie. Właściciel wybrał
+  [odczytowy zbieracz](COLLECTOR.md); modyfikowanie rzeczywistych plików nadal
+  wymaga planu, kopii i przywracania. Zasady i stan projektu: [STATUS.md](STATUS.md),
   [DATA_POLICY.md](DATA_POLICY.md) i [FEASIBILITY.md](FEASIBILITY.md).

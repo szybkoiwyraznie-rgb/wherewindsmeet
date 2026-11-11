@@ -49,11 +49,11 @@ kontenera niezmienioną. Jeśli klient automatycznie przywraca plik, nie obchodz
 tego mechanizmu.
 
 Kontynuujemy na źródłach publicznych i próbkach syntetycznych. Właściciel
-zgłosił instalację Steam, ale nie mamy dostępu do jej plików. Proponowane
-[oględziny nazw i rozmiarów](STEAM_REFERENCE.md) nie wymagają otwierania plików.
-Nie żądamy ani nie modyfikujemy rzeczywistych plików bez uzgodnienia
-konkretnego planu, kopii i sposobu przywrócenia. Nie wymagamy ponownego
-potwierdzenia wybranego kierunku. Opcjonalny, niewysłany
+zgłosił instalację Steam, ale nie mamy dostępu do jej plików. Wybrał
+[odczytowy zbieracz](COLLECTOR.md) i prywatne przekazanie wynikowego ZIP-a;
+poprzednią propozycję ręcznych oględzin zastąpiono. To nie jest zgoda na zapis
+w instalacji: modyfikacja wymaga osobnego planu, kopii i przywracania. Nie
+wymagamy ponownego potwierdzenia wybranego kierunku. Opcjonalny, niewysłany
 [szkic kontaktu z wydawcą](PUBLISHER_PERMISSION.md) może pomóc wyjaśnić zakres
 praw, ale nie jest warunkiem kontynuowania pracy syntetycznej.
 
@@ -117,8 +117,7 @@ narzędzia nie udziela praw do tekstów ani plików gry.
 - **Jakość:** znaki polskie, tokeny, kontekst, limity, pełny backup/rollback i
   test w grze pozostają niezweryfikowane.
 
-Następnym krokiem mogą być [oględziny nazw i rozmiarów](STEAM_REFERENCE.md)
-w Eksploratorze, bez otwierania lub przesyłania plików gry. Opcjonalne
-narzędzie [raportu metadanych](INVENTORY.md) testowano tylko syntetycznie.
-Przed publicznym ujawnieniem danych tekstowych trzeba osobno ustalić prawa
-i zgodę właściciela.
+Następnym krokiem jest odbiór wyniku [zbieracza Windows](COLLECTOR.md) i jego
+prywatna walidacja. Opcjonalne narzędzie [raportu metadanych](INVENTORY.md)
+testowano tylko syntetycznie. Przed publicznym ujawnieniem danych tekstowych
+trzeba osobno ustalić prawa i zgodę właściciela.

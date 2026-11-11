@@ -5,8 +5,8 @@
 - Git dostępny w `PATH`.
 - Python 3.11 lub 3.12 do uruchamiania testów i opcjonalnych skryptów.
   Obecne kontrole używają wyłącznie biblioteki standardowej; nie trzeba
-  instalować `pip`-em bibliotek ani mieć plików gry. Pierwsze oględziny
-  instalacji w Eksploratorze nie wymagają Pythona.
+  instalować `pip`-em bibliotek ani mieć plików gry. Właściciel uruchamia
+  [zbieracz Windows](docs/COLLECTOR.md) bez instalowania Pythona.
 - GitHub CLI (`gh`) jest potrzebne do obsługi PR, nie do uruchomienia testów.
 
 Lokalnie sprawdzono Linux i Python 3.11. W GitHub Actions przeszły również
@@ -28,9 +28,9 @@ W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
 Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
-metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); prostszy pierwszy
-krok w Eksploratorze i opcjonalny skrypt dla dwóch lokalizacji opisuje
-[docs/STEAM_REFERENCE.md](docs/STEAM_REFERENCE.md). Prototyp pakietu
+metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); aktualny
+zbieracz, jego budowę i prywatny odbiór opisuje [docs/COLLECTOR.md](docs/COLLECTOR.md),
+a oznaczenia Steam — [docs/STEAM_REFERENCE.md](docs/STEAM_REFERENCE.md). Prototyp pakietu
 na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md),
 a porównanie aktualizacji, odczytowy skaner plików oraz modele przywracania —
 [docs/UPDATES_AND_RESTORE.md](docs/UPDATES_AND_RESTORE.md) i
@@ -52,7 +52,7 @@ wybrane.
 
 Dokumenty i kod tekstowy są domyślnie wersjonowane z LF. Zgodnie z praktyką SRW
 pliki `.bat`, `.cmd` i `.ps1` są oznaczone `-text`: Git ma zachować zapisane
-bajty, również w archiwum pobranym z GitHub. Gdy powstaną takie pliki, zapisz i
-sprawdź w repozytorium CRLF; dla skryptów PowerShell 5.1 z polskimi znakami
-sprawdź też UTF-8 z BOM. Sama konfiguracja atrybutów nie jest testem działania
-na Windows.
+bajty. Źródła zbieracza mają CRLF, PowerShell ma UTF-8 BOM, a BAT jest ASCII;
+builder i testy sprawdzają bajty w ZIP-ie. Windows CI uruchamia rozpakowane
+skrypty na sztucznej instalacji; sama konfiguracja atrybutów nie jest testem
+rzeczywistej gry.

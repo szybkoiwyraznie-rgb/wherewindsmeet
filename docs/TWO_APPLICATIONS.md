@@ -4,9 +4,9 @@ To **uzgodniony kierunek produktu**, nie gotowe aplikacje. Właściciel chce dwi
 paczki ZIP z uruchamianiem przez BAT: pierwsza wykrywa zmiany i przygotowuje
 **tylko nowe teksty i zmienione linie**, druga instaluje i cofa spolszczenie.
 Nie ma jeszcze ekstraktora WWM, kompletnego audytora, działającego patchera ani
-archiwów ZIP. Jest ogólny, odczytowy skaner hashy do testów na sztucznych
-katalogach oraz modele porównywania linii i kopii na wymyślonych danych; nie
-zostały sprawdzone na instalacji gry.
+ich archiwów ZIP. Jest osobny, wstępny [zbieracz Windows](COLLECTOR.md) oraz
+ogólny skaner hashy i modele porównywania linii i kopii testowane na wymyślonych
+danych; nie zostały sprawdzone na instalacji gry.
 
 ## 1. Audytor — wszystkie pliki, potem tylko zmienione linie
 

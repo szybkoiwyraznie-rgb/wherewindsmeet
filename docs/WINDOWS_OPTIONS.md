@@ -33,10 +33,10 @@ Nie zakładamy, że ustawienia lub pliki lokalne synchronizują się razem z pos
 ### Co może zrobić właściciel
 
 Właściciel podał już oznaczenia Steam i ekranów gry. Build ID Steam nie musi
-być numerem wersji gry ani dowodem stanu wszystkich plików. Następny prosty
-krok to [oględziny kilku nazw i rozmiarów w Eksploratorze](STEAM_REFERENCE.md),
-bez Pythona i bez otwierania plików gry. Nie potrzebujemy danych konta, pełnej
-ścieżki, całej gry ani zrzutów z osobistymi danymi.
+być numerem wersji gry ani dowodem stanu wszystkich plików. Właściciel wybrał
+[automatyczny zbieracz ZIP](COLLECTOR.md), który nie wymaga instalacji Pythona
+ani ręcznego spisywania nazw i zbiera tylko wybrane kandydaty. Nie potrzebujemy
+haseł ani całej gry; raport i wynik są prywatne.
 
 ## Co wynika z polskiego instalatora Arimy
 

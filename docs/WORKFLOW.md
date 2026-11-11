@@ -22,6 +22,14 @@ Po istotnej zmianie zaktualizuj [STATUS.md](STATUS.md), a wynik badań i testów
 zapisz w [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md). Rozróżniaj fakt, hipotezę,
 test syntetyczny, test na kopii oraz test w prawdziwej grze.
 
+## Obecne rozpoznanie instalacji
+
+Właściciel wybrał [zbieracz ZIP z BAT-em](COLLECTOR.md), a nie ręczne
+spisywanie nazw. Zestaw zapisuje jeden prywatny ZIP z inwentarzem i wybranymi
+kopiami danych gry. Po otrzymaniu należy przechowywać go w ignorowanym `local/`,
+sprawdzić walidatorem i dalej analizować prywatnie. Zbieracz nie jest audytorem
+linii, ekstraktorem ani patcherem i nie potwierdza kompletności kontekstu.
+
 ## Przyszły obieg tłumaczenia
 
 | Krok | Wejście → wynik | Bramka przed kolejnym krokiem |

@@ -13,16 +13,19 @@ wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmia
 Powstały prototypy [pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) oraz
 [audytu aktualizacji i modeli przywracania](docs/UPDATES_AND_RESTORE.md) na
 wymyślonych danych. Właściciel wybrał [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md):
-audytor i patcher. Jest ogólny skaner SHA-256 testowany na sztucznych katalogach;
-nie ma jeszcze ekstraktora, importera do gry, instalatora, archiwów aplikacji
-ani czytanki. Naszych narzędzi ani zmian nie testowano na grze.
+audytor i patcher. Jest ogólny skaner SHA-256 testowany na sztucznych katalogach
+oraz osobny [zbieracz do rozpoznania instalacji](docs/COLLECTOR.md): BAT,
+PowerShell i pojedynczy ZIP z wybranymi plikami. Nie ma jeszcze ekstraktora,
+importera do gry, docelowych archiwów audytora i patchera ani czytanki.
+Naszych narzędzi ani zmian nie testowano na rzeczywistej grze.
 
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
-  [instalacja Steam i oględziny bez Pythona](docs/STEAM_REFERENCE.md),
+  [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
+  [zgłoszona instalacja Steam](docs/STEAM_REFERENCE.md),
   [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md),
   [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md),
   [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md) oraz [sposób pracy](docs/WORKFLOW.md)
@@ -43,7 +46,8 @@ python tools/run_tests.py
 ```text
 .github/       CI i szablony współpracy
 docs/          status, decyzje, plan i dziennik eksperymentów
-tools/         kontrole, raport metadanych i prototypy na fikcyjnych danych
+collector/     źródła wstępnego zbieracza Windows (BAT + PowerShell)
+tools/         builder, kontrola zwrotki, raport metadanych i prototypy
 tests/         testy i syntetyczne przykłady bez plików gry
 local/         prywatny katalog roboczy, ignorowany przez Git
 build/         lokalne wyniki, ignorowane przez Git

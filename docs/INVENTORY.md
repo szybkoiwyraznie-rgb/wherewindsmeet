@@ -3,11 +3,11 @@
 `tools/inspect_localization.py` jest małym narzędziem rozpoznawczym, nie
 ekstraktorem ani patchem. Powstało na podstawie publicznie opisanych nazw plików
 z [FEASIBILITY.md](FEASIBILITY.md); zgodność z instalacją właściciela **nie
-została sprawdzona**. Jako prostszy pierwszy krok bez instalacji Pythona
-proponujemy [oględziny nazw w Eksploratorze](STEAM_REFERENCE.md). Tam też
-opisano opcjonalny skrypt sprawdzający dwie kandydackie lokalizacje; jest on
-przetestowany tylko na katalogach syntetycznych. Ustalenie właściciela i
-nierozstrzygnięty zakres warunków opisuje [FEASIBILITY.md](FEASIBILITY.md).
+została sprawdzona**. Właściciel wybrał zamiast ręcznych oględzin
+[automatyczny zbieracz Windows](COLLECTOR.md), który nie wymaga Pythona i
+kopiuje wybrane kandydaty. W [STEAM_REFERENCE.md](STEAM_REFERENCE.md) opisano
+starszy skrypt dwóch lokalizacji, przetestowany tylko na sztucznych katalogach.
+Ustalenie właściciela i zakres warunków: [FEASIBILITY.md](FEASIBILITY.md).
 
 ## Co robi, a czego nie robi
 

@@ -20,9 +20,13 @@ Aktualizacja gry może zmienić te dane — przed późniejszymi próbami należ
 ponownie odczytać. Nie używać numeru buildu jako zgody na zapis czy dowodu
 zgodności backupu.
 
-## Najprostszy następny krok: oględziny nazw
+## Poprzednia propozycja: oględziny nazw (zastąpiona)
 
-Nie trzeba wysyłać plików gry ani instalować Pythona. Proponowany zakres to
+Właściciel odrzucił ten ręczny krok i wybrał [automatyczny zbieracz ZIP z BAT-em](COLLECTOR.md),
+który kopiuje wybrane dane do prywatnego wyniku. Poniższy opis pozostaje jako
+historyczne wyjaśnienie kandydackich nazw, nie jako zadanie dla właściciela.
+
+Poprzednio proponowany zakres to
 wyłącznie **obecność i rozmiary kilku nazw**, bez ich otwierania:
 
 1. Zamknij grę i poczekaj, aż Steam zakończy ewentualną aktualizację. W

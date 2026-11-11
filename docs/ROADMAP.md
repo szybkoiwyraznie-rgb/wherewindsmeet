@@ -16,14 +16,15 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
   format i aktywne warstwy nie są jeszcze znane. Sprawdzić wcześniejsze
   narzędzia i ich licencje, warunki gry oraz ryzyko
   związane z trybami sieciowymi i zabezpieczeniami.
-- Zacząć od metadanych: nazw, rozmiarów i identyfikatorów wersji; ustalić,
-  co raport może bezpiecznie ujawniać. Nie zakładać silnika ani formatów.
+- Właściciel wybrał [zbieracz ZIP z BAT-em](COLLECTOR.md): inwentarz i
+  wybrane kopie kandydackich plików, przechowywane prywatnie. Nie przedstawiać
+  ich jako pełnego tekstu/kontekstu. Nie wymagać ręcznego spisywania nazw.
 - Właściciel zgłosił, że według jego ustalenia zmiany wyłącznie tekstowe są
   dozwolone, i wybrał taki kierunek. Nie potwierdziliśmy niezależnie wyjątku w
   warunkach wydawcy; kontakt w celu wyjaśnienia pozostaje opcjonalny.
-- Dla przyszłych prób ustalić minimalny materiał, prawa, kryterium powodzenia,
-  konkretny plan, kopię i przywracanie. Do tego czasu pracować na syntetycznych
-  danych. Nie obchodzić zabezpieczeń/anti-cheat.
+- Po odczytowym zbieraniu przeanalizować minimalny potrzebny materiał prywatnie.
+  Przed próbami zapisu ustalić prawa, kryterium powodzenia, konkretny plan,
+  kopię i przywracanie. Nie obchodzić zabezpieczeń/anti-cheat.
 - **Wynik:** potwierdzone fakty oddzielone od ustaleń właściciela i niewiadomych,
   ocena ryzyka oraz plan odpowiadający uzgodnionemu kierunkowi.
 

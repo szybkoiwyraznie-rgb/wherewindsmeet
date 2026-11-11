@@ -15,6 +15,7 @@ GUIDES = (
     "docs/ROADMAP.md",
     "docs/FEASIBILITY.md",
     "docs/INVENTORY.md",
+    "docs/COLLECTOR.md",
     "docs/STEAM_REFERENCE.md",
     "docs/WINDOWS_OPTIONS.md",
     "docs/PUBLISHER_PERMISSION.md",

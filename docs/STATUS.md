@@ -28,10 +28,15 @@ rosnącym `AGENTS.md`.
   aktualną kopią na plik. Jest ogólny odczytowy skaner plików, testowany na
   sztucznych katalogach, oraz syntetyczne modele linii, cofania i rotacji kopii.
   Żaden nie został uruchomiony na grze ani nie potwierdza buildu, założeń o ID
-  i zakresie czy autentyczności referencji. Brak gotowych ZIP-ów.
+  i zakresie czy autentyczności referencji. Brak gotowych ZIP-ów audytora i
+  patchera; osobny [zbieracz](COLLECTOR.md) służy tylko rozpoznaniu.
+- Na życzenie właściciela przygotowano [zbieracz Windows](COLLECTOR.md):
+  instrukcja, BAT i PowerShell tworzą jeden ZIP z inwentarzem oraz wybranymi
+  kopiami map i kandydatów kontekstu. Ręczne oględziny zostały odrzucone.
+  Kompletność tekstów/kontekstu, aktualna instalacja i prawa pozostają nieznane.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
-  [PRIOR_ART.md](PRIOR_ART.md). Jego ustalenia dotyczące plików SRW nie są
-  ustaleniami o Where Winds Meet.
+  [PRIOR_ART.md](PRIOR_ART.md); odtworzono również ZIP z generatora
+  `build_kod_kit.py`. Jego ustalenia o SRW nie są ustaleniami o WWM.
 - Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
   Publiczny [przegląd wykonalności](FEASIBILITY.md) wskazuje istniejące
   narzędzia oraz ograniczenia oficjalnych warunków gry. Nie badano jeszcze
@@ -39,13 +44,13 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 165 testów lokalnych na Linux/Python 3.11; dla kodu `3ea3b36` oba przebiegi CI przeszły 4/4 konfiguracje Windows/Linux × Python 3.11/3.12. Wyniki bieżącego commita sprawdzać osobno. |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; są [proste oględziny](STEAM_REFERENCE.md). |
+| Repozytorium i workflow | 180 testów lokalnych Linux/Python 3.11; kod zbieracza `9a4971e` przeszedł 4/4 konfiguracje CI Windows/Linux × Python 3.11/3.12 (push i PR). Dla nowszego commita sprawdzać CI osobno; [dziennik](EXPERIMENT_LOG.md). |
+| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
 | Patcher, instalacja i przywracanie | Nie powstały; są jedynie syntetyczne modele cofania i rotacji kopii, bez zapisu. `runtime_tested: false`. |
 | Aktualizacje gry | Skaner ogólnych plików oraz syntetyczny audyt i wybór linii; brak pamięci tłumaczeń, ekstrakcji i obsługi aktualizacji WWM. |
-| Aplikacje Windows i czytanka | Planowane; ZIP-ów i czytanki nie ma. |
+| Aplikacje Windows i czytanka | Docelowe ZIP-y audytora i patchera oraz czytanka są planowane; wstępny ZIP zbieracza jest osobnym narzędziem. |
 
 ## Otwarte ustalenia
 
@@ -66,15 +71,14 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Poprosić o [oględziny nazw i rozmiarów w Eksploratorze](STEAM_REFERENCE.md):
-dwa kandydackie katalogi, bez instalowania Pythona i bez przesyłania plików
-lub pełnej ścieżki. Brak katalogu nie oznacza braku tekstów w grze. Zapytać
-również o ustawiony język; nie zgadywać formatu ani aktywnej warstwy.
+Przekazać sprawdzony [zbieracz ZIP](COLLECTOR.md). Właściciel uruchamia BAT i
+sam wgrywa jeden wynik na Dysk Google. Odebrać go prywatnie do ignorowanego
+`local/`, zweryfikować bezpiecznie raport, sumy i zakres, a następnie rozpoznać
+format oraz luki kontekstu; nie obiecywać, że same mapy wystarczą. Pamiętać o
+limicie 100 MiB odbioru przez aktualne połączenie Dysku. Nie prosić o ręczne
+spisywanie plików, całą grę ani poświadczenia.
 
-Równolegle można kontynuować prace syntetyczne: rozwinąć skaner do
-strumieniowego indeksu, zaprojektować zatwierdzanie przekładów i odzyskiwanie
-po przerwaniu wieloplikowej zmiany. Przed otwieraniem treści lub
-modyfikowaniem rzeczywistych plików uzgodnić zakres, prawa, konkretny plan,
-kopię i przywracanie. Nie żądać całej gry ani poświadczeń. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md)
-jest opcjonalny; wybranego kierunku nie trzeba ponownie potwierdzać. Szczegóły
-w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
+Równolegle można kontynuować prace syntetyczne. **Przed zapisem w instalacji**
+uzgodnić prawa, konkretny plan, kopię i przywracanie; zgoda na zbieranie nie
+zastępuje tych kroków. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md) jest
+opcjonalny. Szczegóły w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
