@@ -6,16 +6,19 @@ Cztery analizy, których brakowało do projektowania paczki tłumacza:
     dialog <-> mowca   ile grup dialogowych, ile ma wielu mowcow, ile ma wyłącznie
                        mowce generyczna (gracz/techniczna) — tam nie ma rozmowy
     kompletnosc        pokrycie rejestru, sceny bez dialog_no, teksty uzyte
-                       wielokrotnie, teksty mapy niepowiazane ze scenami
+                       wielokrotnie, grupy dialogow z kiloma timeline'ami
     chronologia        spojnosc (czas, kolejnosc), powtorzone czasy, czy
                        total_duration jest wiarygodna granica sceny
     kontekst           ktore pola sa wypelnione w scenach i liniach
+    poza scenami       ile wpisow mapy tlumaczen nie nalezy do zadnej sceny
+                       („widoki": interfejs, przedmioty, miejsca, encyklopedia)
+                       oraz ile tekstow ma w mapie dluzsza wersje niz w scenie
 
 Działa wyłącznie na repozytorium: bez `local/`, bez plików z Dysku, bez gry.
 Nic nie pisze poza `--wyj`.
 
 Użycie:
-    python3 tools/analiza_korpusu.py --wyj analiza
+    python3 tools/analiza_korpusu.py --wyj analiza [--grupy]
 """
 
 from __future__ import annotations
@@ -28,6 +31,10 @@ from pathlib import Path
 
 GENERIC_SPEAKERS = {"玩家", "主角", "player", "player_1", "player_2", "我", "你"}
 MAP_ENTRIES_FILLED = 1816408  # zweryfikowane 2026-11-11 na mapie zh_cn
+MAP_FILE_ENTRIES = 3581256  # wpisy w nagłowkach chunkow mapy zh_cn
+EN_MAP_ENTRIES = 1122784  # mapa EN: 1 122 784 wpisow, 503 206 unikalnych tekstow
+EN_MAP_UNIQUE_TEXTS = 503206
+EN_MAP_REPEATS = 619578  # powtorzenia: 1 122 784 - 503 206
 
 
 def load(root: Path) -> tuple[list[dict], dict[str, dict]]:
@@ -129,10 +136,6 @@ def analyse_completeness(scenes: list[dict], texts: dict[str, dict], manifest: d
              "kwestii": sum(len(scene["linie"]) for scene in members),
              "id_timelineow": [scene["timeline_id"] for scene in members]}
             for number, members in sorted(multi)],
-        "tekstow_poza_scenami": MAP_ENTRIES_FILLED - len(texts),
-        "tekstow_poza_scenami_uwaga": (
-            "mapa zh_cn miala 1816408 niepustych wpisow (zweryfikowane 2026-11-11); "
-            "do wyliczenia potrzebny jest plik mapy, ktory zginął przy czyszczeniu local/"),
     }
 
 
@@ -215,10 +218,90 @@ def analyse_context(scenes: list[dict]) -> dict:
     }
 
 
+def analyse_offscene(scenes: list[dict], texts: dict[str, dict]) -> dict:
+    """Elementy mapy tłumaczeń, które nie należą do żadnej sceny („widoki").
+
+    Indeks trzyma tylko teksty, do których odwołują się sceny, więc liczbę
+    wpisów poza scenami wylicza się z zweryfikowanej wcześniej liczby niepustych
+    wpisów mapy `zh_cn`. Co siedzi w tych wpisach (miejsca, przedmioty,
+    interfejs, encyklopedia) opisano przy odczycie mapy i jest zapisane w
+    `docs/EXPERIMENT_LOG.md` — bez pliku mapy kategorii się nie przelicza.
+    """
+    used: set[str] = set()
+    occurrences: collections.Counter = collections.Counter()
+    for scene in scenes:
+        for line in scene["linie"]:
+            used.add(line["text_id"])
+            occurrences[line["text_id"]] += 1
+    dangling = [text_id for scene in scenes for line in scene["linie"]
+                if line["text_id"] not in texts]
+    unused = [text_id for text_id in texts if text_id not in used]
+
+    same = only_newlines = other = 0
+    example: dict | None = None
+    for text_id, row in texts.items():
+        longer = row.get("tekst_mapa")
+        if not longer:
+            continue
+        scene_text = row["tekst_zh"]
+        if longer == scene_text:
+            same += 1
+        elif longer.replace("\n", "") == scene_text.replace("\n", ""):
+            only_newlines += 1
+        else:
+            other += 1
+            if example is None:
+                example = {"text_id": text_id, "scena": scene_text, "mapa": longer}
+    with_longer = same + only_newlines + other
+    offscene = MAP_ENTRIES_FILLED - len(texts)
+    return {
+        "mapa_zh_cn": {
+            "wpisy_w_naglowkach_chunkow": MAP_FILE_ENTRIES,
+            "wpisy_niepuste": MAP_ENTRIES_FILLED,
+            "zweryfikowane": "2026-11-11, docs/EXPERIMENT_LOG.md",
+        },
+        "wpisy_przypisane_do_scen": len(texts),
+        "wpisy_poza_scenami": offscene,
+        "udzial_poza_scenami_procent": round(100 * offscene / MAP_ENTRIES_FILLED, 1),
+        "powiazania_scena_tekst": {
+            "text_id_w_scenach_bez_tekstu": len(dangling),
+            "teksty_nieuzywane_w_scenach": len(unused),
+            "text_id_w_wielu_scenach": sum(1 for count in occurrences.values() if count > 1),
+        },
+        "wariant_tekstu_mapa_vs_scena": {
+            "tekstow_z_dluzsza_wersja_w_mapie": with_longer,
+            "identycznych": same,
+            "rozni_sie_tylko_lamaniem_wiersza": only_newlines,
+            "rozni_sie_trescia": other,
+            "przyklad": example,
+            "znaczenie": ("wersję z mapy trzeba tłumaczyć: mapa trzyma pełną linię "
+                          "z dopiskiem scenicznym w nawiasach, scena tylko fragment"),
+        },
+        "co_siedzi_poza_scenami": {
+            "zrodlo": "odczyt mapy zh_cn 2026-11-11 (docs/EXPERIMENT_LOG.md)",
+            "kategorie": ["miejsca", "imiona postaci", "przedmioty", "interfejs",
+                          "encyklopedia"],
+            "przyklady": ["寿昌坊-平民", "邵冷乄德明", "耳砂珍坯·三阶", "累计登录2天"],
+            "do_przeliczenia": ("rozbicie na kategorie i liczba unikalnych tekstów poza "
+                                "scenami wymaga pliku mapy; indeks zawiera tylko teksty scen"),
+        },
+        "skala_dla_decyzji": {
+            "mapa_en_wpisy": EN_MAP_ENTRIES,
+            "mapa_en_unikalnych_tekstow": EN_MAP_UNIQUE_TEXTS,
+            "mapa_en_powtorzen": EN_MAP_REPEATS,
+            "paczka_en_zip_mb": 24,
+            "tokeny_w_paczce_en": 583,
+            "uwaga": ("liczba dla mapy EN — skala porównawcza, nie pomiar zh_cn"),
+        },
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Statystyki korpusu z indeksu w repozytorium.")
     parser.add_argument("--indeks", type=Path, default=Path("index"), help="katalog indeksu")
     parser.add_argument("--wyj", type=Path, default=Path("analiza"), help="katalog wyniku")
+    parser.add_argument("--grupy", action="store_true",
+                        help="zapisz też rozpis per grupa dialogowa (plik ok. 18 MB)")
     arguments = parser.parse_args(argv)
 
     scenes, texts = load(arguments.indeks)
@@ -231,14 +314,18 @@ def main(argv=None) -> int:
         "kompletnosc.json": analyse_completeness(scenes, texts, manifest),
         "chronologia.json": analyse_chronology(scenes),
         "kontekst.json": analyse_context(scenes),
+        "elementy_poza_scenami.json": analyse_offscene(scenes, texts),
     }
     for name, payload in outputs.items():
         (arguments.wyj / name).write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
                                           encoding="utf-8")
 
-    # Rozpis per grupa jest duza (megabajty), wiec jest tylko na zyczenie.
-    if arguments.wyj.joinpath("dialog_mowca_grupy.jsonl").exists():
-        arguments.wyj.joinpath("dialog_mowca_grupy.jsonl").unlink()
+    # Rozpis per grupa jest duzy (ok. 18 MB), wiec trafia do repo tylko na zyczenie.
+    if arguments.grupy:
+        with (arguments.wyj / "dialog_mowca_grupy.jsonl").open("w", encoding="utf-8") as handle:
+            for row in per_group:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+        outputs["dialog_mowca_grupy.jsonl"] = per_group
     print(json.dumps({"scen": len(scenes), "grup": dialogues_summary["grup_dialogowych"],
                       "plikow": len(outputs)}, ensure_ascii=False))
     return 0

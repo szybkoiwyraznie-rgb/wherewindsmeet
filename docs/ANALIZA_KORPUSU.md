@@ -1,7 +1,8 @@
-# Analiza korpusu: dialog–mówca, kompletność, chronologia, kontekst
+# Analiza korpusu: dialog–mówca, kompletność, chronologia, kontekst, elementy poza scenami
 
 Wyniki liczone z wersjonowanego `index/` (`tools/sceny_z_indeksu.py` nie jest
-potrzebny — dane są w repo). Maszynowe wersje: `analiza/*.json`.
+potrzebny — dane są w repo). Generator: `python3 tools/analiza_korpusu.py --wyj analiza`
+(opcjonalnie `--grupy`). Maszynowe wersje: `analiza/*.json`.
 
 ## 1. Dialog ↔ mówca
 
@@ -19,7 +20,8 @@ potrzebny — dane są w repo). Maszynowe wersje: `analiza/*.json`.
   powtarzające się w wielu scenach). Po rodzaju: 65 923 „postać",
   13 194 „gracz", 2 363 „techniczny", 119 bez nazwy.
 - Szczegóły per grupa (mówcy, rodzaj, liczba kwestii, pliki, projekty):
-  `analiza/dialog_mowca_grupy.jsonl`.
+  `python3 tools/analiza_korpusu.py --grupy` → `analiza/dialog_mowca_grupy.jsonl`
+  (ok. 18 MB, dlatego generowany tylko na żądanie).
 
 ## 2. Kompletność paczek i powiązań
 
@@ -35,10 +37,12 @@ potrzebny — dane są w repo). Maszynowe wersje: `analiza/*.json`.
 - **2 337 `text_id` występuje w więcej niż jednej scenie** (maksymalnie 3 razy) —
   ten sam tekst używany w kilku miejscach; tłumaczenie jest jedno na `text_id`,
   więc kontekst scen jest tylko pomocą, nie źródłem rozstrzygnięcia.
-- **1 640 262 wpisów mapy `zh_cn` nie jest przypisane do żadnej sceny**
-  (mapa miała 1 816 408 niepustych wpisów, sceny odwołują się do 176 146).
-  To przedmioty, interfejs, miejsca, encyklopedia — **do wyliczenia potrzebny
-  jest plik mapy**, który zginął przy czyszczeniu `local/`.
+- **Powiązania scena ↔ tekst są w 100% spójne**: 0 linii wskazuje na `text_id`,
+  którego nie ma w indeksie, i 0 tekstów w indeksie jest nieużywanych. Indeks
+  zawiera dokładnie tyle tekstów (176 146), ile sceny potrzebują — nic nie
+  ucieka i nic nie jest dodatkowe.
+- **1 640 262 wpisów mapy `zh_cn` nie jest przypisane do żadnej scenie** —
+  szczegóły w sekcji 5.
 
 ## 3. Chronologia scen i tekstów
 
@@ -74,11 +78,44 @@ potrzebny — dane są w repo). Maszynowe wersje: `analiza/*.json`.
 - `obsada` ma medianowo 1 wpis, maksymalnie 25 — to lista mówców sceny
   z `speaker_no` i `skeleton`.
 
+## 5. Elementy poza scenami (widoki: interfejs, przedmioty, miejsca)
+
+Mapa tłumaczeń `zh_cn` jest znacznie większa niż tekst dialogowy. Liczby
+zweryfikowane przy odczycie mapy (2026-11-11, `docs/EXPERIMENT_LOG.md`) i
+wyliczone z indeksu:
+
+| wartość | liczba |
+|---|---|
+| wpisy w nagłówkach chunków mapy | 3 581 256 |
+| niepuste pary `id` → tekst | 1 816 408 |
+| przypisane do scen (unikalne `text_id`) | 176 146 |
+| **poza scenami** | **1 640 262 (90,3% mapy)** |
+
+- Co siedzi w tych 90,3%: miejsca (`寿昌坊-平民`), imiona postaci
+  (`邵冷乄德明`), przedmioty (`耳砂珍坯·三阶`), interfejs (`累计登录2天`),
+  encyklopedia — czyli wszystko, co nie jest wypowiadane w dialogu, a musi być
+  przetłumaczone, żeby gra działała.
+- **25 258 tekstów ma w mapie dłuższą wersję niż w scenie.** Żaden z nich nie
+  jest identyczny: 22 620 różni się wyłącznie łamaniami wierszy (w scenach
+  zostają tabulatory), a **2 638 (10,4%) różni się treścią** — mapa trzyma
+  pełną linię z dopiskiem scenicznym w nawiasach, scena tylko wypowiadany
+  fragment: `（没有真生气，故作痞痞的逗他）陈叔不是让你管我吗…`. Tłumaczyć trzeba
+  wersję z mapy; który wariant renderuje klient — do sprawdzenia w grze.
+- Skala dla decyzji „tłumaczyć wszystko czy tylko sceny": mapa EN ma
+  1 122 784 wpisy, z czego 503 206 unikalnych tekstów (619 578 powtórzeń) i
+  daje paczkę 24 MB ZIP z 583 tokenami. Dla `zh_cn` liczba unikalnych tekstów
+  **nie jest zmierzona** — do policzenia trzeba pliku mapy.
+
 ## Co jest jeszcze do zrobienia
 
-1. **Wyodrębnienie elementów poza scenami** („widoki"): potrzebny plik mapy
-   `zh_cn`, żeby wyliczyć i opisać 1 640 262 tekstów niepowiązanych ze scenami.
-   Prośba o ponowne przesłanie — zginął przy czyszczeniu `local/`.
-2. Domknięcie 5 859 brakujących dialogów rejestru.
+1. **Rozbicie 1 640 262 wpisów poza scenami na kategorie** (interfejs,
+   przedmioty, miejsca, encyklopedia) i policzenie, ile to unikalnych tekstów
+   do przetłumaczenia. Liczba całkowita jest już znana; kategorie wymagają
+   pliku mapy `zh_cn` (69 470 988 B) — jest na Dysku Google, zginął tylko
+   z `local/`.
+2. Domknięcie 5 859 brakujących dialogów rejestru (brakuje `data207`–`data212`).
 3. Sprawdzenie w grze, który wariant linii (z dopiskiem w nawiasach czy bez)
-   renderuje klient — 25 258 tekstów ma dwie wersje.
+   renderuje klient — dotyczy 2 638 tekstów.
+4. Rozpis per grupa dialogowa (`analiza/dialog_mowca_grupy.jsonl`, ok. 18 MB)
+   jest generowany na żądanie: `python3 tools/analiza_korpusu.py --wyj analiza --grupy`.
+   Celowo nie trafia do repo.

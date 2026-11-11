@@ -53,23 +53,53 @@ class CorpusAnalysisTests(unittest.TestCase):
         self.assertEqual(report["uzupelnienie_pol_linii"]["source_id"], report["kwestii"])
         self.assertLess(report["uzupelnienie_pol_linii"]["speaker_no"], report["kwestii"])
 
-    def test_tool_writes_four_reports(self):
+    def test_tool_writes_five_reports(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"
             code = analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
             self.assertEqual(code, 0)
             names = sorted(path.name for path in out.iterdir())
             self.assertEqual(names, ["chronologia.json", "dialog_mowca.json",
-                                     "kompletnosc.json", "kontekst.json"])
+                                     "elementy_poza_scenami.json", "kompletnosc.json",
+                                     "kontekst.json"])
             for path in out.iterdir():
                 json.loads(path.read_text(encoding="utf-8"))
+
+    def test_tool_writes_per_group_only_on_request(self):
+        with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
+            out = Path(temp) / "analiza"
+            analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
+            self.assertFalse((out / "dialog_mowca_grupy.jsonl").exists())
+            out2 = Path(temp) / "grupy"
+            analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out2), "--grupy"])
+            rows = [json.loads(line) for line in
+                    (out2 / "dialog_mowca_grupy.jsonl").read_text(encoding="utf-8").splitlines()
+                    if line]
+            self.assertEqual(len(rows), self.manifest["pokrycie"]["scen_z_dialog_no"])
+
+    def test_offscene_report_adds_up(self):
+        report = analiza_korpusu.analyse_offscene(self.scenes, self.texts)
+        self.assertEqual(report["wpisy_przypisane_do_scen"], len(self.texts))
+        self.assertEqual(report["wpisy_poza_scenami"],
+                         analiza_korpusu.MAP_ENTRIES_FILLED - len(self.texts))
+        self.assertEqual(report["udzial_poza_scenami_procent"], 90.3)
+        # Sceny nie odwoluja sie do tekstow, ktorych nie ma w indeksie.
+        self.assertEqual(report["powiazania_scena_tekst"]["text_id_w_scenach_bez_tekstu"], 0)
+        self.assertEqual(report["powiazania_scena_tekst"]["teksty_nieuzywane_w_scenach"], 0)
+        variants = report["wariant_tekstu_mapa_vs_scena"]
+        self.assertEqual(variants["identycznych"], 0)
+        self.assertEqual(variants["tekstow_z_dluzsza_wersja_w_mapie"],
+                         self.manifest["liczby"]["tekstow_z_dluzsza_wersja_mapy"])
+        self.assertEqual(variants["tekstow_z_dluzsza_wersja_w_mapie"],
+                         variants["identycznych"] + variants["rozni_sie_tylko_lamaniem_wiersza"]
+                         + variants["rozni_sie_trescia"])
 
     def test_committed_reports_match_a_fresh_run(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"
             analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
-            for name in ("dialog_mowca.json", "kompletnosc.json",
-                         "chronologia.json", "kontekst.json"):
+            for name in ("dialog_mowca.json", "kompletnosc.json", "chronologia.json",
+                         "kontekst.json", "elementy_poza_scenami.json"):
                 committed = json.loads((ROOT / "analiza" / name).read_text(encoding="utf-8"))
                 fresh = json.loads((out / name).read_text(encoding="utf-8"))
                 self.assertEqual(committed, fresh, name)
