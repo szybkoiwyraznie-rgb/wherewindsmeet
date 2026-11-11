@@ -2,9 +2,9 @@
 
 Stan: **2026-11-10**. To przegląd publicznych źródeł, bez dostępu do instalacji
 właściciela. Rozróżniamy deklaracje wydawcy, wyniki innych projektów oraz
-własny test na próbce syntetycznej. Właściciel wybrał Windows; rekomendujemy
-Steam jako pierwszy punkt odniesienia, ale gry jeszcze nie zainstalował. Nie
-przeprowadzono testu na plikach gry.
+własny test na próbce syntetycznej. Właściciel zgłosił instalację Steam na
+Windows i podał [oznaczenia builda i wersji](STEAM_REFERENCE.md). Nie mamy
+wglądu w tę instalację i nie przeprowadzono testu na plikach gry.
 
 ## Fakty z oficjalnych źródeł
 
@@ -12,7 +12,7 @@ przeprowadzono testu na plikach gry.
   (app ID `3564740`) podaje Windows 10/11 dla wersji PC, wymaga połączenia
   szerokopasmowego i wymienia tryby solo oraz sieciowe. Na dzień przeglądu w
   wykazie języków interfejsu/napisów nie ma polskiego. To **nie** potwierdza
-  aktywnych warstw tekstów ani konkretnego buildu przyszłej instalacji.
+  aktywnych warstw tekstów ani autentyczności plików zgłoszonej instalacji.
 - Ta sama karta opisuje także generowany w czasie rzeczywistym tekst i głos
   niektórych NPC. Nie wolno więc zakładać, że jednorazowy ekstrakt statycznych
   tekstów obejmie wszystkie możliwe wypowiedzi ani że sam zapewni czytankę.
@@ -48,10 +48,11 @@ nie zakładamy, że zmiana jedynie tekstowych wartości pozostawi resztę bajtó
 kontenera niezmienioną. Jeśli klient automatycznie przywraca plik, nie obchodzimy
 tego mechanizmu.
 
-Kontynuujemy na źródłach publicznych i próbkach syntetycznych. Rzeczywistych
-plików nie żądamy ani nie modyfikujemy bez uzgodnienia konkretnego planu, kopii
-i sposobu przywrócenia; gra nie jest jeszcze zainstalowana. Właściciel może
-normalnie zainstalować i uruchamiać oryginalną grę. Nie wymagamy ponownego
+Kontynuujemy na źródłach publicznych i próbkach syntetycznych. Właściciel
+zgłosił instalację Steam, ale nie mamy dostępu do jej plików. Proponowane
+[oględziny nazw i rozmiarów](STEAM_REFERENCE.md) nie wymagają otwierania plików.
+Nie żądamy ani nie modyfikujemy rzeczywistych plików bez uzgodnienia
+konkretnego planu, kopii i sposobu przywrócenia. Nie wymagamy ponownego
 potwierdzenia wybranego kierunku. Opcjonalny, niewysłany
 [szkic kontaktu z wydawcą](PUBLISHER_PERMISSION.md) może pomóc wyjaśnić zakres
 praw, ale nie jest warunkiem kontynuowania pracy syntetycznej.
@@ -99,8 +100,9 @@ narzędzia nie udziela praw do tekstów ani plików gry.
 
 ## Co trzeba rozstrzygnąć przed ekstrakcją
 
-- **Edycja:** zalecany na początek Windows/Steam, ale brak jeszcze instalacji,
-  regionu i numeru wersji/builda; ścieżki jednego klienta mogą nie pasować do
+- **Edycja:** właściciel zgłosił Windows/Steam i oznaczenia z ekranów oraz
+  Steam ([szczegóły](STEAM_REFERENCE.md)); nie znamy regionu ani nie
+  potwierdziliśmy stanu plików. Ścieżki jednego klienta mogą nie pasować do
   oficjalnego launchera ani Epic.
 - **Źródła:** czy potrzebne mapy rzeczywiście istnieją i które warstwy są
   aktywne; zgodność wersji, `_diff`, usunięć, wariantów i powtórzeń. Nie
@@ -115,7 +117,8 @@ narzędzia nie udziela praw do tekstów ani plików gry.
 - **Jakość:** znaki polskie, tokeny, kontekst, limity, pełny backup/rollback i
   test w grze pozostają niezweryfikowane.
 
-Po instalacji i uzgodnieniu konkretnego sposobu pracy ewentualnym pierwszym
-wejściem może być mały [raport metadanych](INVENTORY.md), nie pełny katalog
-gry. Na razie nie prosimy o pliki gry. Przed publicznym ujawnieniem danych
-tekstowych trzeba osobno ustalić prawa i zgodę właściciela.
+Następnym krokiem mogą być [oględziny nazw i rozmiarów](STEAM_REFERENCE.md)
+w Eksploratorze, bez otwierania lub przesyłania plików gry. Opcjonalne
+narzędzie [raportu metadanych](INVENTORY.md) testowano tylko syntetycznie.
+Przed publicznym ujawnieniem danych tekstowych trzeba osobno ustalić prawa
+i zgodę właściciela.

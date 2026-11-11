@@ -3,10 +3,11 @@
 `tools/inspect_localization.py` jest małym narzędziem rozpoznawczym, nie
 ekstraktorem ani patchem. Powstało na podstawie publicznie opisanych nazw plików
 z [FEASIBILITY.md](FEASIBILITY.md); zgodność z instalacją właściciela **nie
-została sprawdzona**. Na razie nie prosimy o uruchamianie go na instalacji.
-Ewentualny zakres takiej inwentaryzacji uzgodnimy po instalacji; ustalenie
-właściciela i nierozstrzygnięty zakres warunków opisuje
-[FEASIBILITY.md](FEASIBILITY.md).
+została sprawdzona**. Jako prostszy pierwszy krok bez instalacji Pythona
+proponujemy [oględziny nazw w Eksploratorze](STEAM_REFERENCE.md). Tam też
+opisano opcjonalny skrypt sprawdzający dwie kandydackie lokalizacje; jest on
+przetestowany tylko na katalogach syntetycznych. Ustalenie właściciela i
+nierozstrzygnięty zakres warunków opisuje [FEASIBILITY.md](FEASIBILITY.md).
 
 ## Co robi, a czego nie robi
 
@@ -38,8 +39,10 @@ folderu gry:
 python tools/inspect_localization.py --locale-dir "ŚCIEŻKA_DO_KATALOGU_LOKALIZACJI"
 ```
 
-Wynikiem jest JSON na standardowym wyjściu. Nic nie jest zapisywane automatycznie;
-przed ewentualnym przekazaniem raportu należy go obejrzeć. Publiczne źródła
+Wynikiem jest JSON na standardowym wyjściu; skrypt nie zapisuje raportu ani nie
+zmienia wskazanych plików gry. Python może utworzyć pliki cache modułów;
+przekierowanie stdout może zapisać raport we wskazanym miejscu. Przed
+ewentualnym przekazaniem raportu należy go obejrzeć. Publiczne źródła
 opisują dla niektórych wydań PC podkatalogi `Package/HD/oversea/locale` i
 `LocalData/Patch/HD/oversea/locale`, ale są to tylko tropy — nie wiemy, czy
 istnieją w Twoim wydaniu, ani która warstwa jest aktualna.

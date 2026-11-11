@@ -1,22 +1,23 @@
 # Windows: wydanie referencyjne i warianty techniczne
 
-Stan: **2026-11-10**. Właściciel wskazał **Windows**, jeszcze nie zainstalował
-*Where Winds Meet*, chce niezależnego tłumaczenia wspomaganego dobrym modelem i
-preferuje tekst natywnie w grze. Według jego ustalenia modyfikacje ograniczone
+Stan: **2026-11-10**. Właściciel zgłosił instalację *Where Winds Meet* ze Steam
+na **Windows** i podał [oznaczenia wersji i buildu](STEAM_REFERENCE.md). Chce
+niezależnego tłumaczenia wspomaganego dobrym modelem i preferuje tekst natywnie
+w grze. Według jego ustalenia modyfikacje ograniczone
 wyłącznie do tekstu są dozwolone; tego wyjątku nie potwierdziliśmy niezależnie.
 Nakładka ma być wariantem rezerwowym. Nie wykorzystujemy gotowego polskiego
 tłumaczenia Arimy ani innych niezweryfikowanych gotowych zwrotek; wskazane
 projekty badamy jako źródła informacji technicznych.
 
-## Rekomendacja: Steam jako pierwsza wersja referencyjna
+## Pierwsza wersja referencyjna: Steam na Windows
 
 | Wariant | Co przemawia za / przeciw | Stan dowodów |
 |---|---|---|
-| **Windows + Steam** | [Karta Steam](https://store.steampowered.com/app/3564740/Where_Winds_Meet/) ma stały app ID `3564740`; Steam udostępnia informację o buildzie i weryfikację instalacji. Wariant pojawia się w przejrzanych opisach społeczności, więc łatwiej porównywać rezultaty. | **Rekomendacja na start, nie dowód zgodności.** Społeczność opisuje przywracanie `_diff`, także przy starcie; aktualne zachowanie nie było przez nas sprawdzane. |
+| **Windows + Steam** | [Karta Steam](https://store.steampowered.com/app/3564740/Where_Winds_Meet/) ma stały app ID `3564740`; Steam udostępnia informację o buildzie i weryfikację instalacji. Wariant pojawia się w przejrzanych opisach społeczności, więc łatwiej porównywać rezultaty. | **Zgłoszony przez właściciela punkt odniesienia, nie dowód zgodności.** Społeczność opisuje przywracanie `_diff`, także przy starcie; aktualne zachowanie nie było przez nas sprawdzane. |
 | Oficjalny launcher PC | Autor polskiego instalatora uwzględnia go w heurystykach, a społeczność opisuje odrębne ścieżki. Może być późniejszym celem. | Nie wiemy, czy obecny klient łatwiej obsłuży własną lokalizację lub inaczej weryfikuje `_diff`. Nie przetestowano. |
 | Epic Games | Kod polskiego instalatora zawiera typowe ścieżki i łączy ten wariant z launcherem. | Sama heurystyka nie dowodzi poprawnego wykrywania, zgodności plików ani działania w aktualnej grze. Nie przetestowano. |
 
-Steam wybieramy dla **powtarzalnego punktu odniesienia**, nie dlatego, że jest
+Właściciel wybrał Steam jako **punkt odniesienia**; nie wynika z tego, że jest
 bezpieczniejszy dla konta albo na pewno łatwiejszy do modyfikacji. Nie ma
 podstaw, by twierdzić, że alternatywny launcher eliminuje przywracanie plików.
 Aktualizacje gry i weryfikacja mogą zmieniać pliki; nie planujemy omijać
@@ -31,13 +32,11 @@ Nie zakładamy, że ustawienia lub pliki lokalne synchronizują się razem z pos
 
 ### Co może zrobić właściciel
 
-Można zainstalować **zwykłą, niemodyfikowaną grę ze Steam** i zostawić zapas
-miejsca na aktualizacje. Po instalacji wystarczy podać numer wersji gry i, jeśli
-jest widoczny, **Steam Build ID**: Biblioteka → prawy przycisk na grze →
-Właściwości → Aktualizacje (etykiety mogą się różnić między wersjami klienta).
-Build ID Steam nie musi być numerem wersji gry ani dowodem stanu wszystkich
-plików. Nie potrzebujemy danych konta, pełnej ścieżki, całej gry ani zrzutów z
-osobistymi danymi. Na tym etapie nie prosimy o uruchamianie narzędzi na grze.
+Właściciel podał już oznaczenia Steam i ekranów gry. Build ID Steam nie musi
+być numerem wersji gry ani dowodem stanu wszystkich plików. Następny prosty
+krok to [oględziny kilku nazw i rozmiarów w Eksploratorze](STEAM_REFERENCE.md),
+bez Pythona i bez otwierania plików gry. Nie potrzebujemy danych konta, pełnej
+ścieżki, całej gry ani zrzutów z osobistymi danymi.
 
 ## Co wynika z polskiego instalatora Arimy
 
@@ -47,7 +46,7 @@ ani nie uruchomiono binarnego instalatora, plików gry ani jego tłumaczeń.
 
 - Kod rozróżnia bazę i warstwy aktualizacji, warianty językowe oraz niektóre
   nazwy `__small` i `_diff`. To konkretne tropy, ale nie dowód tego, jakie
-  pliki są aktywne w naszym przyszłym buildzie.
+  pliki są aktywne w zgłoszonej instalacji.
 - Funkcja nazywana przez autora „injectorem” w przejrzanym kodzie obserwuje i
   podmienia **plik** podczas startu; nie stwierdziliśmy tam wstrzykiwania kodu
   do pamięci gry. Nie przejmujemy tego mechanizmu ani nie zalecamy jego użycia:

@@ -9,7 +9,7 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
 
 1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
    `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WINDOWS_OPTIONS.md`,
-   `docs/UPDATES_AND_RESTORE.md`, `docs/TWO_APPLICATIONS.md`,
+   `docs/STEAM_REFERENCE.md`, `docs/UPDATES_AND_RESTORE.md`, `docs/TWO_APPLICATIONS.md`,
    `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
    `docs/EXPERIMENT_LOG.md`.
    Zajrzyj do `docs/PRIOR_ART.md` przed
@@ -42,10 +42,12 @@ etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
   katalog gry, dane logowania ani pliki, które nie są konieczne. Pliki wrażliwe
   trzymaj lokalnie; nie umieszczaj prywatnych linków ani identyfikatorów w
   publicznych opisach i logach.
-- Platforma docelowa to Windows; Steam jest rekomendowany jako pierwszy klient
-  referencyjny, ale właściciel nie zainstalował jeszcze gry. Build, region i
-  język źródłowy pozostają nieustalone. Publiczne informacje o grze i istotne
-  ograniczenia warunków są w `docs/FEASIBILITY.md` i `docs/WINDOWS_OPTIONS.md`.
+- Platforma docelowa to Windows; właściciel zgłosił instalację Steam i podał
+  oznaczenia buildu oraz wersji ekranów w `docs/STEAM_REFERENCE.md`. Nie mamy
+  dostępu do tej instalacji, a jej autentyczności i stanu nie zweryfikowano.
+  Region, język źródłowy, format i aktywne warstwy pozostają nieustalone.
+  Publiczne informacje o grze i istotne ograniczenia warunków są w
+  `docs/FEASIBILITY.md` i `docs/WINDOWS_OPTIONS.md`.
   Nie obiecuj zgodności z aktualizacjami ani bezpieczeństwa konta. Nie obchodź
   zabezpieczeń ani anti-cheat. Nie modyfikuj instalacji użytkownika ani nie
   żądaj rzeczywistych plików gry bez uzgodnionego planu, kopii i sprawdzonego

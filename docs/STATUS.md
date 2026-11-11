@@ -8,8 +8,10 @@ rosnącym `AGENTS.md`.
 
 - Właściciel rozpoczyna nieoficjalną polską wersję *Where Winds Meet*. Chce
   procesu analogicznego do SRW Y: ekstrakcja → tłumacz → import i instalacja,
-  później czytanka i obsługa aktualizacji. Celem jest Windows; gra nie jest
-  jeszcze zainstalowana, a [rekomendowaną wersją startową jest Steam](WINDOWS_OPTIONS.md).
+  później czytanka i obsługa aktualizacji. Zgłosił instalację Steam na Windows:
+  App ID `3564740`, Build ID `25906190`, `1.1.0.63833` na ekranie logowania i
+  `1.0.332.63833` po załadowaniu. Są to [odrębne oznaczenia](STEAM_REFERENCE.md),
+  nie dowód autentyczności plików ani ich zgodności z narzędziami.
 - Preferuje własne tłumaczenie z dobrym modelem oraz tekst natywnie w grze;
   nakładka to plan awaryjny. Nie wykorzystujemy gotowego polskiego tłumaczenia
   Arimy ani innych niezweryfikowanych gotowych zwrotek.
@@ -37,8 +39,8 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 150 testów lokalnych; 4/4 konfiguracje CI przeszły dla poprawki `1688eac` na Windows i Linuksie. Wyniki bieżącego commita sprawdzać osobno. |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Windows wybrano; Steam rekomendowano. Instalacja, build, zakres warunków i zgodność narzędzi pozostają niepotwierdzone; jest [narzędzie metadanych](INVENTORY.md). |
+| Repozytorium i workflow | 165 testów lokalnych na Linux/Python 3.11; 4/4 konfiguracje CI przeszły dla wcześniejszego commita `8184c5b` na Windows i Linuksie. Wyniki bieżącego commita sprawdzać osobno. |
+| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; są [proste oględziny](STEAM_REFERENCE.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
 | Patcher, instalacja i przywracanie | Nie powstały; są jedynie syntetyczne modele cofania i rotacji kopii, bez zapisu. `runtime_tested: false`. |
@@ -47,8 +49,9 @@ rosnącym `AGENTS.md`.
 
 ## Otwarte ustalenia
 
-1. Potwierdzenie instalacji Steam, regionu oraz wersji gry i Build ID; zakres
-   planowanych testów dla tego klienta.
+1. Region, ustawiony język, istnienie kandydackich katalogów i plików oraz
+   zakres planowanych testów dla zgłoszonej instalacji Steam. Build ID i numery
+   ekranów są zapisane jako zgłoszone, nie jako weryfikacja plików.
 2. Język źródłowy/referencyjny, wybór modelu, koszty, prawo i warunki
    przetwarzania oraz publikacji tekstu gry. Nie używamy cudzej gotowej
    polonizacji jako źródła tłumaczenia.
@@ -63,14 +66,15 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Kontynuować na próbkach syntetycznych: rozwinąć skaner do strumieniowego
-indeksu, zaprojektować jawne zatwierdzanie przekładów oraz odzyskiwanie po
-przerwaniu wieloplikowej zmiany.
-Później potrzebne będą format i stabilność ID, dokładniejsze reguły tokenów oraz
-bezpieczny import. Właściciel może zainstalować niemodyfikowaną grę ze Steam;
-po instalacji przydadzą się wersja i Build ID. Przed rzeczywistymi plikami
-uzgodnić konkretny plan, kopię oraz przywracanie, a dopiero jeśli to potrzebne —
-minimalny raport metadanych.
-Nie żądać całej gry ani poświadczeń. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md)
+Poprosić o [oględziny nazw i rozmiarów w Eksploratorze](STEAM_REFERENCE.md):
+dwa kandydackie katalogi, bez instalowania Pythona i bez przesyłania plików
+lub pełnej ścieżki. Brak katalogu nie oznacza braku tekstów w grze. Zapytać
+również o ustawiony język; nie zgadywać formatu ani aktywnej warstwy.
+
+Równolegle można kontynuować prace syntetyczne: rozwinąć skaner do
+strumieniowego indeksu, zaprojektować zatwierdzanie przekładów i odzyskiwanie
+po przerwaniu wieloplikowej zmiany. Przed otwieraniem treści lub
+modyfikowaniem rzeczywistych plików uzgodnić zakres, prawa, konkretny plan,
+kopię i przywracanie. Nie żądać całej gry ani poświadczeń. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md)
 jest opcjonalny; wybranego kierunku nie trzeba ponownie potwierdzać. Szczegóły
 w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).

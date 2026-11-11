@@ -11,9 +11,10 @@ uruchamiane bez gry. Nie udajemy, że powstał już patch lub ekstraktor.
 
 ## 1. Rozpoznanie i wykonalność
 
-- Celem jest Windows; [Steam rekomendowano na start](WINDOWS_OPTIONS.md). Po
-  instalacji ustalić wydanie, region, wersję, język źródłowy i zakres projektu.
-  Sprawdzić wcześniejsze narzędzia i ich licencje, warunki gry oraz ryzyko
+- Celem jest Windows; właściciel zgłosił instalację Steam i podał
+  [oznaczenia builda i wersji](STEAM_REFERENCE.md). Region, język źródłowy,
+  format i aktywne warstwy nie są jeszcze znane. Sprawdzić wcześniejsze
+  narzędzia i ich licencje, warunki gry oraz ryzyko
   związane z trybami sieciowymi i zabezpieczeniami.
 - Zacząć od metadanych: nazw, rozmiarów i identyfikatorów wersji; ustalić,
   co raport może bezpiecznie ujawniać. Nie zakładać silnika ani formatów.

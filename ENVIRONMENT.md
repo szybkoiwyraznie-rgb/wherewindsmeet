@@ -3,8 +3,10 @@
 ## Wymagania obecnego etapu
 
 - Git dostępny w `PATH`.
-- Python 3.11 lub 3.12. Obecne kontrole używają wyłącznie biblioteki
-  standardowej; nie trzeba instalować `pip`-em bibliotek ani mieć plików gry.
+- Python 3.11 lub 3.12 do uruchamiania testów i opcjonalnych skryptów.
+  Obecne kontrole używają wyłącznie biblioteki standardowej; nie trzeba
+  instalować `pip`-em bibliotek ani mieć plików gry. Pierwsze oględziny
+  instalacji w Eksploratorze nie wymagają Pythona.
 - GitHub CLI (`gh`) jest potrzebne do obsługi PR, nie do uruchomienia testów.
 
 Lokalnie sprawdzono Linux i Python 3.11. W GitHub Actions przeszły również
@@ -26,8 +28,9 @@ W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
 Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
-metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); zakres jego
-późniejszego użycia na instalacji trzeba będzie uzgodnić. Prototyp pakietu
+metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); prostszy pierwszy
+krok w Eksploratorze i opcjonalny skrypt dla dwóch lokalizacji opisuje
+[docs/STEAM_REFERENCE.md](docs/STEAM_REFERENCE.md). Prototyp pakietu
 na wymyślonych danych opisuje [docs/TRANSLATION_BUNDLE.md](docs/TRANSLATION_BUNDLE.md),
 a porównanie aktualizacji, odczytowy skaner plików oraz modele przywracania —
 [docs/UPDATES_AND_RESTORE.md](docs/UPDATES_AND_RESTORE.md) i

@@ -4,8 +4,9 @@ Nieoficjalny projekt polskiej wersji gry **Where Winds Meet**. Chcemy zbudować
 powtarzalny proces: teksty z gry → pakiet dla tłumacza → sprawdzony import →
 polska wersja w grze. W planie są również czytanka i obsługa aktualizacji gry.
 
-**Stan: rozpoznanie i organizacja projektu.** Celem jest Windows; jako pierwszą
-wersję referencyjną rekomendujemy Steam. Właściciel nie zainstalował jeszcze gry.
+**Stan: rozpoznanie i organizacja projektu.** Właściciel zgłosił instalację
+Steam na Windows i podał [oznaczenia wersji oraz buildu](docs/STEAM_REFERENCE.md).
+Nie mamy dostępu do tej instalacji ani nie sprawdziliśmy jej plików.
 Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
 planem awaryjnym. Właściciel wskazał kierunek ograniczony do zmian tekstu przy
 wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmian.
@@ -14,13 +15,14 @@ Powstały prototypy [pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) oraz
 wymyślonych danych. Właściciel wybrał [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md):
 audytor i patcher. Jest ogólny skaner SHA-256 testowany na sztucznych katalogach;
 nie ma jeszcze ekstraktora, importera do gry, instalatora, archiwów aplikacji
-ani czytanki. Działania na grze nie sprawdzono.
+ani czytanki. Naszych narzędzi ani zmian nie testowano na grze.
 
 ## Od czego zacząć
 
 - [Stan i najbliższy krok](docs/STATUS.md)
 - [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
+  [instalacja Steam i oględziny bez Pythona](docs/STEAM_REFERENCE.md),
   [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md),
   [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md),
   [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md) oraz [sposób pracy](docs/WORKFLOW.md)

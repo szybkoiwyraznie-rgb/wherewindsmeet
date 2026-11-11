@@ -343,3 +343,38 @@ cudzego kodu ani nie wymagają tej procedury.
   i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/42883870587)
   przeszły **4/4** (Linux/Windows × Python 3.11/3.12). Testy CI nie oznaczają
   testu na WWM; wyniki kolejnego commita należy sprawdzić osobno.
+
+## 2026-11-10 — zgłoszona instalacja Steam i następny krok
+
+- **Wejście:** właściciel zgłosił Steam na Windows. Zrzut pokazuje App ID
+  `3564740`, Build ID `25906190` i dosłowny znacznik „Installed content
+  updated: Nov 11, 2026 at 7:23 AM”. Właściciel podał `1.1.0.63833` na
+  ekranie logowania oraz pokazał `1.0.332.63833` po załadowaniu. Oznaczenia
+  zapisano oddzielnie w [STEAM_REFERENCE.md](STEAM_REFERENCE.md); wspólna
+  końcówka dwóch numerów ekranowych nie dowodzi tożsamości komponentu ani
+  bajtów plików.
+- **Metoda:** przegląd przypiętego [kodu instalatora społeczności](https://github.com/arimacold/wwm-spolszczenie/blob/d0a32ee8938526b6fdf6d829bf00baa0fb86b4c3/Instalator/installer.py)
+  wskazuje `Package/HD/oversea/locale` i `LocalData/Patch/HD/oversea/locale`
+  jako kandydatów, nie potwierdza ich obecności lub aktywności w zgłoszonej
+  instalacji. Proponujemy oględziny nazw i rozmiarów w Eksploratorze bez
+  wysyłania plików, ich zawartości, pełnej ścieżki lub danych konta.
+- **Narzędzie opcjonalne:** `inspect_steam_layout.py` sprawdza `lstat` dla
+  dziewięciu stałych nazw w dwóch kandydackich lokalizacjach; nie otwiera
+  zawartości ani nie podejmuje zapisu w drzewie gry. Raport pomija podaną
+  ścieżkę i informacje z wyjątków. Nieudostępniony kandydacki podkatalog daje
+  `incomplete`, nie dziewięć pozornie brakujących plików; linki/reparse są
+  pomijane według
+  kontroli best effort. Kontrole nie zapobiegają wyścigom ani nie stanowią
+  migawki. Opcja `-B` blokuje tworzenie plików bytecode Pythona (`.pyc`).
+- **Weryfikacja:** Linux/Python 3.11.2, `python3 tools/run_tests.py` — **165/165**
+  testów, bez pominięć; `compileall` i `git diff --check` poprawne. Nowe testy
+  używają wyłącznie syntetycznych katalogów, w tym odrzuceń symlinków i
+  symulowanych punktów reparse, braku dostępu i zmiany katalogu. Blokowane są
+  wybrane funkcje otwierania, tworzenia i usuwania, zmiany nazw, listowania oraz
+  gniazda sieciowe. Wyniki Windows i Pythona 3.12 dla tego commita należy
+  sprawdzić osobno w CI.
+- **Ograniczenia:** nie uzyskano dostępu do instalacji ani nie wykonano testu
+  na WWM. Region, język, format i aktywne warstwy są nieznane; Build ID nie
+  potwierdza autentyczności ani stanu plików. Nie ma ekstraktora, importera,
+  działającego patchera ani gotowych ZIP-ów. Samo narzędzie metadanych nie
+  weryfikuje formatu, kompletności, pochodzenia ani uprawnień do modyfikacji.
