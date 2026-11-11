@@ -477,6 +477,12 @@ cudzego kodu ani nie wymagają tej procedury.
   `f77b637fa83b5b729a13064b119a643f8c28c36e127250b55d7559123d64c541`;
   trzy oczekiwane pliki, CRC poprawne, BAT w archiwum nie zawiera
   `-ExecutionPolicy`.
-- **Ograniczenia:** PowerShell nie jest zainstalowany w środowisku Linux, więc
-  zmienionego BAT-a/PS1 nie uruchomiono w Windows. CI Windows dla tej zmiany
-  oczekuje sprawdzenia; nie testowano na instalacji gry.
+- **CI:** dla commita `86471d6e5b05cd8d144c1582f5941d0966e4336f` przebiegi
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43059814684)
+  i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43059849827)
+  przeszły **4/4** konfiguracje Linux/Windows × Python 3.11/3.12. Testy
+  Windows uruchamiają BAT i PowerShell na sztucznym drzewie, teraz z bieżącą
+  polityką wykonywania.
+- **Ograniczenia:** PowerShell nie jest zainstalowany lokalnie w środowisku
+  Linux, więc BAT-a nie uruchomiono w tej sesji. CI nie testuje instalacji gry
+  ani ustawień polityki na komputerze właściciela.

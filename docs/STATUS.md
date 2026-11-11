@@ -36,7 +36,8 @@ rosnącym `AGENTS.md`.
   Kompletność tekstów/kontekstu, aktualna instalacja i prawa pozostają nieznane.
   Na prośbę właściciela BAT przestał nadpisywać politykę wykonywania PowerShell;
   jeśli system blokuje skrypt, instrukcja zaleca przerwanie bez obniżania polityki.
-  Zmiana nie została jeszcze sprawdzona w Windows CI ani na komputerze właściciela.
+  Zmiana przeszła CI na Linux/Windows × Python 3.11/3.12; nie testowano jej
+  na komputerze właściciela ani na instalacji gry.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md); odtworzono również ZIP z generatora
   `build_kod_kit.py`. Jego ustalenia o SRW nie są ustaleniami o WWM.
@@ -47,7 +48,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 180 testów lokalnych Linux/Python 3.11; kod zbieracza `075c8ab` przeszedł 4/4 konfiguracje CI Windows/Linux × Python 3.11/3.12 (push i PR), w tym testy Windows na sztucznej instalacji. Zmiana polityki PowerShell wymaga osobnego wyniku CI; [dziennik](EXPERIMENT_LOG.md). |
+| Repozytorium i workflow | 180 testów lokalnych Linux/Python 3.11; kod zbieracza `075c8ab` przeszedł 4/4 konfiguracje CI Windows/Linux × Python 3.11/3.12. Zmiana polityki PowerShell również przeszła 4/4 konfiguracje push i PR; [dziennik](EXPERIMENT_LOG.md). |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
