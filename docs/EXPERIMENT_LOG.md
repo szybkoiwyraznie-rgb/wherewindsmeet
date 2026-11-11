@@ -461,3 +461,28 @@ cudzego kodu ani nie wymagają tej procedury.
   `3a43a299ce694aa849a86c365af63e24fbb52636543c2cdbfa837dbfb48bbc5c`.
   Trzy człony, CRC i zgodność z deterministycznym builderem sprawdzono; nie
   zawiera danych gry. Zastępuje poprzednią wersję podaną historycznie wyżej.
+
+## 2026-11-11 — zbieracz respektuje politykę PowerShell
+
+- **Decyzja:** na prośbę właściciela usunięto z dystrybuowanego `URUCHOM.bat`
+  wymuszenie `-ExecutionPolicy Bypass`. BAT uruchamia teraz Windows PowerShell
+  z jego bieżącą polityką; nie zmienia i nie obchodzi ustawień systemu. Jeżeli
+  polityka blokuje skrypt, narzędzie może się nie uruchomić — instrukcje każą
+  przerwać, nie osłabiać polityki. Usunięto też nadpisanie z pomocnika testów
+  Windows, a test buildera sprawdza brak argumentu `-ExecutionPolicy`.
+- **Weryfikacja lokalna:** Linux/Python 3.11.2, `python tools/run_tests.py` —
+  **180/180** testów; `python -m compileall -q tools tests` oraz
+  `git diff --check` przeszły. ZIP zbudowano deterministycznym builderem:
+  **31 065 B**, SHA-256
+  `f77b637fa83b5b729a13064b119a643f8c28c36e127250b55d7559123d64c541`;
+  trzy oczekiwane pliki, CRC poprawne, BAT w archiwum nie zawiera
+  `-ExecutionPolicy`.
+- **CI:** dla commita `86471d6e5b05cd8d144c1582f5941d0966e4336f` przebiegi
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43059814684)
+  i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43059849827)
+  przeszły **4/4** konfiguracje Linux/Windows × Python 3.11/3.12. Testy
+  Windows uruchamiają BAT i PowerShell na sztucznym drzewie, teraz z bieżącą
+  polityką wykonywania.
+- **Ograniczenia:** PowerShell nie jest zainstalowany lokalnie w środowisku
+  Linux, więc BAT-a nie uruchomiono w tej sesji. CI nie testuje instalacji gry
+  ani ustawień polityki na komputerze właściciela.

@@ -5,9 +5,11 @@
 Jednorazowy, odczytowy zestaw do rozpoznania instalacji: rozpakuj ZIP,
 uruchom `URUCHOM.bat`, otrzymaj **jeden** ZIP na Pulpicie i przekaż go
 prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
-instaluje Pythona, zależności ani niczego nie pobiera przez skrypt. Zbieracz
-nie instaluje ani nie cofa tłumaczenia. Jest osobny od planowanych
-[audytora i patchera](TWO_APPLICATIONS.md).
+instaluje Pythona, zależności ani niczego nie pobiera przez skrypt. BAT
+uruchamia PowerShell bez nadpisywania jego polityki wykonywania. Jeśli ta
+polityka blokuje skrypt, nie obniżaj jej ani nie omijaj zabezpieczeń — przerwij
+uruchamianie. Zbieracz nie instaluje ani nie cofa tłumaczenia. Jest osobny od
+planowanych [audytora i patchera](TWO_APPLICATIONS.md).
 
 Właściciel wskazał wzorce SRW Y. W repozytorium `mtgcrawler` odnaleziono
 [generator `build_kod_kit.py`](https://github.com/szybkoiwyraznie-rgb/mtgcrawler/blob/2b675b15e190248c47f0e30791b9dbbc46e08e04/srw-y-translation/tools/build_kod_kit.py).

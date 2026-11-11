@@ -59,7 +59,8 @@ class CollectorKitTests(unittest.TestCase):
     def test_launcher_runs_local_powershell_without_python_or_downloads(self):
         launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
         self.assertIn('WindowsPowerShell\\v1.0\\powershell.exe', launcher)
-        self.assertIn('-ExecutionPolicy Bypass -File "%~dp0zbierz.ps1" %*', launcher)
+        self.assertIn('-NoLogo -NoProfile -File "%~dp0zbierz.ps1" %*', launcher)
+        self.assertNotIn("-ExecutionPolicy", launcher)
         self.assertIn("pause", launcher)
         self.assertNotIn("pip install", launcher.lower())
         self.assertNotIn("python.exe", launcher.lower())

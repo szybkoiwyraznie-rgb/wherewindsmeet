@@ -61,7 +61,7 @@ if os.name == "nt":
 
         def run_ps(self, *args: str):
             return subprocess.run(
-                [str(self.ps), "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                [str(self.ps), "-NoLogo", "-NoProfile", "-NonInteractive",
                  "-File", str(self.kit / "zbierz.ps1"), *map(str, args)],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180, check=False,
             )
