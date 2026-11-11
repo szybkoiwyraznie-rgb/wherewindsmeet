@@ -136,3 +136,28 @@ Git ignoruje artefakty ZIP. Testy Windows wykonują **rozpakowane** BAT i
 Windows PowerShell na fikcyjnej instalacji, a testy Linux sprawdzają builder,
 kodowanie i walidator. Wynik dla konkretnego commita zob. w dzienniku i CI.
 Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
+
+## Uzupełnienie korpusu: `spakuj_dane.ps1`
+
+`zbierz.ps1` ma z założenia limit payloadu 90 MB, więc nie uniesie całego korpusu:
+same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
+`MANIFEST` pokazuje **74 951** dialogów, z których `data205` daje tylko 7 571
+(patrz [SCENY_WWM.md](SCENY_WWM.md)).
+
+Do jednorazowego uzupełnienia służy osobny skrypt, który **tylko czyta** katalog gry:
+kopiuje wskazany zestaw plików do folderu tymczasowego, liczy SHA-256, zapisuje
+`SPIS.json` i pakuje ZIP do wgrania na Dysk.
+
+```powershell
+# dialogi (data200-data212 bez data205, ~133 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet"
+
+# kontekst: pozostałe dataN, MANIFEST, CameraZone, Audio_Area, bulk_data (~80 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres kontekst
+
+# wszystko naraz (~215 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres wszystko
+```
+
+`-ExecutionPolicy Bypass` dotyczy tylko tego procesu — skrypt nie zmienia rejestru
+ani polityki systemu, nie dotyka zapisów gry i nie zapisuje nic w katalogu gry.
