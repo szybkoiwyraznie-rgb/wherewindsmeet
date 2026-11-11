@@ -163,7 +163,7 @@ function Read-BuildForGame([string] $Root) {
         $acf = Join-Path $dir.Parent.FullName 'appmanifest_3564740.acf'
         $name = Get-AcfValue $acf 'installdir'
         $build = Get-AcfValue $acf 'buildid'
-        if ($name -ieq (Split-Path -Leaf $Root) -and $build -match '^\d+$') { return $build }
+        if ($name -ieq ([IO.Path]::GetFileName($Root)) -and $build -match '^\d+$') { return $build }
     } catch { }
     return ''
 }
@@ -217,7 +217,7 @@ function Inspect-KnownLocations {
             $full = Join-Path $script:RootPath ($relative.Replace('/', '\'))
             $status = 'not_found_or_unavailable'
             try {
-                $parent = Split-Path -Parent $full
+                $parent = [IO.Path]::GetDirectoryName($full)
                 Assert-NoReparseAncestors $parent
                 $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
                 if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
@@ -291,7 +291,7 @@ function Get-Sha256([string] $Path) {
 }
 
 function Stable-Hash([string] $Path, [long] $ExpectedSize) {
-    Assert-NoReparseAncestors (Split-Path -Parent $Path)
+    Assert-NoReparseAncestors ([IO.Path]::GetDirectoryName($Path))
     $before = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
     if ($before.PSIsContainer -or (($before.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $before.Length -ne $ExpectedSize) { throw 'source_changed' }
     $time = $before.LastWriteTimeUtc.Ticks
@@ -302,7 +302,7 @@ function Stable-Hash([string] $Path, [long] $ExpectedSize) {
 }
 
 function Copy-Verified([string] $Source, [string] $Destination, [long] $ExpectedSize) {
-    Assert-NoReparseAncestors (Split-Path -Parent $Source)
+    Assert-NoReparseAncestors ([IO.Path]::GetDirectoryName($Source))
     $before = Get-Item -LiteralPath $Source -Force -ErrorAction Stop
     if ($before.PSIsContainer -or (($before.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $before.Length -ne $ExpectedSize) { throw 'source_changed' }
     $time = $before.LastWriteTimeUtc.Ticks

@@ -103,8 +103,9 @@ if os.name == "nt":
             self.assertEqual(report["status"], "collected")
             self.assertEqual(report["inventory"]["files"], len(inventory))
             self.assertEqual(len(report["expected"]), 8)
-            self.assertTrue(any(row["status"] == "present" for row in report["expected"]))
-            self.assertTrue(any(row["status"] == "not_found_or_unavailable" for row in report["expected"]))
+            statuses = [row["status"] for row in report["expected"]]
+            self.assertIn("present", statuses, f"expected statuses: {statuses}")
+            self.assertIn("not_found_or_unavailable", statuses, f"expected statuses: {statuses}")
             records = report["files"]
             self.assertEqual(len(records), 6)
             self.assertEqual(sum(row["status"] == "duplicate" for row in records), 1)
@@ -192,6 +193,17 @@ if os.name == "nt":
             self.assertEqual(len(created), 1)
             self.assertEqual(validate(created.pop())["collection_status"], "collected")
             self.assertEqual(set(desktop.glob(".WWM_ZBIERANIE_*")), before_temp)
+            self.assertEqual(self.original, self.game_files())
+
+        def test_output_directory_with_brackets(self):
+            output = self.root / "Wyniki [gry] żółć"
+            output.mkdir()
+            result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", output, "-NonInteractive")
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            paths = list(output.glob("WWM_DANE_*.zip"))
+            self.assertEqual(len(paths), 1)
+            self.assertEqual(validate(paths[0])["collection_status"], "collected")
+            self.assertFalse(list(output.glob(".WWM_ZBIERANIE_*")))
             self.assertEqual(self.original, self.game_files())
 
         def test_repeated_runs_create_new_zip_without_overwriting(self):
