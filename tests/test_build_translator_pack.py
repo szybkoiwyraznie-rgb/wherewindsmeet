@@ -31,6 +31,38 @@ class BuildTranslatorPackTests(unittest.TestCase):
         self.assertEqual(lines[0], "3. [Tekst] (pusty)")
         self.assertIn("   limit: 0 B", lines)
 
+    def test_repeated_text_is_inherited_not_retranslated(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "p"
+            entries = [{"id": "a" * 16, "text": "Got it"}, {"id": "b" * 16, "text": "Got it"}]
+            result = pack.build_pack(entries, out, view="00_teksty")
+            self.assertEqual(result["unique"], 1)
+            self.assertEqual(result["inherited"], 1)
+            body = (out / "widoki" / "00_teksty_001.md").read_text(encoding="utf-8")
+            self.assertIn("   copy_of: " + "a" * 16, body)
+            self.assertEqual(body.count("   EN: Got it"), 1)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual([m["copy_of"] for m in manifest], [None, "a" * 16])
+
+    def test_pack_is_split_into_files_of_bounded_size(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "p"
+            entries = [{"id": f"{i:016x}", "text": f"tekst {i}"} for i in range(7)]
+            result = pack.build_pack(entries, out, view="05_interfejs", per_file=3)
+            self.assertEqual(result["files"], 3)
+            body = (out / "widoki" / "05_interfejs_003.md").read_text(encoding="utf-8")
+            self.assertIn("7. [Tekst] tekst 6", body)
+
+    def test_crlf_source_is_normalised_and_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "p"
+            pack.build_pack([{"id": "c" * 16, "text": "a\r\nb"}], out)
+            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+            self.assertTrue(manifest[0]["crlf"])
+            self.assertEqual(manifest[0]["lines"], 2)
+            body = (out / "widoki" / "00_teksty_001.md").read_text(encoding="utf-8")
+            self.assertNotIn("\r", body)
+
     def test_tokens_are_collected_once_each(self):
         tokens = pack.collect_tokens(["#Yzłoto#E i #Yzłoto#E", "$T(5001) {0}"])
         self.assertEqual(tokens["kolor"], ["#Y"])
@@ -45,7 +77,7 @@ class BuildTranslatorPackTests(unittest.TestCase):
             result = pack.build_pack(entries, out, group="Interfejs", view="05_interfejs")
             self.assertEqual(result["entries"], 2)
             self.assertTrue((out / "README.md").is_file())
-            body = (out / "widoki" / "05_interfejs.md").read_text(encoding="utf-8")
+            body = (out / "widoki" / "05_interfejs_001.md").read_text(encoding="utf-8")
             self.assertIn("1. [Interfejs] Unlocked at 5:00 on Jul 3", body)
             self.assertIn("2. [Interfejs] #YGot it#E", body)
             tokens = (out / "tokeny.tsv").read_text(encoding="utf-8")

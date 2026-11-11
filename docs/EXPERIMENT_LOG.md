@@ -726,3 +726,26 @@ cudzego kodu ani nie wymagają tej procedury.
   w chunku 0 aż 219/244 odcinków `blob[o:o+len]` dekoduje się jako UTF-8, ale
   żadne przypisanie pól (offset/offset od końca/para u32) nie daje spójnej
   semantyki — hipoteza do dalszych prób, nie wynik.
+
+## 2026-11-11 — format tabeli odczytany do końca (dzięki prior art)
+
+- **Przełom:** zajrzałem do istniejących narzędzi społeczności. `dest1yo/wwm_utils`
+  (`src/core.rs`, `src/structs.rs`) opisuje dokładnie ten format. Moje wcześniejsze
+  hipotezy były błędne: pole `u32 0x595896DC` to **timestamp**, nie magic, a drugie
+  pole wpisu to **offset**, nie typ.
+- **Prawdziwy układ tabeli:** `u64 entry_count | u64 value_count | u64 timestamp`,
+  potem `max(entry_count+17, 24)` bajtów nieprzejrzystych `buckets`, potem
+  `entry_count × (u64 id, u32 offset, u32 length)`, potem teksty; pozycja tekstu to
+  `entries_pos + 16*index + 8 + offset`. Bajt `0xFF` na początku tekstu = zaślepka.
+- **Skutek:** cała mapa główna parsuje się bez reszty — **1 122 784 wpisy, 0 błędów,
+  4386/4386 chunków** (wcześniej 0/60). `_diff` daje 12 934 wpisy w 4163 chunkach.
+- **Zapis zwrotny rozwiązany:** przepakowanie z zachowaniem nagłówka i `buckets`
+  i przeliczonymi offsetami odtwarza zbiór `id → tekst` w 4386/4386 + 4163/4163
+  chunkach. W danych występują współdzielone regiony tekstów i „dziury” z
+  nieaktualnymi offsetami — dlatego teksty czytamy przez `offset`, nie przez sumę
+  długości.
+- **Paczka:** 1 122 784 elementy, 503 206 unikalnych tekstów, 619 578 dziedziczonych
+  (`copy_of`), 141 plików, 583 tokeny.
+- **Testy:** 215/215. Poprawiono `tools/locale_records.py` (pełna specyfikacja +
+  `pack_table`) i `tests/test_locale_records.py`.
+- **Następne:** patcher (podmiana tekstów po `id`) i odczytanie mówców/scen.

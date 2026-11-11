@@ -106,6 +106,18 @@ Aktualizacja po patchu gry:
 - Żadnego dopasowywania „na oko”: błąd klucza, brak wpisu lub zmiana formatu
   ma zatrzymywać operację, a nie powodować cichy, częściowy zapis.
 
+## Stan paczki (2026-11-11)
+
+Paczka zbudowana z pełnej mapy EN: **1 122 784 elementy**, z czego
+**503 206 unikalnych tekstów** i **619 578 powtórzeń** (55%) dziedziczonych przez
+`copy_of:`. Razem 141 plików `widoki/00_teksty_NNN.md` (~271 MB), plus
+`README.md`, `tokeny.tsv` (583 tokeny) i `manifest.json`.
+
+Plik leży prywatnie w `local/paczka_v1/` — tekst gry nie wchodzi do repozytorium.
+
+Czego paczka **nie ma**: podziału na sceny i widoki, mówców, kolejności scen,
+limitów pól interfejsu. To następny etap.
+
 ## Generator paczki
 
 Paczkę buduje `tools/build_translator_pack.py`:

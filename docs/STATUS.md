@@ -93,29 +93,11 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Układ `_diff` jest odczytany (`tools/locale_records.py`, 598/4164 chunków
-przechodzi walidację) i powstał **prototyp** elementu paczki
-(`id:` = hash, `limit:`, `EN:`, `PL:`). Bramą pozostaje **mapa główna**:
-jej indeks nie jest tablicą rekordów stałej długości, więc 1 122 784 wpisów
-wciąż nie są dostępne. To jest teraz jedyne zadanie blokujące. Rekordy nie mają stałej długości (test sumy długości nie
-przechodzi dla żadnego układu 2/4/8/16/20/24 B), więc kodowanie jest zmienne.
-Bez kluczy nie ma `id` w paczce dla tłumacza, nie ma zapisu zwrotnego i nie ma
-audytu aktualizacji. Format docelowy paczki i lista braków:
-[TRANSLATOR_PACKAGE_WWM.md](TRANSLATOR_PACKAGE_WWM.md). Kontener czytamy już
-narzędziem `tools/locale_container.py` (192/192 testy).
+Format kontenera i tabeli jest **odczytany w obie strony** (potwierdzone przez
+prior art i własne testy): 1 122 784 wpisów wyciągnięte bez błędów, przepakowanie
+bez zmiany tekstów odtwarza zawartość 4386/4386 chunków. Paczka dla Tłumacza
+powstała (`local/paczka_v1`, 1 122 784 elementy, 503 206 unikalnych).
 
-Dostarczyć sprawdzony [zbieracz ZIP](COLLECTOR.md) inną drogą niż connector
-Dysku Google, który 2026-11-11 odrzucił archiwum przez filtr bezpieczeństwa
-dostawcy i nie wysłał pliku; nie ponawiano wysyłki ani nie zmieniano zawartości,
-by ominąć filtr. Archiwum jest odtwarzalne z tego repozytorium i ma SHA-256
-`f77b637f…d64c541` (31 065 B). Właściciel uruchamia BAT i
-sam wgrywa jeden wynik na Dysk Google. Odebrać go prywatnie do ignorowanego
-`local/`, zweryfikować bezpiecznie raport, sumy i zakres, a następnie rozpoznać
-format oraz luki kontekstu; nie obiecywać, że same mapy wystarczą. Pamiętać o
-limicie 100 MiB odbioru przez aktualne połączenie Dysku. Nie prosić o ręczne
-spisywanie plików, całą grę ani poświadczenia.
-
-Równolegle można kontynuować prace syntetyczne. **Przed zapisem w instalacji**
-uzgodnić prawa, konkretny plan, kopię i przywracanie; zgoda na zbieranie nie
-zastępuje tych kroków. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md) jest
-opcjonalny. Szczegóły w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
+Dalej: **patcher** (podmiana tekstów po `id` + przepakowanie kontenera, praca na
+kopii pliku gry) oraz **podział paczki na sceny i widoki** z mówcami — to wymaga
+odczytania powiązań między wpisami a dialogami, czego jeszcze nie ma.

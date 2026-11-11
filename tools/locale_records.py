@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""Split a decompressed WWM locale chunk into (hash, type, text) records.
+"""Read a decompressed WWM locale table into (id, text) records.
 
-Layout verified on 2026-11-11 for chunks of `translate_words_map_*_diff`:
+The layout is the one used by the game's own table format and by the community
+tools `dest1yo/wwm_utils` and `lehieugch68/WWM-Locale-Editor`; it is reproduced
+here independently and checked against this project's own data.
 
-    header   24 B : u64 group, u64 count, u32 0x595896DC, u32 0
-    index          : opaque, hash-derived; size varies per chunk
-    records  count * 16 B : u64 hash, u32 type, u32 length
-    texts          : all texts concatenated in record order, no terminator
+    TableHeader   24 B : u64 entry_count, u64 value_count, u64 timestamp
+    buckets             : max(entry_count + 1 + 16, 24) bytes, opaque
+    entries             : entry_count * 16 B: u64 id, u32 offset, u32 length
+    values              : strings inside the table
 
-The size of the opaque index is found by requiring that the declared lengths
-add up exactly to the bytes left after the records. Chunks whose length fields
-do not add up (shared or padded texts, unknown layouts) are rejected rather
-than guessed.
+A value is located at `entries_pos + 16 * index + 8 + offset`, so offsets are
+measured from the offset field of their own entry and the strings normally
+follow the entry array directly. Entries with `id == 0` or `length == 0` are
+holes (the entry array is allocated in fixed-capacity tables). A value whose
+first byte is 0xFF is a placeholder, not text.
 
-This module never writes and never prints text; the caller decides what to do.
-The main `translate_words_map_en` map uses a different, still-undecoded index
-and is not handled here.
+Nothing here writes, and nothing prints game text unless the caller asks.
 """
 
 from __future__ import annotations
@@ -24,99 +25,105 @@ import argparse
 import json
 import struct
 
-HEADER = struct.Struct("<QQII")
-RECORD = struct.Struct("<QII")
+HEADER = struct.Struct("<QQQ")
+ENTRY = struct.Struct("<QII")
 HEADER_SIZE = HEADER.size
-RECORD_SIZE = RECORD.size
-CONSTANT = 0x595896DC
-# Types observed so far: 8 = plain text; other small values appear too, and are
-# reported verbatim instead of being interpreted.
-KNOWN_TEXT_TYPE = 8
+ENTRY_SIZE = ENTRY.size
+PLACEHOLDER = 0xFF
 
 
 class LayoutError(Exception):
-    """The chunk does not follow the verified record layout."""
+    """The payload does not follow the verified table layout."""
 
 
-def _texts_look_valid(entries: list[dict]) -> bool:
-    """Texts declared as plain text must be valid UTF-8; others are left alone."""
-    checked = 0
-    for entry in entries:
-        text = entry["text"]
-        if not text:
-            continue
-        if entry["type"] != KNOWN_TEXT_TYPE:
-            continue
-        checked += 1
-        try:
-            text.decode("utf-8")
-        except UnicodeDecodeError:
-            return False
-    return checked > 0 or all(not entry["text"] for entry in entries)
+def bucket_size(entry_count: int) -> int:
+    return max(entry_count + 1 + 16, 24)
 
 
-def parse_chunk(payload: bytes) -> dict:
+def parse_table(payload: bytes) -> dict:
     if len(payload) < HEADER_SIZE:
-        raise LayoutError("payload is shorter than the chunk header")
-    group, count, constant, reserved = HEADER.unpack_from(payload, 0)
-    if constant != CONSTANT:
-        raise LayoutError("unexpected chunk constant; layout not recognised")
-    if reserved != 0:
-        raise LayoutError("unexpected reserved field in chunk header")
-    if count == 0:
-        raise LayoutError("chunk declares no records")
-    available = len(payload) - HEADER_SIZE - RECORD_SIZE * count
-    if available < 0:
-        raise LayoutError("records do not fit in the payload")
-    for index_size in range(0, available + 1, 4):
-        records_at = HEADER_SIZE + index_size
-        total = 0
-        plausible = True
-        for position in range(count):
-            length = RECORD.unpack_from(payload, records_at + RECORD_SIZE * position)[2]
-            total += length
-            if total > available - index_size:
-                plausible = False
-                break
-        if not plausible or index_size + RECORD_SIZE * count + total != len(payload) - HEADER_SIZE:
+        raise LayoutError("payload is shorter than the table header")
+    entry_count, value_count, timestamp = HEADER.unpack_from(payload, 0)
+    entries_pos = HEADER_SIZE + bucket_size(entry_count)
+    values_end = entries_pos + ENTRY_SIZE * entry_count
+    if values_end > len(payload):
+        raise LayoutError("entry array does not fit in the payload")
+
+    entries = []
+    filled = 0
+    for index in range(entry_count):
+        ident, offset, length = ENTRY.unpack_from(payload, entries_pos + ENTRY_SIZE * index)
+        start = entries_pos + ENTRY_SIZE * index + 8 + offset
+        end = start + length
+        text = b""
+        placeholder = False
+        if ident and length:
+            if start < entries_pos or end > len(payload):
+                raise LayoutError(f"value {index} points outside the payload")
+            text = payload[start:end]
+            placeholder = text[:1] == bytes((PLACEHOLDER,))
+            if not placeholder:
+                filled += 1
+        entries.append(
+            {
+                "id": ident,
+                "offset": offset,
+                "length": length,
+                "placeholder": placeholder,
+                "text": text,
+            }
+        )
+    return {
+        "entry_count": entry_count,
+        "value_count": value_count,
+        "timestamp": timestamp,
+        "filled": filled,
+        "entries": entries,
+    }
+
+
+def iter_texts(payload: bytes, *, encoding: str = "utf-8") -> list[dict]:
+    table = parse_table(payload)
+    texts = []
+    for entry in table["entries"]:
+        if not entry["id"] or not entry["length"] or entry["placeholder"]:
             continue
-        entries = []
-        cursor = records_at + RECORD_SIZE * count
-        for position in range(count):
-            digest, kind, length = RECORD.unpack_from(payload, records_at + RECORD_SIZE * position)
-            entries.append({"hash": digest, "type": kind, "text": payload[cursor : cursor + length]})
-            cursor += length
-        if not _texts_look_valid(entries):
-            # Several index sizes can satisfy the byte sum by accident when the
-            # opaque index contains zeros; text encoding disambiguates them.
-            continue
-        return {"group": group, "index_size": index_size, "entries": entries}
-    raise LayoutError("declared lengths do not account for the payload")
+        try:
+            text = entry["text"].decode(encoding)
+        except UnicodeDecodeError as error:
+            raise LayoutError(f"value for id {entry['id']:016x} is not {encoding}") from error
+        texts.append({"id": f"{entry['id']:016x}", "text": text})
+    return texts
 
 
 def describe(payload: bytes) -> dict:
-    parsed = parse_chunk(payload)
-    texts = [entry["text"] for entry in parsed["entries"]]
-    lengths = [len(text) for text in texts]
+    table = parse_table(payload)
+    lengths = [
+        entry["length"]
+        for entry in table["entries"]
+        if entry["id"] and entry["length"] and not entry["placeholder"]
+    ]
     return {
-        "group": parsed["group"],
-        "index_size": parsed["index_size"],
-        "records": len(texts),
-        "bytes": len(payload),
-        "text_bytes_total": sum(lengths),
-        "text_bytes_min": min(lengths),
-        "text_bytes_max": max(lengths),
-        "empty_texts": sum(1 for length in lengths if length == 0),
-        "non_text_types": sum(1 for entry in parsed["entries"] if entry["type"] != KNOWN_TEXT_TYPE),
+        "entry_count": table["entry_count"],
+        "value_count": table["value_count"],
+        "timestamp": table["timestamp"],
+        "texts": len(lengths),
+        "holes": table["entry_count"] - len(lengths),
+        "bytes_total": sum(lengths),
+        "bytes_min": min(lengths) if lengths else 0,
+        "bytes_max": max(lengths) if lengths else 0,
+        "placeholder_entries": sum(1 for entry in table["entries"] if entry["placeholder"]),
+        "accounts_for_payload": HEADER_SIZE
+        + bucket_size(table["entry_count"])
+        + ENTRY_SIZE * table["entry_count"],
     }
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Report the structure of a single decompressed chunk file. "
-        "Prints aggregates only; never prints game text.",
+        description="Report the structure of one decompressed table. Prints aggregates, never game text.",
     )
-    parser.add_argument("path", help="file holding one decompressed chunk payload")
+    parser.add_argument("path", help="file holding one decompressed table")
     arguments = parser.parse_args(argv)
     payload = open(arguments.path, "rb").read()
     try:
@@ -130,3 +137,35 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+def pack_table(original: bytes, texts: dict[int, str]) -> bytes:
+    """Rebuild a table with replaced texts, keeping the original layout.
+
+    `texts` maps an entry id to its new text; other entries keep their text.
+    The header and the opaque bucket region are copied from `original`, the
+    entry array is rewritten in place and the values are laid out again right
+    after it. Feeding back the original texts reproduces `original` byte for
+    byte.
+    """
+    table = parse_table(original)
+    entry_count = table["entry_count"]
+    entries_pos = HEADER_SIZE + bucket_size(entry_count)
+    header = original[:HEADER_SIZE]
+    buckets = original[HEADER_SIZE:entries_pos]
+
+    values = b""
+    rows = []
+    for index, entry in enumerate(table["entries"]):
+        ident = entry["id"]
+        if not ident or not entry["length"]:
+            rows.append(ENTRY.pack(0, 0xFFFFFFFF, 0))
+            continue
+        payload = entry["text"]
+        replacement = texts.get(ident)
+        if replacement is not None:
+            payload = replacement.encode("utf-8")
+        offset = (entry_count - index) * ENTRY_SIZE - 8 + len(values)
+        rows.append(ENTRY.pack(ident, offset, len(payload)))
+        values += payload
+    return header + buckets + b"".join(rows) + values
+
