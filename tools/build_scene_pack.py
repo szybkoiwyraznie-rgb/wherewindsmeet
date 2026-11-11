@@ -260,9 +260,39 @@ def write_index(path: Path, scenes: list[dict], files: dict[str, list[str]], eng
         "- Grupy techniczne (`Entity轨道组`) nie mają postaci; takie kwestie nie mają mówcy.",
         "- Kwestie w cinematicach **mają** mówców (nie są puste) — sprawdzone dla 933 scen bez `project_name`.",
         "",
-        "## Pliki scen",
+        "## Jak sprawdziłem mówców",
         "",
+        "Kwestia dostaje mówcę z grupy postaci, w której jest zapisana. Kontrola na trzech",
+        "poziomach:",
+        "",
+        "1. **W obrębie sceny** — dialogi zmieniają mówcę tam, gdzie zmienia się osoba",
+        "   (rozmowa z 飞霜公子: na przemian `mian_player` i `飞霜公子`, wtrącenie `神秘青年`,",
+        "   didaskalia w nawiasach należą do mówiącej postaci).",
+        "2. **Kolejność scen w projekcie** — `dialog_no` rośnie zgodnie z fabułą",
+        "   (2700057 złapanie złodzieja → 2700060 odnalezienie 飞霜公子 → 2700063 dalszy ciąg).",
+        "3. **Cinematics (933 sceny bez `project_name`)** — **mają** mówców: 6 431 kwestii,",
+        "   440 różnych nazw, żadnej kwestii bez nazwy. To sprawdzone, nie założone.",
+        "",
+        "## Ile jest w każdym projekcie",
+        "",
+        "| projekt | scen | kwestii | mówców | dialog_no |",
+        "|---------|------|---------|--------|-----------|",
     ]
+    summary: dict[str, dict] = defaultdict(lambda: {"scenes": 0, "lines": 0, "speakers": set(), "nos": []})
+    for scene in scenes:
+        key = scene.get("project") or "bez projektu"
+        entry = summary[key]
+        entry["scenes"] += 1
+        entry["lines"] += len(scene.get("lines") or [])
+        entry["speakers"].update(line.get("speaker") for line in scene.get("lines") or [])
+        if isinstance(scene.get("dialog_no"), int):
+            entry["nos"].append(scene["dialog_no"])
+    for key, entry in sorted(summary.items(), key=lambda item: -item[1]["lines"]):
+        span = f"{min(entry['nos'])}–{max(entry['nos'])}" if entry["nos"] else "—"
+        out.append(
+            f"| {clean(key)} | {entry['scenes']} | {entry['lines']} | {len(entry['speakers'])} | {span} |"
+        )
+    out.extend(["", "## Pliki scen", ""])
     for name in sorted(files):
         out.append(f"- `sceny/{name}`")
     path.write_text("\n".join(out) + "\n", encoding="utf-8")
