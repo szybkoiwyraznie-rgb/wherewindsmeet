@@ -642,3 +642,31 @@ cudzego kodu ani nie wymagają tej procedury.
   94 581 912 B. To liczba strukturalna, nie heurystyka.
 - **Ograniczenia:** nie sprawdzono pokrycia wszystkich powierzchni tekstowych
   gry; `MANIFEST` (count 1, chunk bez zstd) pozostaje nierozpoznany.
+
+## 2026-11-11 — format paczki tłumacza i pierwszy parser kontenera
+
+- **Wzorzec:** pobrano prywatnie `plik_dla_tlumacza_v8.zip` (8 364 702 B) z Dysku
+  i przeczytano dokumentację `mtgcrawler` (`TRANSLATOR_PACKAGE.md`,
+  `TRANSLATOR_PACKAGE_TECH.md`, `TRANSLATION_WORKFLOW.md`) przez API GitHuba.
+  Paczka SRW to `README.md` + `sceny.zip` (39 plików `.md`) + `widoki.zip`
+  (10 plików); element ma nagłówek `[Dialog - mówca]`, `limit:` oraz linie
+  `EN:` i `PL:`; kontekst sceny to `## Scena N/M — id`, `grupa`, `pliki`,
+  `misja`, `uczestnicy`.
+- **Dokument docelowy:** [TRANSLATOR_PACKAGE_WWM.md](TRANSLATOR_PACKAGE_WWM.md)
+  opisuje mapowanie SRW→WWM (źródłem jest EN z gry), szkic elementu, proces
+  i **cztery blokady**: nieodczytany indeks kluczy, brak atrybucji mówcy/scen,
+  niezmierzone limity i niesprawdzony zapis zwrotny.
+- **Parser:** dodano `tools/locale_container.py` (sam nagłówek i tabela
+  offsetów; opcjonalny `zstandard` importowany tylko przy dekompresji) oraz
+  `tests/test_locale_container.py` (8 testów na danych syntetycznych).
+  Na odebranym pliku: 4386 chunków, 50 527 281 B danych chunków, **4386/4386**
+  z ramką zstd na przesunięciu 9.
+- **Próby rozłożenia indeksu:** rekordy w chunku **nie mają stałej długości** —
+  sprawdzono układy 2/4/8/12/16/20/24/32 B z polami `u32`/`u64` i warunkiem
+  „suma długości = rozmiar bloba”: **brak dopasowania** w trzech chunkach.
+  Bezpośrednio przed blobem widać rekordy o kształcie `[u64][u32][u32]`
+  z sensownymi małymi wartościami, ale region zawiera gęste `0x80`, co wskazuje
+  na kodowanie zmienne (varint/bitowe). To **hipoteza**, nie ustalenie.
+- **Kontrole:** `python tools/run_tests.py` — **192/192**.
+- **Ograniczenia:** indeks, klucze, mówcy, limity i zapis zwrotny pozostają
+  nieznane; paczka dla tłumacza nie jest gotowa do wysłania.

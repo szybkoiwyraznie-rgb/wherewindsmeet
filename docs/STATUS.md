@@ -93,10 +93,13 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Zbudować ekstraktor `translate_words_map_*` → pary (klucz, tekst) na podstawie
-[rozpoznania kontenera](LOCALE_CONTAINER.md), z licznikiem wpisów z nagłówków
-chunków i raportem wpisów nierozpoznanych; dopiero potem pakiet tłumacza.
-Wynik nadal trzymać w ignorowanym `local/`.
+Rozłożyć **indeks `klucz → tekst`** wewnątrz chunku — to jedyna brama do
+wszystkiego dalej. Rekordy nie mają stałej długości (test sumy długości nie
+przechodzi dla żadnego układu 2/4/8/16/20/24 B), więc kodowanie jest zmienne.
+Bez kluczy nie ma `id` w paczce dla tłumacza, nie ma zapisu zwrotnego i nie ma
+audytu aktualizacji. Format docelowy paczki i lista braków:
+[TRANSLATOR_PACKAGE_WWM.md](TRANSLATOR_PACKAGE_WWM.md). Kontener czytamy już
+narzędziem `tools/locale_container.py` (192/192 testy).
 
 Dostarczyć sprawdzony [zbieracz ZIP](COLLECTOR.md) inną drogą niż connector
 Dysku Google, który 2026-11-11 odrzucił archiwum przez filtr bezpieczeństwa
