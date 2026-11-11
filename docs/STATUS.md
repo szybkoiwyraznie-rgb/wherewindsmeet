@@ -59,6 +59,10 @@ rosnącym `AGENTS.md`.
   specyfikacją ZIP; walidator odrzucił archiwum (`unsafe archive member path`).
   Zamieniono na ręczne wpisy `ZipArchive` z `/` oraz dodano wyraźny komunikat
   walidatora. Dane w odebranym ZIP-ie były kompletne i zostały przeanalizowane.
+  Wyjaśniono też, dlaczego test tej ścieżki padał **tylko** na Windows:
+  `zipfile` podmienia `\` na `/` w nazwach wpisów przy zapisie i odczycie, więc
+  walidator nie widzi tam separatora — paczkę i tak odrzuca, a wieloplatformową
+  bramką są pola raportu `source`/`stored_as` czytane z JSON.
 - **2026-11-11 odebrano dostawę `oversea` z Dysku Google** (4 pliki, największy
   96 942 617 B; inwentarz z SHA-256 w [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md)):
   `oversea.zip`, `oversea2.zip`, `patch.zip`, `translate_words_map_zh_cn`.
@@ -90,7 +94,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 242 testy lokalne Linux/Python 3.11; `check_repository.py` i `git diff --check` czyste. Zmiany zbioracza i polityki PowerShell przeszły 4/4 konfiguracje CI; [dziennik](EXPERIMENT_LOG.md). |
+| Repozytorium i workflow | 242 testy lokalne Linux/Python 3.11; `check_repository.py` i `git diff --check` czyste. CI **4/4 zielone** (Ubuntu i Windows × Python 3.11/3.12) po naprawie testu odbioru paczki, który padał tylko na Windows; [dziennik](EXPERIMENT_LOG.md). |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
 | Ekstrakcja i zakres tekstów | Kontener map rozpoznany, parser par `id → tekst` działa (`tools/locale_records.py`): mapa EN 1 122 784 wpisy, mapa źródłowa `zh_cn` 1 816 408 niepustych. Sceny i mówce odczytane z `data201`–`206`. Nieznany jest zapis zwrotny do plików gry ani weryfikacja w grze. |
 | Pakiet tłumacza i import | Format tabeli dla tłumacza gotowy (kolumny, kontekst sceny, zasada pełnego tekstu z mapy). Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji pełnej paczki, importu i integracji z grą. |

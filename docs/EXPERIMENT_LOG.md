@@ -825,3 +825,31 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Następne:** uzupełnić brakujące 31 123 dialogi (brakuje `data207`–`212`
   lub innego źródła), a potem decyzja, czy tłumaczyć pełny korpus mapy `zh_cn`
   (1,8 mln wpisów) czy wyłącznie teksty objęte scenami.
+
+## 2026-11-11 — czerwone CI na Windows: test odbioru paczki, nie dane
+
+- **Objaw:** `windows-latest / Python 3.11` i `3.12` padały z
+  `tests.test_collector_return...test_rejects_member_names_with_backslashes:
+  AssertionError: 'backslashes' not found in 'unexpected archive member'`,
+  przy zielonym Ubuntu. Stan trwał od wielu commitów (przed dostawą `oversea`),
+  więc nie był skutkiem nowych danych.
+- **Przyczyna:** test składał wpis ZIP przez `writestr("pliki\\…")`, a
+  `ZipInfo.__init__` podmienia `os.sep` (`\` na Windows) na `/` zgodnie
+  ze specyfikacją ZIP. Na Windows wpis powstawał już jako `pliki/000001_map`,
+  więc walidator nigdy nie widział separatora i odrzucał paczkę inną ścieżką.
+  Ten sam mechanizm działa przy **odczycie**: `_RealGetContents` tworzy
+  `ZipInfo(filename)` z nazwy z katalogu centralnego, więc na Windows
+  `infolist()` zwraca nazwy z `/` nawet gdy archiwum ma `\`.
+- **Konsekwencja dla odbioru:** gałąź „archive member path uses backslashes"
+  nie może zadziałać na Windows. Paczka z PowerShell 5.1 jest i tak odrzucana
+  — fałszywa nazwa nie pasuje do wzorca `STORED` (`unexpected archive member`),
+  a prawdziwą, wieloplatformową bramką są pola raportu `source` i `stored_as`,
+  czytane z JSON, gdzie separator zostaje nietknięty (`safe_relative`, `STORED`).
+- **Poprawka:** `archive()` w teście składa `ZipInfo` i przypisuje nazwę po
+  konstrukcji, więc archiwum trzyma wpis z bajtami takimi, jakie zapisał
+  zbieracz; test rozróżnia platformy (Linux: komunikat `backslashes`, Windows:
+  paczka odrzucona jako `unexpected archive member`); dodany przypadek
+  `stored_as` z `\` i komentarz w walidatorze.
+- **Wynik:** 242/242 lokalnie, CI **4/4 zielone** (Ubuntu i Windows × Python
+  3.11/3.12). Ślepych punktów w testach `extras` nie ma: każdy faszywy wpis jest
+  weryfikowany pod kątem obecności w archiwum.
