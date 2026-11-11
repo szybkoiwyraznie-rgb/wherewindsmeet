@@ -710,3 +710,19 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Kontrole:** `python tools/run_tests.py` — **200/200**.
 - **Ograniczenia:** mapa główna (1 122 784 wpisów) pozostaje nieodczytana;
   mówcy, kolejność scen, limity pól i zapis zwrotny nadal nieznane.
+
+## 2026-11-11 — generator paczki dla Tłumacza
+
+- **Nowe narzędzie:** `tools/build_translator_pack.py` — z JSONL `{id, text}`
+  buduje katalog paczki: `README.md` (instrukcja: numeracja stała, `EN:`
+  zamrożone, `PL:` do wypełnienia, dziedziczenie powtórzeń, znaczenie tokenów,
+  UTF-8), `widoki/<nazwa>.md` (elementy `N. [Grupa] …` + `id:` + `limit:` +
+  `EN:`/`PL:`) oraz `tokeny.tsv` (`#Y…#E`, `#H`, `#R`, `{…}`, `$T(…)`, `[[…]]`).
+- **Test:** `tests/test_build_translator_pack.py` — 8 testów; razem **208/208**.
+- **Uruchomienie na realnych danych:** 598 wpisów z `_diff` →
+  `local/prototyp_paczki/` (598 elementów, 18 tokenów). Pakiet jest kompletny
+  formalnie, ale zawiera tylko ułamek tekstu gry.
+- **Trop dla mapy głównej (niepotwierdzony):** przy blokach 32 B od offsetu 32
+  w chunku 0 aż 219/244 odcinków `blob[o:o+len]` dekoduje się jako UTF-8, ale
+  żadne przypisanie pól (offset/offset od końca/para u32) nie daje spójnej
+  semantyki — hipoteza do dalszych prób, nie wynik.

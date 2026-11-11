@@ -105,3 +105,16 @@ Aktualizacja po patchu gry:
 - Nie wysyłamy tłumaczowi niczego poza tekstem potrzebnym do pracy.
 - Żadnego dopasowywania „na oko”: błąd klucza, brak wpisu lub zmiana formatu
   ma zatrzymywać operację, a nie powodować cichy, częściowy zapis.
+
+## Generator paczki
+
+Paczkę buduje `tools/build_translator_pack.py`:
+
+```text
+python3 tools/build_translator_pack.py wpisy.jsonl katalog_paczki --grupa "Tekst"
+```
+
+Wejście: JSONL, po jednym obiekcie `{"id": "...", "text": "..."}` na linię
+(`id` to hash wpisu z gry). Wyjście: `README.md`, `widoki/<nazwa>.md`,
+`tokeny.tsv`. Nazwę widoku ustala się potem przez zmianę nazwy pliku — numeracja
+w pliku jest stała i nie zależy od nazwy.
