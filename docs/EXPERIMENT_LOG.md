@@ -437,3 +437,27 @@ cudzego kodu ani nie wymagają tej procedury.
   SHA-256 nie gwarantuje autentyczności ani atomowej migawki; skan nie obejmuje
   wyłączonych katalogów ani całej gry. W razie przekroczenia limitu odbioru
   potrzebna będzie osobna decyzja co do dalszego przekazania.
+
+## 2026-11-10 — ścieżki Windows i domyślny wynik zbieracza
+
+- **Dodatkowa regresja:** po dodaniu do fikcyjnej ścieżki instalacji znaków
+  `[` i `]` test wykrył, że lista spodziewanych plików oznacza nieobecne
+  kandydaty jako `present` (przebiegi Windows dla `7f686d8` i `fac2c1f`).
+  Nie używano prawdziwych plików gry. Próba zamiany `Split-Path` na bezpośrednie
+  operacje `[IO.Path]` nie naprawiła sama tego objawu.
+- **Poprawka:** jawna obsługa pustego wyniku `Get-Item` przed oznaczeniem
+  pliku jako obecnego, przy zachowaniu literalnego pobierania ścieżek. Test
+  porównuje teraz osobno stan każdej spodziewanej ścieżki z fikcyjnym drzewem.
+- **Weryfikacja:** Linux/Python 3.11 — **180/180** testów, bez pominięć.
+  Dla `075c8aba69a8dad6c3cdefacf3db2721ca67dae0` zarówno
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43054562224),
+  jak i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43054572010)
+  przeszły **4/4** konfiguracje Windows/Linux × Python 3.11/3.12. Windows
+  dodatkowo sprawdza nawiasy i polskie znaki w ścieżce gry, nawiasy w ścieżce
+  wynikowej, domyślny Pulpit, ponowne uruchomienie bez nadpisania i usunięcie
+  katalogu tymczasowego. Nie jest to test gry ani gwarancja każdej konfiguracji.
+  Wyniki nowszych commitów należy sprawdzić osobno.
+- **Artefakt:** ZIP ze źródeł `075c8ab` ma **30 883 B**, SHA-256
+  `3a43a299ce694aa849a86c365af63e24fbb52636543c2cdbfa837dbfb48bbc5c`.
+  Trzy człony, CRC i zgodność z deterministycznym builderem sprawdzono; nie
+  zawiera danych gry. Zastępuje poprzednią wersję podaną historycznie wyżej.
