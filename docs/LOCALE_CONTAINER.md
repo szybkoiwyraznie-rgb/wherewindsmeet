@@ -52,9 +52,15 @@ ale w danych gry zdarzają się wpisy wskazujące **wcześniejszy** region tekst
 offsetami. Dlatego parser czyta teksty przez `offset`, a nie przez sumowanie
 długości.
 
-`0x595896DC` w nagłówku to **nie magic** — to `u32` dolnej połowy `timestamp`
-(2017-07-05), a nie stała formatu. `value_count` = liczba niepustych wpisów;
-`entry_count` bywa większe (np. 511 slotów, 244 teksty).
+`entry_count` to **rozmiar tablicy slotów** (capacity), nie liczba tekstów;
+`value_count` to liczba zajętych slotów. `buckets` to pole `ctrl` tablicy
+hashowej (`0x80` = pusty slot, `0xFE` = usunięty, `< 0x80` = zajęty) plus
+bajt `0xFF`, 15-bajtowa kopia początku `ctrl` i dopełnienie do 8 bajtów —
+razem `entry_count + 17` (dla 511 slotów: 528 B).
+
+`0x595896DC` w nagłówku to `seed` tablicy hashowej (wspólny dla całego pliku) —
+wygląda jak magic, ale nią nie jest. Klucze są hashami tekstu źródłowego;
+samego źródła plik nie przechowuje, dlatego mapy są per-język.
 
 Wpis, którego tekst zaczyna się od bajtu `0xFF`, jest zaślepką, nie tekstem.
 
