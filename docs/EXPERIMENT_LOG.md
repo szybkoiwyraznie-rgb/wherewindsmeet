@@ -511,3 +511,30 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** nadal nie uruchomiono zbieracza na komputerze właściciela
   ani na instalacji gry; dostawa narzędzia pozostaje otwarta i wymaga innej
   drogi niż ten connector.
+
+## 2026-11-11 — diagnostyka blokady: porównanie z paczkami SRW Y
+
+- **Materiał:** pobrano prywatnie z Dysku `SRW_Y_ENCYKLOPEDIA_PROSBA.zip`
+  (3 704 B) — najmniejszą paczkę „prośba” o tym samym przeznaczeniu. Plik
+  leżał w ignorowanym `google_drive/`, nie trafił do Git.
+- **Porównanie:** układ identyczny — `CZYTAJ_TO.txt` + `URUCHOM_TO.bat` +
+  skrypt `.ps1`; paczka SRW zawiera nawet `-ExecutionPolicy Bypass`
+  i `Unblock-File`, a mimo to została przyjęta przez Dysk wcześniej. Nasze
+  archiwum: 30 747 B rozpakowane / trzy człony; SRW: 7 616 B / trzy człony.
+- **Różnice treści (zgrubny skan tokenów, nie test filtra):** nasz skrypt
+  zawiera łańcuchy `password`, `passwd`, `token`, `cookie`, `secret`,
+  `credential`, odczyt `HKCU`/`HKLM`, `Get-Process`, `CreateFromDirectory`
+  i SHA-256; skrypt SRW nie zawiera żadnego z nich. To pasuje do heurystyki
+  „zbieranie danych + archiwizacja”, ale **nie dowodzi**, co dokładnie
+  uruchomiło filtr — dostawca nie ujawnia reguł.
+- **Decyzja:** nie ponawiamy wysyłki tego archiwum przez connector i nie
+  zmieniamy jego treści, aby ominąć filtr. Zamiast tego udokumentowano drogę
+  bez Pythona: archiwum repozytorium z `main` → `collector/URUCHOM.bat`.
+  Sprawdzono, że archiwum z `codeload` zawiera `zbierz.ps1` o SHA-256
+  `dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4`, z BOM
+  i CRLF, czyli bajt w bajt jak w repozytorium. Na Dysk wgrano osobną
+  notatkę tekstową `JAK_ZDOBYC_ZBIERACZ.txt` (2024 B) — wgranie tekstu
+  zadziałało, więc blokada dotyczy treści archiwum, nie połączenia.
+- **Ograniczenia:** to hipoteza o przyczynie blokady; nie testowano innych
+  wariantów archiwum ani nie odtwarzano reguł filtra. Nadal brak uruchomienia
+  zbieracza na Windows właściciela i na instalacji gry.

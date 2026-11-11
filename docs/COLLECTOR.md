@@ -35,6 +35,23 @@ ani formatu i nie kopia danych SRW. WWM ma własny wybór plików i ograniczenia
 4. Jeśli ZIP w ogóle nie powstał, przekaż komunikat z okna; nie wysyłaj haseł.
    Każde uruchomienie ma inną nazwę i nie nadpisuje starszych wyników.
 
+## Dostawa archiwum
+
+Gotowy ZIP nie zawsze da się przekazać przez connector Dysku Google: 2026-11-11
+filtr bezpieczeństwa dostawcy connectora odrzucił to archiwum („blocked because
+of its content”), choć paczki `SRW_Y_*_PROSBA.zip` o tym samym układzie
+instrukcja + BAT + PS1 przechodzą. Różnica jest w treści skryptu: 25 KB,
+`Get-Process`, odczyt rejestru Steam, kopiowanie plików, SHA-256 i tworzenie
+ZIP-a — kombinacja heurystycznie podejrzana, mimo że operacja jest odczytowa.
+Nie zmieniamy treści po to, by ominąć filtr.
+
+Bez Pythona i bez nowej publikacji te same bajty daje archiwum repozytorium:
+pobierz `https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/archive/refs/heads/main.zip`,
+rozpakuj poza grą i uruchom `collector/URUCHOM.bat`. Git ma dla `.bat`/`.ps1`
+ustawione `-text`, a sprawdzenie archiwum z `main` dało SHA-256 `zbierz.ps1`
+`dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4` i identyczny
+BOM/CRLF jak w repozytorium, więc to nie jest inna wersja narzędzia.
+
 ## Dokładny zakres
 
 - `INWENTARZ.jsonl`: względne ścieżki, rozmiary i czas modyfikacji plików pod
