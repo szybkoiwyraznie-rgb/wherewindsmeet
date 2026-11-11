@@ -538,3 +538,26 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** to hipoteza o przyczynie blokady; nie testowano innych
   wariantów archiwum ani nie odtwarzano reguł filtra. Nadal brak uruchomienia
   zbieracza na Windows właściciela i na instalacji gry.
+
+## 2026-11-11 — decyzja o treści archiwum i drogi publikacji
+
+- **Prośba:** przebudować ZIP „na wzór paczek SRW Y”, żeby nie uruchamiał
+  fałszywego alarmu filtra, i udostępnić go przez GitHub.
+- **Decyzja:** nie zmieniamy treści archiwum w celu ominięcia filtra
+  bezpieczeństwa. Elementy, które najpewniej uruchamiają heurystykę (lista nazw
+  prywatnych z `password`/`token`, odczyt `HKCU`/`HKLM` do wykrycia Steam,
+  kopiowanie + archiwizacja + SHA-256), są jednocześnie tym, co daje filtrowanie
+  prywatnych nazw i automatyczne znajdowanie instalacji. Ich usunięcie byłoby
+  regresem funkcji, nie uproszczeniem, i wymagałoby ponownych testów Windows.
+- **Publikacja:** próba `gh release create` z assetem nie powiodła się —
+  `uploads.github.com` jest z tego środowiska nieosiągalny (`SSL_ERROR_SYSCALL`),
+  a release nie został utworzony (sprawdzono: brak release'ów i tagów).
+  `raw.githubusercontent.com` również jest nieosiągalny, więc wgranie pliku do
+  repozytorium i link raw nie są alternatywą.
+- **Dostępna droga:** archiwum repozytorium z `codeload.github.com`
+  (`…/archive/refs/heads/main.zip`, 173 920 B) → `collector/URUCHOM.bat`.
+  Sprawdzone: `zbierz.ps1` SHA-256 `dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4`,
+  BOM i CRLF zachowane, czyli to samo narzędzie co w ZIP-ie.
+- **Ograniczenia:** brak assetu release'a nie jest usterką projektu, tylko
+  ograniczeniem sieci tego środowiska; właściciel może dodać asset ręcznie
+  w interfejsie GitHuba. Nadal brak uruchomienia na jego Windows i na grze.
