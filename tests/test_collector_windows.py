@@ -103,9 +103,9 @@ if os.name == "nt":
             self.assertEqual(report["status"], "collected")
             self.assertEqual(report["inventory"]["files"], len(inventory))
             self.assertEqual(len(report["expected"]), 8)
-            statuses = [row["status"] for row in report["expected"]]
-            self.assertIn("present", statuses, f"expected statuses: {statuses}")
-            self.assertIn("not_found_or_unavailable", statuses, f"expected statuses: {statuses}")
+            for row in report["expected"]:
+                expected_status = "present" if (self.game / row["path"]).is_file() else "not_found_or_unavailable"
+                self.assertEqual(row["status"], expected_status, f"unexpected status for {row['path']}")
             records = report["files"]
             self.assertEqual(len(records), 6)
             self.assertEqual(sum(row["status"] == "duplicate" for row in records), 1)

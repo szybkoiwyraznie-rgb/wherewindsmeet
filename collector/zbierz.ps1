@@ -220,7 +220,9 @@ function Inspect-KnownLocations {
                 $parent = [IO.Path]::GetDirectoryName($full)
                 Assert-NoReparseAncestors $parent
                 $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
-                if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
+                # Some providers return no item without raising even with -ErrorAction Stop.
+                if ($null -eq $item) { $status = 'not_found_or_unavailable' }
+                elseif (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
                 elseif (-not $item.PSIsContainer) { $status = 'present' }
             } catch { }
             [void] $script:Expected.Add([pscustomobject]@{ path = $relative; status = $status })
