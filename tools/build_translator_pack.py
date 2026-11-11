@@ -8,24 +8,21 @@ Package layout:
     <out>/tokeny.tsv         every non-translatable token with its meaning
     <out>/manifest.json      per-entry data for the importer (not for the translator)
 
-Each element is either a full entry
+Every distinct source text appears exactly once:
 
-    1. [Tekst] first line of the source
+    1. [Tekst] Northmount West
        id: 0123456789abcdef
        limit: 15 B
-       EN: Northmount West
        PL:
 
-or an inherited repeat of an earlier text, which the translator copies instead
-of retranslating:
+A text that occurs many times in the game is still a single element — the
+patcher fills every occurrence with the same translation. Repeats are counted,
+not rendered, so the package stays close to the size of the text itself.
 
-    2. [Tekst] Northmount West
-       id: fedcba9876543210
-       copy_of: 0123456789abcdef
-       limit: 15 B
+Multi-line texts carry their lines under `EN:` (one `PL:` per line): the header
+line is the first line only when the text is a single line.
 
-Numbering is fixed and never renumbered afterwards: the importer matches on
-`id`, so entries may be added later without shifting anything.
+Numbering is fixed and never renumbered afterwards.
 """
 
 from __future__ import annotations
@@ -63,9 +60,9 @@ Teksty z gry w oryginale angielskim. Tłumaczysz **tylko** linie `PL:`.
 3. Nie usuwaj linii `id:`, `copy_of:` ani `limit:`.
 4. `limit:` to liczba bajtów oryginału. Trzymaj się jej: polski tekst bywa
    dłuższy, ale nie przekraczaj limitu o więcej niż 20%.
-5. Element z `copy_of:` powtarza wcześniejszy tekst. Wpisz w `PL:` dokładnie to
-   samo, co przy wskazanym elemencie — nie tłumacz go inaczej drugi raz.
-   Patcher sam podstawi tłumaczenie z `copy_of`, więc `PL:` możesz zostawić puste.
+5. Każdy tekst występuje w paczce **raz**, nawet jeśli w grze powtarza się
+   wiele razy. Patcher sam podstawi to samo tłumaczenie we wszystkich miejscach,
+   więc nie tłumacz tego samego tekstu dwa razy.
 6. Tokeny z `tokeny.tsv` (`#Y`, `#E`, `$T(...)`, `{...}`, `[[...]]`) przepisz bez
    zmian, w tej samej liczbie i kolejności.
 7. Pusty `PL:` znaczy „jeszcze nieprzetłumaczone”.
@@ -73,20 +70,18 @@ Teksty z gry w oryginale angielskim. Tłumaczysz **tylko** linie `PL:`.
 
 ## 2. Element wielolinijkowy
 
-Każda linia oryginału ma własną linię `EN:` i własną `PL:` — zachowaj tę samą
-liczbę linii:
+Tekst jednej linii stoi w nagłówku elementu. Tekst wielolinijkowy ma nagłówek
+bez treści, a każdą linię pod `EN:` — z taką samą liczbą linii `PL:`:
 
 ```text
-7. [Tekst] Zaproszenie
+7. [Tekst]
    id: 0011223344556677
    limit: 34 B
    EN: Przybywaj do nas
-   EN: o świcie.
+   EN: o świtie.
    PL:
    PL:
 ```
-
-Tekst jednej linii nie może zawierać znaku tabulacji ani końca linii.
 
 ## 3. Czego ta paczka jeszcze nie ma
 
@@ -102,22 +97,25 @@ def normalise(text: str) -> tuple[str, bool]:
     return text.replace("\r\n", "\n").replace("\r", "\n"), used_crlf
 
 
-def render_entry(number: int, entry: dict, group: str, *, copy_of: str | None = None) -> list[str]:
+def render_entry(number: int, entry: dict, group: str) -> list[str]:
     text, _ = normalise(entry["text"])
     lines = text.split("\n")
-    head = lines[0].strip() or "(pusty)"
-    if len(head) > 120:
-        head = head[:117] + "..."
-    rendered = [f"{number}. [{group}] {head}"]
+    head = lines[0].strip()
+    rendered = []
+    if len(lines) == 1:
+        if len(head) > 160:
+            head = head[:157] + "..."
+        rendered.append(f"{number}. [{group}] {head}" if head else f"{number}. [{group}] (pusty)")
+    else:
+        rendered.append(f"{number}. [{group}]")
     rendered.append(f"   id: {entry['id']}")
-    if copy_of:
-        rendered.append(f"   copy_of: {copy_of}")
     rendered.append(f"   limit: {len(entry['text'].encode('utf-8'))} B")
-    if copy_of:
-        return rendered
-    for line in lines:
-        rendered.append(f"   EN: {line}")
-    for _ in lines:
+    if len(lines) > 1:
+        for line in lines:
+            rendered.append(f"   EN: {line}")
+        for _ in lines:
+            rendered.append("   PL:")
+    else:
         rendered.append("   PL:")
     return rendered
 
@@ -147,69 +145,75 @@ def build_pack(
     *,
     group: str = "Tekst",
     view: str = "00_teksty",
-    per_file: int = 25000,
+    per_file: int = 20000,
 ) -> dict:
     out_dir = Path(out_dir)
     views_dir = out_dir / "widoki"
     views_dir.mkdir(parents=True, exist_ok=True)
 
-    seen: dict[str, str] = {}
-    manifest = []
+    seen: set[str] = set()
+    crlf_ids = []
     body: list[str] = []
-    tokens = {}
-
+    tokens: dict[str, list[str]] = {}
+    number = 0
+    inherited = 0
     written = 0
 
-    def flush(index: int) -> None:
+    def flush() -> None:
         nonlocal written
         if not body:
             return
         header = [
-            f"# {view} — część {index + 1}",
+            f"# {view} — część {written + 1}",
             "",
             "Numeracja jest stała i ciągła w całej paczce. Tłumacz tylko linie `PL:`.",
             "",
         ]
-        (views_dir / f"{view}_{index + 1:03d}.md").write_text("\n".join(header + body), encoding="utf-8")
+        (views_dir / f"{view}_{written + 1:03d}.md").write_text(
+            "\n".join(header + body), encoding="utf-8"
+        )
         written += 1
         body.clear()
 
-    number = 0
     for entry in entries:
+        text = entry["text"]
+        if text in seen:
+            inherited += 1
+            continue
+        seen.add(text)
         number += 1
-        first = seen.get(entry["text"])
-        if first is None:
-            seen[entry["text"]] = entry["id"]
-        copy_of = None if first is None else first
-        text, crlf = normalise(entry["text"])
-        manifest.append(
-            {
-                "n": number,
-                "id": entry["id"],
-                "bytes": len(entry["text"].encode("utf-8")),
-                "lines": text.count("\n") + 1,
-                "crlf": crlf,
-                "copy_of": copy_of,
-            }
-        )
-        body.extend(render_entry(number, entry, group, copy_of=copy_of))
+        normalised, crlf = normalise(text)
+        if crlf:
+            crlf_ids.append(entry["id"])
+        body.extend(render_entry(number, entry, group))
         body.append("")
         for name, pattern in TOKEN_PATTERNS:
-            for match in pattern.findall(text):
+            for match in pattern.findall(normalised):
                 tokens.setdefault(name, [])
                 if match not in tokens[name]:
                     tokens[name].append(match)
         if number % per_file == 0:
-            flush(written)
+            flush()
 
-    flush(written)
+    flush()
     (out_dir / "README.md").write_text(README, encoding="utf-8")
     (out_dir / "tokeny.tsv").write_text(render_tokens(tokens), encoding="utf-8")
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    (out_dir / "manifest.json").write_text(
+        json.dumps(
+            {
+                "elements": number,
+                "inherited": inherited,
+                "files": written,
+                "groups": [group],
+                "crlf_ids": crlf_ids,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     return {
-        "entries": number,
-        "unique": len(seen),
-        "inherited": number - len(seen),
+        "elements": number,
+        "inherited": inherited,
         "files": written,
         "tokens": sum(len(v) for v in tokens.values()),
     }
@@ -231,7 +235,7 @@ def main(argv=None) -> int:
     parser.add_argument("out", help="output directory for the package")
     parser.add_argument("--grupa", default="Tekst", help="label shown in every entry header")
     parser.add_argument("--widok", default="00_teksty", help="base name of the view files")
-    parser.add_argument("--na-plik", type=int, default=25000, help="entries per view file")
+    parser.add_argument("--na-plik", type=int, default=20000, help="entries per view file")
     arguments = parser.parse_args(argv)
     result = build_pack(
         load_entries(arguments.entries),

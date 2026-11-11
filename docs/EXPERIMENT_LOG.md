@@ -744,8 +744,8 @@ cudzego kodu ani nie wymagają tej procedury.
   chunkach. W danych występują współdzielone regiony tekstów i „dziury” z
   nieaktualnymi offsetami — dlatego teksty czytamy przez `offset`, nie przez sumę
   długości.
-- **Paczka:** 1 122 784 elementy, 503 206 unikalnych tekstów, 619 578 dziedziczonych
-  (`copy_of`), 141 plików, 583 tokeny.
+- **Paczka:** 1 122 784 wpisy w grze, 503 206 unikalnych tekstów → 503 206
+  elementów, 26 plików, 61 MB rozpakowane / **24 MB ZIP**, 583 tokeny.
 - **Testy:** 215/215. Poprawiono `tools/locale_records.py` (pełna specyfikacja +
   `pack_table`) i `tests/test_locale_records.py`.
 - **Następne:** patcher (podmiana tekstów po `id`) i odczytanie mówców/scen.
@@ -765,3 +765,19 @@ cudzego kodu ani nie wymagają tej procedury.
   `tests/test_locale_container.py`).
 - **Dokumentacja:** [PATCHER_WWM.md](PATCHER_WWM.md).
 - **Następne:** sceny i mówcy, limity pól interfejsu, skrypt instalacyjny.
+
+## 2026-11-11 — paczka odchudzona z 271 MB do 24 MB
+
+- **Błąd, który wyszło widać po uwadze właściciela:** pierwsza paczka miała 271 MB
+  przy 32,3 MB unikalnego tekstu, bo (a) każdy element powtarzał tekst w nagłówku
+  i w linii `EN:`, (b) każde z 619 578 powtórzeń było osobnym elementem z
+  `copy_of:`, (c) `manifest.json` miał 118 MB.
+- **Nowy format:** element tylko dla unikalnego tekstu; tekst jednej linii stoi
+  w nagłówku, wielolinijkowy pod `EN:`; `manifest.json` to kilkaset bajtów;
+  dziedziczenie rozwiązuje patcher, nie paczka.
+- **Wynik:** 503 206 elementów, 26 plików, **61 MB → 24 MB ZIP** (26% objętości
+  wyjściowej), generowanie 2,9 s.
+- **Patcher:** tłumaczenie tekstu trafia we **wszystkie** jego wystąpienia —
+  sprawdzone na mapie EN: 200 przetłumaczonych tekstów → **41 962 zmienione wpisy**,
+  weryfikacja 1 122 784 id bez rozjazdów (13 s).
+- **Testy:** 232/232.

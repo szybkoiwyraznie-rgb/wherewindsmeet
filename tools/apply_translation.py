@@ -135,7 +135,29 @@ def build_container(chunks: list[bytes]) -> bytes:
     )
 
 
-def apply_translations(data: bytes, translations: dict[int, str], *, level: int = 9) -> tuple[bytes, dict]:
+def build_text_map(data: bytes, translations: dict[int, str]) -> dict[bytes, bytes]:
+    """Map every source text that has a translation to that translation.
+
+    The translator package lists each distinct text once, so the same
+    translation has to reach every entry that repeats that text.
+    """
+    mapping: dict[bytes, bytes] = {}
+    for entry in iter_all_entries(data):
+        text = translations.get(entry["id"])
+        if text:
+            mapping[entry["text"]] = text.encode("utf-8")
+    return mapping
+
+
+def apply_translations(
+    data: bytes,
+    translations: dict[int, str],
+    *,
+    level: int = 9,
+    text_map: dict[bytes, bytes] | None = None,
+) -> tuple[bytes, dict]:
+    if text_map is None:
+        text_map = build_text_map(data, translations)
     chunks = read_container(data)
     applied = 0
     entries = 0
@@ -158,9 +180,13 @@ def apply_translations(data: bytes, translations: dict[int, str], *, level: int 
                 continue
             entries += 1
             replacement = translations.get(entry["id"])
-            if replacement is None:
+            if replacement is not None and not replacement:
                 continue
-            if not replacement:
+            if replacement is None:
+                inherited = text_map.get(entry["text"])
+                if inherited is None:
+                    continue
+                wanted[entry["id"]] = inherited.decode("utf-8")
                 continue
             if replacement.encode("utf-8")[:1] == b"\xff":
                 raise PatchError(f"translation for id {entry['id']:016x} starts with a reserved byte")
@@ -195,8 +221,16 @@ def iter_all_entries(data: bytes):
                 yield entry
 
 
-def verify(original: bytes, patched: bytes, translations: dict[int, str]) -> dict:
+def verify(
+    original: bytes,
+    patched: bytes,
+    translations: dict[int, str],
+    *,
+    text_map: dict[bytes, bytes] | None = None,
+) -> dict:
     """Compare the two maps entry by entry; raise unless exactly the intended change happened."""
+    if text_map is None:
+        text_map = build_text_map(original, translations)
     before = {entry["id"]: entry["text"] for entry in iter_all_entries(original)}
     after = {entry["id"]: entry["text"] for entry in iter_all_entries(patched)}
     if before.keys() != after.keys():
@@ -204,9 +238,11 @@ def verify(original: bytes, patched: bytes, translations: dict[int, str]) -> dic
     changed = 0
     for ident, text in before.items():
         expected = translations.get(ident)
-        if expected is None or not expected:
+        if not expected:
+            expected = text_map.get(text)
+        if expected is None:
             expected = text
-        else:
+        elif isinstance(expected, str):
             expected = expected.encode("utf-8")
         if after[ident] != expected:
             raise PatchError(f"entry {ident:016x} does not hold the expected text")
@@ -248,9 +284,13 @@ def main(argv=None) -> int:
     data = source.read_bytes()
     translations = load_translations(arguments.tlumaczenia)
     try:
-        patched, stats = apply_translations(data, translations, level=arguments.poziom)
+        text_map = build_text_map(data, translations)
+        patched, stats = apply_translations(
+            data, translations, level=arguments.poziom, text_map=text_map
+        )
+        stats["translated_texts"] = len(text_map)
         if not arguments.bez_weryfikacji:
-            stats["verified"] = verify(data, patched, translations)
+            stats["verified"] = verify(data, patched, translations, text_map=text_map)
     except (PatchError, records.LayoutError) as error:
         print(json.dumps({"ok": False, "reason": str(error)}))
         return 1

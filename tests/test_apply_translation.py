@@ -88,6 +88,16 @@ class ApplyTranslationTests(unittest.TestCase):
             [e["text"] for e in patcher.iter_all_entries(patched)], [b"x", b"\xff"]
         )
 
+    def test_same_text_in_two_entries_gets_one_translation(self):
+        data = container([table([(1, b"Got it"), (2, b"Got it"), (3, b"Other")])])
+        patched, stats = patcher.apply_translations(data, {1: "Jest"})
+        texts = {e["id"]: e["text"] for e in patcher.iter_all_entries(patched)}
+        self.assertEqual(texts[1], "Jest".encode())
+        self.assertEqual(texts[2], "Jest".encode())
+        self.assertEqual(texts[3], b"Other")
+        self.assertEqual(stats["applied"], 2)
+        patcher.verify(data, patched, {1: "Jest"})
+
     def test_unknown_ids_are_reported_not_invented(self):
         data = container([table([(1, b"x")])])
         _, stats = patcher.apply_translations(data, {999: "nowy"})

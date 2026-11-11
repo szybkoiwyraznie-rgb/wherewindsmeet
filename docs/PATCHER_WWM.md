@@ -25,8 +25,9 @@ Wymaga pakietu `zstandard` (`python3 -m venv .venv && .venv/bin/pip install zsta
 
 1. Czyta kontener, chunki i tabele (format w [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)).
 2. Chunek 0 (indeks mapy) przepisuje bez zmian.
-3. W każdej tabeli podmienia teksty wpisów, których `id` występuje w pliku
-   tłumaczeń; pozostałe wpisy zostają nietknięte.
+3. W każdej tabeli podmienia teksty: najpierw po `id`, a potem — dla wpisów,
+   których tekst jest identyczny z przetłumaczonym — przez dziedziczenie.
+   Dzięki temu jedno tłumaczenie trafia we wszystkie powtórzenia w grze.
 4. Przepakowuje tabelę: te same id, nowe offsety i długości, teksty sklejone od
    nowa. Dzięki temu tłumaczenie może być dłuższe lub krótsze od oryginału.
 5. Kompresuje chunki, składa nowy kontener z nową tabelą przesunięć.
@@ -55,6 +56,7 @@ Wymaga pakietu `zstandard` (`python3 -m venv .venv && .venv/bin/pip install zsta
 
 ## Wynik na realnej mapie
 
-Mapa EN 50 550 179 B, 4386 tabel tekstów, 1 122 784 wpisy: 200 podmian,
-11 s, wynik 51 904 280 B, weryfikacja 1 122 784 id / 200 zmian. Struktura
-wyniku przechodzi `tools/locale_container.py`.
+Mapa EN 50 550 179 B, 4386 tabel tekstów, 1 122 784 wpisy: **200 przetłumaczonych
+tekstów → 41 962 zmienione wpisy** (dziedziczenie), 13 s, wynik 49 560 183 B,
+weryfikacja 1 122 784 id bez rozjazdów. Struktura wyniku przechodzi
+`tools/locale_container.py`.

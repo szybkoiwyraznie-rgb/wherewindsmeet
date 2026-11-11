@@ -14,8 +14,9 @@ class BuildTranslatorPackTests(unittest.TestCase):
         self.assertEqual(lines[0], "1. [Tekst] Northmount West")
         self.assertIn("   id: abc", lines)
         self.assertIn("   limit: 15 B", lines)
-        self.assertIn("   EN: Northmount West", lines)
         self.assertEqual(lines[-1], "   PL:")
+        # single-line source stays on the header line, so it is not repeated
+        self.assertEqual(sum(1 for l in lines if "Northmount West" in l), 1)
 
     def test_multiline_entry_repeats_en_and_pl_lines(self):
         lines = pack.render_entry(2, {"id": "x", "text": "pierwsza\ndruga"}, "Scena")
@@ -31,18 +32,28 @@ class BuildTranslatorPackTests(unittest.TestCase):
         self.assertEqual(lines[0], "3. [Tekst] (pusty)")
         self.assertIn("   limit: 0 B", lines)
 
-    def test_repeated_text_is_inherited_not_retranslated(self):
+    def test_repeated_text_becomes_one_element(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "p"
             entries = [{"id": "a" * 16, "text": "Got it"}, {"id": "b" * 16, "text": "Got it"}]
             result = pack.build_pack(entries, out, view="00_teksty")
-            self.assertEqual(result["unique"], 1)
+            self.assertEqual(result["elements"], 1)
             self.assertEqual(result["inherited"], 1)
             body = (out / "widoki" / "00_teksty_001.md").read_text(encoding="utf-8")
-            self.assertIn("   copy_of: " + "a" * 16, body)
-            self.assertEqual(body.count("   EN: Got it"), 1)
-            manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual([m["copy_of"] for m in manifest], [None, "a" * 16])
+            self.assertEqual(body.count("Got it"), 1)
+            self.assertNotIn("b" * 16, body)
+
+    def test_multiline_text_moves_lines_under_en(self):
+        lines = pack.render_entry(5, {"id": "e" * 16, "text": "pierwsza\ndruga"}, "Tekst")
+        self.assertEqual(lines[0], "5. [Tekst]")
+        self.assertEqual([l for l in lines if l.startswith("   EN:")], ["   EN: pierwsza", "   EN: druga"])
+        self.assertEqual([l for l in lines if l == "   PL:"], ["   PL:", "   PL:"])
+
+    def test_single_line_text_stays_in_the_header(self):
+        lines = pack.render_entry(5, {"id": "e" * 16, "text": "jedna linia"}, "Tekst")
+        self.assertEqual(lines[0], "5. [Tekst] jedna linia")
+        self.assertEqual([l for l in lines if l.startswith("   EN:")], [])
+        self.assertEqual([l for l in lines if l == "   PL:"], ["   PL:"])
 
     def test_pack_is_split_into_files_of_bounded_size(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -50,6 +61,7 @@ class BuildTranslatorPackTests(unittest.TestCase):
             entries = [{"id": f"{i:016x}", "text": f"tekst {i}"} for i in range(7)]
             result = pack.build_pack(entries, out, view="05_interfejs", per_file=3)
             self.assertEqual(result["files"], 3)
+            self.assertEqual(result["elements"], 7)
             body = (out / "widoki" / "05_interfejs_003.md").read_text(encoding="utf-8")
             self.assertIn("7. [Tekst] tekst 6", body)
 
@@ -58,8 +70,7 @@ class BuildTranslatorPackTests(unittest.TestCase):
             out = Path(tmp) / "p"
             pack.build_pack([{"id": "c" * 16, "text": "a\r\nb"}], out)
             manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-            self.assertTrue(manifest[0]["crlf"])
-            self.assertEqual(manifest[0]["lines"], 2)
+            self.assertEqual(manifest["crlf_ids"], ["c" * 16])
             body = (out / "widoki" / "00_teksty_001.md").read_text(encoding="utf-8")
             self.assertNotIn("\r", body)
 
@@ -75,7 +86,7 @@ class BuildTranslatorPackTests(unittest.TestCase):
             out = Path(tmp) / "paczka"
             entries = [{"id": "a1", "text": "Unlocked at 5:00 on Jul 3"}, {"id": "b2", "text": "#YGot it#E"}]
             result = pack.build_pack(entries, out, group="Interfejs", view="05_interfejs")
-            self.assertEqual(result["entries"], 2)
+            self.assertEqual(result["elements"], 2)
             self.assertTrue((out / "README.md").is_file())
             body = (out / "widoki" / "05_interfejs_001.md").read_text(encoding="utf-8")
             self.assertIn("1. [Interfejs] Unlocked at 5:00 on Jul 3", body)

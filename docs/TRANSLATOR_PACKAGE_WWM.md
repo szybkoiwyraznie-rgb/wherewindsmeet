@@ -108,10 +108,19 @@ Aktualizacja po patchu gry:
 
 ## Stan paczki (2026-11-11)
 
-Paczka zbudowana z pełnej mapy EN: **1 122 784 elementy**, z czego
-**503 206 unikalnych tekstów** i **619 578 powtórzeń** (55%) dziedziczonych przez
-`copy_of:`. Razem 141 plików `widoki/00_teksty_NNN.md` (~271 MB), plus
-`README.md`, `tokeny.tsv` (583 tokeny) i `manifest.json`.
+Paczka zbudowana z pełnej mapy EN: **503 206 elementów** — po jednym na każdy
+**unikalny** tekst gry. Mapa ma 1 122 784 wpisy, więc **619 578 z nich (55%)
+powtarza tekst już obecny w paczce**; patcher podstawia im to samo tłumaczenie,
+więc Tłumacz nie tłumaczy tego samego dwa razy i paczka nie puchnie.
+
+Rozmiar: **61 MB rozpakowane → 24 MB w ZIP**, 26 plików
+`widoki/00_teksty_NNN.md`, plus `README.md`, `tokeny.tsv` (583 tokeny) i mały
+`manifest.json` (liczby + lista 311 id z Windowsowymi końcami linii).
+
+Dla porównania: 32,3 MB z tych 61 MB to sam tekst gry; reszta to `id:`,
+`limit:`, linie `PL:` i numeracja. Wersja pierwotna miała 271 MB, bo każdy
+element powtarzał tekst w nagłówku i w `EN:`, a powtórzenia były osobnymi
+elementami z `copy_of:` — to było marnowanie miejsca, nie treść.
 
 Plik leży prywatnie w `local/paczka_v1/` — tekst gry nie wchodzi do repozytorium.
 
