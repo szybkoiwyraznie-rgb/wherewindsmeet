@@ -625,3 +625,20 @@ cudzego kodu ani nie wymagają tej procedury.
   PowerShell w tym środowisku); wynik CI trzeba sprawdzić osobno. Znaczenie pól
   nagłówka, wiązanie łańcuchów z kluczami i zapis zwrotny pozostają nieznane.
   Zmierzona liczba fragmentów tekstu jest heurystyczna, nie jest liczbą wpisów.
+
+## 2026-11-11 — czy `partial` to problem; skala mapy
+
+- **Powód `partial`:** dokładnie jeden plik `skipped_limit`
+  (`translate_words_map_zh_cn`, 69 470 988 B). Pozostałe 8 kandydatów skopiowano,
+  0 problemów odczytu, inwentarz nieobcięty (`limited: false`), 0 błędów.
+  Wykorzystano 73 878 943 B z 94 371 840 B (78,3%), zapas 20 492 897 B —
+  chińska mapa nie zmieściłaby się nawet przy pełnym budżecie.
+- **Wniosek:** dla tłumaczenia EN→PL brak niczego istotnego; EN jest kompletną
+  mapą zbieracza, a `collected` i tak nie znaczyłoby „kompletne”.
+- **Kontrola innych pojemników:** `data3` (3949 chunków) i `data205` (2606) mają
+  ten sam kontener, ale po dekompresji zawierają identyfikatory i nazwy ustawień,
+  nie tekst fabularny. Warstwa tekstowa to mapy `translate_words_map_*`.
+- **Skala:** suma wpisów z nagłówków mapy EN — **1 122 784**, rozpakowane
+  94 581 912 B. To liczba strukturalna, nie heurystyka.
+- **Ograniczenia:** nie sprawdzono pokrycia wszystkich powierzchni tekstowych
+  gry; `MANIFEST` (count 1, chunk bez zstd) pozostaje nierozpoznany.

@@ -47,6 +47,20 @@ także fragmenty indeksu, więc **nie jest** liczbą wpisów do tłumaczenia.
 Liczba wpisów z nagłówków chunków (suma `B`) jest osobnym, jeszcze nie
 zmierzonym parametrem.
 
+## Skala i co siedzi w pozostałych plikach
+
+Suma pola `B` z nagłówków wszystkich 4386 chunków mapy EN to **1 122 784
+wpisów** (średnio 256 na chunk), a łączny rozpakowany payload to
+**94 581 912 B** (średnio ok. 84 B na wpis). To pierwsza liczba wpisów oparta
+na strukturze, nie na heurystyce tekstowej.
+
+Ten sam kontener (`0xDEADBEEF`, ta sama tabela) mają też `data3` (3949 chunków),
+`data205` (2606) i `_diff`. Po dekompresji pierwszego chunku `data3` widać
+identyfikatory typu `bp_399_pref_building_…`, a w `data205` nazwy ustawień typu
+`disable_change_time_speed`, `enable_avatar_filter` — czyli indeksy danych gry,
+**nie proza do tłumaczenia**. `MANIFEST` ma `count = 1` i jeden chunk bez ramki
+zstd, więc jego układu nie sprawdzono.
+
 ## Czego nie wiemy
 
 - Znaczenia pól `A`, `B`, `C`; `C` jest stałe w plikach EN, `_diff` i `zh_cn_diff`,
