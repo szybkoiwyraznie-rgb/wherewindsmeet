@@ -31,7 +31,7 @@ if os.name == "nt":
             with ZipFile(io.BytesIO(build_bytes())) as archive:
                 archive.extractall(self.kit)  # archive is built from our own three known filenames
             self.ps = Path(os.environ["SystemRoot"]) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
-            self.game = self.root / "Biblioteka gry żółć" / "steamapps" / "common" / "Where Winds Meet"
+            self.game = self.root / "Biblioteka [gry] żółć" / "steamapps" / "common" / "Where Winds Meet"
             self.out = self.root / "Wyniki żółć"
             self.out.mkdir()
             self.write("Package/HD/oversea/locale/translate_words_map_en", b"synthetic base map")
@@ -169,6 +169,41 @@ if os.name == "nt":
             report, _, _, _ = self.collection()
             self.assertEqual(report["steam_app_id"], "3564740")
             self.assertEqual(report["steam_build_id"], "12345678")
+            self.assertEqual(self.original, self.game_files())
+
+        def test_default_desktop_destination_without_output_parameter(self):
+            command = "[Console]::OutputEncoding=[Text.Encoding]::UTF8; [Console]::Write([Environment]::GetFolderPath('Desktop'))"
+            detected = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
+            self.assertEqual(detected.returncode, 0, self.detail(detected))
+            desktop_text = detected.stdout.decode("utf-8-sig").strip()
+            self.assertTrue(desktop_text)
+            desktop = Path(desktop_text)
+            if not desktop.exists():
+                desktop.mkdir()
+                self.addCleanup(desktop.rmdir)
+            before = set(desktop.glob("WWM_DANE_*.zip"))
+            before_temp = set(desktop.glob(".WWM_ZBIERANIE_*"))
+            result = self.run_ps("-GameRoot", self.game, "-NonInteractive")
+            created = set(desktop.glob("WWM_DANE_*.zip")) - before
+            for path in created:
+                self.addCleanup(path.unlink, missing_ok=True)
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            self.assertEqual(len(created), 1)
+            self.assertEqual(validate(created.pop())["collection_status"], "collected")
+            self.assertEqual(set(desktop.glob(".WWM_ZBIERANIE_*")), before_temp)
+            self.assertEqual(self.original, self.game_files())
+
+        def test_repeated_runs_create_new_zip_without_overwriting(self):
+            args = ("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
+            first_run = self.run_ps(*args)
+            self.assertEqual(first_run.returncode, 0, self.detail(first_run))
+            first = next(self.out.glob("WWM_DANE_*.zip"))
+            original_zip = first.read_bytes()
+            second_run = self.run_ps(*args)
+            self.assertEqual(second_run.returncode, 0, self.detail(second_run))
+            self.assertEqual(len(list(self.out.glob("WWM_DANE_*.zip"))), 2)
+            self.assertEqual(first.read_bytes(), original_zip)
             self.assertEqual(self.original, self.game_files())
 
         def test_game_output_path_is_refused_before_writing(self):
