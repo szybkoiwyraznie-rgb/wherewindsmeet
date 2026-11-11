@@ -371,8 +371,12 @@ cudzego kodu ani nie wymagają tej procedury.
   używają wyłącznie syntetycznych katalogów, w tym odrzuceń symlinków i
   symulowanych punktów reparse, braku dostępu i zmiany katalogu. Blokowane są
   wybrane funkcje otwierania, tworzenia i usuwania, zmiany nazw, listowania oraz
-  gniazda sieciowe. Wyniki Windows i Pythona 3.12 dla tego commita należy
-  sprawdzić osobno w CI.
+  gniazda sieciowe. Dla commita z kodem
+  `3ea3b36876d7c956b44c37bf672c96ade950a048` przebiegi
+  [push](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43047313508)
+  i [PR](https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/actions/runs/43047326482)
+  przeszły po **4/4** konfiguracje Linux/Windows × Python 3.11/3.12. Każdy
+  kolejny commit ma osobne wyniki CI; nie jest to test na grze.
 - **Ograniczenia:** nie uzyskano dostępu do instalacji ani nie wykonano testu
   na WWM. Region, język, format i aktywne warstwy są nieznane; Build ID nie
   potwierdza autentyczności ani stanu plików. Nie ma ekstraktora, importera,

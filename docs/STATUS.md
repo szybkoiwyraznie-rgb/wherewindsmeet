@@ -39,7 +39,7 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 165 testów lokalnych na Linux/Python 3.11; 4/4 konfiguracje CI przeszły dla wcześniejszego commita `8184c5b` na Windows i Linuksie. Wyniki bieżącego commita sprawdzać osobno. |
+| Repozytorium i workflow | 165 testów lokalnych na Linux/Python 3.11; dla kodu `3ea3b36` oba przebiegi CI przeszły 4/4 konfiguracje Windows/Linux × Python 3.11/3.12. Wyniki bieżącego commita sprawdzać osobno. |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; są [proste oględziny](STEAM_REFERENCE.md). |
 | Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
