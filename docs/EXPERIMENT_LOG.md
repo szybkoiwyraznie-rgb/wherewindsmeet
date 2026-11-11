@@ -670,3 +670,23 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Kontrole:** `python tools/run_tests.py` — **192/192**.
 - **Ograniczenia:** indeks, klucze, mówcy, limity i zapis zwrotny pozostają
   nieznane; paczka dla tłumacza nie jest gotowa do wysłania.
+
+## 2026-11-11 — odczytany rekord wpisu w chunku
+
+- **Materiał:** `translate_words_map_en_diff` — 686 chunków z `A = B = 1`,
+  gdzie indeks jest najmniejszy.
+- **Ustalenie:** po 24-bajtowym nagłówku i regionie indeksu (24 B dla `B = 1`,
+  56 B dla `B = 2` i `B = 3`) leży rekord `[u64 hash][u32 typ][u32 długość]`
+  (`typ = 8` dla tekstu UTF-8), a za nim tekst dokładnie tej długości, bez
+  terminatora. Zgodność długości we wszystkich 686 chunkach jednowpisowych
+  (np. `Northmount West` → 15, `Unlocked at 5:00 on Jul 3` → 25, opis muszli
+  → 350).
+- **Hipoteza:** region indeksu jest pochodną hashy (wypełniony `0x80`,
+  rozmiar nie zależy liniowo od `B`), a nie tabelą przesunięć — więc zmiana
+  długości tekstu może nie wymagać przeliczenia indeksu. **Niesprawdzone**:
+  wymaga przebudowy chunku i odczytu zwrotnego.
+- **Narzędzie:** `tools/locale_container.py` nadal czyta tylko warstwę
+  zewnętrzną; parser rekordów jeszcze nie powstał.
+- **Ograniczenia:** nieznany układ dla chunków wielowpisowych i mapa główna
+  (`B` do 511) nie jest jeszcze przemierzona; mówcy, limity pól i zapis
+  zwrotny pozostają nieznane.

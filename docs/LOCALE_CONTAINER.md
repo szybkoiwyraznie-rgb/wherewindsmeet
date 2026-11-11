@@ -61,12 +61,42 @@ identyfikatory typu `bp_399_pref_building_…`, a w `data205` nazwy ustawień ty
 **nie proza do tłumaczenia**. `MANIFEST` ma `count = 1` i jeden chunk bez ramki
 zstd, więc jego układu nie sprawdzono.
 
+## Rekord wpisu (zweryfikowane na 686 chunkach `_diff`)
+
+W pliku `translate_words_map_en_diff` jest 686 chunków z jednym wpisem
+(`A = B = 1`) — tam indeks jest mikroskopijny i układ dał się odczytać:
+
+| offset w payloadzie | zawartość |
+|---|---|
+| 0 | `u64` A (liczba wpisów w „grupie”) |
+| 8 | `u64` B (liczba wpisów w chunku) |
+| 16 | `u32` `0x595896DC` |
+| 20 | `u32` 0 |
+| 24 | region indeksu (dla `B = 1` dokładnie **24 B**, dla `B = 2` — 56 B) |
+| po indeksie | `u64` hash wpisu, `u32` typ (`8` = tekst UTF-8), `u32` długość |
+| dalej | tekst o dokładnie tej długości, bez terminatora |
+
+Sprawdzenie: dla chunku z tekstem `Northmount West` rekord ma długość `0x0F`
+(15) i tyle dokładnie bajtów zajmuje tekst; dla `Unlocked at 5:00 on Jul 3` —
+`0x19` (25) i 25 B; dla opisu muszli — `0x15E` (350) i 350 B. Zgodność
+wystąpiła we wszystkich 686 przypadkach jednowpisowych.
+
+Region indeksu rośnie z liczbą wpisów, ale nie liniowo od `B` (dla `B = 2`
+i `B = 3` ma po 56 B), a wypełniają go bajty `0x80` — wygląda na strukturę
+pochodną od hashy (trie/prefix), a **nie** na tabelę przesunięć tekstu. Jeśli to
+się potwierdzi, indeks nie wymaga przeliczania przy zmianie długości tekstu,
+a podmiana sprowadza się do rekordu (długość) i tekstu. To **hipoteza** — wymaga
+sprawdzenia przez przebudowę chunku i odczyt zwrotny, zanim cokolwiek zapiszemy
+w instalacji gry.
+
 ## Czego nie wiemy
 
 - Znaczenia pól `A`, `B`, `C`; `C` jest stałe w plikach EN, `_diff` i `zh_cn_diff`,
   więc **nie** jest identyfikatorem języka.
-- Jak indeks wiąże łańcuchy z kluczami/hashami i jak odróżnić wpisy puste,
-  usunięte i przeniesione.
+- Znaczenia regionu indeksu (pochodna hashy?) i tego, czy zawiera on
+  przesunięcia tekstu; jak odróżnić wpisy puste, usunięte i przeniesione.
+- Czy układ `rekord + tekst` obowiązuje w chunkach wielowpisowych: dla
+  `B = 1` potwierdzony, dla większych `B` jeszcze nie prześledzony.
 - Czy `data3`/`data205`/`MANIFEST` mają ten sam układ rekordów — mają tę samą
   magiczną liczbę i ten sam nagłówek, ale ich payload nie był rozpakowany.
 - Jak zapisać plik z powrotem: kolejność, kompresja, sumy i ewentualne
