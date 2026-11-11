@@ -2,7 +2,20 @@
 
 Źródło: `tools/timeline.py` (parser `data205` i nowych plików `data201`–`data206`) → JSONL. Tekst źródłowy to chiński — angielski tylko pomocniczo (decyzja `zh_en`).
 
-Tekst pod `text_id` jest identyczny z wpisem w `translate_words_map_zh_cn` (sprawdzono: 100% `text_id` ze scen występuje w mapie, teksty zgodne). Przekład wpisuje się pod to samo `id` w mapie tłumaczeń (`tools/apply_translation.py`).
+Tekst pod `text_id` jest **takim samym kluczem** jak w `translate_words_map_zh_cn` — sprawdzono na 50 000 `text_id` ze scen: **100% występuje w mapie**, 42 208 tekstów identycznych, 7 006 różni się tylko łamaniami wiersza. Przekład wpisuje się pod to samo `id` w mapie tłumaczeń (`tools/apply_translation.py`).
+
+### Dwa źródła jednej répliki — którą brać?
+
+| źródło | co zawiera |
+|---|---|
+| `translate_words_map_zh_cn` (mapa) | pełna linia **z dopiskiem scenicznym w nawiasach**, np. `（正声）咳咳，江湖中有…` albo `喵喵喵喵！（你这些天去哪了，好久没喂我了，哼！）` |
+| `formatted_text` w scenie | tylko **wypowiadany fragment** bez nawiasów |
+
+Różni się treścią **1 863 z 50 000** (3,7%): w 1 055 przypadkach dopisek stoi **przed** kwestią (sposób mówienia, np. `（恍然）`), w 322 — **za** nią (myśl bohaterki, np. `（嗯嗯！）`). Tłumaczyć trzeba **pełny tekst z mapy** (z nawiasami), bo tylko on jest w pliku tekstów gry; wersja ze sceny jest podglądem do kontekstu. Który wariant faktycznie renderuje klient — **do sprawdzenia w grze**, nie zakładać.
+
+### Mówcy nie zawsze są osobami
+
+Z 12 920 różnych `entity_tag` większość to imiona postaci, ale trafiają się też etykiety techniczne i generyki: `玩家`, `主角`, `player`, `player_1/2`, `我`, `你` (postać gracza) oraz `Entity轨道组` i puste tagi (grupy techniczne). Dla tłumacza ważna jest treść i kolejność; etykietę-generyka w raporcie oznaczać jako „gracz / nieokreślony", nie wymyślać imienia.
 
 ## Kolumny
 
@@ -32,9 +45,17 @@ Tekst pod `text_id` jest identyczny z wpisem w `translate_words_map_zh_cn` (spra
 | — | — | 3.0 | 小偷 | f736fb540cc24dc7 | 别、别去见官—— | | |
 | — | — | 5.5 | 小偷 | fdc96c9d6699a273 | 我……我前阵子东家倒了，我没活干，我、我才…… | | |
 
+### Dwa wiersze z dopiskiem scenicznym (z mapy, nie ze sceny)
+
+| dialog_no | scena/projekt | czas | mówca | text_id | tekst źródłowy (chiński, z mapy) | przekład | uwagi |
+|---|---|---|---|---|---|---|---|
+| 100586 | 对话-sunyiming | 0 | player | c7b761b2c28d5c11 | 喵喵喵喵！（你这些天去哪了，好久没喂我了，哼！） | | dopisek po kwestii = myśl mówcy |
+| — | — | 24.565 | 游采苓 | 4d9d1854f47bfdde | （恍然）——蹊跷蕴之？原来这就是那道士说的天地之籁。 | | dopisek przed kwestią = sposób mówienia |
+
 ## Zasady
 
 - Chiński jest źródłem; przekład wpisuje się tylko w kolumnie `przekład`, nigdy nie nadpisuje źródła.
-- Mówcę i kolejność réplik bierze się z timelinu — nie zmieniać, nie domyślać się.
+- Tłumaczy się **pełny tekst z mapy** (z dopiskiem w nawiasach), nie skróconą wersję ze sceny — skrót jest tylko podglądem kontekstu.
+- Mówcę i kolejność réplik bierze się z timelinu — nie zmieniać, nie domyślać się. Etykiety-generyka (`玩家`, `主角`, `player`, `我`, `你`, `Entity轨道组`) oznaczać jako „gracz / nieokreślony", nie wymyślać imienia.
 - Puste/niejasne wartości (brak `dialog_no`, brak mówcy, tekst nieznaleziony w mapie) zgłaszać jako problem, nie zgadywać.
 - Teksty nie-dialogowe (przedmioty, specjale, encyklopedia) są częścią zadania: ich klucze też są w `translate_words_map_zh_cn` i dostają kontekst sceny.

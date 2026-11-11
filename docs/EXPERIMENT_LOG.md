@@ -781,3 +781,47 @@ cudzego kodu ani nie wymagają tej procedury.
   sprawdzone na mapie EN: 200 przetłumaczonych tekstów → **41 962 zmienione wpisy**,
   weryfikacja 1 122 784 id bez rozjazdów (13 s).
 - **Testy:** 232/232.
+
+## 2026-11-11 — dostawa `oversea` z Dysku Google: nowe dane scen i mapa `zh_cn`
+
+- **Wejście:** 4 pliki z Dysku Google (prywatnie w `google_drive/`):
+  `oversea.zip` 61 626 340 B, `oversea2.zip` 96 942 617 B, `patch.zip`
+  3 488 483 B, `translate_words_map_zh_cn` 69 470 988 B. Wypakowanie do
+  ignorowanego `local/oversea` (25 plików) i `local/patch`.
+  Inwentarz z SHA-256: [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md).
+- **Co przyszło:** `data200`, `201`, `202`, `203`, `204`, `206`.
+  `data200` **nie ma** `TimelinePObject` (same tabele kontekstowe).
+  Nadal brakuje `data207`–`data212`; `data205` mamy z wcześniejszego zbieracza.
+- **Sceny** (`tools/timeline.py`, 47 548 scen, 114 592 kwestii, wszystkie
+  `text_id` unikalne, 12 920 różnych `entity_tag`):
+  `data201` 6 926 scen / 15 805 linii, `data202` 10 600 / 27 488,
+  `data203` 8 939 / 25 004, `data204` 8 811 / 22 934, `data206` 12 272 / 23 361.
+- **Rejestr pokrycia:** `MANIFEST` z patcha ma 74 951 `dialog_timelines`
+  (281 004 klucze łącznie). Nowe sceny pokrywają **58,5%** (43 828 scen
+  z `dialog_no`; wcześniej 10,1% / 7 571). **Brakuje 31 123 dialogów.**
+  Żadna scena nie jest poza rejestrem.
+- **Mapa źródłowa `zh_cn` rozpoznana do końca:** ten sam kontener co mapa EN
+  (`0xDEADBEEF`, wersja 1, 7097 chunków, zstd) — 3 581 256 wpisów w nagłówkach,
+  **1 816 408 niepustych** par `id → chiński tekst`. Treść to nie tylko dialogi:
+  miejsca (`寿昌坊-平民`), imiona (`邵冷乄德明`), przedmioty (`耳砂珍坯·三阶`),
+  interfejs (`累计登录2天`), encyklopedia.
+- **Wiązanie scena ↔ mapa sprawdzone:** na 50 000 `text_id` ze scen **100%
+  występuje w mapie `zh_cn`**; 42 208 tekstów identycznych, 7 006 różni się
+  wyłącznie łamaniem wiersza.
+- **Nowe odkrycie — dopisek sceniczny:** 1 863 z 50 000 (3,7%) różni się treścią.
+  Mapa trzyma pełną linię z dopiskiem w nawiasach, scena tylko wypowiadany
+  fragment: `（正声）咳咳，…` / `（恍然）——蹊跷蕴之？…` (1 055 przypadków, sposób
+  mówienia przed kwestią) oraz `喵喵喵喵！（你这些天去哪了，好久没喂我了，哼！）`
+  (322, myśl bohaterki po kwestii). Tłumaczyć trzeba wersję z mapy; który wariant
+  renderuje klient — **do sprawdzenia w grze**, nie zakładać.
+- **Mówcy:** większość `entity_tag` to imiona postaci, ale trafiają się generyki
+  (`玩家`, `主角`, `player`, `player_1/2`, `我`, `你` = postać gracza) i grupy
+  techniczne (`Entity轨道组`, pusty tag) — nie są osobami.
+- **Format dla tłumacza:** [format_tlumacza.md](format_tlumacza.md) — kolumny
+  `dialog_no`, projekt, czas, mówca, `text_id`, chińskie źródło z mapy, pusta
+  kolumna na przekład, uwagi; przykłady z prawdziwych danych, w tym oba wzorce
+  z dopiskiem.
+- **Testy:** 242/242, `check_repository.py` OK, `git diff --check` czysty.
+- **Następne:** uzupełnić brakujące 31 123 dialogi (brakuje `data207`–`212`
+  lub innego źródła), a potem decyzja, czy tłumaczyć pełny korpus mapy `zh_cn`
+  (1,8 mln wpisów) czy wyłącznie teksty objęte scenami.
