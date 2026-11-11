@@ -93,8 +93,11 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Rozłożyć **indeks `klucz → tekst`** wewnątrz chunku — to jedyna brama do
-wszystkiego dalej. Rekordy nie mają stałej długości (test sumy długości nie
+Układ `_diff` jest odczytany (`tools/locale_records.py`, 598/4164 chunków
+przechodzi walidację) i powstał **prototyp** elementu paczki
+(`id:` = hash, `limit:`, `EN:`, `PL:`). Bramą pozostaje **mapa główna**:
+jej indeks nie jest tablicą rekordów stałej długości, więc 1 122 784 wpisów
+wciąż nie są dostępne. To jest teraz jedyne zadanie blokujące. Rekordy nie mają stałej długości (test sumy długości nie
 przechodzi dla żadnego układu 2/4/8/16/20/24 B), więc kodowanie jest zmienne.
 Bez kluczy nie ma `id` w paczce dla tłumacza, nie ma zapisu zwrotnego i nie ma
 audytu aktualizacji. Format docelowy paczki i lista braków:

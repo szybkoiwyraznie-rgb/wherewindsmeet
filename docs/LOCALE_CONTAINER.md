@@ -89,6 +89,32 @@ a podmiana sprowadza się do rekordu (długość) i tekstu. To **hipoteza** — 
 sprawdzenia przez przebudowę chunku i odczyt zwrotny, zanim cokolwiek zapiszemy
 w instalacji gry.
 
+## Układ chunku `_diff` (odczytany w całości)
+
+W plikach `_diff` chunk ma układ, który domyka się co do bajtu:
+
+```text
+[0..24)          nagłówek: u64 grupa, u64 liczba wpisów, u32 0x595896DC, u32 0
+[24..24+I)       indeks — nieprzejrzysty, rozmiar I zmienia się per chunk
+                 (obserwowane: 8, 20, 24, 36, 40, 56, 72 B)
+[24+I ..)        N × 16 B rekordów: u64 hash, u32 typ, u32 długość
+[dalej)          wszystkie teksty sklejone w kolejności rekordów, bez terminatora
+```
+
+`I` wyznacza warunek: suma zadeklarowanych długości musi równać się dokładnie
+liczbie bajtów pozostałych po rekordach. Gdy indeks zawiera zera, kilka wartości
+`I` spełnia sumę przypadkiem — rozstrzyga walidacja UTF-8 tekstów typu 8.
+
+Narzędzie: `tools/locale_records.py` (tylko odczyt, walidacja, bez zapisu).
+Na `translate_words_map_en_diff`: **598 z 4164** chunków przechodzi tę walidację
+(suma 630 wpisów, 621 unikalnych hashy). Reszta jest odrzucana, nie zgadywana —
+prawdopodobnie mają wspólne teksty albo inny wariant indeksu.
+
+Mapa główna `translate_words_map_en` ma **inny** układ: po nagłówku widać ok.
+8,7 kB nieprzejrzystego indeksu, a rekordów `[hash][typ][długość]` nie udaje się
+tam odnaleźć jako tablicy stałej długości (sprawdzone 8/12/16/20/24/32 B z
+kontrolą sumy). Jej 1 122 784 wpisów pozostają nieodczytane.
+
 ## Czego nie wiemy
 
 - Znaczenia pól `A`, `B`, `C`; `C` jest stałe w plikach EN, `_diff` i `zh_cn_diff`,

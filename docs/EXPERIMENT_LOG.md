@@ -690,3 +690,23 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** nieznany układ dla chunków wielowpisowych i mapa główna
   (`B` do 511) nie jest jeszcze przemierzona; mówcy, limity pól i zapis
   zwrotny pozostają nieznane.
+
+## 2026-11-11 — układ chunku `_diff` odczytany; prototyp elementu paczki
+
+- **Ustalenie:** chunk `_diff` = nagłówek 24 B + indeks o zmiennym rozmiarze
+  (8/20/24/36/40/56/72 B) + `N × 16 B` rekordów `[u64 hash][u32 typ][u32 len]`
+  + sklejone teksty bez terminatora. Rozmiar indeksu wyznacza warunek
+  „suma długości = reszta payloadu”.
+- **Narzędzie:** `tools/locale_records.py` (odczyt, walidacja, brak zapisu) +
+  `tests/test_locale_records.py` (8 testów syntetycznych). Przy kilku możliwych
+  rozmiarach indeksu rozstrzyga walidacja UTF-8 tekstów typu 8.
+- **Wynik na realnym pliku:** `translate_words_map_en_diff` — **598 z 4164**
+  chunków przechodzi walidację, 630 wpisów, 621 unikalnych hashy, 10 pustych.
+  Pozostałe są odrzucane (nie zgadywane). `data3`/`data205`/mapa główna nie są
+  obsługiwane: ich rekordy nie tworzą tablicy stałej długości.
+- **Prototyp paczki:** wygenerowano prywatnie `local/prototyp_paczki/probka.md`
+  w formacie SRW: `N. [Tekst] …`, `id:` (hash), `limit:` (bajty oryginału),
+  `EN:`, `PL:`. Służy do sprawdzenia formatu, **nie** jest paczką do wysłania.
+- **Kontrole:** `python tools/run_tests.py` — **200/200**.
+- **Ograniczenia:** mapa główna (1 122 784 wpisów) pozostaje nieodczytana;
+  mówcy, kolejność scen, limity pól i zapis zwrotny nadal nieznane.
