@@ -78,8 +78,30 @@ Wartość bez schematu to jedna zserializowana wartość z etykietą typu:
 | `0x0b` `0x0c` `0x0d` | None, False, True |
 
 Wiersz tabeli **ze schematem** ma inną budowę: `u16 liczba_pól`, potem pola
-`[u8 numer kolumny, u8 kod typu, dane]`. Rozpoznane kody: `0x0c` = u32,
-`0x28` = słownik. Pełna lista kodów — **do ustalenia** (patrz dziennik).
+`u16 (numer_kolumny | typ << 10)` + dane. Numer kolumny ma 10 bitów (tabele
+mają ponad 256 kolumn), `typ` to ten sam tag co wyżej, a dane są kodowane jak
+wartość z etykietą, tylko bez bajtu etykiety. Kolumn, których wiersz nie
+wypełnia, po prostu w nim nie ma.
+
+## Sprawdzenie na całej bazie (2026-11-11)
+
+`python3 tools/baza_gry.py KATALOGI --sprawdz` czyta każdy wiersz każdej tabeli
+i wymaga, żeby wartość skończyła się w swoim przedziale, a dopełnienie było
+zerowe. Wynik na dostawach z Dysku (pliki bazowe + `LocalData/Patch`):
+
+| miara | wynik |
+|---|---|
+| tabel w `MANIFEST` | 114 171 (28 261 ze schematem), 10 077 485 wierszy |
+| tabel odczytanych bez błędu | **113 792**, 10 069 118 wierszy |
+| nieznane tagi | 0 |
+| tabel z inną liczbą wierszy niż w `MANIFEST` | 377 (różnica zwykle 1–3 wiersze) |
+| tabel z błędem wartości | 2 (`0x00` w miejscu tagu) |
+
+Rozbieżności liczby wierszy **nie są jeszcze wyjaśnione**: w 171 z 377 tabel
+indeks ma tyle wierszy, ile podaje `MANIFEST` bazowy (z `Package`), a nie ten
+z `LocalData/Patch`, więc patch najpewniej nakłada wiersze inną drogą niż
+lista części tabeli. Do ustalenia, zanim audyt aktualizacji będzie na tym
+polegał.
 
 ## Dialog = cztery pola jednej tabeli
 
