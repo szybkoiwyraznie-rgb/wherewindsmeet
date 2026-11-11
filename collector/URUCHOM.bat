@@ -12,7 +12,8 @@ echo Zamknij gre i poczekaj na koniec aktualizacji Steam.
 echo Program nic nie zmienia w grze i nie wysyla nic sam.
 echo.
 if not exist "%PS%" goto no_powershell
-"%PS%" -NoLogo -NoProfile -File "%~dp0zbierz.ps1" %*
+"%PS%" -NoLogo -NoProfile -Command "Get-ChildItem -LiteralPath '%~dp0' -Filter *.ps1 -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" 2>nul
+"%PS%" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0zbierz.ps1" %*
 set "RESULT=%ERRORLEVEL%"
 echo.
 if "%RESULT%"=="0" goto done

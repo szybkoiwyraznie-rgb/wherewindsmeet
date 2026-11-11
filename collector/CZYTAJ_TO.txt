@@ -48,9 +48,14 @@ lokalizacji Steam i numeru builda z manifestu Steam. Część nazw/katalogów
 prywatnych i linki systemu plików są pomijane. Inwentarz i kopie mogą jednak
 zawierać dane gry oraz prywatne nazwy: obejrzyj wynik przed udostępnieniem,
 nie publikuj go i przekazuj tylko osobom, którym ufasz. Nie podawaj haseł.
-URUCHOM.bat respektuje aktualną politykę wykonywania PowerShell i jej nie
-zmienia. Jeśli Windows zablokuje skrypt, nie obniżaj polityki ani nie omijaj
-zabezpieczeń; przerwij i skonsultuj komunikat.
+URUCHOM.bat uruchamia Windows PowerShell z parametrem -ExecutionPolicy Bypass,
+tak jak pozostałe paczki tego projektu. Parametr dotyczy wyłącznie tego jednego
+procesu: nie zmienia ustawień systemowych, rejestru ani polityki zapisanej
+w komputerze, nie wymaga uprawnień administratora i nic nie pobiera ani nie
+instaluje. BAT zdejmuje też znacznik „plik pobrany z internetu” (Unblock-File)
+z plików w tym folderze, żeby Windows ich nie blokował. Jeśli mimo tego system
+odmówi uruchomienia, przerwij i prześlij komunikat — nie zmieniaj polityki
+wykonywania na stałe.
 
 Na Pulpicie powstaje tymczasowy folder roboczy, normalnie usuwany po pracy;
 po awaryjnym zamknięciu może pozostać folder .WWM_ZBIERANIE_... wraz z kopiami.

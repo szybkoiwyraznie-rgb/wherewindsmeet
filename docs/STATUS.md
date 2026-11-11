@@ -34,8 +34,9 @@ rosnącym `AGENTS.md`.
   instrukcja, BAT i PowerShell tworzą jeden ZIP z inwentarzem oraz wybranymi
   kopiami map i kandydatów kontekstu. Ręczne oględziny zostały odrzucone.
   Kompletność tekstów/kontekstu, aktualna instalacja i prawa pozostają nieznane.
-  Na prośbę właściciela BAT przestał nadpisywać politykę wykonywania PowerShell;
-  jeśli system blokuje skrypt, instrukcja zaleca przerwanie bez obniżania polityki.
+  Po błędzie `running scripts is disabled` na komputerze właściciela BAT znów
+  uruchamia PowerShell z `-ExecutionPolicy Bypass` (tylko dla tego procesu,
+  bez zmian w systemie) i wykonuje `Unblock-File` na swoich `*.ps1`.
   Zmiana przeszła CI na Linux/Windows × Python 3.11/3.12; nie testowano jej
   na komputerze właściciela ani na instalacji gry.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w

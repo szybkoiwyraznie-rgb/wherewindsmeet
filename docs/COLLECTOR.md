@@ -5,10 +5,16 @@
 Jednorazowy, odczytowy zestaw do rozpoznania instalacji: rozpakuj ZIP,
 uruchom `URUCHOM.bat`, otrzymaj **jeden** ZIP na Pulpicie i przekaż go
 prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
-instaluje Pythona, zależności ani niczego nie pobiera przez skrypt. BAT
-uruchamia PowerShell bez nadpisywania jego polityki wykonywania. Jeśli ta
-polityka blokuje skrypt, nie obniżaj jej ani nie omijaj zabezpieczeń — przerwij
-uruchamianie. Zbieracz nie instaluje ani nie cofa tłumaczenia. Jest osobny od
+instaluje Pythona, zależności ani niczego nie pobiera przez skrypt.
+
+Na życzenie właściciela, po tym jak domyślna polityka wykonywania zablokowała
+skrypt na jego komputerze, BAT uruchamia PowerShell z parametrem
+`-ExecutionPolicy Bypass` — tak jak paczki SRW Y tego projektu. Parametr
+obejmuje **tylko ten jeden proces**: nie zmienia polityki w rejestrze ani
+ustawień systemowych, nie wymaga administratora i niczego nie instaluje.
+BAT wykonuje też `Unblock-File` na plikach `*.ps1` w swoim folderze, żeby
+znacznik „pobrane z internetu” nie blokował uruchomienia. To nie jest
+obchodzenie zabezpieczeń gry; gra pozostaje tylko czytana. Zbieracz nie instaluje ani nie cofa tłumaczenia. Jest osobny od
 planowanych [audytora i patchera](TWO_APPLICATIONS.md).
 
 Właściciel wskazał wzorce SRW Y. W repozytorium `mtgcrawler` odnaleziono

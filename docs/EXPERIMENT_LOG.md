@@ -561,3 +561,29 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** brak assetu release'a nie jest usterką projektu, tylko
   ograniczeniem sieci tego środowiska; właściciel może dodać asset ręcznie
   w interfejsie GitHuba. Nadal brak uruchomienia na jego Windows i na grze.
+
+## 2026-11-11 — przywrócenie `-ExecutionPolicy Bypass` w BAT
+
+- **Zgłoszenie właściciela:** na jego komputerze `URUCHOM.bat` przerwał się
+  komunikatem `zbierz.ps1 cannot be loaded because running scripts is disabled
+  on this system` (`UnauthorizedAccess`). Przyczyną była wcześniejsza decyzja
+  o nietykaniu polityki wykonywania; domyślna polityka Windows blokowała skrypt.
+- **Decyzja właściciela:** przywrócić zachowanie paczek SRW Y. `URUCHOM.bat`
+  wywołuje teraz `powershell.exe` z `-ExecutionPolicy Bypass` (dotyczy tylko
+  tego jednego procesu, nie zmienia rejestru ani ustawień systemowych, nie
+  wymaga administratora) oraz wykonuje `Unblock-File` na `*.ps1` w swoim
+  folderze, żeby znacznik „pobrane z internetu” nie blokował uruchomienia.
+  To nie jest obchodzenie zabezpieczeń gry — zbieracz nadal tylko czyta pliki.
+- **Zmiany:** `collector/URUCHOM.bat`, `collector/CZYTAJ_TO.txt` (opis
+  parametru i `Unblock-File`), `tests/test_collector_kit.py` (dawny test
+  wymagał braku `-ExecutionPolicy`; teraz sprawdza `Bypass`, brak
+  `Set-ExecutionPolicy`, brak zapisu do rejestru i obecność `Unblock-File`),
+  `docs/COLLECTOR.md`, `docs/STATUS.md`.
+- **Kontrole lokalne:** `python tools/run_tests.py` — **182/182** (dwa nowe
+  testy); `git diff --check` i `check_repository.py` bez uwag. ZIP zbudowany
+  ponownie: **31 643 B**, SHA-256
+  `35f6959ab98ffb8125c2961aec642faaa39598d02049fd7cd5da60a0b4cb616b`, trzy
+  człony, CRC poprawne, BAT nadal ASCII/CRLF, PS1 bez zmian (BOM, 25571 B).
+- **Ograniczenia:** PowerShell nie jest zainstalowany w środowisku Linux, więc
+  poprawionego BAT-a nie uruchomiono tutaj; wynik CI dla tego commita trzeba
+  sprawdzić osobno. Nie testowano na komputerze właściciela ani na grze.
