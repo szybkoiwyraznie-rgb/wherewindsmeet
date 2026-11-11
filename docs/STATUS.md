@@ -93,11 +93,10 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Format kontenera i tabeli jest **odczytany w obie strony** (potwierdzone przez
-prior art i własne testy): 1 122 784 wpisów wyciągnięte bez błędów, przepakowanie
-bez zmiany tekstów odtwarza zawartość 4386/4386 chunków. Paczka dla Tłumacza
-powstała (`local/paczka_v1`, 1 122 784 elementy, 503 206 unikalnych).
+Format jest odczytany w obie strony i **potwierdzony na realnej mapie**:
+1 122 784 wpisy, `tools/apply_translation.py` podmienia teksty o dowolnej
+długości, weryfikuje wynik i zapisuje nową mapę (200 podmian w 11 s).
 
-Dalej: **patcher** (podmiana tekstów po `id` + przepakowanie kontenera, praca na
-kopii pliku gry) oraz **podział paczki na sceny i widoki** z mówcami — to wymaga
-odczytania powiązań między wpisami a dialogami, czego jeszcze nie ma.
+Dalej: **podział paczki na sceny i widoki** (mówcy, kolejność scen — wymaga
+odczytania powiązań wpisów z dialogami), **limit pól interfejsu**, oraz
+**skrypt instalacyjny** dla użytkownika (kopiowanie, backup, przywracanie).

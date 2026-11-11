@@ -16,9 +16,13 @@ u32[count+1] tabela przesunięć (bajty od początku tabeli przesunięć)
 chunki...
 ```
 
-`base = 12 + 4 * (count + 1) = 16 + 4 * count`. Ostatni wpis tabeli jest
-wartownikiem równym rozmiarowi reszty pliku, więc tabela domyka się do rozmiaru
-pliku. To zweryfikowano na `translate_words_map_en` (4386 chunków) i `_diff`.
+`base = 12 + 4 * (count + 1)`. Ostatni wpis tabeli jest wartownikiem równym
+rozmiarowi reszty pliku, więc tabela domyka się do rozmiaru pliku.
+
+**Chunk 0 nie jest tabelą tekstów** — to indeks mapy: `u64 suma wpisów |
+u64 liczba chunków | u32[liczba chunków - 1]` (na mapie EN: 1 122 784 wpisów,
+4386 chunków danych, 17560 B). Trzeba go przepisywać bez zmian. Mapa EN ma
+więc **4387 chunków, z czego 4386 to tabele tekstów**.
 
 ## Warstwa 2 — chunk
 
@@ -73,6 +77,7 @@ kompaktowanie skraca tabelę), ale zawartość tak.
 | kontener, chunki, zstd | odczytane, testy w `tests/test_locale_container.py` |
 | tabela wpisów, offsety, teksty | odczytane, testy w `tests/test_locale_records.py` |
 | zapis zwrotny (przepakowanie) | odczytany i sprawdzony na 8549 chunkach |
-| 1 122 784 wpisów mapy EN | wyciągnięte, 0 błędów |
+| 1 122 784 wpisów mapy EN | wyciągnięte, 0 błędów (4386 tabel + chunk indeksu) |
+| zapis zwrotny przez patcher | `tools/apply_translation.py`, sprawdzony na całej mapie EN (200 podmian, 11 s) |
 | mówcy, kolejność scen | **nieodczytane** |
 | limity pól interfejsu | **nieznane** (używamy długości oryginału) |

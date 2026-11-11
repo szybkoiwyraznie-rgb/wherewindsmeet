@@ -749,3 +749,19 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Testy:** 215/215. Poprawiono `tools/locale_records.py` (pełna specyfikacja +
   `pack_table`) i `tests/test_locale_records.py`.
 - **Następne:** patcher (podmiana tekstów po `id`) i odczytanie mówców/scen.
+
+## 2026-11-11 — patcher działa na całej mapie EN
+
+- **Nowe narzędzie:** `tools/apply_translation.py` — podmiana tekstów po `id`,
+  przepakowanie tabeli (offsety przeliczone), rekompresja zstd, nowa tabela
+  przesunięć, wszystko na kopii (wejście nietknięte).
+- **Chunk 0 kontenera to indeks mapy**, nie tabela tekstów: `u64 suma wpisów |
+  u64 liczba chunków | u32[…]`; przepisywany bez zmian. Nagłówek: `count` =
+  liczba chunków, tabela ma `count+1` wpisów (ostatni to wartownik).
+  `tools/locale_container.py` poprawiony na te semantyki.
+- **Wynik:** mapa EN 50 550 179 B → 51 904 280 B po 200 podmianach, 11 s,
+  weryfikacja: 1 122 784 id, 200 zmian, zero rozjazdów.
+- **Testy:** 229/229 (`tests/test_apply_translation.py` + poprawione
+  `tests/test_locale_container.py`).
+- **Dokumentacja:** [PATCHER_WWM.md](PATCHER_WWM.md).
+- **Następne:** sceny i mówcy, limity pól interfejsu, skrypt instalacyjny.
