@@ -5,6 +5,25 @@ kolejności** i **gdzie kończy się jedna scena, a zaczyna następna**. Wcześn
 podejścia (mapa `keyHash → tekst`) dawały tylko płaską listę stringów bez kontekstu;
 `data205` daje pełny graf dialogów.
 
+## `dialog_no` to grupa dialogowa, nie pojedynczy timeline
+
+Pole `dialog_no` w obiekcie `TimelinePObject` **nie** identyfikuje jednoznacznie
+jednego timeline'u. Ten sam numer występuje w dwóch różnych plikach z **inną**
+treścią, innymi mówcami i innym `id` timeline'u:
+
+| `dialog_no` | plik | `id` timeline'u | kwestii | treść |
+|---|---|---|---|---|
+| 1960001321 | `data203` | 1167636709 | 5 | 木闻莺 o蒙学院 |
+| 1960001321 | `data1200` (patch) | 1709454066 | 9 | 黎书韵 o衙门 |
+
+W całym korpusie jest **10** takich grup. Dlatego:
+
+- **scalać po `dialog_no` nie wolna** — jedna z wersji zostałaby zgubiona;
+- rejestr `MANIFEST` liczy **grup** (`dialog_timelines` = 74 951), więc pokrycie
+  „X% dialogów" oznacza grupy, dla których mamy przynajmniej jeden timeline;
+- tłumaczenie i tak jest kluczowane `text_id`, więc obie wersje są tłumaczone
+  niezależnie i żadna nie jest nadpisywana.
+
 ## Serializator
 
 Każda wartość to `<tag: u8><payload>`:

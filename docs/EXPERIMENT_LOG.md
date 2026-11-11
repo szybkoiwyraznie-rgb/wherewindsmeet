@@ -853,3 +853,54 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Wynik:** 242/242 lokalnie, CI **4/4 zielone** (Ubuntu i Windows × Python
   3.11/3.12). Ślepych punktów w testach `extras` nie ma: każdy faszywy wpis jest
   weryfikowany pod kątem obecności w archiwum.
+
+## 2026-11-11 — druga dostawa: brakujące `data205`–`data208`, indeksy i trwały indeks w repo
+
+- **Wejście:** `oversea3.zip` (76 372 696 B), `index.zip` (90 717 968 B),
+  `index2.zip` (33 917 240 B). To były **brakujące pliki**: `data205`, `data207`,
+  `data208`, `data209`, `data210`, `data211`, `data212` oraz indeksy
+  `index1`–`index4`, `index1001`, `index1200`, `index200`–`index204`.
+- **Skan nowym narzędziem** `tools/skan_timeline.py` (liczy serializowane pole
+  `Type` = `TimelinePObject`, nie goły literał): sceny mają `data205` (8 484),
+  `data207` (11 847), `data208` (7 042). **`data209`–`data212` i wszystkie
+  indeksy nie mają ani jednego obiektu sceny** — nie brakowo scen, tylko inna
+  treść. Łącznie z wcześniejszą dostawą: 75 006 obiektów, 8 plików ze scenami.
+- **Ekstrakcja** (`tools/timeline.py`): `data205` 8 484 scen / 17 268 kwestii,
+  `data207` 11 847 / 32 015, `data208` 7 042 / 14 471.
+- **Pokrycie rejestru:** 58,5% → **92,2%** (69 092 z 74 951 `dialog_timelines`).
+  **Brakuje 5 859 dialogów**; żadna scena nie jest poza rejestrem.
+- **Nowe ustalenie o `dialog_no`:** to **identyfikator grupy dialogowej**, nie
+  pojedynczego timeline'u. Ten sam numer występuje w dwóch plikach z **inną**
+  treścią i innymi mówcami (przykład: `1960001321` — w `data203` 5 kwestii
+  z 木闻莺 o蒙学院, w `data1200` 9 kwestii z 黎书韵 o衙门; różne `id`
+  timeline'u: 1167636709 vs 1709454066). Scalać po `dialog_no` **nie wolna** —
+  treść się zgubi. W korpusie 10 takich grup.
+- **`data1200` z patcha jest nadzbiorem** wersji z `oversea`: wszystkie 158
+  `text_id` bazy występuje w patchu plus 25 nowych. Do korpusu brana jest wersja
+  z patcha; `data3` (25 scen) także wchodzi do korpusu.
+- **Trwały indeks w repo** (decyzja właściciela, szczegóły w
+  [DATA_POLICY.md](DATA_POLICY.md)): `index/manifest.json`, 5 shardów scen
+  (74 979 scen, 178 572 kwestii) i 3 shardy tekstów (176 146 unikalnych), każdy
+  plik < 10 MiB. Tekst stoi tylko w shardach tekstów, więc nie jest powtarzany
+  przy każdej kwestii. `tools/buduj_indeks.py` buduje indeks z prywatnych
+  wyjść, `tools/sceny_z_indeksu.py` odtwarza z niego sceny i listy tekstów
+  **bez `local/` i bez plików z Dysku**.
+- **Round-trip sprawdzony:** sceny odtworzone z indeksu są identyczne z wyjściem
+  `timeline.py` we wszystkich polach linii (po poprawce: obsada jest klucowana
+  parą `mowca` + `speaker_no`, bo ten sam tag bywa użyty dla dwóch mówców, a
+  `skeleton` ujednolicamy do pierwszej napotkanej postaci — w źródle ten sam
+  mówca bywa zapisany z `''` i bez wartości, a żadne narzędzie potokowe tego
+  pola nie używa).
+- **Tekst źródłowy do tłumaczenia:** 25 258 z 176 146 tekstów (14,3%) ma w mapie
+  `zh_cn` **dłuższą** wersję — z dopiskiem scenicznym w nawiasach, który scena
+  obcięła. Tłumaczy się wersję z mapy (`tekst_mapa` w shardach tekstów).
+- **Uwaga o piaskownicy:** w trakcie tej pracy `local/`, `google_drive/` i
+  `.venv` zniknęły przy czyszczeniu środowiska. Przetrwał tylko materiał w
+  repozytorium — co jest dokładnie tym argumentem, dla którego indeks jest
+  wersjonowany. Lokalny commit zaginął razem z drzewem i został odtworzony.
+- **Testy:** 258/258, w tym 8 testów indeksu (round-trip, limity shardów,
+  spójność zacommitowanego indeksu, odrzucanie nieznanego formatu) i 8 testów
+  skanu timeline'ów.
+- **Następne:** domknąć 5 859 brakujących dialogów (nie ma już nieprzesłanych
+  plików `data*`, więc albo rejestr zawiera grupy bez timeline'u, albo treść
+  jest w innym pliku), a potem ograniczenia pól interfejsu i skrypt instalacyjny.

@@ -1,0 +1,153 @@
+{
+  "format": "wwm-indeks-v1",
+  "utworzono": "2026-11-11",
+  "liczby": {
+    "scen": 74979,
+    "kwestii": 178572,
+    "unikalnych_tekstow": 176146,
+    "mowcow": 17492,
+    "tekstow_z_dluzsza_wersja_mapy": 25258
+  },
+  "pokrycie": {
+    "dialog_timelines": 74951,
+    "scen_z_dialog_no": 69092,
+    "scen_poza_rejestrem": 0,
+    "pokrycie_procent": 92.2,
+    "brakuje_dialogow": 5859
+  },
+  "zrodla": {
+    "mapa": {
+      "plik": "translate_words_map_zh_cn",
+      "bajtow": 69470988,
+      "sha256": "74505cecc0a7ca6f85ff9b31ea04cf7e6c5a0407b61f046469ff1158abaf7c71"
+    },
+    "rejestr": {
+      "plik": "MANIFEST",
+      "bajtow": 1415521,
+      "sha256": "48ce04bade699fdbea157e4b5bb1b197ba14e421c31595ccb412d0ff029f23e9"
+    },
+    "sceny": [
+      {
+        "plik": "sceny_data201.jsonl",
+        "bajtow": 5432577,
+        "sha256": "1e0b35a291a2d0dd93eeef48d97af9dd6d80517050080ec074b75612b032f1cf",
+        "scen": 6926,
+        "kwestii": 15805
+      },
+      {
+        "plik": "sceny_data202.jsonl",
+        "bajtow": 9238665,
+        "sha256": "07305810e87271d99cec4dcd41fac63dd30eaed5620e26cc69e5365a70ffbefc",
+        "scen": 10600,
+        "kwestii": 27488
+      },
+      {
+        "plik": "sceny_data203.jsonl",
+        "bajtow": 8232136,
+        "sha256": "cf946b8495e4d732f8af0a38ee9d26c355a2a48f29496e9e503b4156d3816074",
+        "scen": 8939,
+        "kwestii": 25004
+      },
+      {
+        "plik": "sceny_data204.jsonl",
+        "bajtow": 7803187,
+        "sha256": "7021472e9d01a4633588c13543093ca9cebc46a932c52f6d3e795b51d1b7a2e7",
+        "scen": 8811,
+        "kwestii": 22934
+      },
+      {
+        "plik": "sceny_data206.jsonl",
+        "bajtow": 8221926,
+        "sha256": "6ef9356aa7ef3c5588e0489e87a41640bce9bb71401e8b4cb2464cf4c4121325",
+        "scen": 12272,
+        "kwestii": 23361
+      },
+      {
+        "plik": "sceny_data3.jsonl",
+        "bajtow": 14810,
+        "sha256": "4f51958f133dd87d4175e88430181f07a49cf8e75dab461e8d476c120dabcbed",
+        "scen": 25,
+        "kwestii": 43
+      },
+      {
+        "plik": "sceny_data1200_patch.jsonl",
+        "bajtow": 55576,
+        "sha256": "7b77dab8a6ba1b2de083ba6d20c2cc9c3d118b918ac3ecfa9ecffd14c7d8641d",
+        "scen": 33,
+        "kwestii": 183
+      },
+      {
+        "plik": "sceny_data205.jsonl",
+        "bajtow": 5794924,
+        "sha256": "7fb471bc1213397e4686f8aadb52afc944815c9484ed99c6345e62ec70357884",
+        "scen": 8484,
+        "kwestii": 17268
+      },
+      {
+        "plik": "sceny_data207.jsonl",
+        "bajtow": 10366753,
+        "sha256": "ed54983959913a1d31b6b8624edf6e4f2cb89d8f8f06c3bce6624e89d42ff02d",
+        "scen": 11847,
+        "kwestii": 32015
+      },
+      {
+        "plik": "sceny_data208.jsonl",
+        "bajtow": 5092619,
+        "sha256": "8777d0f87c5fbb7c9371e79a4c934c7b7b991557e426cb14784f3e8a669a3897",
+        "scen": 7042,
+        "kwestii": 14471
+      }
+    ]
+  },
+  "shardy": {
+    "sceny": [
+      {
+        "plik": "sceny_000.jsonl",
+        "linie": 16227,
+        "bajtow": 9436514
+      },
+      {
+        "plik": "sceny_001.jsonl",
+        "linie": 15323,
+        "bajtow": 9436943
+      },
+      {
+        "plik": "sceny_002.jsonl",
+        "linie": 18040,
+        "bajtow": 9436877
+      },
+      {
+        "plik": "sceny_003.jsonl",
+        "linie": 17113,
+        "bajtow": 9436782
+      },
+      {
+        "plik": "sceny_004.jsonl",
+        "linie": 8276,
+        "bajtow": 4858865
+      }
+    ],
+    "teksty": [
+      {
+        "plik": "teksty_000.jsonl",
+        "linie": 74793,
+        "bajtow": 9437146
+      },
+      {
+        "plik": "teksty_001.jsonl",
+        "linie": 75033,
+        "bajtow": 9437116
+      },
+      {
+        "plik": "teksty_002.jsonl",
+        "linie": 26320,
+        "bajtow": 3319027
+      }
+    ]
+  },
+  "pominiete": [
+    "formatted_text (jest w shardach tekstow)",
+    "skeleton (identyfikacja mowcy: mowca + speaker_no)",
+    "chunk, chunk_index (szczegoly ekstrakcji)"
+  ]
+}

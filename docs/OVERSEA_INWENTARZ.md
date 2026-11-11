@@ -50,3 +50,35 @@ Pobrane z Dysku Google (4 pliki, każdy poniżej limitu 100 MB) i wypakowane do 
 ## Brakujące pliki
 Z oczekiwanej listy `data200`–`data212` (bez `data205`, patrz `collector/spakuj_dane.ps1`) dostarczono: `data200`, `201`, `202`, `203`, `204`, `206`.
 Nadchodzić mogą jeszcze: `data207`, `208`, `209`, `210`, `211`, `212` — nie było ich w tych 4 paczkach.
+
+## Druga dostawa (2026-11-11): `oversea3.zip`, `index.zip`, `index2.zip`
+
+| paczka | rozmiar | zawartość |
+|---|---|---|
+| `oversea3.zip` | 76 372 696 B | `data205`, `data207`, `data208`, `data209`, `data210`, `data211`, `data212` |
+| `index.zip` | 90 717 968 B | `index1`, `index2`, `index3`, `index4` |
+| `index2.zip` | 33 917 240 B | `index1001`, `index1200`, `index200`, `index201`, `index202`, `index203`, `index204` |
+
+Skróty samych archiwów ZIP nie zostały obliczone (pliki pośrednie zniknęły przy
+czyszczeniu piaskownicy); trwałe skróty są w `index/manifest.json` dla
+**wypakowanych** danych: mapy `zh_cn`, rejestru `MANIFEST` i każdego pliku scen.
+
+### Które pliki mają sceny (`tools/skan_timeline.py`)
+
+| plik | obiekty `TimelinePObject` | scen | kwestii |
+|---|---|---|---|
+| `data207` | 11 847 | 11 847 | 32 015 |
+| `data205` | 8 484 | 8 484 | 17 268 |
+| `data208` | 7 042 | 7 042 | 14 471 |
+| `data209`, `data210`, `data211`, `data212` | **0** | 0 | 0 |
+| `index1`–`index4`, `index1001`, `index1200`, `index200`–`index204` | **0** | 0 | 0 |
+
+Razem z pierwszą dostawą: **75 006 obiektów scen** w 8 plikach
+(`data201`, `202`, `203`, `204`, `206`, `205`, `207`, `208`) plus `data3` (25)
+i `data1200` (27 + 33 z patcha). Pokrycie rejestru: **92,2%** (69 092 z 74 951),
+brakuje **5 859** dialogów — i nie został już nieprzesłany żaden plik `data*`.
+
+### `data1200` z patcha jest nadzbiorem wersji z `oversea`
+
+Wszystkie 158 `text_id` z `oversea/data1200` występuje w `patch/oversea/data1200`
+plus 25 nowych (33 sceny vs 27). Do korpusu brana jest wyłącznie wersja z patcha.

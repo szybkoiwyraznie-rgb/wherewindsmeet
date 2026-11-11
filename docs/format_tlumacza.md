@@ -4,6 +4,16 @@
 
 Tekst pod `text_id` jest **takim samym kluczem** jak w `translate_words_map_zh_cn` — sprawdzono na 50 000 `text_id` ze scen: **100% występuje w mapie**, 42 208 tekstów identycznych, 7 006 różni się tylko łamaniami wiersza. Przekład wpisuje się pod to samo `id` w mapie tłumaczeń (`tools/apply_translation.py`).
 
+### Którą wersję brać — liczby z całego korpusu
+
+Na pełnym korpusie (176 146 unikalnych tekstów) **25 258 tekstów (14,3%)** ma w
+mapie `zh_cn` dłuższą wersję niż scena. Różnica to nie tylko łamania wiersza
+(7 006 przypadków), ale właśnie ten dopisek. Pełny tekst do tłumaczenia jest
+więc w shardach `index/teksty_*.jsonl` pod kluczem `tekst_mapa`, a wersja
+wyświetlana w grze pod `tekst_zh`. Narzędzie `tools/sceny_z_indeksu.py --z-mapa`
+wypisuje listę `{id, text}` w wersji z mapy, gotową dla
+`tools/build_translator_pack.py`.
+
 ### Dwa źródła jednej répliki — którą brać?
 
 | źródło | co zawiera |
