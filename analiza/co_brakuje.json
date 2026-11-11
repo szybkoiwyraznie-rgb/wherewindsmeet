@@ -1,0 +1,78 @@
+{
+ "1_pokrycie_danych": {
+  "stan_procent": 92.18,
+  "mamy_unikalnych_dialog_no": 69092,
+  "rejestr_dialog_timelines": 74951,
+  "brakuje": 5859,
+  "lista_brakujacych": "analiza/brakujace_dialogi.json (wymaga pliku rejestru)",
+  "gdzie_szukano": {
+   "pliki_z_timeline": {
+    "data201": 6926,
+    "data202": 10600,
+    "data203": 8939,
+    "data204": 8811,
+    "data205": 8484,
+    "data206": 12272,
+    "data207": 11847,
+    "data208": 7042,
+    "data3": 25,
+    "data1200": 27
+   },
+   "pliki_bez_timeline": [
+    "data200",
+    "data1",
+    "data2",
+    "data4",
+    "data5",
+    "data6",
+    "data7",
+    "data8",
+    "data9",
+    "data10",
+    "data11",
+    "data1001",
+    "data209",
+    "data210",
+    "data211",
+    "data212"
+   ],
+   "wniosek": "wszystkie pliki z timeline'ami są już w index/; brakujące dialogi nie są w żadnym dostarczonym pliku"
+  },
+  "co_trzeba_dostarczyc": [
+   "pełną listę plików z katalogu gry Package/HD/oversea/ (nazwa + rozmiar), żeby wskazać, czego brakuje",
+   "albo uruchomić kolektor na całym katalogu zamiast na wybranych plikach"
+  ]
+ },
+ "2_kategorie_tekstow": {
+  "unikalnych_tekstow_poza_scenami": 428560,
+  "stan": "podzielone tylko po cechach mierzalnych (długość, tokeny), nie po kategoriach gry",
+  "sprawdzono_i_martwe": {
+   "rejestr_storyline": "138 kluczy to stany animacji awatara, nie misje",
+   "rejestr_new_graph_cues": "2 442 klucze, 0 trafień z dialog_no i timeline_id",
+   "rejestr_maps": "3 416 kluczy to hex_world (świat), nie teksty",
+   "data200": "0 z 300 kluczy mapy i 0 z 300 tekstów mapy — tabele kontekstowe nie odwołują się do tekstów"
+  },
+  "co_trzeba_dostarczyc": [
+   "pliki gry z tablicami przedmiotów/questów/interfejsu powiązanymi z kluczami mapy tłumaczeń",
+   "albo decyzję, że kategorie ustala tłumacz/właściciel ręcznie"
+  ]
+ },
+ "3_mapowanie_mowcow": {
+  "kwestii_bez_nazwy": 232,
+  "kwestii_bez_speaker_no_procent": 32.5,
+  "numerow_z_wieloma_nazwami": 2625,
+  "nazw_z_wieloma_numerami": 3478,
+  "entity_name_niepustych": 0,
+  "stan": "identyfikatorem mówcy jest para (mowca, speaker_no); entity_name w grze jest zawsze puste",
+  "co_trzeba_dostarczyc": [
+   "źródło prawdziwych imion/encji (pliki NPC lub tablicę encji z gry), żeby rozstrzygnąć 2 625 numerów z wieloma nazwami"
+  ]
+ },
+ "4_chronologia": {
+  "scen_niemonotonicznych": 0,
+  "stan": "kolejność w obrębie pliku i pary (czas, kolejność) jest spójna; brak mapy scena → misja → rozdział",
+  "co_trzeba_dostarczyc": [
+   "dane misji/questów gry, które wskazują sceny danego zadania"
+  ]
+ }
+}

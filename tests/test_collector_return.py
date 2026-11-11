@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
 import warnings
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 from tools import validate_collector_return as intake
 
@@ -52,7 +53,14 @@ def archive(path: Path, report=None, *, payload=BASE, inventory=None, extras=())
             if payload is not None:
                 z.writestr(OBJECT, payload)
             for name, content in extras:
-                z.writestr(name, content)
+                # ZipInfo.__init__ rewrites os.sep to "/" as the ZIP spec wants,
+                # which on Windows would silently turn a collector-written
+                # "pliki\name" entry into "pliki/name" before the intake sees it.
+                # Assign the name after construction so the archive keeps the
+                # bytes the collector actually wrote, on every platform.
+                info = ZipInfo(name)
+                info.filename = name
+                z.writestr(info, content)
 
 
 class CollectorReturnTests(unittest.TestCase):
@@ -65,6 +73,25 @@ class CollectorReturnTests(unittest.TestCase):
         archive(self.path, report, **kwargs)
         with self.assertRaises(intake.InvalidReturn):
             intake.validate(self.path)
+
+    def test_rejects_member_names_with_backslashes(self):
+        # Windows PowerShell 5.1 CreateFromDirectory wrote "pliki\\name".
+        archive(self.path, extras=(("pliki\\000001_map", BASE),))
+        if os.name != "nt":
+            # Off Windows the crafted name really reaches the archive with its
+            # backslash; ZipInfo would otherwise rewrite it to "/".
+            with ZipFile(self.path) as written:
+                self.assertIn("pliki\\000001_map", written.namelist())
+        with self.assertRaises(intake.InvalidReturn) as caught:
+            intake.validate(self.path)
+        if os.name == "nt":
+            # zipfile rewrites "\\" to "/" while reading member names, so the
+            # separator never reaches the intake on Windows. The crafted name
+            # then fails the stored-name pattern, and the report fields
+            # (source, stored_as) stay the cross-platform guard.
+            self.assertIn("unexpected archive member", str(caught.exception))
+        else:
+            self.assertIn("backslashes", str(caught.exception))
 
     def test_validates_unique_and_duplicate_bytes_without_modifying_archive(self):
         archive(self.path)
@@ -104,6 +131,10 @@ class CollectorReturnTests(unittest.TestCase):
             lambda r: r["files"][1].update(status="copied"),
             lambda r: r["inventory"].update(files=3),
             lambda r: r["files"][1].update(stored_as="pliki/../../secret"),
+            # Windows PowerShell 5.1 wrote "\\" names in the report too; this
+            # field is read from JSON, so the separator survives on every
+            # platform and stays the cross-platform guard.
+            lambda r: r["files"][1].update(stored_as="pliki\\000001_map"),
             lambda r: r["files"][1].update(sha256="not-a-sha"),
         ):
             report = fixture()
@@ -121,7 +152,17 @@ class CollectorReturnTests(unittest.TestCase):
             [("pliki/000002_data3", b"unreferenced")],
         ):
             with self.subTest(extras=extras):
-                self.rejected(extras=extras)
+                # The crafted member must really be in the archive, otherwise a
+                # platform rewriting its name would hide what the intake has to
+                # reject. zipfile rewrites "\" to "/" in member names when it
+                # reads them on Windows, so accept either spelling.
+                archive(self.path, extras=extras)
+                with ZipFile(self.path) as written:
+                    listed = set(written.namelist())
+                    for name, _ in extras:
+                        self.assertTrue(name in listed or name.replace("\\", "/") in listed, name)
+                with self.assertRaises(intake.InvalidReturn):
+                    intake.validate(self.path)
 
     def test_original_paths_and_inventory_are_safe_and_unique(self):
         for bad in ("../outside", "C:/secret", "Package/../secret", "Package//secret", "Package\\secret", "Other/file"):

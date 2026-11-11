@@ -59,11 +59,39 @@ class CollectorKitTests(unittest.TestCase):
     def test_launcher_runs_local_powershell_without_python_or_downloads(self):
         launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
         self.assertIn('WindowsPowerShell\\v1.0\\powershell.exe', launcher)
-        self.assertIn('-NoLogo -NoProfile -File "%~dp0zbierz.ps1" %*', launcher)
-        self.assertNotIn("-ExecutionPolicy", launcher)
+        self.assertIn('-NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0zbierz.ps1" %*', launcher)
         self.assertIn("pause", launcher)
         self.assertNotIn("pip install", launcher.lower())
         self.assertNotIn("python.exe", launcher.lower())
+        self.assertNotIn("Set-ExecutionPolicy", launcher)
+        self.assertNotIn("Unrestricted", launcher)
+
+    def test_launcher_bypasses_policy_only_for_its_own_process(self):
+        launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
+        # Bypass is passed on the command line of one child process, never stored.
+        self.assertIn("-ExecutionPolicy Bypass", launcher)
+        self.assertNotIn("reg add", launcher.lower())
+        self.assertNotIn("setx", launcher.lower())
+        # Zone.Identifier removal is best-effort and limited to this folder.
+        self.assertIn("Unblock-File", launcher)
+        self.assertIn("-Filter *.ps1", launcher)
+        self.assertIn("2>nul", launcher)
+
+    def test_collector_writes_zip_members_with_forward_slashes(self):
+        script = kit.kit_files()["zbierz.ps1"].decode("utf-8-sig")
+        # .NET Framework CreateFromDirectory emits "\\" separators, which the
+        # validator rejects; the collector must build entries itself.
+        self.assertNotIn("[IO.Compression.ZipFile]::CreateFromDirectory(", script)
+        self.assertIn("ZipArchiveMode]::Create", script)
+        self.assertIn("CreateEntry($entryName", script)
+        self.assertIn(".Replace('\\', '/')", script)
+        self.assertIn("$entryName.Contains('..')", script)
+
+    def test_readme_discloses_the_policy_handling(self):
+        readme = kit.kit_files()["CZYTAJ_TO.txt"].decode("utf-8-sig")
+        self.assertIn("-ExecutionPolicy", readme)
+        self.assertIn("Unblock-File", readme)
+        self.assertIn("nie zmienia ustawień systemowych", readme)
 
 
 if __name__ == "__main__":

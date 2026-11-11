@@ -1,0 +1,87 @@
+{
+ "mapa_zh_cn": {
+  "wpisy_w_naglowkach_chunkow": 3581256,
+  "wpisy_niepuste": 1816408,
+  "zweryfikowane": "2026-11-11, odczyt pliku mapy"
+ },
+ "wpisy_przypisane_do_scen": 176119,
+ "wpisy_poza_scenami": 1640289,
+ "udzial_poza_scenami_procent": 90.3,
+ "co_siedzi_poza_scenami": {
+  "unikalnych_tekstow_poza_scenami": 428560,
+  "unikalnych_tekstow_w_calej_mapie": 580100,
+  "długość_znaków": {
+   "mediana": 5,
+   "średnia": 11.3,
+   "p10": 2,
+   "p90": 21,
+   "maksimum": 14290
+  },
+  "krótsze_niz_5_znaków": 725795,
+  "dłuższe_niz_100_znaków": 14703,
+  "z_tokenami_formatowania": 63125,
+  "z_tokenami_formatowania_procent": 3.8,
+  "z_interpunkcja_dialogowa": 66880,
+  "najczęściej_powtarzane": [
+   {
+    "tekst": "生态物种",
+    "wpisów": 26453
+   },
+   {
+    "tekst": "陈嘉铮",
+    "wpisów": 14622
+   },
+   {
+    "tekst": "对话",
+    "wpisów": 14167
+   },
+   {
+    "tekst": "数据加载中",
+    "wpisów": 7148
+   },
+   {
+    "tekst": "奖励表-陈佳伟",
+    "wpisów": 7133
+   }
+  ],
+  "interpretacja": "połowa wpisów ma <= 5 znaków i tokeny formatowania występują w 4% - to nazewnictwo i interfejs, nie dialog; najczęściej powtarzane wpisy to nazwy wewnętrzne (np. nazwy postaci używane w systemowych komunikatach), które nie są tekstem dla gracza"
+ },
+ "powiazania_scena_tekst": {
+  "text_id_w_scenach_bez_tekstu": 0,
+  "teksty_nieuzywane_w_scenach": 0,
+  "text_id_w_wielu_scenach": 2337,
+  "text_id_w_scenach_bez_wpisu_w_mapie": 27,
+  "text_id_w_scenach_bez_wpisu_w_mapie_przykład": [
+   "0c00ce0067813a2e",
+   "148ef56b850afa58",
+   "233eb85e68aeaf27",
+   "28baad814905b204",
+   "43b770d947398268",
+   "4562fc0d2e83575c",
+   "489d55b96210548b",
+   "4a638fd045349ad8",
+   "6270fe9acbb07282",
+   "6fedc1dc8fa41179"
+  ]
+ },
+ "wariant_tekstu_mapa_vs_scena": {
+  "tekstow_z_dluzsza_wersja_w_mapie": 25258,
+  "identycznych": 0,
+  "rozni_sie_tylko_lamaniem_wiersza": 22620,
+  "rozni_sie_trescia": 2638,
+  "przykład": {
+   "text_id": "000fdb780f4e480e",
+   "scena": "陈叔不是让你管我吗，你就这么丢下我跑了？",
+   "mapa": "（没有真生气，故作痞痞的逗他）陈叔不是让你管我吗，你就这么丢下我跑了？"
+  },
+  "znaczenie": "wersję z mapy trzeba tłumaczyć: mapa trzyma pełną linię z dopiskiem scenicznym w nawiasach, scena tylko fragment"
+ },
+ "skala_dla_decyzji": {
+  "mapa_en_wpisy": 1122784,
+  "mapa_en_unikalnych_tekstow": 503206,
+  "mapa_en_powtorzen": 619578,
+  "paczka_en_zip_mb": 24,
+  "tokeny_w_paczce_en": 583,
+  "uwaga": "liczba dla mapy EN - skala porownawcza, nie pomiar zh_cn"
+ }
+}

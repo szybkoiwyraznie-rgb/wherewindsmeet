@@ -486,3 +486,421 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** PowerShell nie jest zainstalowany lokalnie w środowisku
   Linux, więc BAT-a nie uruchomiono w tej sesji. CI nie testuje instalacji gry
   ani ustawień polityki na komputerze właściciela.
+
+## 2026-11-11 — kontrola builda i zablokowana dostawa przez Dysk Google
+
+- **Kontrola bez zmian w kodzie:** `python tools/run_tests.py` — **180/180**
+  testów na Linux/Python 3.11.2; `python -m compileall -q tools tests`,
+  `git diff --check` i `python tools/check_repository.py` przeszły.
+  Deterministyczny builder odtworzył `WWM_ZBIERZ_DANE.zip` o **31 065 B**,
+  SHA-256 `f77b637fa83b5b729a13064b119a643f8c28c36e127250b55d7559123d64c541`,
+  czyli bajt w bajt archiwum z wpisu z 2026-11-11: trzy człony, CRC poprawne,
+  BAT bez `-ExecutionPolicy`, BAT ASCII/CRLF, PS1 UTF-8 BOM/CRLF.
+- **Przegląd logiki:** sprawdzono literały ścieżek w `Relative-GamePath`,
+  `Inspect-KnownLocations`, wykrywanie dodatkowej biblioteki Steam, kontrolę
+  wyjścia poza instalację, limity 90/20 MiB i deduplikację. Wątpliwe podwójne
+  backslashe w podglądzie okazały się artefaktem kodowania JSON; w plikach są
+  pojedyncze. Nie zmieniano skryptów.
+- **Blokada dostawy:** próba wgrania ZIP-a na Dysk Google przez connector
+  została odrzucona przez filtr bezpieczeństwa dostawcy connectora
+  („blocked … because of its content”); plik nie został wysłany. Zgodnie
+  z komunikatem nie ponawiano wysyłki ani nie zmieniano zawartości archiwum,
+  żeby ominąć filtr. Utworzony pusty folder `Where Winds Meet` na Dysku
+  pozostaje bez ZIP-a. Archiwum nie zawiera danych gry — to BAT, PS1 i tekst
+  instrukcji.
+- **Ograniczenia:** nadal nie uruchomiono zbieracza na komputerze właściciela
+  ani na instalacji gry; dostawa narzędzia pozostaje otwarta i wymaga innej
+  drogi niż ten connector.
+
+## 2026-11-11 — diagnostyka blokady: porównanie z paczkami SRW Y
+
+- **Materiał:** pobrano prywatnie z Dysku `SRW_Y_ENCYKLOPEDIA_PROSBA.zip`
+  (3 704 B) — najmniejszą paczkę „prośba” o tym samym przeznaczeniu. Plik
+  leżał w ignorowanym `google_drive/`, nie trafił do Git.
+- **Porównanie:** układ identyczny — `CZYTAJ_TO.txt` + `URUCHOM_TO.bat` +
+  skrypt `.ps1`; paczka SRW zawiera nawet `-ExecutionPolicy Bypass`
+  i `Unblock-File`, a mimo to została przyjęta przez Dysk wcześniej. Nasze
+  archiwum: 30 747 B rozpakowane / trzy człony; SRW: 7 616 B / trzy człony.
+- **Różnice treści (zgrubny skan tokenów, nie test filtra):** nasz skrypt
+  zawiera łańcuchy `password`, `passwd`, `token`, `cookie`, `secret`,
+  `credential`, odczyt `HKCU`/`HKLM`, `Get-Process`, `CreateFromDirectory`
+  i SHA-256; skrypt SRW nie zawiera żadnego z nich. To pasuje do heurystyki
+  „zbieranie danych + archiwizacja”, ale **nie dowodzi**, co dokładnie
+  uruchomiło filtr — dostawca nie ujawnia reguł.
+- **Decyzja:** nie ponawiamy wysyłki tego archiwum przez connector i nie
+  zmieniamy jego treści, aby ominąć filtr. Zamiast tego udokumentowano drogę
+  bez Pythona: archiwum repozytorium z `main` → `collector/URUCHOM.bat`.
+  Sprawdzono, że archiwum z `codeload` zawiera `zbierz.ps1` o SHA-256
+  `dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4`, z BOM
+  i CRLF, czyli bajt w bajt jak w repozytorium. Na Dysk wgrano osobną
+  notatkę tekstową `JAK_ZDOBYC_ZBIERACZ.txt` (2024 B) — wgranie tekstu
+  zadziałało, więc blokada dotyczy treści archiwum, nie połączenia.
+- **Ograniczenia:** to hipoteza o przyczynie blokady; nie testowano innych
+  wariantów archiwum ani nie odtwarzano reguł filtra. Nadal brak uruchomienia
+  zbieracza na Windows właściciela i na instalacji gry.
+
+## 2026-11-11 — decyzja o treści archiwum i drogi publikacji
+
+- **Prośba:** przebudować ZIP „na wzór paczek SRW Y”, żeby nie uruchamiał
+  fałszywego alarmu filtra, i udostępnić go przez GitHub.
+- **Decyzja:** nie zmieniamy treści archiwum w celu ominięcia filtra
+  bezpieczeństwa. Elementy, które najpewniej uruchamiają heurystykę (lista nazw
+  prywatnych z `password`/`token`, odczyt `HKCU`/`HKLM` do wykrycia Steam,
+  kopiowanie + archiwizacja + SHA-256), są jednocześnie tym, co daje filtrowanie
+  prywatnych nazw i automatyczne znajdowanie instalacji. Ich usunięcie byłoby
+  regresem funkcji, nie uproszczeniem, i wymagałoby ponownych testów Windows.
+- **Publikacja:** próba `gh release create` z assetem nie powiodła się —
+  `uploads.github.com` jest z tego środowiska nieosiągalny (`SSL_ERROR_SYSCALL`),
+  a release nie został utworzony (sprawdzono: brak release'ów i tagów).
+  `raw.githubusercontent.com` również jest nieosiągalny, więc wgranie pliku do
+  repozytorium i link raw nie są alternatywą.
+- **Dostępna droga:** archiwum repozytorium z `codeload.github.com`
+  (`…/archive/refs/heads/main.zip`, 173 920 B) → `collector/URUCHOM.bat`.
+  Sprawdzone: `zbierz.ps1` SHA-256 `dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4`,
+  BOM i CRLF zachowane, czyli to samo narzędzie co w ZIP-ie.
+- **Ograniczenia:** brak assetu release'a nie jest usterką projektu, tylko
+  ograniczeniem sieci tego środowiska; właściciel może dodać asset ręcznie
+  w interfejsie GitHuba. Nadal brak uruchomienia na jego Windows i na grze.
+
+## 2026-11-11 — przywrócenie `-ExecutionPolicy Bypass` w BAT
+
+- **Zgłoszenie właściciela:** na jego komputerze `URUCHOM.bat` przerwał się
+  komunikatem `zbierz.ps1 cannot be loaded because running scripts is disabled
+  on this system` (`UnauthorizedAccess`). Przyczyną była wcześniejsza decyzja
+  o nietykaniu polityki wykonywania; domyślna polityka Windows blokowała skrypt.
+- **Decyzja właściciela:** przywrócić zachowanie paczek SRW Y. `URUCHOM.bat`
+  wywołuje teraz `powershell.exe` z `-ExecutionPolicy Bypass` (dotyczy tylko
+  tego jednego procesu, nie zmienia rejestru ani ustawień systemowych, nie
+  wymaga administratora) oraz wykonuje `Unblock-File` na `*.ps1` w swoim
+  folderze, żeby znacznik „pobrane z internetu” nie blokował uruchomienia.
+  To nie jest obchodzenie zabezpieczeń gry — zbieracz nadal tylko czyta pliki.
+- **Zmiany:** `collector/URUCHOM.bat`, `collector/CZYTAJ_TO.txt` (opis
+  parametru i `Unblock-File`), `tests/test_collector_kit.py` (dawny test
+  wymagał braku `-ExecutionPolicy`; teraz sprawdza `Bypass`, brak
+  `Set-ExecutionPolicy`, brak zapisu do rejestru i obecność `Unblock-File`),
+  `docs/COLLECTOR.md`, `docs/STATUS.md`.
+- **Kontrole lokalne:** `python tools/run_tests.py` — **182/182** (dwa nowe
+  testy); `git diff --check` i `check_repository.py` bez uwag. ZIP zbudowany
+  ponownie: **31 643 B**, SHA-256
+  `35f6959ab98ffb8125c2961aec642faaa39598d02049fd7cd5da60a0b4cb616b`, trzy
+  człony, CRC poprawne, BAT nadal ASCII/CRLF, PS1 bez zmian (BOM, 25571 B).
+- **Ograniczenia:** PowerShell nie jest zainstalowany w środowisku Linux, więc
+  poprawionego BAT-a nie uruchomiono tutaj; wynik CI dla tego commita trzeba
+  sprawdzić osobno. Nie testowano na komputerze właściciela ani na grze.
+
+## 2026-11-11 — odbiór wyniku zbieracza i rozpoznanie kontenera map
+
+- **Odbiór:** właściciel wgrał `WWM_DANE_20261111_181913_13ff7ac1.zip`
+  (72 995 594 B, poniżej limitu 100 MiB). Pobrano prywatnie do ignorowanego
+  `local/`; SHA-256 archiwum `29f5914aadc66b2f736062948e5f4f4deedcfd58af9e4ec12050958439820261`.
+  CRC wszystkich 11 wpisów poprawne.
+- **Walidator odrzucił archiwum:** `unsafe archive member path`. Przyczyna:
+  Windows PowerShell 5.1 / .NET Framework zapisał nazwy wpisów z `\`
+  (`pliki\000001_…`), a specyfikacja ZIP wymaga `/`. Dane były kompletne.
+- **Raport wyniku:** `status: partial`, 0 problemów, build `25906190`, inwentarz
+  640 plików, 9 kandydatów, 1 pominięty przez limit (`translate_words_map_zh_cn`,
+  69 470 988 B), 73 878 943 B unikalnych kopii. Obecne:
+  `Package/HD/oversea/locale/translate_words_map_en` (50 550 179 B),
+  `…_en_diff` w `Package` (751 922 B) i w `LocalData/Patch` (1 122 346 B),
+  `MANIFEST` w obu gałęziach, `data3` (10 829 572 B), `data205` (7 564 939 B),
+  `…_zh_cn_diff` (233 290 B). Nieobecne: oba warianty `__small`.
+  W katalogu `locale` są też mapy innych języków (m.in. `th`, `ru`, `vi`, `fr`,
+  `ja`, `de`, `ko`, `es`, `pt_br`) — nie kopiowano ich zgodnie z zakresem.
+- **Struktura:** `0xDEADBEEF` + wersja 1 + `uint64` liczba chunków + tabela
+  `uint32` offsetów; ostatni offset + koniec tablicy = rozmiar pliku dokładnie,
+  ostatni wpis ma 0 B (wartownik). Chunki: 8-bajtowy prefiks + ramka zstd;
+  wszystkie **4386/4386** rozpakowują się bez błędu. Payload: nagłówek
+  `uint64, uint64, uint32 0x595896DC, uint32 0`, region indeksu i jawny tekst
+  z markupem (`#Y…#E`, `$T(…)`, `{}`). Szczegóły w
+  [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md).
+- **Naprawa zbieracza:** `zbierz.ps1` buduje teraz archiwum przez
+  `System.IO.Compression.ZipArchive` i `CreateEntry` z nazwami normalizowanymi
+  do `/`, z kontrolą `..` i wiodącego `/`; `CreateFromDirectory` usunięto.
+  Walidator przy backslashach zwraca czytelny powód. Dodano dwa testy
+  (`tests/test_collector_kit.py`, `tests/test_collector_return.py`).
+- **Kontrole:** `python tools/run_tests.py` — **184/184**. ZIP zbieracza
+  zbudowany ponownie: **33 111 B**, SHA-256
+  `b156eabb7624b2a8b707af73272641765938dbc02725960f8cf377b30c3a8b2e`.
+- **Ograniczenia:** poprawionego zapisu ZIP nie uruchomiono na Windows (brak
+  PowerShell w tym środowisku); wynik CI trzeba sprawdzić osobno. Znaczenie pól
+  nagłówka, wiązanie łańcuchów z kluczami i zapis zwrotny pozostają nieznane.
+  Zmierzona liczba fragmentów tekstu jest heurystyczna, nie jest liczbą wpisów.
+
+## 2026-11-11 — czy `partial` to problem; skala mapy
+
+- **Powód `partial`:** dokładnie jeden plik `skipped_limit`
+  (`translate_words_map_zh_cn`, 69 470 988 B). Pozostałe 8 kandydatów skopiowano,
+  0 problemów odczytu, inwentarz nieobcięty (`limited: false`), 0 błędów.
+  Wykorzystano 73 878 943 B z 94 371 840 B (78,3%), zapas 20 492 897 B —
+  chińska mapa nie zmieściłaby się nawet przy pełnym budżecie.
+- **Wniosek:** dla tłumaczenia EN→PL brak niczego istotnego; EN jest kompletną
+  mapą zbieracza, a `collected` i tak nie znaczyłoby „kompletne”.
+- **Kontrola innych pojemników:** `data3` (3949 chunków) i `data205` (2606) mają
+  ten sam kontener, ale po dekompresji zawierają identyfikatory i nazwy ustawień,
+  nie tekst fabularny. Warstwa tekstowa to mapy `translate_words_map_*`.
+- **Skala:** suma wpisów z nagłówków mapy EN — **1 122 784**, rozpakowane
+  94 581 912 B. To liczba strukturalna, nie heurystyka.
+- **Ograniczenia:** nie sprawdzono pokrycia wszystkich powierzchni tekstowych
+  gry; `MANIFEST` (count 1, chunk bez zstd) pozostaje nierozpoznany.
+
+## 2026-11-11 — format paczki tłumacza i pierwszy parser kontenera
+
+- **Wzorzec:** pobrano prywatnie `plik_dla_tlumacza_v8.zip` (8 364 702 B) z Dysku
+  i przeczytano dokumentację `mtgcrawler` (`TRANSLATOR_PACKAGE.md`,
+  `TRANSLATOR_PACKAGE_TECH.md`, `TRANSLATION_WORKFLOW.md`) przez API GitHuba.
+  Paczka SRW to `README.md` + `sceny.zip` (39 plików `.md`) + `widoki.zip`
+  (10 plików); element ma nagłówek `[Dialog - mówca]`, `limit:` oraz linie
+  `EN:` i `PL:`; kontekst sceny to `## Scena N/M — id`, `grupa`, `pliki`,
+  `misja`, `uczestnicy`.
+- **Dokument docelowy:** [TRANSLATOR_PACKAGE_WWM.md](TRANSLATOR_PACKAGE_WWM.md)
+  opisuje mapowanie SRW→WWM (źródłem jest EN z gry), szkic elementu, proces
+  i **cztery blokady**: nieodczytany indeks kluczy, brak atrybucji mówcy/scen,
+  niezmierzone limity i niesprawdzony zapis zwrotny.
+- **Parser:** dodano `tools/locale_container.py` (sam nagłówek i tabela
+  offsetów; opcjonalny `zstandard` importowany tylko przy dekompresji) oraz
+  `tests/test_locale_container.py` (8 testów na danych syntetycznych).
+  Na odebranym pliku: 4386 chunków, 50 527 281 B danych chunków, **4386/4386**
+  z ramką zstd na przesunięciu 9.
+- **Próby rozłożenia indeksu:** rekordy w chunku **nie mają stałej długości** —
+  sprawdzono układy 2/4/8/12/16/20/24/32 B z polami `u32`/`u64` i warunkiem
+  „suma długości = rozmiar bloba”: **brak dopasowania** w trzech chunkach.
+  Bezpośrednio przed blobem widać rekordy o kształcie `[u64][u32][u32]`
+  z sensownymi małymi wartościami, ale region zawiera gęste `0x80`, co wskazuje
+  na kodowanie zmienne (varint/bitowe). To **hipoteza**, nie ustalenie.
+- **Kontrole:** `python tools/run_tests.py` — **192/192**.
+- **Ograniczenia:** indeks, klucze, mówcy, limity i zapis zwrotny pozostają
+  nieznane; paczka dla tłumacza nie jest gotowa do wysłania.
+
+## 2026-11-11 — odczytany rekord wpisu w chunku
+
+- **Materiał:** `translate_words_map_en_diff` — 686 chunków z `A = B = 1`,
+  gdzie indeks jest najmniejszy.
+- **Ustalenie:** po 24-bajtowym nagłówku i regionie indeksu (24 B dla `B = 1`,
+  56 B dla `B = 2` i `B = 3`) leży rekord `[u64 hash][u32 typ][u32 długość]`
+  (`typ = 8` dla tekstu UTF-8), a za nim tekst dokładnie tej długości, bez
+  terminatora. Zgodność długości we wszystkich 686 chunkach jednowpisowych
+  (np. `Northmount West` → 15, `Unlocked at 5:00 on Jul 3` → 25, opis muszli
+  → 350).
+- **Hipoteza:** region indeksu jest pochodną hashy (wypełniony `0x80`,
+  rozmiar nie zależy liniowo od `B`), a nie tabelą przesunięć — więc zmiana
+  długości tekstu może nie wymagać przeliczenia indeksu. **Niesprawdzone**:
+  wymaga przebudowy chunku i odczytu zwrotnego.
+- **Narzędzie:** `tools/locale_container.py` nadal czyta tylko warstwę
+  zewnętrzną; parser rekordów jeszcze nie powstał.
+- **Ograniczenia:** nieznany układ dla chunków wielowpisowych i mapa główna
+  (`B` do 511) nie jest jeszcze przemierzona; mówcy, limity pól i zapis
+  zwrotny pozostają nieznane.
+
+## 2026-11-11 — układ chunku `_diff` odczytany; prototyp elementu paczki
+
+- **Ustalenie:** chunk `_diff` = nagłówek 24 B + indeks o zmiennym rozmiarze
+  (8/20/24/36/40/56/72 B) + `N × 16 B` rekordów `[u64 hash][u32 typ][u32 len]`
+  + sklejone teksty bez terminatora. Rozmiar indeksu wyznacza warunek
+  „suma długości = reszta payloadu”.
+- **Narzędzie:** `tools/locale_records.py` (odczyt, walidacja, brak zapisu) +
+  `tests/test_locale_records.py` (8 testów syntetycznych). Przy kilku możliwych
+  rozmiarach indeksu rozstrzyga walidacja UTF-8 tekstów typu 8.
+- **Wynik na realnym pliku:** `translate_words_map_en_diff` — **598 z 4164**
+  chunków przechodzi walidację, 630 wpisów, 621 unikalnych hashy, 10 pustych.
+  Pozostałe są odrzucane (nie zgadywane). `data3`/`data205`/mapa główna nie są
+  obsługiwane: ich rekordy nie tworzą tablicy stałej długości.
+- **Prototyp paczki:** wygenerowano prywatnie `local/prototyp_paczki/probka.md`
+  w formacie SRW: `N. [Tekst] …`, `id:` (hash), `limit:` (bajty oryginału),
+  `EN:`, `PL:`. Służy do sprawdzenia formatu, **nie** jest paczką do wysłania.
+- **Kontrole:** `python tools/run_tests.py` — **200/200**.
+- **Ograniczenia:** mapa główna (1 122 784 wpisów) pozostaje nieodczytana;
+  mówcy, kolejność scen, limity pól i zapis zwrotny nadal nieznane.
+
+## 2026-11-11 — generator paczki dla Tłumacza
+
+- **Nowe narzędzie:** `tools/build_translator_pack.py` — z JSONL `{id, text}`
+  buduje katalog paczki: `README.md` (instrukcja: numeracja stała, `EN:`
+  zamrożone, `PL:` do wypełnienia, dziedziczenie powtórzeń, znaczenie tokenów,
+  UTF-8), `widoki/<nazwa>.md` (elementy `N. [Grupa] …` + `id:` + `limit:` +
+  `EN:`/`PL:`) oraz `tokeny.tsv` (`#Y…#E`, `#H`, `#R`, `{…}`, `$T(…)`, `[[…]]`).
+- **Test:** `tests/test_build_translator_pack.py` — 8 testów; razem **208/208**.
+- **Uruchomienie na realnych danych:** 598 wpisów z `_diff` →
+  `local/prototyp_paczki/` (598 elementów, 18 tokenów). Pakiet jest kompletny
+  formalnie, ale zawiera tylko ułamek tekstu gry.
+- **Trop dla mapy głównej (niepotwierdzony):** przy blokach 32 B od offsetu 32
+  w chunku 0 aż 219/244 odcinków `blob[o:o+len]` dekoduje się jako UTF-8, ale
+  żadne przypisanie pól (offset/offset od końca/para u32) nie daje spójnej
+  semantyki — hipoteza do dalszych prób, nie wynik.
+
+## 2026-11-11 — format tabeli odczytany do końca (dzięki prior art)
+
+- **Przełom:** zajrzałem do istniejących narzędzi społeczności. `dest1yo/wwm_utils`
+  (`src/core.rs`, `src/structs.rs`) opisuje dokładnie ten format. Moje wcześniejsze
+  hipotezy były błędne: pole `u32 0x595896DC` to **timestamp**, nie magic, a drugie
+  pole wpisu to **offset**, nie typ.
+- **Prawdziwy układ tabeli:** `u64 entry_count | u64 value_count | u64 timestamp`,
+  potem `max(entry_count+17, 24)` bajtów nieprzejrzystych `buckets`, potem
+  `entry_count × (u64 id, u32 offset, u32 length)`, potem teksty; pozycja tekstu to
+  `entries_pos + 16*index + 8 + offset`. Bajt `0xFF` na początku tekstu = zaślepka.
+- **Skutek:** cała mapa główna parsuje się bez reszty — **1 122 784 wpisy, 0 błędów,
+  4386/4386 chunków** (wcześniej 0/60). `_diff` daje 12 934 wpisy w 4163 chunkach.
+- **Zapis zwrotny rozwiązany:** przepakowanie z zachowaniem nagłówka i `buckets`
+  i przeliczonymi offsetami odtwarza zbiór `id → tekst` w 4386/4386 + 4163/4163
+  chunkach. W danych występują współdzielone regiony tekstów i „dziury” z
+  nieaktualnymi offsetami — dlatego teksty czytamy przez `offset`, nie przez sumę
+  długości.
+- **Paczka:** 1 122 784 wpisy w grze, 503 206 unikalnych tekstów → 503 206
+  elementów, 26 plików, 61 MB rozpakowane / **24 MB ZIP**, 583 tokeny.
+- **Testy:** 215/215. Poprawiono `tools/locale_records.py` (pełna specyfikacja +
+  `pack_table`) i `tests/test_locale_records.py`.
+- **Następne:** patcher (podmiana tekstów po `id`) i odczytanie mówców/scen.
+
+## 2026-11-11 — patcher działa na całej mapie EN
+
+- **Nowe narzędzie:** `tools/apply_translation.py` — podmiana tekstów po `id`,
+  przepakowanie tabeli (offsety przeliczone), rekompresja zstd, nowa tabela
+  przesunięć, wszystko na kopii (wejście nietknięte).
+- **Chunk 0 kontenera to indeks mapy**, nie tabela tekstów: `u64 suma wpisów |
+  u64 liczba chunków | u32[…]`; przepisywany bez zmian. Nagłówek: `count` =
+  liczba chunków, tabela ma `count+1` wpisów (ostatni to wartownik).
+  `tools/locale_container.py` poprawiony na te semantyki.
+- **Wynik:** mapa EN 50 550 179 B → 51 904 280 B po 200 podmianach, 11 s,
+  weryfikacja: 1 122 784 id, 200 zmian, zero rozjazdów.
+- **Testy:** 229/229 (`tests/test_apply_translation.py` + poprawione
+  `tests/test_locale_container.py`).
+- **Dokumentacja:** [PATCHER_WWM.md](PATCHER_WWM.md).
+- **Następne:** sceny i mówcy, limity pól interfejsu, skrypt instalacyjny.
+
+## 2026-11-11 — paczka odchudzona z 271 MB do 24 MB
+
+- **Błąd, który wyszło widać po uwadze właściciela:** pierwsza paczka miała 271 MB
+  przy 32,3 MB unikalnego tekstu, bo (a) każdy element powtarzał tekst w nagłówku
+  i w linii `EN:`, (b) każde z 619 578 powtórzeń było osobnym elementem z
+  `copy_of:`, (c) `manifest.json` miał 118 MB.
+- **Nowy format:** element tylko dla unikalnego tekstu; tekst jednej linii stoi
+  w nagłówku, wielolinijkowy pod `EN:`; `manifest.json` to kilkaset bajtów;
+  dziedziczenie rozwiązuje patcher, nie paczka.
+- **Wynik:** 503 206 elementów, 26 plików, **61 MB → 24 MB ZIP** (26% objętości
+  wyjściowej), generowanie 2,9 s.
+- **Patcher:** tłumaczenie tekstu trafia we **wszystkie** jego wystąpienia —
+  sprawdzone na mapie EN: 200 przetłumaczonych tekstów → **41 962 zmienione wpisy**,
+  weryfikacja 1 122 784 id bez rozjazdów (13 s).
+- **Testy:** 232/232.
+
+## 2026-11-11 — dostawa `oversea` z Dysku Google: nowe dane scen i mapa `zh_cn`
+
+- **Wejście:** 4 pliki z Dysku Google (prywatnie w `google_drive/`):
+  `oversea.zip` 61 626 340 B, `oversea2.zip` 96 942 617 B, `patch.zip`
+  3 488 483 B, `translate_words_map_zh_cn` 69 470 988 B. Wypakowanie do
+  ignorowanego `local/oversea` (25 plików) i `local/patch`.
+  Inwentarz z SHA-256: [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md).
+- **Co przyszło:** `data200`, `201`, `202`, `203`, `204`, `206`.
+  `data200` **nie ma** `TimelinePObject` (same tabele kontekstowe).
+  Nadal brakuje `data207`–`data212`; `data205` mamy z wcześniejszego zbieracza.
+- **Sceny** (`tools/timeline.py`, 47 548 scen, 114 592 kwestii, wszystkie
+  `text_id` unikalne, 12 920 różnych `entity_tag`):
+  `data201` 6 926 scen / 15 805 linii, `data202` 10 600 / 27 488,
+  `data203` 8 939 / 25 004, `data204` 8 811 / 22 934, `data206` 12 272 / 23 361.
+- **Rejestr pokrycia:** `MANIFEST` z patcha ma 74 951 `dialog_timelines`
+  (281 004 klucze łącznie). Nowe sceny pokrywają **58,5%** (43 828 scen
+  z `dialog_no`; wcześniej 10,1% / 7 571). **Brakuje 31 123 dialogów.**
+  Żadna scena nie jest poza rejestrem.
+- **Mapa źródłowa `zh_cn` rozpoznana do końca:** ten sam kontener co mapa EN
+  (`0xDEADBEEF`, wersja 1, 7097 chunków, zstd) — 3 581 256 wpisów w nagłówkach,
+  **1 816 408 niepustych** par `id → chiński tekst`. Treść to nie tylko dialogi:
+  miejsca (`寿昌坊-平民`), imiona (`邵冷乄德明`), przedmioty (`耳砂珍坯·三阶`),
+  interfejs (`累计登录2天`), encyklopedia.
+- **Wiązanie scena ↔ mapa sprawdzone:** na 50 000 `text_id` ze scen **100%
+  występuje w mapie `zh_cn`**; 42 208 tekstów identycznych, 7 006 różni się
+  wyłącznie łamaniem wiersza.
+- **Nowe odkrycie — dopisek sceniczny:** 1 863 z 50 000 (3,7%) różni się treścią.
+  Mapa trzyma pełną linię z dopiskiem w nawiasach, scena tylko wypowiadany
+  fragment: `（正声）咳咳，…` / `（恍然）——蹊跷蕴之？…` (1 055 przypadków, sposób
+  mówienia przed kwestią) oraz `喵喵喵喵！（你这些天去哪了，好久没喂我了，哼！）`
+  (322, myśl bohaterki po kwestii). Tłumaczyć trzeba wersję z mapy; który wariant
+  renderuje klient — **do sprawdzenia w grze**, nie zakładać.
+- **Mówcy:** większość `entity_tag` to imiona postaci, ale trafiają się generyki
+  (`玩家`, `主角`, `player`, `player_1/2`, `我`, `你` = postać gracza) i grupy
+  techniczne (`Entity轨道组`, pusty tag) — nie są osobami.
+- **Format dla tłumacza:** [format_tlumacza.md](format_tlumacza.md) — kolumny
+  `dialog_no`, projekt, czas, mówca, `text_id`, chińskie źródło z mapy, pusta
+  kolumna na przekład, uwagi; przykłady z prawdziwych danych, w tym oba wzorce
+  z dopiskiem.
+- **Testy:** 242/242, `check_repository.py` OK, `git diff --check` czysty.
+- **Następne:** uzupełnić brakujące 31 123 dialogi (brakuje `data207`–`212`
+  lub innego źródła), a potem decyzja, czy tłumaczyć pełny korpus mapy `zh_cn`
+  (1,8 mln wpisów) czy wyłącznie teksty objęte scenami.
+
+## 2026-11-11 — czerwone CI na Windows: test odbioru paczki, nie dane
+
+- **Objaw:** `windows-latest / Python 3.11` i `3.12` padały z
+  `tests.test_collector_return...test_rejects_member_names_with_backslashes:
+  AssertionError: 'backslashes' not found in 'unexpected archive member'`,
+  przy zielonym Ubuntu. Stan trwał od wielu commitów (przed dostawą `oversea`),
+  więc nie był skutkiem nowych danych.
+- **Przyczyna:** test składał wpis ZIP przez `writestr("pliki\\…")`, a
+  `ZipInfo.__init__` podmienia `os.sep` (`\` na Windows) na `/` zgodnie
+  ze specyfikacją ZIP. Na Windows wpis powstawał już jako `pliki/000001_map`,
+  więc walidator nigdy nie widział separatora i odrzucał paczkę inną ścieżką.
+  Ten sam mechanizm działa przy **odczycie**: `_RealGetContents` tworzy
+  `ZipInfo(filename)` z nazwy z katalogu centralnego, więc na Windows
+  `infolist()` zwraca nazwy z `/` nawet gdy archiwum ma `\`.
+- **Konsekwencja dla odbioru:** gałąź „archive member path uses backslashes"
+  nie może zadziałać na Windows. Paczka z PowerShell 5.1 jest i tak odrzucana
+  — fałszywa nazwa nie pasuje do wzorca `STORED` (`unexpected archive member`),
+  a prawdziwą, wieloplatformową bramką są pola raportu `source` i `stored_as`,
+  czytane z JSON, gdzie separator zostaje nietknięty (`safe_relative`, `STORED`).
+- **Poprawka:** `archive()` w teście składa `ZipInfo` i przypisuje nazwę po
+  konstrukcji, więc archiwum trzyma wpis z bajtami takimi, jakie zapisał
+  zbieracz; test rozróżnia platformy (Linux: komunikat `backslashes`, Windows:
+  paczka odrzucona jako `unexpected archive member`); dodany przypadek
+  `stored_as` z `\` i komentarz w walidatorze.
+- **Wynik:** 242/242 lokalnie, CI **4/4 zielone** (Ubuntu i Windows × Python
+  3.11/3.12). Ślepych punktów w testach `extras` nie ma: każdy faszywy wpis jest
+  weryfikowany pod kątem obecności w archiwum.
+
+## 2026-11-11 — druga dostawa: brakujące `data205`–`data208`, indeksy i trwały indeks w repo
+
+- **Wejście:** `oversea3.zip` (76 372 696 B), `index.zip` (90 717 968 B),
+  `index2.zip` (33 917 240 B). To były **brakujące pliki**: `data205`, `data207`,
+  `data208`, `data209`, `data210`, `data211`, `data212` oraz indeksy
+  `index1`–`index4`, `index1001`, `index1200`, `index200`–`index204`.
+- **Skan nowym narzędziem** `tools/skan_timeline.py` (liczy serializowane pole
+  `Type` = `TimelinePObject`, nie goły literał): sceny mają `data205` (8 484),
+  `data207` (11 847), `data208` (7 042). **`data209`–`data212` i wszystkie
+  indeksy nie mają ani jednego obiektu sceny** — nie brakowo scen, tylko inna
+  treść. Łącznie z wcześniejszą dostawą: 75 006 obiektów, 8 plików ze scenami.
+- **Ekstrakcja** (`tools/timeline.py`): `data205` 8 484 scen / 17 268 kwestii,
+  `data207` 11 847 / 32 015, `data208` 7 042 / 14 471.
+- **Pokrycie rejestru:** 58,5% → **92,2%** (69 092 z 74 951 `dialog_timelines`).
+  **Brakuje 5 859 dialogów**; żadna scena nie jest poza rejestrem.
+- **Nowe ustalenie o `dialog_no`:** to **identyfikator grupy dialogowej**, nie
+  pojedynczego timeline'u. Ten sam numer występuje w dwóch plikach z **inną**
+  treścią i innymi mówcami (przykład: `1960001321` — w `data203` 5 kwestii
+  z 木闻莺 o蒙学院, w `data1200` 9 kwestii z 黎书韵 o衙门; różne `id`
+  timeline'u: 1167636709 vs 1709454066). Scalać po `dialog_no` **nie wolna** —
+  treść się zgubi. W korpusie 10 takich grup.
+- **`data1200` z patcha jest nadzbiorem** wersji z `oversea`: wszystkie 158
+  `text_id` bazy występuje w patchu plus 25 nowych. Do korpusu brana jest wersja
+  z patcha; `data3` (25 scen) także wchodzi do korpusu.
+- **Trwały indeks w repo** (decyzja właściciela, szczegóły w
+  [DATA_POLICY.md](DATA_POLICY.md)): `index/manifest.json`, 5 shardów scen
+  (74 979 scen, 178 572 kwestii) i 3 shardy tekstów (176 146 unikalnych), każdy
+  plik < 10 MiB. Tekst stoi tylko w shardach tekstów, więc nie jest powtarzany
+  przy każdej kwestii. `tools/buduj_indeks.py` buduje indeks z prywatnych
+  wyjść, `tools/sceny_z_indeksu.py` odtwarza z niego sceny i listy tekstów
+  **bez `local/` i bez plików z Dysku**.
+- **Round-trip sprawdzony:** sceny odtworzone z indeksu są identyczne z wyjściem
+  `timeline.py` we wszystkich polach linii (po poprawce: obsada jest klucowana
+  parą `mowca` + `speaker_no`, bo ten sam tag bywa użyty dla dwóch mówców, a
+  `skeleton` ujednolicamy do pierwszej napotkanej postaci — w źródle ten sam
+  mówca bywa zapisany z `''` i bez wartości, a żadne narzędzie potokowe tego
+  pola nie używa).
+- **Tekst źródłowy do tłumaczenia:** 25 258 z 176 146 tekstów (14,3%) ma w mapie
+  `zh_cn` **dłuższą** wersję — z dopiskiem scenicznym w nawiasach, który scena
+  obcięła. Tłumaczy się wersję z mapy (`tekst_mapa` w shardach tekstów).
+- **Uwaga o piaskownicy:** w trakcie tej pracy `local/`, `google_drive/` i
+  `.venv` zniknęły przy czyszczeniu środowiska. Przetrwał tylko materiał w
+  repozytorium — co jest dokładnie tym argumentem, dla którego indeks jest
+  wersjonowany. Lokalny commit zaginął razem z drzewem i został odtworzony.
+- **Testy:** 258/258, w tym 8 testów indeksu (round-trip, limity shardów,
+  spójność zacommitowanego indeksu, odrzucanie nieznanego formatu) i 8 testów
+  skanu timeline'ów.
+- **Następne:** domknąć 5 859 brakujących dialogów (nie ma już nieprzesłanych
+  plików `data*`, więc albo rejestr zawiera grupy bez timeline'u, albo treść
+  jest w innym pliku), a potem ograniczenia pól interfejsu i skrypt instalacyjny.

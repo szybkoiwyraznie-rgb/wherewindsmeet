@@ -43,6 +43,27 @@ uzgodnić przechowywanie i świadomie zrewidować tę regułę; nie omijać jej 
 `git add -f`. Submoduły także wymagają osobnego przeglądu i są na razie
 odrzucane przez kontrolę indeksu.
 
+## Decyzja właściciela z 2026-11-11: indeks korpusu w repozytorium
+
+Właściciel zdecydował, że **chińskie teksty źródłowe i indeks korpusu scen mają
+być wersjonowane w repozytorium**, ponieważ wyniki ekstrakcji żyły tylko w
+ignorowanym `local/`, które jest regularnie czyszczone, a patcher i skrypty
+budujące paczki nie mogą zależeć ani od `local/`, ani od plików przesyłanych
+prywatnym kanałem. Wykonano to bez omijania reguły rozmiaru:
+
+- `index/manifest.json` — liczby, pokrycie rejestru, inwentarz SHA-256 źródeł,
+  lista shardów; `index/sceny_NNN.jsonl` — sceny z liniami (linia trzyma
+  `text_id`, nie tekst); `index/teksty_NNN.jsonl` — unikalne `text_id` → tekst.
+- Każdy plik jest mniejszy niż 10 MiB (limit repozytorium), podział robi
+  `tools/buduj_indeks.py`; żaden plik nie jest dodawany przez `git add -f`.
+- Tekst występuje **raz** na unikalny `text_id`, nie przy każdej kwestii.
+
+Zapiszany szczery warunek: **warunków wydawcy nie zweryfikowaliśmy
+niezależnie**, a decyzja o publikacji tekstu gry należy do właściciela. Jeśli
+okaże się, że publikacji nie można utrzymać, indeks gry usuwa się z repozytorium
+jednym commitem, a narzędzia (`tools/sceny_z_indeksu.py`) dają się uruchomić
+z kopii poza repozytorium — format jest zapisany w `index/manifest.json`.
+
 ## Katalogi i wymiana
 
 `local/` jest ignorowanym miejscem na prywatne wejścia; `build/`, `dist/` i

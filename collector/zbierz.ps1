@@ -443,8 +443,30 @@ try {
         'To nie dowod kompletnosci tekstow ani kontekstu. Nie zawiera celowo zapisow gry ani hasel.'
     ) -join "`r`n"
     [IO.File]::WriteAllText((Join-Path $stage 'RAPORT.txt'), $summary + "`r`n", $script:Utf8)
+    # Build the archive entry by entry so member names always use "/".
+    # .NET Framework (Windows PowerShell 5.1) writes "\\" separators with
+    # CreateFromDirectory, which violates the ZIP spec and breaks readers.
+    Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    [IO.Compression.ZipFile]::CreateFromDirectory($stage, $tempZip, [IO.Compression.CompressionLevel]::Optimal, $false)
+    $zipStream = [IO.File]::Open($tempZip, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try {
+        $zip = New-Object System.IO.Compression.ZipArchive($zipStream, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            $stageFiles = @(Get-ChildItem -LiteralPath $stage -Recurse -File -Force | Sort-Object -Property FullName)
+            foreach ($file in $stageFiles) {
+                $entryName = $file.FullName.Substring($stage.Length + 1).Replace('\', '/')
+                if ([string]::IsNullOrWhiteSpace($entryName) -or $entryName.StartsWith('/') -or $entryName.Contains('\\') -or $entryName.Contains('..')) {
+                    throw 'Niepoprawna nazwa wpisu w archiwum.'
+                }
+                $entry = $zip.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
+                $entryStream = $entry.Open()
+                try {
+                    $sourceStream = [IO.File]::Open($file.FullName, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+                    try { $sourceStream.CopyTo($entryStream) } finally { $sourceStream.Dispose() }
+                } finally { $entryStream.Dispose() }
+            }
+        } finally { $zip.Dispose() }
+    } finally { $zipStream.Dispose() }
     Move-Item -LiteralPath $tempZip -Destination $finalZip -ErrorAction Stop
     $tempZip = ''
     $zipItem = Get-Item -LiteralPath $finalZip -Force

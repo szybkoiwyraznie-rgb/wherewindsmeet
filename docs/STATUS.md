@@ -34,13 +34,79 @@ rosnącym `AGENTS.md`.
   instrukcja, BAT i PowerShell tworzą jeden ZIP z inwentarzem oraz wybranymi
   kopiami map i kandydatów kontekstu. Ręczne oględziny zostały odrzucone.
   Kompletność tekstów/kontekstu, aktualna instalacja i prawa pozostają nieznane.
-  Na prośbę właściciela BAT przestał nadpisywać politykę wykonywania PowerShell;
-  jeśli system blokuje skrypt, instrukcja zaleca przerwanie bez obniżania polityki.
+  Po błędzie `running scripts is disabled` na komputerze właściciela BAT znów
+  uruchamia PowerShell z `-ExecutionPolicy Bypass` (tylko dla tego procesu,
+  bez zmian w systemie) i wykonuje `Unblock-File` na swoich `*.ps1`.
   Zmiana przeszła CI na Linux/Windows × Python 3.11/3.12; nie testowano jej
   na komputerze właściciela ani na instalacji gry.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md); odtworzono również ZIP z generatora
   `build_kod_kit.py`. Jego ustalenia o SRW nie są ustaleniami o WWM.
+- **2026-11-11 odebrano wynik zbieracza** (`WWM_DANE_20261111_181913_13ff7ac1.zip`,
+  72 995 594 B, prywatnie w `local/`). Stan `partial` z powodu pominięcia mapy
+  `zh_cn` (69 470 988 B) przez limit 90 MiB; 0 problemów odczytu, build
+  `25906190` zgodny ze zgłoszonym. Inwentarz 640 plików w `Package`
+  i `LocalData/Patch`. Mapy EN: główna 50 550 179 B plus dwa `_diff`
+  (1 122 346 B z `LocalData/Patch`, 751 922 B z `Package`), `MANIFEST` ×2,
+  `data3` 10 829 572 B, `data205` 7 564 939 B.
+- **Rozpoznano kontener map** (szczegóły i liczby w
+  [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)): `0xDEADBEEF`, wersja 1, liczba
+  chunków, tabela offsetów, chunki w zstd; po dekompresji jawny tekst z markupem
+  gry. Zweryfikowano dekompresję 4386/4386 chunków mapy EN. Nie znamy jeszcze
+  wiązania łańcuchów z kluczami ani zapisu zwrotnego.
+- **Błąd zbieracza wykryty na realnym wyniku:** `CreateFromDirectory`
+  w Windows PowerShell 5.1 zapisał nazwy wpisów z `\`, sprzecznie ze
+  specyfikacją ZIP; walidator odrzucił archiwum (`unsafe archive member path`).
+  Zamieniono na ręczne wpisy `ZipArchive` z `/` oraz dodano wyraźny komunikat
+  walidatora. Dane w odebranym ZIP-ie były kompletne i zostały przeanalizowane.
+  Wyjaśniono też, dlaczego test tej ścieżki padał **tylko** na Windows:
+  `zipfile` podmienia `\` na `/` w nazwach wpisów przy zapisie i odczycie, więc
+  walidator nie widzi tam separatora — paczkę i tak odrzuca, a wieloplatformową
+  bramką są pola raportu `source`/`stored_as` czytane z JSON.
+- **2026-11-11 odebrano dostawę `oversea` z Dysku Google** (4 pliki, największy
+  96 942 617 B; inwentarz z SHA-256 w [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md)):
+  `oversea.zip`, `oversea2.zip`, `patch.zip`, `translate_words_map_zh_cn`.
+  Wypakowanie do ignorowanego `local/`. Przyszły `data200`–`204` i `206`;
+  `data200` nie ma `TimelinePObject`, a `data205` mamy z wcześniejszego
+  zbieracza. Nadal **brakuje `data207`–`data212`**.
+- **Nowe sceny:** 47 548 scen i 114 592 kwestii z `data201`–`206`
+  (`tools/timeline.py`; wszystkie `text_id` unikalne, 12 920 różnych `entity_tag`).
+  Rejestr `MANIFEST` z patcha ma 74 951 `dialog_timelines`; nowe sceny pokrywają
+  **58,5%** (43 828 z `dialog_no`; wcześniej 10,1%), **brakuje 31 123 dialogów**.
+- **Mapa źródłowa `zh_cn` rozpoznana:** ten sam kontener `0xDEADBEEF` co mapa EN
+  (7097 chunków, zstd) — **1 816 408 niepustych** par `id → chiński tekst`
+  (3 581 256 wpisów w nagłówkach). Nie same dialogi: także miejsca, imiona,
+  przedmioty, interfejs, encyklopedia. Na 50 000 `text_id` ze scen **100%
+  występuje w mapie**, 42 208 tekstów identycznych, 7 006 różni się tylko
+  łamaniami wiersza.
+- **Dopisek sceniczny w nawiasach (nowe):** 1 863 z 50 000 (3,7%) różni się
+  treścią — mapa trzyma pełną linię z dopiskiem, scena tylko wypowiadany
+  fragment: `（正声）咳咳，…` (1 055, sposób mówienia przed kwestią) oraz
+  `喵喵喵喵！（…）` (322, myśl po kwestii). Który wariant renderuje klient —
+  **do sprawdzenia w grze**.
+- **2026-11-11 druga dostawa z Dysku** (`oversea3.zip`, `index.zip`,
+  `index2.zip`): przyszły brakujące `data205`, `data207`–`data212` oraz indeksy.
+  Skan `tools/skan_timeline.py`: sceny mają tylko `data205` (8 484), `data207`
+  (11 847) i `data208` (7 042); `data209`–`data212` i wszystkie indeksy nie mają
+  ani jednego obiektu sceny.
+- **Korpus zamknięty w 92,2%:** 74 979 scen, 178 572 kwestii, 176 146 unikalnych
+  tekstów, 17 492 mówców; rejestr pokryty w 69 092 z 74 951 `dialog_timelines`.
+  **Brakuje 5 859 dialogów** — a nie został już nieprzesłany żaden plik `data*`.
+- **`dialog_no` to grupa dialogowa, nie pojedynczy timeline:** ten sam numer
+  występuje w dwóch plikach z inną treścią i innymi mówcami (10 takich grup).
+  Scalanie po `dialog_no` gubi treść — robimy sumę, nie różnicę.
+- **Trwały indeks w repo** (decyzja właściciela, patrz
+  [DATA_POLICY.md](DATA_POLICY.md)): `index/` — manifest, 5 shardów scen i 3
+  shardy tekstów, każdy < 10 MiB. Tekst jest raz na unikalny `text_id`.
+  `tools/sceny_z_indeksu.py` odtwarza z niego sceny i listy tekstów **bez
+  `local/` i bez plików z Dysku**; round-trip zweryfikowany polem do pola.
+  To odpowiedź na to, że `local/` jest regularnie czyszczone — w trakcie tej
+  pracy `local/`, `google_drive/` i `.venv` faktycznie zniknęły.
+- **Tekst źródłowy do tłumaczenia:** 25 258 z 176 146 (14,3%) ma w mapie `zh_cn`
+  dłuższą wersję z dopiskiem scenicznym w nawiasach; tłumaczy się wersję z mapy.
+- **Format dla tłumacza** gotowy: [format_tlumacza.md](format_tlumacza.md)
+  (kolumny, przykłady z prawdziwych danych, zasada „tłumaczyć pełny tekst
+  z mapy, nie zgadywać"). Język źródłowy decyzją właściciela: chiński.
 - Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
   Publiczny [przegląd wykonalności](FEASIBILITY.md) wskazuje istniejące
   narzędzia oraz ograniczenia oficjalnych warunków gry. Nie badano jeszcze
@@ -48,10 +114,10 @@ rosnącym `AGENTS.md`.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 180 testów lokalnych Linux/Python 3.11; kod zbieracza `075c8ab` przeszedł 4/4 konfiguracje CI Windows/Linux × Python 3.11/3.12. Zmiana polityki PowerShell również przeszła 4/4 konfiguracje push i PR; [dziennik](EXPERIMENT_LOG.md). |
+| Repozytorium i workflow | 258 testów; `check_repository.py` i `git diff --check` czyste. CI **4/4 zielone** (Ubuntu i Windows × Python 3.11/3.12); [dziennik](EXPERIMENT_LOG.md). |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
-| Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
-| Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
+| Ekstrakcja i zakres tekstów | Kontener map rozpoznany, parser par `id → tekst` działa (`tools/locale_records.py`): mapa EN 1 122 784 wpisy, mapa źródłowa `zh_cn` 1 816 408 niepustych. Sceny i mówce odczytane z `data201`–`206`. Nieznany jest zapis zwrotny do plików gry ani weryfikacja w grze. |
+| Pakiet tłumacza i import | Format tabeli dla tłumacza gotowy (kolumny, kontekst sceny, zasada pełnego tekstu z mapy). Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji pełnej paczki, importu i integracji z grą. |
 | Patcher, instalacja i przywracanie | Nie powstały; są jedynie syntetyczne modele cofania i rotacji kopii, bez zapisu. `runtime_tested: false`. |
 | Aktualizacje gry | Skaner ogólnych plików oraz syntetyczny audyt i wybór linii; brak pamięci tłumaczeń, ekstrakcji i obsługi aktualizacji WWM. |
 | Aplikacje Windows i czytanka | Docelowe ZIP-y audytora i patchera oraz czytanka są planowane; wstępny ZIP zbieracza jest osobnym narzędziem. |
@@ -61,7 +127,8 @@ rosnącym `AGENTS.md`.
 1. Region, ustawiony język, istnienie kandydackich katalogów i plików oraz
    zakres planowanych testów dla zgłoszonej instalacji Steam. Build ID i numery
    ekranów są zapisane jako zgłoszone, nie jako weryfikacja plików.
-2. Język źródłowy/referencyjny, wybór modelu, koszty, prawo i warunki
+2. Język źródłowy/referencyjny (decyzja właściciela: **chiński**, mapa `zh_cn`;
+   angielski tylko pomocniczo), wybór modelu, koszty, prawo i warunki
    przetwarzania oraz publikacji tekstu gry. Nie używamy cudzej gotowej
    polonizacji jako źródła tłumaczenia.
 3. Wpływ warunków gry i zabezpieczeń na wybraną edycję oraz techniczna
@@ -75,14 +142,12 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Przekazać sprawdzony [zbieracz ZIP](COLLECTOR.md). Właściciel uruchamia BAT i
-sam wgrywa jeden wynik na Dysk Google. Odebrać go prywatnie do ignorowanego
-`local/`, zweryfikować bezpiecznie raport, sumy i zakres, a następnie rozpoznać
-format oraz luki kontekstu; nie obiecywać, że same mapy wystarczą. Pamiętać o
-limicie 100 MiB odbioru przez aktualne połączenie Dysku. Nie prosić o ręczne
-spisywanie plików, całą grę ani poświadczenia.
+Format jest odczytany w obie strony i **potwierdzony na realnej mapie**:
+1 122 784 wpisy, `tools/apply_translation.py` podmienia teksty o dowolnej
+długości, weryfikuje wynik i zapisuje nową mapę (200 podmian w 11 s).
 
-Równolegle można kontynuować prace syntetyczne. **Przed zapisem w instalacji**
-uzgodnić prawa, konkretny plan, kopię i przywracanie; zgoda na zbieranie nie
-zastępuje tych kroków. [Kontakt z wydawcą](PUBLISHER_PERMISSION.md) jest
-opcjonalny. Szczegóły w [planie](ROADMAP.md) i [rozpoznaniu](FEASIBILITY.md).
+Dalej: **domknąć 5 859 brakujących dialogów** — nie zostały nieprzesłane pliki
+`data*`, więc sprawdzić, czy rejestr zawiera grupy bez timeline'u, czy treść
+siedzi w innym pliku. Potem **sprawdzić w grze**, który wariant linii z
+dopiskiem w nawiasach renderuje klient, **limity pól interfejsu** oraz
+**skrypt instalacyjny** dla użytkownika (kopiowanie, backup, przywracanie).

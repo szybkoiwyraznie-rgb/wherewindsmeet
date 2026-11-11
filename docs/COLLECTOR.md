@@ -5,10 +5,16 @@
 Jednorazowy, odczytowy zestaw do rozpoznania instalacji: rozpakuj ZIP,
 uruchom `URUCHOM.bat`, otrzymaj **jeden** ZIP na Pulpicie i przekaż go
 prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
-instaluje Pythona, zależności ani niczego nie pobiera przez skrypt. BAT
-uruchamia PowerShell bez nadpisywania jego polityki wykonywania. Jeśli ta
-polityka blokuje skrypt, nie obniżaj jej ani nie omijaj zabezpieczeń — przerwij
-uruchamianie. Zbieracz nie instaluje ani nie cofa tłumaczenia. Jest osobny od
+instaluje Pythona, zależności ani niczego nie pobiera przez skrypt.
+
+Na życzenie właściciela, po tym jak domyślna polityka wykonywania zablokowała
+skrypt na jego komputerze, BAT uruchamia PowerShell z parametrem
+`-ExecutionPolicy Bypass` — tak jak paczki SRW Y tego projektu. Parametr
+obejmuje **tylko ten jeden proces**: nie zmienia polityki w rejestrze ani
+ustawień systemowych, nie wymaga administratora i niczego nie instaluje.
+BAT wykonuje też `Unblock-File` na plikach `*.ps1` w swoim folderze, żeby
+znacznik „pobrane z internetu” nie blokował uruchomienia. To nie jest
+obchodzenie zabezpieczeń gry; gra pozostaje tylko czytana. Zbieracz nie instaluje ani nie cofa tłumaczenia. Jest osobny od
 planowanych [audytora i patchera](TWO_APPLICATIONS.md).
 
 Właściciel wskazał wzorce SRW Y. W repozytorium `mtgcrawler` odnaleziono
@@ -34,6 +40,23 @@ ani formatu i nie kopia danych SRW. WWM ma własny wybór plików i ograniczenia
    104 857 600 B na pobranie i nie obiecujemy, że duży ZIP da się odebrać.
 4. Jeśli ZIP w ogóle nie powstał, przekaż komunikat z okna; nie wysyłaj haseł.
    Każde uruchomienie ma inną nazwę i nie nadpisuje starszych wyników.
+
+## Dostawa archiwum
+
+Gotowy ZIP nie zawsze da się przekazać przez connector Dysku Google: 2026-11-11
+filtr bezpieczeństwa dostawcy connectora odrzucił to archiwum („blocked because
+of its content”), choć paczki `SRW_Y_*_PROSBA.zip` o tym samym układzie
+instrukcja + BAT + PS1 przechodzą. Różnica jest w treści skryptu: 25 KB,
+`Get-Process`, odczyt rejestru Steam, kopiowanie plików, SHA-256 i tworzenie
+ZIP-a — kombinacja heurystycznie podejrzana, mimo że operacja jest odczytowa.
+Nie zmieniamy treści po to, by ominąć filtr.
+
+Bez Pythona i bez nowej publikacji te same bajty daje archiwum repozytorium:
+pobierz `https://github.com/szybkoiwyraznie-rgb/wherewindsmeet/archive/refs/heads/main.zip`,
+rozpakuj poza grą i uruchom `collector/URUCHOM.bat`. Git ma dla `.bat`/`.ps1`
+ustawione `-text`, a sprawdzenie archiwum z `main` dało SHA-256 `zbierz.ps1`
+`dd9c1ecf235ca9702c4a1ad12d24ff742ddfc3950ba007b01b785bfd94e25ce4` i identyczny
+BOM/CRLF jak w repozytorium, więc to nie jest inna wersja narzędzia.
 
 ## Dokładny zakres
 
@@ -113,3 +136,28 @@ Git ignoruje artefakty ZIP. Testy Windows wykonują **rozpakowane** BAT i
 Windows PowerShell na fikcyjnej instalacji, a testy Linux sprawdzają builder,
 kodowanie i walidator. Wynik dla konkretnego commita zob. w dzienniku i CI.
 Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
+
+## Uzupełnienie korpusu: `spakuj_dane.ps1`
+
+`zbierz.ps1` ma z założenia limit payloadu 90 MB, więc nie uniesie całego korpusu:
+same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
+`MANIFEST` pokazuje **74 951** dialogów, z których `data205` daje tylko 7 571
+(patrz [SCENY_WWM.md](SCENY_WWM.md)).
+
+Do jednorazowego uzupełnienia służy osobny skrypt, który **tylko czyta** katalog gry:
+kopiuje wskazany zestaw plików do folderu tymczasowego, liczy SHA-256, zapisuje
+`SPIS.json` i pakuje ZIP do wgrania na Dysk.
+
+```powershell
+# dialogi (data200-data212 bez data205, ~133 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet"
+
+# kontekst: pozostałe dataN, MANIFEST, CameraZone, Audio_Area, bulk_data (~80 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres kontekst
+
+# wszystko naraz (~215 MB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres wszystko
+```
+
+`-ExecutionPolicy Bypass` dotyczy tylko tego procesu — skrypt nie zmienia rejestru
+ani polityki systemu, nie dotyka zapisów gry i nie zapisuje nic w katalogu gry.
