@@ -17,6 +17,7 @@ import unittest
 from zipfile import ZipFile
 
 from tools.build_collector_kit import build_bytes
+from tools.validate_collector_return import validate
 
 
 if os.name == "nt":
@@ -65,9 +66,17 @@ if os.name == "nt":
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180, check=False,
             )
 
+        def detail(self, result):
+            # Keep the relevant synthetic-fixture diagnostic on one annotation line.
+            text = result.stdout.decode("utf-8", errors="replace")
+            errors = [line.strip() for line in text.splitlines() if "BLAD:" in line]
+            return (errors[0] if errors else repr(text))[:700]
+
         def collection(self):
             paths = list(self.out.glob("WWM_DANE_*.zip"))
             self.assertEqual(len(paths), 1, paths)
+            verified = validate(paths[0])
+            self.assertEqual(verified["validation"], "passed")
             with ZipFile(paths[0]) as archive:
                 self.assertIsNone(archive.testzip())
                 names = archive.namelist()
@@ -84,11 +93,11 @@ if os.name == "nt":
                        "if ($err.Count) {$err | ForEach-Object {Write-Host $_}; exit 1}; exit 0")
             result = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
-            self.assertEqual(result.returncode, 0, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 0, self.detail(result))
 
         def test_collects_maps_context_and_inventory_without_private_files(self):
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
-            self.assertEqual(result.returncode, 0, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 0, self.detail(result))
             report, inventory, payload, summary = self.collection()
             self.assertEqual(report["format"], "wwm-collection-v1")
             self.assertEqual(report["status"], "collected")
@@ -122,7 +131,7 @@ if os.name == "nt":
             command = f'"{bat}" "{self.game}" -OutputDirectory "{self.out}" -NonInteractive'
             result = subprocess.run(command, shell=True, input=b"\r\n", stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, timeout=180, check=False)
-            self.assertEqual(result.returncode, 0, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 0, self.detail(result))
             report, _, _, _ = self.collection()
             self.assertEqual(report["status"], "collected")
             self.assertEqual(self.original, self.game_files())
@@ -131,7 +140,7 @@ if os.name == "nt":
             n = len(b"synthetic base map")
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out,
                                  "-PayloadLimitBytes", str(n), "-ContextLimitBytes", "0", "-NonInteractive")
-            self.assertEqual(result.returncode, 2, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 2, self.detail(result))
             report, _, payload, _ = self.collection()
             self.assertEqual(report["status"], "partial")
             self.assertEqual(report["payload_bytes"], n)
@@ -156,7 +165,7 @@ if os.name == "nt":
                 '"AppState"\n{\n"installdir" "Where Winds Meet"\n"buildid" "12345678"\n}\n', encoding="utf-8"
             )
             result = self.run_ps("-SteamRoot", steam, "-OutputDirectory", self.out, "-NonInteractive")
-            self.assertEqual(result.returncode, 0, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 0, self.detail(result))
             report, _, _, _ = self.collection()
             self.assertEqual(report["steam_app_id"], "3564740")
             self.assertEqual(report["steam_build_id"], "12345678")
@@ -164,7 +173,7 @@ if os.name == "nt":
 
         def test_game_output_path_is_refused_before_writing(self):
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.game / "Package", "-NonInteractive")
-            self.assertEqual(result.returncode, 1, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 1, self.detail(result))
             self.assertEqual(self.original, self.game_files())
             self.assertFalse(list(self.game.rglob("WWM_DANE_*.zip")))
 
@@ -172,7 +181,7 @@ if os.name == "nt":
             for p in self.game.rglob("translate_words_map_en*"):
                 p.unlink()
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
-            self.assertEqual(result.returncode, 2, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 2, self.detail(result))
             report, inventory, _, _ = self.collection()
             self.assertEqual(report["status"], "partial")
             self.assertGreater(len(inventory), 0)
@@ -185,9 +194,9 @@ if os.name == "nt":
             junction = self.game / "Package" / "link_to_outside"
             result = subprocess.run([os.environ["COMSPEC"], "/d", "/c", "mklink", "/J", str(junction), str(outside)],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30, check=False)
-            self.assertEqual(result.returncode, 0, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 0, self.detail(result))
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
-            self.assertEqual(result.returncode, 2, result.stdout.decode(errors="replace"))
+            self.assertEqual(result.returncode, 2, self.detail(result))
             report, inventory, _, _ = self.collection()
             self.assertTrue(any(row["reason"] == "reparse_skipped" for row in report["problems"]))
             self.assertFalse(any("should_not_enter" in row["path"] for row in inventory))
