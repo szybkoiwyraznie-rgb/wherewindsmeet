@@ -48,6 +48,9 @@ lokalizacji Steam i numeru builda z manifestu Steam. Część nazw/katalogów
 prywatnych i linki systemu plików są pomijane. Inwentarz i kopie mogą jednak
 zawierać dane gry oraz prywatne nazwy: obejrzyj wynik przed udostępnieniem,
 nie publikuj go i przekazuj tylko osobom, którym ufasz. Nie podawaj haseł.
+URUCHOM.bat respektuje aktualną politykę wykonywania PowerShell i jej nie
+zmienia. Jeśli Windows zablokuje skrypt, nie obniżaj polityki ani nie omijaj
+zabezpieczeń; przerwij i skonsultuj komunikat.
 
 Na Pulpicie powstaje tymczasowy folder roboczy, normalnie usuwany po pracy;
 po awaryjnym zamknięciu może pozostać folder .WWM_ZBIERANIE_... wraz z kopiami.

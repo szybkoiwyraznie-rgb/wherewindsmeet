@@ -461,3 +461,22 @@ cudzego kodu ani nie wymagają tej procedury.
   `3a43a299ce694aa849a86c365af63e24fbb52636543c2cdbfa837dbfb48bbc5c`.
   Trzy człony, CRC i zgodność z deterministycznym builderem sprawdzono; nie
   zawiera danych gry. Zastępuje poprzednią wersję podaną historycznie wyżej.
+
+## 2026-11-11 — zbieracz respektuje politykę PowerShell
+
+- **Decyzja:** na prośbę właściciela usunięto z dystrybuowanego `URUCHOM.bat`
+  wymuszenie `-ExecutionPolicy Bypass`. BAT uruchamia teraz Windows PowerShell
+  z jego bieżącą polityką; nie zmienia i nie obchodzi ustawień systemu. Jeżeli
+  polityka blokuje skrypt, narzędzie może się nie uruchomić — instrukcje każą
+  przerwać, nie osłabiać polityki. Usunięto też nadpisanie z pomocnika testów
+  Windows, a test buildera sprawdza brak argumentu `-ExecutionPolicy`.
+- **Weryfikacja lokalna:** Linux/Python 3.11.2, `python tools/run_tests.py` —
+  **180/180** testów; `python -m compileall -q tools tests` oraz
+  `git diff --check` przeszły. ZIP zbudowano deterministycznym builderem:
+  **31 065 B**, SHA-256
+  `f77b637fa83b5b729a13064b119a643f8c28c36e127250b55d7559123d64c541`;
+  trzy oczekiwane pliki, CRC poprawne, BAT w archiwum nie zawiera
+  `-ExecutionPolicy`.
+- **Ograniczenia:** PowerShell nie jest zainstalowany w środowisku Linux, więc
+  zmienionego BAT-a/PS1 nie uruchomiono w Windows. CI Windows dla tej zmiany
+  oczekuje sprawdzenia; nie testowano na instalacji gry.
