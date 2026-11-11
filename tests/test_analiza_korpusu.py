@@ -59,7 +59,7 @@ class CorpusAnalysisTests(unittest.TestCase):
             code = analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
             self.assertEqual(code, 0)
             names = sorted(path.name for path in out.iterdir())
-            self.assertEqual(names, ["chronologia.json", "dialog_mowca.json",
+            self.assertEqual(names, ["chronologia.json", "dialog_mowca.json", "do_decyzji.json",
                                      "elementy_poza_scenami.json", "kompletnosc.json",
                                      "kontekst.json"])
             for path in out.iterdir():
@@ -94,12 +94,27 @@ class CorpusAnalysisTests(unittest.TestCase):
                          variants["identycznych"] + variants["rozni_sie_tylko_lamaniem_wiersza"]
                          + variants["rozni_sie_trescia"])
 
+    def test_decision_report_lists_what_needs_a_human(self):
+        summary, per_group = analiza_korpusu.analyse_dialogues(self.scenes)
+        report = analiza_korpusu.analyse_decisions(per_group)
+        multi = report["grupy_z_wieloma_timeline"]
+        self.assertEqual(multi["liczb"], summary["grup_z_wieloma_timeline"])
+        self.assertEqual(len(multi["lista"]), multi["liczb"])
+        for row in multi["lista"]:
+            self.assertLessEqual(len(row["pliki"]), row["timelineow"])
+        self.assertEqual(report["grupy_tylko_generyczna_obsada"]["liczb"],
+                         summary["grup_tylko_generyczna_obsada"])
+        self.assertEqual(report["grupy_bez_mowcy"]["liczb"],
+                         summary["rozklad_liczby_mowcow"].get("0", 0))
+        for key in ("grupy_tylko_generyczna_obsada", "grupy_bez_mowcy"):
+            self.assertLessEqual(len(report[key]["proba"]), 20)
+
     def test_committed_reports_match_a_fresh_run(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"
             analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
             for name in ("dialog_mowca.json", "kompletnosc.json", "chronologia.json",
-                         "kontekst.json", "elementy_poza_scenami.json"):
+                         "kontekst.json", "elementy_poza_scenami.json", "do_decyzji.json"):
                 committed = json.loads((ROOT / "analiza" / name).read_text(encoding="utf-8"))
                 fresh = json.loads((out / name).read_text(encoding="utf-8"))
                 self.assertEqual(committed, fresh, name)

@@ -296,6 +296,41 @@ def analyse_offscene(scenes: list[dict], texts: dict[str, dict]) -> dict:
     }
 
 
+def analyse_decisions(per_group: list[dict]) -> dict:
+    """Grupy, ktorych nie da sie przetworzyc automatycznie — decyzja czlowieka.
+
+    Pelna lista jest w rozpisie per grupa (`--grupy`); tutaj trafiaja te, ktore
+    sa na tyle malo liczne, ze mozna je przegladac w calosci, plus probki.
+    """
+    multi_timeline = [
+        {"dialog_no": row["dialog_no"], "timelineow": row["timelineow"],
+         "pliki": row["pliki"], "kwestii": row["kwestii"], "mowcow": row["mowcow"]}
+        for row in per_group if row["timelineow"] > 1]
+    generic = [row for row in per_group if row["tylko_generyczna_obsada"]]
+    no_speaker = [row for row in per_group if row["mowcow"] == 0]
+    return {
+        "grupy_z_wieloma_timeline": {
+            "liczb": len(multi_timeline),
+            "lista": multi_timeline,
+            "co_zrobic": ("ten sam dialog_no w dwoch plikach z inna trescia i innymi "
+                          "mowcami — nie scalac automatycznie; kazda timeline to osobne "
+                          "przejscie dialogu"),
+        },
+        "grupy_tylko_generyczna_obsada": {
+            "liczb": len(generic),
+            "proba": [row["dialog_no"] for row in generic[:20]],
+            "co_zrobic": ("brak rozpoznawalnego mowcy (gracz lub grupa techniczna) — "
+                          "tlumacz nie moze wymyslac imion; przeklad po bezosobowej "
+                          "wersji z mapy"),
+        },
+        "grupy_bez_mowcy": {
+            "liczb": len(no_speaker),
+            "proba": [row["dialog_no"] for row in no_speaker[:20]],
+            "co_zrobic": "kwestie bez wypelnionego mowca — ustalic mowce przed paczka",
+        },
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Statystyki korpusu z indeksu w repozytorium.")
     parser.add_argument("--indeks", type=Path, default=Path("index"), help="katalog indeksu")
@@ -315,6 +350,7 @@ def main(argv=None) -> int:
         "chronologia.json": analyse_chronology(scenes),
         "kontekst.json": analyse_context(scenes),
         "elementy_poza_scenami.json": analyse_offscene(scenes, texts),
+        "do_decyzji.json": analyse_decisions(per_group),
     }
     for name, payload in outputs.items():
         (arguments.wyj / name).write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",

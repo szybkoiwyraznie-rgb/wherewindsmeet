@@ -106,6 +106,17 @@ wyliczone z indeksu:
   daje paczkę 24 MB ZIP z 583 tokenami. Dla `zh_cn` liczba unikalnych tekstów
   **nie jest zmierzona** — do policzenia trzeba pliku mapy.
 
+## 6. Co wymaga decyzji człowieka (nie da się zautomatyzować)
+
+Raport `analiza/do_decyzji.json`, szczegóły per grupa przez `--grupy`:
+
+- **16 grup z wieloma timeline'ami** — pełna lista w raporcie. Dwa timeliney mogą
+  być w **tym samym pliku** (np. `dialog_no` 7400065 w `data207`), więc podział
+  po pliku ich nie rozstrzyga. Nie scalać po `dialog_no`.
+- **13 476 grup ma wyłącznie mówcę generycznego lub technicznego** — tłumacz nie
+  może wymyślać imion; przekład po bezosobowej wersji z mapy.
+- **6 503 grup nie ma w ogóle mówcy** — przed paczką trzeba ustalić, kto mówi.
+
 ## Co jest jeszcze do zrobienia
 
 1. **Rozbicie 1 640 262 wpisów poza scenami na kategorie** (interfejs,
@@ -113,7 +124,10 @@ wyliczone z indeksu:
    do przetłumaczenia. Liczba całkowita jest już znana; kategorie wymagają
    pliku mapy `zh_cn` (69 470 988 B) — jest na Dysku Google, zginął tylko
    z `local/`.
-2. Domknięcie 5 859 brakujących dialogów rejestru (brakuje `data207`–`data212`).
+2. Domknięcie 5 859 brakujących dialogów rejestru — mamy `data201`–`data208`,
+   więc brakuje `data209`–`data212` albo innego źródła. Do policzenia, które
+   dokładnie `dialog_no` brakują, potrzebny jest plik rejestru `MANIFEST`
+   (1 415 521 B, SHA-256 w `index/manifest.json`) — jest na Dysku obok mapy.
 3. Sprawdzenie w grze, który wariant linii (z dopiskiem w nawiasach czy bez)
    renderuje klient — dotyczy 2 638 tekstów.
 4. Rozpis per grupa dialogowa (`analiza/dialog_mowca_grupy.jsonl`, ok. 18 MB)
