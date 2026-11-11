@@ -5,6 +5,7 @@ Pliki `MANIFEST`, `indexN` i `dataN` z `Package/HD/oversea` tworzą jedną bazę
 klucz -> wartość (opis: docs/BAZA_GRY.md):
 
     MANIFEST   nazwa tabeli -> liczba wierszy, chunk schematu, chunki wierszy
+               (każdy z opcjonalnym chunkiem poprawek z warstwy aktualizacji)
     indexN     chunk schematu (nazwy kolumn) albo tablica haszująca
                klucz wiersza -> (plik danych, chunk, offset, długość)
     dataN      wartości; offset i długość liczone w słowach 8-bajtowych
@@ -49,12 +50,13 @@ class BazaError(Exception):
 
 
 BEZ_SCHEMATU = 0xFFFF
+BRAK = 0xFFFF
 FLAGA_KLUCZE_LICZBOWE = 0x400
 FLAGA_KLUCZE_NAPISOWE = 0x800
 SLOWO = 8
 NAGLOWEK_MANIFESTU = struct.Struct("<HHIIIII")
 REKORD_TABELI = struct.Struct("<IIHHIIIII")
-CZESC = struct.Struct("<HHI")
+CZESC = struct.Struct("<HHHH")
 NAGLOWEK_TABLICY = struct.Struct("<QQQ")
 MAKS_GLEBOKOSC = 200
 
@@ -64,7 +66,15 @@ T_NAPIS = 0x08
 T_LISTA = 0x09
 T_OBIEKT = 0x0A
 T_NONE, T_FALSE, T_TRUE = 0x0B, 0x0C, 0x0D
-T_SLOWNIK = 0x28
+
+
+@dataclass(frozen=True)
+class Czesc:
+    """Chunk indeksu z wierszami oraz opcjonalny chunk poprawek (warstwa aktualizacji)."""
+
+    plik: int
+    chunk: int
+    poprawki: tuple[int, int] | None = None
 
 
 @dataclass(frozen=True)
@@ -72,8 +82,9 @@ class Tabela:
     nazwa: str
     wiersze: int
     schemat: tuple[int, int] | None
-    czesci: tuple[tuple[int, int], ...]
+    czesci: tuple[Czesc, ...]
     flagi: int
+    schemat_dopisany: tuple[int, int] | None = None
 
     @property
     def klucze_liczbowe(self) -> bool:
@@ -88,6 +99,11 @@ class Polozenie:
     chunk: int
     offset: int
     dlugosc: int
+
+    @property
+    def usuniety(self) -> bool:
+        """W chunku poprawek: wiersz skasowany przez warstwę aktualizacji."""
+        return self.plik == 0 and self.dlugosc == 0
 
 
 @dataclass(frozen=True)
@@ -156,12 +172,16 @@ def parse_manifest(buf: bytes) -> Manifest:
     tail_at = parts_at + CZESC.size * n_czesci
     if tail_at > len(buf):
         raise BazaError("MANIFEST: rekordy wychodzą poza plik")
-    parts = [CZESC.unpack_from(buf, parts_at + CZESC.size * i)[:2] for i in range(n_czesci)]
+    parts = []
+    for index in range(n_czesci):
+        plik, chunk, d_plik, d_chunk = CZESC.unpack_from(buf, parts_at + CZESC.size * index)
+        parts.append(Czesc(plik, chunk, None if d_plik == BRAK else (d_plik, d_chunk)))
     tabele: dict[str, Tabela] = {}
     for index in range(n_tabel):
-        rows, count, s_file, s_chunk, _d, _hash, _zero, first, flags = REKORD_TABELI.unpack_from(
+        rows, count, s_file, s_chunk, delta, _hash, _zero, first, flags = REKORD_TABELI.unpack_from(
             buf, records_at + REKORD_TABELI.size * index
         )
+        d_file, d_chunk = delta & 0xFFFF, delta >> 16
         if first + count > n_czesci:
             raise BazaError(f"MANIFEST: tabela {names[index]!r} wskazuje części poza listą")
         tabele[names[index]] = Tabela(
@@ -170,6 +190,7 @@ def parse_manifest(buf: bytes) -> Manifest:
             schemat=None if s_file == BEZ_SCHEMATU else (s_file, s_chunk),
             czesci=tuple(parts[first : first + count]),
             flagi=flags,
+            schemat_dopisany=None if d_file == BRAK else (d_file, d_chunk),
         )
     pliki_indeksu, pos = _nazwy_plikow(buf, tail_at)
     pliki_danych, pos = _nazwy_plikow(buf, pos)
@@ -277,7 +298,7 @@ def _dane(tag: int, buf: bytes, pos: int, depth: int):
                 item, pos = read_value(buf, pos, depth + 1)
                 items.append(item)
             return items, pos
-        if tag in (T_OBIEKT, T_SLOWNIK):
+        if tag == T_OBIEKT:
             count = struct.unpack_from("<H", buf, pos)[0]
             pos += 2
             if count % 2:
@@ -347,7 +368,7 @@ class Baza:
         self._kontenery: dict[str, list[bytes]] = {}
         self._chunki: OrderedDict[tuple[str, int], bytes] = OrderedDict()
         self._pamiec = pamiec_chunkow
-        self._schematy: dict[tuple[int, int], list[str]] = {}
+        self._schematy: dict[tuple, list[str]] = {}
 
     def _chunk(self, nazwa_pliku: str, index: int) -> bytes:
         key = (nazwa_pliku, index)
@@ -377,20 +398,34 @@ class Baza:
             raise BazaError(f"brak tabeli {nazwa!r}") from None
 
     def kolumny(self, nazwa: str) -> list[str] | None:
-        schemat = self.tabela(nazwa).schemat
-        if schemat is None:
+        """Kolumny tabeli: schemat bazowy plus kolumny dopisane przez warstwę aktualizacji."""
+        tabela = self.tabela(nazwa)
+        if tabela.schemat is None:
             return None
-        if schemat not in self._schematy:
-            self._schematy[schemat] = parse_schema(self._chunk(f"index{schemat[0]}", schemat[1]))
-        return self._schematy[schemat]
+        klucz = (tabela.schemat, tabela.schemat_dopisany)
+        if klucz not in self._schematy:
+            kolumny = list(parse_schema(self._chunk(f"index{tabela.schemat[0]}", tabela.schemat[1])))
+            if tabela.schemat_dopisany is not None:
+                plik, chunk = tabela.schemat_dopisany
+                kolumny += parse_schema(self._chunk(f"index{plik}", chunk))
+            self._schematy[klucz] = kolumny
+        return self._schematy[klucz]
 
     def polozenia(self, nazwa: str) -> Iterator[tuple[object, Polozenie]]:
+        """Wiersze tabeli po nałożeniu poprawek: zamiana, dopisanie, skasowanie."""
         tabela = self.tabela(nazwa)
         count = 0
-        for plik, chunk in tabela.czesci:
-            for key, place in iter_index(self._chunk(f"index{plik}", chunk), tabela.klucze_liczbowe):
-                count += 1
-                yield key, place
+        for czesc in tabela.czesci:
+            rows = dict(iter_index(self._chunk(f"index{czesc.plik}", czesc.chunk), tabela.klucze_liczbowe))
+            if czesc.poprawki is not None:
+                d_plik, d_chunk = czesc.poprawki
+                for key, place in iter_index(self._chunk(f"index{d_plik}", d_chunk), tabela.klucze_liczbowe):
+                    if place.usuniety:
+                        rows.pop(key, None)
+                    else:
+                        rows[key] = place
+            count += len(rows)
+            yield from rows.items()
         if count != tabela.wiersze:
             raise BazaError(f"{nazwa}: MANIFEST podaje {tabela.wiersze} wierszy, indeks ma {count}")
 
@@ -443,6 +478,9 @@ def podsumowanie(baza: Baza) -> dict:
         "tabel": len(baza.tabele),
         "wierszy": sum(table.wiersze for table in baza.tabele.values()),
         "tabel_ze_schematem": sum(1 for table in baza.tabele.values() if table.schemat),
+        "czesci_z_poprawkami": sum(
+            1 for table in baza.tabele.values() for czesc in table.czesci if czesc.poprawki
+        ),
         "nazw_bez_rekordu": len(baza.manifest.bez_rekordu),
         "rodzin": len(rodziny),
         "najwieksze_rodziny": rodziny.most_common(12),

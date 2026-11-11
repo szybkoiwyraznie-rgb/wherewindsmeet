@@ -39,9 +39,8 @@ def tagged(value) -> bytes:
     if isinstance(value, list):
         return b"\x09" + struct.pack("<H", len(value)) + b"".join(tagged(item) for item in value)
     if isinstance(value, dict):
-        tag = b"\x0a" if all(isinstance(key, str) for key in value) else b"\x28"
         body = b"".join(tagged(key) + tagged(item) for key, item in value.items())
-        return tag + struct.pack("<H", 2 * len(value)) + body
+        return b"\x0a" + struct.pack("<H", 2 * len(value)) + body
     raise TypeError(type(value))
 
 
@@ -95,16 +94,17 @@ def manifest_chunk(tables: list[dict], extra_names: tuple[list[str], list[str]] 
     records = b""
     for table in tables:
         first = len(parts)
-        parts.extend(table["parts"])
+        parts.extend(part if len(part) == 4 else (*part, 0xFFFF, 0xFFFF) for part in table["parts"])
         schema = table.get("schema") or (0xFFFF, 0xFFFF)
-        records += struct.pack("<IIHHIIIII", table["rows"], len(table["parts"]), schema[0], schema[1],
-                               0xFFFFFFFF, 0, 0, first, table["flags"])
+        schema_fix = table.get("schema_fix") or (0xFFFF, 0xFFFF)
+        records += struct.pack("<IIHHHHIIII", table["rows"], len(table["parts"]), schema[0], schema[1],
+                               schema_fix[0], schema_fix[1], 0, 0, first, table["flags"])
     out = struct.pack("<HHIIIII", 1, 1, 8, len(tables), len(parts), len(extra_names[0]), len(extra_names[1]))
     for name in names:
         raw = name.encode("ascii")
         out += pad8_from(len(out), struct.pack("<H", len(raw)) + raw)
     out += records
-    out += b"".join(struct.pack("<HHI", plik, chunk, 0xFFFFFFFF) for plik, chunk in parts)
+    out += b"".join(struct.pack("<HHHH", *part) for part in parts)
     for group in (index_files, data_files):
         out += struct.pack("<I", len(group))
         for name in group:
@@ -244,6 +244,42 @@ class DatabaseTests(unittest.TestCase):
             baza.tabela("nie.ma")
         with self.assertRaisesRegex(baza_gry.BazaError, "brak katalogu"):
             baza_gry.Baza([self.root / "nie-istnieje"])
+
+    def test_update_layer_replaces_adds_and_deletes_rows(self):
+        old = pad8(tagged({"wersja": 1}))
+        new = pad8(tagged({"wersja": 2}))
+        added = pad8(tagged({"wersja": 3}))
+        row = pad8(struct_row([(0, 7), (1, "kolumna dopisana")]))
+        (self.root / "data1").write_bytes(container([old * 3]))
+        (self.root / "data9").write_bytes(container([new + added + row]))
+        words, row_words = len(old) // 8, len(row) // 8
+        (self.root / "index1").write_bytes(container([
+            index_chunk([("a", (1, 0, 0, words)), ("b", (1, 0, words, words)), ("c", (1, 0, 2 * words, words))]),
+            schema_chunk(["id"]),
+            index_chunk([(7, (9, 0, 2 * words, row_words))]),
+        ]))
+        (self.root / "index9").write_bytes(container([
+            # zamiana `b`, skasowanie `c` (plik 0, długość 0), dopisanie `d`
+            index_chunk([("b", (9, 0, 0, words)), ("c", (0, 0, 0, 0)), ("d", (9, 0, words, words))]),
+            schema_chunk(["opis"]),
+        ]))
+        manifest = manifest_chunk(
+            [
+                {"name": "warstwy", "rows": 3, "parts": [(1, 0, 9, 0)], "flags": 0x801},
+                {"name": "schemat", "rows": 1, "parts": [(1, 2)], "schema": (1, 1), "schema_fix": (9, 1),
+                 "flags": 0x400},
+            ],
+            index_files=("index1", "index9"), data_files=("data1", "data9"),
+        )
+        (self.root / "MANIFEST").write_bytes(container([manifest]))
+        baza = baza_gry.Baza([self.root])
+        self.assertEqual(
+            dict(baza.wiersze("warstwy")),
+            {"a": {"wersja": 1}, "b": {"wersja": 2}, "d": {"wersja": 3}},
+        )
+        self.assertEqual(baza.kolumny("schemat"), ["id", "opis"])
+        self.assertEqual(dict(baza.wiersze("schemat")), {7: {"id": 7, "opis": "kolumna dopisana"}})
+        self.assertEqual(baza_gry.podsumowanie(baza)["czesci_z_poprawkami"], 1)
 
     def test_cli_summary_table_and_check(self):
         build_database(self.root)

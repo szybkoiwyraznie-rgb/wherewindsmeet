@@ -25,15 +25,18 @@ Wszystkie trzy rodzaje plików używają tego samego kontenera co mapa tekstów
 nagłówek 24 B : u16 1, u16 1, u32 8, u32 n_tabel, u32 n_części, u32 n_c, u32 n_d
 nazwy         : (n_tabel + n_c + n_d) × [u16 długość, ASCII, dopełnienie do 8 B]
 rekordy       : n_tabel × 32 B
-części        : n_części × 8 B  (u16 plik indeksu, u16 chunk, u32 0xFFFFFFFF)
+części        : n_części × 8 B  (u16 plik indeksu, u16 chunk,
+                                 u16 plik poprawek, u16 chunk poprawek; 0xFFFF = brak)
 ogon          : u32 liczba + nazwy plików indeksu, u32 liczba + nazwy plików danych
 ```
 
 Rekord tabeli (32 B): `u32 wiersze, u32 liczba_części, u16 plik_schematu,
-u16 chunk_schematu, u32 d, u32 hash, u32 0, u32 pierwsza_część, u32 flagi`.
+u16 chunk_schematu, u16 plik_kolumn_dopisanych, u16 chunk_kolumn_dopisanych,
+u32 hash, u32 0, u32 pierwsza_część, u32 flagi`.
 
 - `plik_schematu = 0xFFFF` oznacza tabelę bez schematu kolumn.
 - Części `pierwsza_część … +liczba_części` wskazują chunki indeksu z wierszami.
+- `wiersze` to liczba wierszy **po nałożeniu poprawek** (patrz niżej).
 - Flagi: bit `0x400` — klucze wierszy są liczbami (`u64`), bit `0x800` — klucze
   są napisami; bit `0x1` — tabela bez chunku schematu.
 - Manifest z patcha (`LocalData/Patch`): 114 171 tabel z rekordem, 149 050
@@ -42,6 +45,28 @@ u16 chunk_schematu, u32 d, u32 hash, u32 0, u32 pierwsza_część, u32 flagi`.
 - Największe rodziny nazw z rekordem: `dialog_timelines.<numer>` 74 950,
   `spaces.*` 23 302, `new_graph_cues.*` 2 443, `maps.*` 1 582; razem 7 595
   różnych prefiksów.
+
+## Warstwa aktualizacji (`index1001`, `index1200`, `data1001`, `data1200`)
+
+Gra nie przepisuje dużych plików przy aktualizacji. Zmiany leżą w osobnych
+plikach `1001` (tabele) i `1200` (dialogi, przestrzenie), a `MANIFEST` wiąże je
+z plikami bazowymi na dwa sposoby:
+
+1. **Poprawki wierszy.** Każda część tabeli może wskazać drugi chunk indeksu
+   („chunk poprawek”) o tej samej budowie. Wiersz z chunku poprawek:
+   - zastępuje wiersz bazowy o tym samym kluczu,
+   - dopisuje nowy wiersz, jeśli klucza nie było,
+   - **kasuje** wiersz bazowy, jeśli jego położenie to `plik 0, długość 0`.
+2. **Kolumny dopisane.** Rekord tabeli może wskazać drugi chunk schematu.
+   Pełna lista kolumn = kolumny bazowe + kolumny dopisane (numeracja ciągła).
+   Przykład: `sound_data` dostała w ten sposób kolumnę `sea_text`.
+
+Stan w dostawie z 2026-11-11: manifest bazowy ma 2 574 części z poprawkami
+i 8 tabel z dopisanymi kolumnami; manifest z `LocalData/Patch` — 3 862 części
+i 10 tabel. Wszystkie wskazują pliki `1001` albo `1200`.
+
+To jest podstawa audytu aktualizacji: porównanie wierszy po nałożeniu poprawek
+(a nie porównanie bajtów plików) mówi dokładnie, które rekordy gra zmieniła.
 
 ## Chunk indeksu
 
@@ -73,8 +98,7 @@ Wartość bez schematu to jedna zserializowana wartość z etykietą typu:
 | `0x06` | f64 |
 | `0x08` | napis: `u16` długość w bajtach + UTF-8 |
 | `0x09` | lista: `u16` liczba elementów |
-| `0x0a` | obiekt: `u16` **liczba elementów = 2 × liczba pól**, potem pary nazwa/wartość |
-| `0x28` | słownik z dowolnymi kluczami (ta sama budowa co `0x0a`) |
+| `0x0a` | obiekt lub słownik: `u16` **liczba elementów = 2 × liczba par**, potem pary klucz/wartość (klucz bywa napisem albo liczbą) |
 | `0x0b` `0x0c` `0x0d` | None, False, True |
 
 Wiersz tabeli **ze schematem** ma inną budowę: `u16 liczba_pól`, potem pola
@@ -82,6 +106,11 @@ Wiersz tabeli **ze schematem** ma inną budowę: `u16 liczba_pól`, potem pola
 mają ponad 256 kolumn), `typ` to ten sam tag co wyżej, a dane są kodowane jak
 wartość z etykietą, tylko bez bajtu etykiety. Kolumn, których wiersz nie
 wypełnia, po prostu w nim nie ma.
+
+Bajt `0x28`, wzięty początkowo za osobny tag słownika, to po prostu starszy
+bajt nagłówka pola (`0x0a << 2`). W strumieniu wartości nie występuje ani razu
+(policzone na 3 670 355 wierszach: wszystkie tabele poza `spaces.*`, `maps.*`
+i `new_graph_cues.*` oraz 3 000 losowych dialogów).
 
 ## Sprawdzenie na całej bazie (2026-11-11)
 
@@ -92,16 +121,20 @@ zerowe. Wynik na dostawach z Dysku (pliki bazowe + `LocalData/Patch`):
 | miara | wynik |
 |---|---|
 | tabel w `MANIFEST` | 114 171 (28 261 ze schematem), 10 077 485 wierszy |
-| tabel odczytanych bez błędu | **113 792**, 10 069 118 wierszy |
+| tabel odczytanych bez błędu | **114 169**, 10 077 465 wierszy |
 | nieznane tagi | 0 |
-| tabel z inną liczbą wierszy niż w `MANIFEST` | 377 (różnica zwykle 1–3 wiersze) |
+| tabel z inną liczbą wierszy niż w `MANIFEST` | **0** |
 | tabel z błędem wartości | 2 (`0x00` w miejscu tagu) |
 
-Rozbieżności liczby wierszy **nie są jeszcze wyjaśnione**: w 171 z 377 tabel
-indeks ma tyle wierszy, ile podaje `MANIFEST` bazowy (z `Package`), a nie ten
-z `LocalData/Patch`, więc patch najpewniej nakłada wiersze inną drogą niż
-lista części tabeli. Do ustalenia, zanim audyt aktualizacji będzie na tym
-polegał.
+Dwie tabele z błędem to `spaces.s66027.spawn.spawn_sw_default_0`
+i `spaces.s66027.spawn.spawn_sw_hg_usual_0` (rozmieszczenie obiektów w jednej
+przestrzeni, bez tekstów). Przyczyna **niewyjaśniona**; dla pakietu tłumacza
+bez znaczenia.
+
+Pierwszy odczyt (bez warstwy aktualizacji) dawał 377 tabel z inną liczbą
+wierszy i 113 792 tabele czyste. Po uwzględnieniu chunków poprawek i kolumn
+dopisanych liczba wierszy zgadza się z `MANIFEST` w każdej tabeli — to jest
+dowód, że opis warstwy aktualizacji powyżej jest poprawny.
 
 ## Dialog = cztery pola jednej tabeli
 
