@@ -109,6 +109,14 @@ class CorpusAnalysisTests(unittest.TestCase):
         for key in ("grupy_tylko_generyczna_obsada", "grupy_bez_mowcy"):
             self.assertLessEqual(len(report[key]["proba"]), 20)
 
+    def test_map_and_registry_reports_are_opt_in(self):
+        with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
+            out = Path(temp) / "analiza"
+            analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
+            # Oba pomiary potrzebuja pliku, ktorego nie ma w repo.
+            self.assertFalse((out / "mapa_zh_cn.json").exists())
+            self.assertFalse((out / "brakujace_dialogi.json").exists())
+
     def test_committed_reports_match_a_fresh_run(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"

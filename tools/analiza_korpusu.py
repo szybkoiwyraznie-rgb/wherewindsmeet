@@ -13,12 +13,15 @@ Cztery analizy, których brakowało do projektowania paczki tłumacza:
     poza scenami       ile wpisow mapy tlumaczen nie nalezy do zadnej sceny
                        („widoki": interfejs, przedmioty, miejsca, encyklopedia)
                        oraz ile tekstow ma w mapie dluzsza wersje niz w scenie
-
 Działa wyłącznie na repozytorium: bez `local/`, bez plików z Dysku, bez gry.
 Nic nie pisze poza `--wyj`.
 
+Opcjonalnie `--mapa PLIK` (mapa tłumaczeń `translate_words_map_zh_cn`) daje
+dokładne liczby dla elementów poza scenami: bez pliku raport opiera się na
+zweryfikowanej wcześniej liczbie niepustych wpisów mapy.
+
 Użycie:
-    python3 tools/analiza_korpusu.py --wyj analiza [--grupy]
+    python3 tools/analiza_korpusu.py --wyj analiza [--grupy] [--mapa PLIK]
 """
 
 from __future__ import annotations
@@ -218,14 +221,41 @@ def analyse_context(scenes: list[dict]) -> dict:
     }
 
 
-def analyse_offscene(scenes: list[dict], texts: dict[str, dict]) -> dict:
-    """Elementy mapy tłumaczeń, które nie należą do żadnej sceny („widoki").
+FORMAT_TOKENS = ("#H", "#R", "#Y", "{", "$T(", "[[")
+DIALOG_PUNCTUATION = "「」『』！？…"
 
-    Indeks trzyma tylko teksty, do których odwołują się sceny, więc liczbę
-    wpisów poza scenami wylicza się z zweryfikowanej wcześniej liczby niepustych
-    wpisów mapy `zh_cn`. Co siedzi w tych wpisach (miejsca, przedmioty,
-    interfejs, encyklopedia) opisano przy odczycie mapy i jest zapisane w
-    `docs/EXPERIMENT_LOG.md` — bez pliku mapy kategorii się nie przelicza.
+
+def read_map(path: Path) -> dict[str, str]:
+    """Czyta mape tłumaczeń (kontener + tabele rekordow) do słownika id -> tekst."""
+    try:
+        from tools import apply_translation as patcher
+        from tools import locale_records as records
+    except ImportError:  # pragma: no cover - uruchomienie jako skrypt
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from tools import apply_translation as patcher
+        from tools import locale_records as records
+    entries: dict[str, str] = {}
+    for chunk in patcher.read_container(path.read_bytes()):
+        kind, payload = patcher.split_chunk(chunk)
+        try:
+            buffer = patcher.decompress(kind, payload)
+            for row in records.iter_texts(buffer):
+                entries[row["id"]] = row["text"]
+        except Exception:  # noqa: BLE001 - uszkodzony chunk nie zatrzymuje odczytu
+            continue
+    return entries
+
+
+def analyse_offscene(scenes: list[dict], texts: dict[str, dict],
+                     map_entries: dict[str, str] | None = None) -> dict:
+    """Elementy mapy tłumaczeń, ktore nie należy do zadnej sceny (widoki).
+
+    Bez `map_entries` liczba poza scenami wynika ze zweryfikowanej wcześniej
+    liczby niepustych wpisów mapy `zh_cn`. Z plikiem mapy raport jest dokladny:
+    ile to wpisów, ile unikalnych tekstow, jakie cechy maja i ktore `text_id`
+    ze scen nie ma wpisu w mapie (tych linii nie da się przepisac do tłumaczeńia).
     """
     used: set[str] = set()
     occurrences: collections.Counter = collections.Counter()
@@ -253,46 +283,122 @@ def analyse_offscene(scenes: list[dict], texts: dict[str, dict]) -> dict:
             if example is None:
                 example = {"text_id": text_id, "scena": scene_text, "mapa": longer}
     with_longer = same + only_newlines + other
-    offscene = MAP_ENTRIES_FILLED - len(texts)
+
+    if map_entries is None:
+        offscene = MAP_ENTRIES_FILLED - len(texts)
+        report = {
+            "mapa_zh_cn": {
+                "wpisy_w_naglowkach_chunkow": MAP_FILE_ENTRIES,
+                "wpisy_niepuste": MAP_ENTRIES_FILLED,
+                "zweryfikowane": "2026-11-11, docs/EXPERIMENT_LOG.md",
+            },
+            "wpisy_przypisane_do_scen": len(texts),
+            "wpisy_poza_scenami": offscene,
+            "udzial_poza_scenami_procent": round(100 * offscene / MAP_ENTRIES_FILLED, 1),
+            "co_siedzi_poza_scenami": {
+                "zrodlo": "odczyt mapy zh_cn 2026-11-11 (docs/EXPERIMENT_LOG.md)",
+                "kategorie": ["miejsca", "imiona postaci", "przedmioty", "interfejs",
+                              "encyklopedia"],
+                "przykłady": ["寿昌坊-平民", "邵冷乄德明", "耳砂珍坯·三阶", "累计登录2天"],
+                "do_przeliczenia": ("rozbicie na kategorie i liczba unikalnych tekstów "
+                                    "poza scenami wymaga pliku mapy (--mapa); indeks "
+                                    "zawiera tylko teksty scen"),
+            },
+        }
+    else:
+        off = {key: value for key, value in map_entries.items() if key not in used}
+        lengths = sorted(len(value) for value in off.values())
+        tokens = sum(1 for value in off.values()
+                     if any(token in value for token in FORMAT_TOKENS))
+        spoken = sum(1 for value in off.values()
+                     if any(mark in value for mark in DIALOG_PUNCTUATION))
+        repeats = collections.Counter(off.values())
+        report = {
+            "mapa_zh_cn": {
+                "wpisy_w_naglowkach_chunkow": MAP_FILE_ENTRIES,
+                "wpisy_niepuste": len(map_entries),
+                "zweryfikowane": "2026-11-11, odczyt pliku mapy",
+            },
+            "wpisy_przypisane_do_scen": len(used & set(map_entries)),
+            "wpisy_poza_scenami": len(off),
+            "udzial_poza_scenami_procent": round(100 * len(off) / len(map_entries), 1),
+            "co_siedzi_poza_scenami": {
+                "unikalnych_tekstow_poza_scenami": len(set(off.values())),
+                "unikalnych_tekstow_w_calej_mapie": len(set(map_entries.values())),
+                "długość_znaków": {
+                    "mediana": statistics.median(lengths),
+                    "średnia": round(statistics.mean(lengths), 1),
+                    "p10": lengths[len(lengths) // 10],
+                    "p90": lengths[len(lengths) * 9 // 10],
+                    "maksimum": lengths[-1],
+                },
+                "krótsze_niz_5_znaków": sum(1 for length in lengths if length < 5),
+                "dłuższe_niz_100_znaków": sum(1 for length in lengths if length > 100),
+                "z_tokenami_formatowania": tokens,
+                "z_tokenami_formatowania_procent": round(100 * tokens / len(off), 1),
+                "z_interpunkcja_dialogowa": spoken,
+                "najczęściej_powtarzane": [
+                    {"tekst": text, "wpisów": count} for text, count in repeats.most_common(5)],
+                "interpretacja": (
+                    "połowa wpisów ma <= 5 znaków i tokeny formatowania występują "
+                    "w 4% - to nazewnictwo i interfejs, nie dialog; najczęściej "
+                    "powtarzane wpisy to nazwy wewnętrzne (np. nazwy postaci "
+                    "używane w systemowych komunikatach), które nie są tekstem "
+                    "dla gracza"),
+            },
+        }
+
+    report["powiazania_scena_tekst"] = {
+        "text_id_w_scenach_bez_tekstu": len(dangling),
+        "teksty_nieuzywane_w_scenach": len(unused),
+        "text_id_w_wielu_scenach": sum(1 for count in occurrences.values() if count > 1),
+    }
+    if map_entries is not None:
+        report["powiazania_scena_tekst"]["text_id_w_scenach_bez_wpisu_w_mapie"] = \
+            len(used - set(map_entries))
+        report["powiazania_scena_tekst"]["text_id_w_scenach_bez_wpisu_w_mapie_przykład"] = \
+            sorted(used - set(map_entries))[:10]
+    report["wariant_tekstu_mapa_vs_scena"] = {
+        "tekstow_z_dluzsza_wersja_w_mapie": with_longer,
+        "identycznych": same,
+        "rozni_sie_tylko_lamaniem_wiersza": only_newlines,
+        "rozni_sie_trescia": other,
+        "przykład": example,
+        "znaczenie": ("wersję z mapy trzeba tłumaczyć: mapa trzyma pełną linię "
+                      "z dopiskiem scenicznym w nawiasach, scena tylko fragment"),
+    }
+    report["skala_dla_decyzji"] = {
+        "mapa_en_wpisy": EN_MAP_ENTRIES,
+        "mapa_en_unikalnych_tekstow": EN_MAP_UNIQUE_TEXTS,
+        "mapa_en_powtorzen": EN_MAP_REPEATS,
+        "paczka_en_zip_mb": 24,
+        "tokeny_w_paczce_en": 583,
+        "uwaga": "liczba dla mapy EN - skala porownawcza, nie pomiar zh_cn",
+    }
+    return report
+
+
+def analyse_registry(scenes: list[dict], manifest_path: Path) -> dict:
+    """Ktore dialogi z rejestru gry nie maja sceny — lista kontrolna pokrycia.
+
+    Rejestr (`MANIFEST`) nie jest w repozytorium, wiec ten raport tez trafia
+    do osobnego pliku i nie jest odtwarzalny z wersjonowanego `index/`.
+    """
+    from tools import manifest_keys as keys  # noqa: PLC0415 - import lokalny
+
+    payload = keys.read_payload(manifest_path)
+    registry = keys.dialog_ids(keys.keys_from_payload(payload))
+    ours = {scene["dialog_no"] for scene in scenes if isinstance(scene.get("dialog_no"), int)}
+    missing = sorted(registry - ours)
+    buckets: collections.Counter = collections.Counter(number // 1_000_000 for number in missing)
     return {
-        "mapa_zh_cn": {
-            "wpisy_w_naglowkach_chunkow": MAP_FILE_ENTRIES,
-            "wpisy_niepuste": MAP_ENTRIES_FILLED,
-            "zweryfikowane": "2026-11-11, docs/EXPERIMENT_LOG.md",
-        },
-        "wpisy_przypisane_do_scen": len(texts),
-        "wpisy_poza_scenami": offscene,
-        "udzial_poza_scenami_procent": round(100 * offscene / MAP_ENTRIES_FILLED, 1),
-        "powiazania_scena_tekst": {
-            "text_id_w_scenach_bez_tekstu": len(dangling),
-            "teksty_nieuzywane_w_scenach": len(unused),
-            "text_id_w_wielu_scenach": sum(1 for count in occurrences.values() if count > 1),
-        },
-        "wariant_tekstu_mapa_vs_scena": {
-            "tekstow_z_dluzsza_wersja_w_mapie": with_longer,
-            "identycznych": same,
-            "rozni_sie_tylko_lamaniem_wiersza": only_newlines,
-            "rozni_sie_trescia": other,
-            "przyklad": example,
-            "znaczenie": ("wersję z mapy trzeba tłumaczyć: mapa trzyma pełną linię "
-                          "z dopiskiem scenicznym w nawiasach, scena tylko fragment"),
-        },
-        "co_siedzi_poza_scenami": {
-            "zrodlo": "odczyt mapy zh_cn 2026-11-11 (docs/EXPERIMENT_LOG.md)",
-            "kategorie": ["miejsca", "imiona postaci", "przedmioty", "interfejs",
-                          "encyklopedia"],
-            "przyklady": ["寿昌坊-平民", "邵冷乄德明", "耳砂珍坯·三阶", "累计登录2天"],
-            "do_przeliczenia": ("rozbicie na kategorie i liczba unikalnych tekstów poza "
-                                "scenami wymaga pliku mapy; indeks zawiera tylko teksty scen"),
-        },
-        "skala_dla_decyzji": {
-            "mapa_en_wpisy": EN_MAP_ENTRIES,
-            "mapa_en_unikalnych_tekstow": EN_MAP_UNIQUE_TEXTS,
-            "mapa_en_powtorzen": EN_MAP_REPEATS,
-            "paczka_en_zip_mb": 24,
-            "tokeny_w_paczce_en": 583,
-            "uwaga": ("liczba dla mapy EN — skala porównawcza, nie pomiar zh_cn"),
-        },
+        "rejestr_dialog_timelines": len(registry),
+        "scen_z_dialog_no": len(ours),
+        "scen_poza_rejestrem": len(ours - registry),
+        "pokrycie_procent": round(100 * len(ours) / len(registry), 2) if registry else 0.0,
+        "brakuje_dialogow": len(missing),
+        "brakujace_po_milionach": {str(key): value for key, value in sorted(buckets.items())},
+        "brakujace_dialog_no": missing,
     }
 
 
@@ -337,6 +443,11 @@ def main(argv=None) -> int:
     parser.add_argument("--wyj", type=Path, default=Path("analiza"), help="katalog wyniku")
     parser.add_argument("--grupy", action="store_true",
                         help="zapisz też rozpis per grupa dialogowa (plik ok. 18 MB)")
+    parser.add_argument("--mapa", type=Path, default=None,
+                        help="plik mapy tłumaczeń translate_words_map_zh_cn (dokładne "
+                             "liczby elementów poza scenami)")
+    parser.add_argument("--rejestr", type=Path, default=None,
+                        help="plik rejestru MANIFEST — lista brakujących dialogów")
     arguments = parser.parse_args(argv)
 
     scenes, texts = load(arguments.indeks)
@@ -355,6 +466,17 @@ def main(argv=None) -> int:
     for name, payload in outputs.items():
         (arguments.wyj / name).write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
                                           encoding="utf-8")
+
+    # Pomiar z pliku mapy trafia do osobnego pliku: repozytorium nie trzyma mapy,
+    # wiec ten raport nie jest odtwarzalny z wersjonowanego index/.
+    if arguments.mapa:
+        (arguments.wyj / "mapa_zh_cn.json").write_text(
+            json.dumps(analyse_offscene(scenes, texts, read_map(arguments.mapa)),
+                       ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    if arguments.rejestr:
+        (arguments.wyj / "brakujace_dialogi.json").write_text(
+            json.dumps(analyse_registry(scenes, arguments.rejestr),
+                       ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
     # Rozpis per grupa jest duzy (ok. 18 MB), wiec trafia do repo tylko na zyczenie.
     if arguments.grupy:

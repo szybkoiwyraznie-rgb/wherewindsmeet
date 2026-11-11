@@ -103,8 +103,41 @@ wyliczone z indeksu:
   wersję z mapy; który wariant renderuje klient — do sprawdzenia w grze.
 - Skala dla decyzji „tłumaczyć wszystko czy tylko sceny": mapa EN ma
   1 122 784 wpisy, z czego 503 206 unikalnych tekstów (619 578 powtórzeń) i
-  daje paczkę 24 MB ZIP z 583 tokenami. Dla `zh_cn` liczba unikalnych tekstów
-  **nie jest zmierzona** — do policzenia trzeba pliku mapy.
+  daje paczkę 24 MB ZIP z 583 tokenami. Dla `zh_cn` ta liczba jest teraz
+  zmierzona — patrz niżej.
+
+### 5a. Elementy poza scenami po odczycie pliku mapy (`--mapa`)
+
+Mapa `zh_cn` pobrana z Dysku (69 470 988 B, SHA-256 w `index/manifest.json`)
+i przeczytana do końca: **1 816 408 niepustych wpisów** w 7 097 chunkach
+(jeden chunk jest uszkodzony i jest pomijany — 3 581 256 wpisów w nagłówkach
+potwierdza, że mapa ma też puste wpisy). Wyniki: `analiza/mapa_zh_cn.json`.
+
+| wartość | liczba |
+|---|---|
+| wpisy przypisane do scen | 176 119 |
+| wpisy poza scenami | **1 640 289** |
+| unikalnych tekstów poza scenami | **428 560** |
+| unikalnych tekstów w całej mapie | 580 100 |
+
+- **Najważniejsza liczba dla tłumaczenia: 428 560 unikalnych tekstów poza
+  scenami** — tyle faktycznie trzeba przetłumaczyć, jeśli tłumaczy się całą
+  mapę, a nie tylko dialogi (dla porównania: cała mapa EN dawała 503 206
+  unikalnych tekstów).
+- Połowa wpisów poza scenami ma **≤ 5 znaków** (725 795 wpisów krótszych niż
+  5 znaków), 14 703 ma ponad 100 znaków (encyklopedia, opisy). Tokeny
+  formatowania (`#H`, `{…}`, `$T(…)`, `[[…]]`) występują w 63 125 wpisach
+  (3,8%), interpunkcja dialogowa w 66 880 (4,1%) — czyli tylko 4% wpisów poza
+  scenami wygląda na tekst mówiony, reszta to nazewnictwo i interfejs.
+- Najczęściej powtarzane wpisy to nazwy wewnętrzne, nie tekst dla gracza:
+  `生态物种` (26 453×), `陈嘉铮` (14 622×), `对话` (14 167×),
+  `数据加载中` (7 148×), `奖励表-陈佳伟` (7 133×). Powtórzenia nie zwiększają
+  pracy tłumacza — tłumaczy się tekst, nie wpis.
+- **Blokada tłumaczeniowa: 27 `text_id` używanych w scenach nie ma wpisie w
+  mapie `zh_cn`.** Wszystkie 27 pochodzi z `data1200_patch` (m.in. dialogi
+  3402410–3402412, 12201947, 1960001218, 1960001321). Tekst tych linii jest
+  w timeline'ach, więc go mamy, ale nie ma go w mapie — nie da się ich
+  przepisać do tłumaczenia bez dopisania wpisów do mapy.
 
 ## 6. Co wymaga decyzji człowieka (nie da się zautomatyzować)
 
@@ -119,17 +152,42 @@ Raport `analiza/do_decyzji.json`, szczegóły per grupa przez `--grupy`:
 
 ## Co jest jeszcze do zrobienia
 
-1. **Rozbicie 1 640 262 wpisów poza scenami na kategorie** (interfejs,
-   przedmioty, miejsca, encyklopedia) i policzenie, ile to unikalnych tekstów
-   do przetłumaczenia. Liczba całkowita jest już znana; kategorie wymagają
-   pliku mapy `zh_cn` (69 470 988 B) — jest na Dysku Google, zginął tylko
-   z `local/`.
-2. Domknięcie 5 859 brakujących dialogów rejestru — mamy `data201`–`data208`,
-   więc brakuje `data209`–`data212` albo innego źródła. Do policzenia, które
-   dokładnie `dialog_no` brakują, potrzebny jest plik rejestru `MANIFEST`
-   (1 415 521 B, SHA-256 w `index/manifest.json`) — jest na Dysku obok mapy.
+1. **5 859 brakujących dialogów rejestru — lista jest znana, źródła nie ma.**
+   Z rejestru `MANIFEST` wyliczono dokładnie, które `dialog_no` brakują
+   (`analiza/brakujace_dialogi.json`; pokrycie 92,18%). Przeskanowano jednak
+   **wszystkie pliki z czterech archiwów na Dysku** pod kątem `TimelinePObject`:
+
+   | plik | TimelinePObject | czym jest |
+   |---|---|---|
+   | `data201`–`data208`, `data3`, `data1200` | 6 926 / 10 600 / 8 939 / 8 811 / 12 272 / 8 484 / 11 847 / 7 042 / 25 / 27 | timeline'e dialogowe — **wszystkie już w `index/`** |
+   | `data209`–`data212` | 0 | dane modelowe: kolory, LOD, ścieżki assetów (`C2/char/...`) |
+   | `data200`, `data1`, `data2` | 0 | dane skilli (`SkillTimelineNode`, `timeline_only_calc_hit`) |
+   | `data4`–`data11`, `data1001` | 0 | tabele kontekstowe, bez timeline'ów |
+
+   Wniosek: **brakujące dialogi nie są w żadnym pliku, który mamy** — rejestr
+   zna 74 951 `dialog_timelines`, a timeline'e istnieją tylko dla 69 092 z nich.
+   Żeby domknąć pokrycie do 100%, potrzebne są pliki, których na Dysku nie ma
+   (najpewniej partie timeline'ów wydzielone do osobnego zasobu).
+2. **27 `text_id` ze scen nie ma wpisie w mapie `zh_cn`** — wszystkie z
+   `data1200_patch`. Trzeba albo dopisać te wpisy do mapy, albo ustalić, skąd
+   brać dla nich tłumaczenie.
 3. Sprawdzenie w grze, który wariant linii (z dopiskiem w nawiasach czy bez)
    renderuje klient — dotyczy 2 638 tekstów.
 4. Rozpis per grupa dialogowa (`analiza/dialog_mowca_grupy.jsonl`, ok. 18 MB)
    jest generowany na żądanie: `python3 tools/analiza_korpusu.py --wyj analiza --grupy`.
    Celowo nie trafia do repo.
+
+## Jak odtworzyć raporty wymagające plików poza repozytorium
+
+`elementy_poza_scenami.json` i pozostałe pięć raportów liczą się z samym
+`index/`. Dwa pomiary potrzebują plików z Dysku Google (pobieranych przez
+connector do `google_drive/`, katalog ignorowany przez git):
+
+    python3 tools/analiza_korpusu.py --wyj analiza \
+        --mapa google_drive/translate_words_map_zh_cn \
+        --rejestr local/rejestr/MANIFEST
+
+`--mapa` dopisze `analiza/mapa_zh_cn.json` (elementy poza scenami, unikalne
+teksty, 27 `text_id` bez wpisu w mapie), `--rejestr` — `analiza/brakujace_dialogi.json`
+(lista 5 859 brakujących `dialog_no`). Oba pliki są w repo jako wynik pomiaru,
+ale nie da się ich odtworzyć bez tych danych wejściowych.
