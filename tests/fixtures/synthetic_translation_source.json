@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "source_id": "synthetic-demo-v1",
+  "records": [
+    {
+      "id": "demo/greeting",
+      "source": "Hello, {hero}! You have {count} stars.",
+      "context": "Invented greeting, not text from any game.",
+      "protected_tokens": ["{hero}", "{count}"]
+    },
+    {
+      "id": "demo/menu",
+      "source": "Line A<br>Line B<br>",
+      "context": "Invented menu with a repeated literal marker.",
+      "protected_tokens": ["<br>"]
+    },
+    {
+      "id": "demo/note",
+      "source": "A fictional side note.",
+      "context": "Invented text with no declared tokens.",
+      "protected_tokens": []
+    }
+  ]
+}

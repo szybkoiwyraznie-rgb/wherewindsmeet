@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "source_id": "synthetic-build-one",
+  "records": [
+    {
+      "id": "demo/welcome",
+      "source": "Hello, {name}!",
+      "context": "An invented greeting.",
+      "protected_tokens": ["{name}"]
+    },
+    {
+      "id": "demo/reward",
+      "source": "Found {n} pebbles.",
+      "context": "An invented inventory message.",
+      "protected_tokens": ["{n}"]
+    },
+    {
+      "id": "demo/action",
+      "source": "Close",
+      "context": "A fictional button to close a window.",
+      "protected_tokens": []
+    },
+    {
+      "id": "demo/pending",
+      "source": "A paper boat.",
+      "context": "An invented note.",
+      "protected_tokens": []
+    },
+    {
+      "id": "demo/unknown",
+      "source": "A blue kite.",
+      "context": "An invented note omitted from the returned batch.",
+      "protected_tokens": []
+    },
+    {
+      "id": "demo/retired",
+      "source": "Old imaginary message.",
+      "context": "An invented retired message.",
+      "protected_tokens": []
+    },
+    {
+      "id": "demo/old-position",
+      "source": "A forgotten ribbon.",
+      "context": "An invented note, identical after an ID change.",
+      "protected_tokens": []
+    }
+  ]
+}
