@@ -75,7 +75,11 @@ rosnącym `AGENTS.md`.
 
 ## Następny krok
 
-Przekazać sprawdzony [zbieracz ZIP](COLLECTOR.md). Właściciel uruchamia BAT i
+Dostarczyć sprawdzony [zbieracz ZIP](COLLECTOR.md) inną drogą niż connector
+Dysku Google, który 2026-11-11 odrzucił archiwum przez filtr bezpieczeństwa
+dostawcy i nie wysłał pliku; nie ponawiano wysyłki ani nie zmieniano zawartości,
+by ominąć filtr. Archiwum jest odtwarzalne z tego repozytorium i ma SHA-256
+`f77b637f…d64c541` (31 065 B). Właściciel uruchamia BAT i
 sam wgrywa jeden wynik na Dysk Google. Odebrać go prywatnie do ignorowanego
 `local/`, zweryfikować bezpiecznie raport, sumy i zakres, a następnie rozpoznać
 format oraz luki kontekstu; nie obiecywać, że same mapy wystarczą. Pamiętać o

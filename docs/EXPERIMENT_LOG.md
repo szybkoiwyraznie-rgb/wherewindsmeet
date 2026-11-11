@@ -486,3 +486,28 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** PowerShell nie jest zainstalowany lokalnie w środowisku
   Linux, więc BAT-a nie uruchomiono w tej sesji. CI nie testuje instalacji gry
   ani ustawień polityki na komputerze właściciela.
+
+## 2026-11-11 — kontrola builda i zablokowana dostawa przez Dysk Google
+
+- **Kontrola bez zmian w kodzie:** `python tools/run_tests.py` — **180/180**
+  testów na Linux/Python 3.11.2; `python -m compileall -q tools tests`,
+  `git diff --check` i `python tools/check_repository.py` przeszły.
+  Deterministyczny builder odtworzył `WWM_ZBIERZ_DANE.zip` o **31 065 B**,
+  SHA-256 `f77b637fa83b5b729a13064b119a643f8c28c36e127250b55d7559123d64c541`,
+  czyli bajt w bajt archiwum z wpisu z 2026-11-11: trzy człony, CRC poprawne,
+  BAT bez `-ExecutionPolicy`, BAT ASCII/CRLF, PS1 UTF-8 BOM/CRLF.
+- **Przegląd logiki:** sprawdzono literały ścieżek w `Relative-GamePath`,
+  `Inspect-KnownLocations`, wykrywanie dodatkowej biblioteki Steam, kontrolę
+  wyjścia poza instalację, limity 90/20 MiB i deduplikację. Wątpliwe podwójne
+  backslashe w podglądzie okazały się artefaktem kodowania JSON; w plikach są
+  pojedyncze. Nie zmieniano skryptów.
+- **Blokada dostawy:** próba wgrania ZIP-a na Dysk Google przez connector
+  została odrzucona przez filtr bezpieczeństwa dostawcy connectora
+  („blocked … because of its content”); plik nie został wysłany. Zgodnie
+  z komunikatem nie ponawiano wysyłki ani nie zmieniano zawartości archiwum,
+  żeby ominąć filtr. Utworzony pusty folder `Where Winds Meet` na Dysku
+  pozostaje bez ZIP-a. Archiwum nie zawiera danych gry — to BAT, PS1 i tekst
+  instrukcji.
+- **Ograniczenia:** nadal nie uruchomiono zbieracza na komputerze właściciela
+  ani na instalacji gry; dostawa narzędzia pozostaje otwarta i wymaga innej
+  drogi niż ten connector.
