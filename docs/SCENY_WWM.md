@@ -114,3 +114,54 @@ python3 tools/build_scene_pack.py local/sceny.jsonl \
 `local/tlumacz` zawiera: `00_INDEX.md`, `01_MOWCY.md`, `02_CHRONOLOGIA.md`,
 `sceny/*.md` (49 plików, kwestie z mówcą, chińskim, angielskim i `id`) oraz
 `sceny.jsonl` (te same dane maszynowo, 12 MB całości).
+
+## Rejestr kluczy `MANIFEST` — ile dialogów ma gra i czego brakuje
+
+`Package/HD/oversea/MANIFEST` (1,4 MB, zstd) to posortowany rejestr nazw kluczy:
+`dialog_timelines.<id>`, `spaces.*`, `maps.*`, `AL.*`, … Rekordy nie mają stałej
+długości, więc czyta się je skanem `u16 długość + ASCII` (`tools/manifest_keys.py`).
+
+Wynik (`python3 tools/manifest_keys.py local/manifest.bin --sceny local/sceny.jsonl`):
+
+| miara | wartość |
+|-------|---------|
+| kluczy w rejestrze | 281 002 |
+| `dialog_timelines.<id>` | **74 951** |
+| zakres `dialog_no` | 5 – 4 640 002 542 |
+| naszych scen z `dialog_no` (z `data205`) | 7 571 |
+| scen poza rejestrem (błąd odczytu) | **0** |
+| pokrycie korpusu | **10,1%** |
+| brakujących dialogów | **67 380** |
+
+Wniosek: **`data205` to tylko jeden shard.** Wszystkie 7 571 naszych `dialog_no`
+jest w rejestrze (więc identyfikatory czytamy poprawnie), ale 90% dialogów leży
+w pozostałych plikach `Package/HD/oversea/data*` — obok `data205` w tej samej
+gałęzi są `data1`–`data11`, `data200`–`data212`, `data1001`, `data1200`
+(po ~1–16 MB, razem ok. 200 MB). Rejestr jest listą kontrolną pokrycia: po
+dostarczeniu kolejnych plików widać dokładnie, ile dialogów przybyło.
+
+## Gdzie szukać stref i kolejności fabuły (i dlaczego ich tu nie ma)
+
+W `data205` przejrzano **2 589 różnych nazw pól** — nie ma `zone`, `map`, `area`,
+`chapter`, `quest`, `story`, `act`, `scene_no`. Nie ma też grafu zależności scen
+(`time_ref_id` nie trafia w żadne `id` timeline'u). Dlatego w `data205` **nie da się**
+odczytać strefy ani fabularnej kolejności scen.
+
+Rejestr `MANIFEST` pokazuje jednak tabele, które te dane mają:
+
+| tabela (klucz) | co daje |
+|----------------|----------|
+| `dialog_source_id_to_entry_data` | mapowanie `source_id` kwestii (mamy go w każdej linii!) na wpis dialogu |
+| `dialog_group_skip`, `dialog_anim_info`, `dialog_light_weather_time_data` | metadane dialogu |
+| `chapter_unlock_to_world_level`, `dungeon_2p_chapter_*` | rozdziały i odblokowania |
+| `maps.*` (3 416), `spaces.*` (184 946) | przestrzenie i mapy — potencjalne źródło strefy |
+| `storyline.*` | animacje stanów, **nie** fabuła (nazwa myli) |
+
+`data3` (10,8 MB, 3 949 chunków) to **blueprinty budynków** (`bp_302_pref_building_...`,
+współrzędne f32); nie ma tam tekstu ani dialogów. `CameraZone.json` i `Audio_Area`
+też są w grze, ale nie w tej paczce.
+
+**Kolejny krok, żeby domknąć strefę i chronologię:** dostarczyć `data200`–`data212`
+(cały korpus dialogów) oraz — jeśli będzie potrzebna strefa — pliki z tabelami
+`maps`/`spaces`/`chapter`. Bez nich jedyną pewną chronologią pozostaje kolejność
+w obrębie projektu (`dialog_no`), a jedynym kontekstem — mówcy i obsada sceny.
