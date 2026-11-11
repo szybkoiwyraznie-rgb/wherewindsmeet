@@ -275,12 +275,27 @@ function Scan-Tree([string] $RelativeRoot, [System.IO.StreamWriter] $Writer) {
     }
 }
 
+# Use the .NET cryptography API rather than depending on PowerShell's
+# auto-loaded Utility module (PSModulePath can differ on real Windows systems).
+function Get-Sha256([string] $Path) {
+    $stream = $null
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+        $digest = $sha.ComputeHash($stream)
+        return [BitConverter]::ToString($digest).Replace('-', '').ToLowerInvariant()
+    } finally {
+        if ($null -ne $stream) { $stream.Dispose() }
+        $sha.Dispose()
+    }
+}
+
 function Stable-Hash([string] $Path, [long] $ExpectedSize) {
     Assert-NoReparseAncestors (Split-Path -Parent $Path)
     $before = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
     if ($before.PSIsContainer -or (($before.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $before.Length -ne $ExpectedSize) { throw 'source_changed' }
     $time = $before.LastWriteTimeUtc.Ticks
-    $hash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
+    $hash = (Get-Sha256 $Path)
     $after = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
     if ($after.PSIsContainer -or (($after.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $after.Length -ne $ExpectedSize -or $after.LastWriteTimeUtc.Ticks -ne $time) { throw 'source_changed' }
     return $hash
@@ -305,7 +320,7 @@ function Copy-Verified([string] $Source, [string] $Destination, [long] $Expected
     $after = Get-Item -LiteralPath $Source -Force -ErrorAction Stop
     if ($after.PSIsContainer -or (($after.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or $after.Length -ne $ExpectedSize -or $after.LastWriteTimeUtc.Ticks -ne $time) { throw 'source_changed' }
     $sourceHash = Stable-Hash $Source $ExpectedSize
-    $copyHash = (Get-FileHash -LiteralPath $Destination -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
+    $copyHash = (Get-Sha256 $Destination)
     if ((Get-Item -LiteralPath $Destination).Length -ne $ExpectedSize -or $sourceHash -ne $copyHash) { throw 'copy_verification_failed' }
     return $sourceHash
 }
@@ -431,7 +446,7 @@ try {
     Move-Item -LiteralPath $tempZip -Destination $finalZip -ErrorAction Stop
     $tempZip = ''
     $zipItem = Get-Item -LiteralPath $finalZip -Force
-    $zipHash = (Get-FileHash -LiteralPath $finalZip -Algorithm SHA256).Hash.ToLowerInvariant()
+    $zipHash = (Get-Sha256 $finalZip)
     Write-Host ''
     Write-Host ('ZIP: ' + $finalZip)
     Write-Host ('Bajty: ' + $zipItem.Length + '  SHA-256: ' + $zipHash)
