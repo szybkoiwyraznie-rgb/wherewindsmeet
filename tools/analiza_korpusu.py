@@ -378,6 +378,94 @@ def analyse_offscene(scenes: list[dict], texts: dict[str, dict],
     return report
 
 
+# Pomiary wykonane na plikach z Dysku 2026-11-11 (nieodtwarzalne z index/):
+# timeline'y dialogowe istnieją tylko w tych plikach, wszystkie są w index/.
+TIMELINE_FILES = {
+    "data201": 6926, "data202": 10600, "data203": 8939, "data204": 8811,
+    "data205": 8484, "data206": 12272, "data207": 11847, "data208": 7042,
+    "data3": 25, "data1200": 27,
+}
+# Pliki bez TimelinePObject (przeskanowane, nie zawierały dialogów).
+NO_TIMELINE_FILES = ["data200", "data1", "data2", "data4", "data5", "data6", "data7",
+                     "data8", "data9", "data10", "data11", "data1001",
+                     "data209", "data210", "data211", "data212"]
+
+
+def analyse_blockers(scenes: list[dict], texts: dict[str, dict]) -> dict:
+    """Co stoi miedzy aktualnym stanem a 100% w czterech filarach.
+
+    Filary: pokrycie danych, podział na kategorie, mapowanie mówców, chronologia.
+    Raport mówi wprost, co jest zmierzone i czego brakuje w danych — bez
+    zgadywania. Liczby oznaczone „wymaga pliku" pochodzą z pomiarów na plikach
+    z Dysku (2026-11-11) i nie da się ich odtworzyć z wersjonowanego `index/`.
+    """
+    # Pokrycie liczymy po unikalnych dialog_no: rejestr zawiera identyfikatory
+    # dialogów, a 16 grup ma dwa timeline'e (i byź mylic pokrycie o 16).
+    with_number = len({scene["dialog_no"] for scene in scenes
+                       if isinstance(scene.get("dialog_no"), int)})
+    registry = 74951  # dialog_timelines w rejestrze MANIFEST
+    used = {line["text_id"] for scene in scenes for line in scene["linie"]}
+    speakers = analyse_speakers(scenes)
+    return {
+        "1_pokrycie_danych": {
+            "stan_procent": round(100 * with_number / registry, 2),
+            "mamy_unikalnych_dialog_no": with_number,
+            "rejestr_dialog_timelines": registry,
+            "brakuje": registry - with_number,
+            "lista_brakujacych": "analiza/brakujace_dialogi.json (wymaga pliku rejestru)",
+            "gdzie_szukano": {
+                "pliki_z_timeline": TIMELINE_FILES,
+                "pliki_bez_timeline": NO_TIMELINE_FILES,
+                "wniosek": ("wszystkie pliki z timeline'ami są już w index/; brakujące "
+                            "dialogi nie są w żadnym dostarczonym pliku"),
+            },
+            "co_trzeba_dostarczyc": [
+                "pełną listę plików z katalogu gry Package/HD/oversea/ "
+                "(nazwa + rozmiar), żeby wskazać, czego brakuje",
+                "albo uruchomić kolektor na całym katalogu zamiast na wybranych plikach",
+            ],
+        },
+        "2_kategorie_tekstow": {
+            "unikalnych_tekstow_poza_scenami": 428560,
+            "stan": ("podzielone tylko po cechach mierzalnych (długość, tokeny), "
+                     "nie po kategoriach gry"),
+            "sprawdzono_i_martwe": {
+                "rejestr_storyline": "138 kluczy to stany animacji awatara, nie misje",
+                "rejestr_new_graph_cues": "2 442 klucze, 0 trafień z dialog_no i timeline_id",
+                "rejestr_maps": "3 416 kluczy to hex_world (świat), nie teksty",
+                "data200": "0 z 300 kluczy mapy i 0 z 300 tekstów mapy — tabele "
+                           "kontekstowe nie odwołują się do tekstów",
+            },
+            "co_trzeba_dostarczyc": [
+                "pliki gry z tablicami przedmiotów/questów/interfejsu powiązanymi "
+                "z kluczami mapy tłumaczeń",
+                "albo decyzję, że kategorie ustala tłumacz/właściciel ręcznie",
+            ],
+        },
+        "3_mapowanie_mowcow": {
+            "kwestii_bez_nazwy": speakers["kwestii_bez_nazwy_mowcy"],
+            "kwestii_bez_speaker_no_procent": speakers["kwestii_bez_speaker_no_procent"],
+            "numerow_z_wieloma_nazwami": speakers["speaker_no_z_wieloma_nazwami"],
+            "nazw_z_wieloma_numerami": speakers["nazw_z_wieloma_speaker_no"],
+            "entity_name_niepustych": speakers["entity_name_w_grze"]["niepustych"],
+            "stan": ("identyfikatorem mówcy jest para (mowca, speaker_no); "
+                     "entity_name w grze jest zawsze puste"),
+            "co_trzeba_dostarczyc": [
+                "źródło prawdziwych imion/encji (pliki NPC lub tablicę encji z gry), "
+                "żeby rozstrzygnąć 2 625 numerów z wieloma nazwami",
+            ],
+        },
+        "4_chronologia": {
+            "scen_niemonotonicznych": 0,
+            "stan": ("kolejność w obrębie pliku i pary (czas, kolejność) jest spójna; "
+                     "brak mapy scena → misja → rozdział"),
+            "co_trzeba_dostarczyc": [
+                "dane misji/questów gry, które wskazują sceny danego zadania",
+            ],
+        },
+    }
+
+
 def analyse_registry(scenes: list[dict], manifest_path: Path) -> dict:
     """Ktore dialogi z rejestru gry nie maja sceny — lista kontrolna pokrycia.
 
@@ -399,6 +487,80 @@ def analyse_registry(scenes: list[dict], manifest_path: Path) -> dict:
         "brakuje_dialogow": len(missing),
         "brakujace_po_milionach": {str(key): value for key, value in sorted(buckets.items())},
         "brakujace_dialog_no": missing,
+    }
+
+
+ENTITY_NAME_FILLED = 0  # zmierzone 2026-11-11 na plikach gry: 0 z 84 393
+
+
+def analyse_speakers(scenes: list[dict]) -> dict:
+    """Mapowanie mowcow: czym mowce sa identyfikowane i gdzie mapowanie nie jest 1:1.
+
+    Z danych wynika: nazwa mowcy jest wypelniona w 100% kwestii, ale
+    `speaker_no` brakuje w co trzeciej. Identyfikatorem mowcy jest wiec para
+    (`mowca`, `speaker_no`), nie sama nazwa — ta sama nazwa wystepuje z wieloma
+    numerami, a ten sam numer z wieloma nazwami. `entity_name` (prawdziwe imie)
+    jest w grze zawsze puste, wiec nie uzupenia brakujacych mowcow.
+    """
+    pairs: collections.Counter = collections.Counter()
+    names: collections.Counter = collections.Counter()
+    skeletons: dict[str, set] = collections.defaultdict(set)
+    no_by_name: dict[str, set] = collections.defaultdict(set)
+    name_by_no: dict[int, set] = collections.defaultdict(set)
+    kinds: collections.Counter = collections.Counter()
+    total = without_no = 0
+    for scene in scenes:
+        for line in scene["linie"]:
+            total += 1
+            tag, number = line.get("mowca"), line.get("speaker_no")
+            if number is None:
+                without_no += 1
+            if not tag:
+                continue
+            names[tag] += 1
+            kinds[speaker_kind(tag)] += 1
+            if number is not None:
+                pairs[(tag, number)] += 1
+                no_by_name[tag].add(number)
+                name_by_no[number].add(tag)
+        for member in scene.get("obsada") or []:
+            if member.get("mowca") and member.get("skeleton"):
+                skeletons[member["mowca"]].add(member["skeleton"])
+
+    many_numbers = sorted(((len(v), name) for name, v in no_by_name.items() if len(v) > 1),
+                          reverse=True)[:10]
+    many_names = sorted(((len(v), number) for number, v in name_by_no.items() if len(v) > 1),
+                        reverse=True)[:10]
+    labels = [name for name in names if len(name) > 20]
+    return {
+        "kwestii": total,
+        "kwestii_bez_nazwy_mowcy": total - sum(names.values()),
+        "kwestii_bez_speaker_no": without_no,
+        "kwestii_bez_speaker_no_procent": round(100 * without_no / total, 1),
+        "unikalnych_nazw": len(names),
+        "unikalnych_par_mowca_speaker_no": len(pairs),
+        "nazw_z_wieloma_speaker_no": sum(1 for v in no_by_name.values() if len(v) > 1),
+        "maks_speaker_no_na_nazwe": max((len(v) for v in no_by_name.values()), default=0),
+        "najwiecej_numerow": [{"mowca": name, "speaker_no": count} for count, name in many_numbers],
+        "speaker_no_z_wieloma_nazwami": sum(1 for v in name_by_no.values() if len(v) > 1),
+        "przyklad_numer_z_wieloma_nazwami": [
+            {"speaker_no": number, "nazw": count} for count, number in many_names],
+        "nazw_z_wieloma_skeletonami": sum(1 for v in skeletons.values() if len(v) > 1),
+        "nazw_bez_skeletonu": sum(1 for name in names if name not in skeletons),
+        "nazwy_po_rodzaju": dict(kinds),
+        "etykiety_dłuższe_niż_20_znaków": {
+            "liczb": len(labels),
+            "przyklady": labels[:5],
+            "znaczenie": ("to nie imiona, a etykiety wystąpień scenicznych "
+                          "(np. lokalizacja + typ + wariant); tłumacz nie powinien "
+                          "tłumaczyć ich jak imion własnych"),
+        },
+        "entity_name_w_grze": {
+            "niepustych": ENTITY_NAME_FILLED,
+            "uwaga": ("pole `entity_name` istnieje w timeline'ach, ale gra go nie "
+                      "wypełnia — zmierzone na 84 393 wystąpieniach w data201–data206; "
+                      "nie uzupełnia brakujących mówców"),
+        },
     }
 
 
@@ -462,6 +624,8 @@ def main(argv=None) -> int:
         "kontekst.json": analyse_context(scenes),
         "elementy_poza_scenami.json": analyse_offscene(scenes, texts),
         "do_decyzji.json": analyse_decisions(per_group),
+        "mapowanie_mowcow.json": analyse_speakers(scenes),
+        "co_brakuje.json": analyse_blockers(scenes, texts),
     }
     for name, payload in outputs.items():
         (arguments.wyj / name).write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",

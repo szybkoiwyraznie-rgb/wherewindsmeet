@@ -1,0 +1,5 @@
+# Zaleznosci deweloperskie (obowiazkowe do czytania plikow gry).
+# Bez zstandard zaden plik lokalizacyjny gry sie nie dekompresuje i kazda
+# ekstrakcja zwraca 0 scen — objaw: "timelines": 0.
+#   python3 -m pip install --break-system-packages -r requirements-dev.txt
+zstandard>=0.15

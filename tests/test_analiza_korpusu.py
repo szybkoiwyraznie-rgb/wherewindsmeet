@@ -59,9 +59,10 @@ class CorpusAnalysisTests(unittest.TestCase):
             code = analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
             self.assertEqual(code, 0)
             names = sorted(path.name for path in out.iterdir())
-            self.assertEqual(names, ["chronologia.json", "dialog_mowca.json", "do_decyzji.json",
-                                     "elementy_poza_scenami.json", "kompletnosc.json",
-                                     "kontekst.json"])
+            self.assertEqual(names, ["chronologia.json", "co_brakuje.json", "dialog_mowca.json",
+                                     "do_decyzji.json", "elementy_poza_scenami.json",
+                                     "kompletnosc.json", "kontekst.json",
+                                     "mapowanie_mowcow.json"])
             for path in out.iterdir():
                 json.loads(path.read_text(encoding="utf-8"))
 
@@ -109,6 +110,18 @@ class CorpusAnalysisTests(unittest.TestCase):
         for key in ("grupy_tylko_generyczna_obsada", "grupy_bez_mowcy"):
             self.assertLessEqual(len(report[key]["proba"]), 20)
 
+    def test_speaker_mapping_is_not_one_to_one(self):
+        report = analiza_korpusu.analyse_speakers(self.scenes)
+        self.assertEqual(report["kwestii"], self.manifest["liczby"]["kwestii"])
+        self.assertEqual(report["kwestii_bez_nazwy_mowcy"], 232)
+        # Identyfikatorem mówcy jest para (nazwa, speaker_no), nie sama nazwa.
+        self.assertGreater(report["unikalnych_par_mowca_speaker_no"], report["unikalnych_nazw"])
+        self.assertGreater(report["nazw_z_wieloma_speaker_no"], 0)
+        self.assertGreater(report["speaker_no_z_wieloma_nazwami"], 0)
+        self.assertGreaterEqual(report["maks_speaker_no_na_nazwe"], 100)
+        self.assertEqual(report["entity_name_w_grze"]["niepustych"], 0)
+        self.assertGreater(report["etykiety_dłuższe_niż_20_znaków"]["liczb"], 0)
+
     def test_map_and_registry_reports_are_opt_in(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"
@@ -117,12 +130,25 @@ class CorpusAnalysisTests(unittest.TestCase):
             self.assertFalse((out / "mapa_zh_cn.json").exists())
             self.assertFalse((out / "brakujace_dialogi.json").exists())
 
+    def test_blockers_report_names_what_is_needed(self):
+        report = analiza_korpusu.analyse_blockers(self.scenes, self.texts)
+        self.assertEqual(set(report), {"1_pokrycie_danych", "2_kategorie_tekstow",
+                                       "3_mapowanie_mowcow", "4_chronologia"})
+        coverage = report["1_pokrycie_danych"]
+        self.assertEqual(coverage["rejestr_dialog_timelines"] - coverage["mamy_unikalnych_dialog_no"],
+                         coverage["brakuje"])
+        self.assertEqual(coverage["brakuje"], 5859)
+        for key, value in report.items():
+            self.assertTrue(value["co_trzeba_dostarczyc"], key)
+            self.assertTrue(value.get("stan") or value.get("stan_procent"), key)
+
     def test_committed_reports_match_a_fresh_run(self):
         with tempfile.TemporaryDirectory(prefix="wwm-analiza-") as temp:
             out = Path(temp) / "analiza"
             analiza_korpusu.main(["--indeks", str(ROOT / "index"), "--wyj", str(out)])
             for name in ("dialog_mowca.json", "kompletnosc.json", "chronologia.json",
-                         "kontekst.json", "elementy_poza_scenami.json", "do_decyzji.json"):
+                         "kontekst.json", "elementy_poza_scenami.json", "do_decyzji.json",
+                         "mapowanie_mowcow.json", "co_brakuje.json"):
                 committed = json.loads((ROOT / "analiza" / name).read_text(encoding="utf-8"))
                 fresh = json.loads((out / name).read_text(encoding="utf-8"))
                 self.assertEqual(committed, fresh, name)

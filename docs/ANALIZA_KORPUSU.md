@@ -150,44 +150,50 @@ Raport `analiza/do_decyzji.json`, szczegóły per grupa przez `--grupy`:
   może wymyślać imion; przekład po bezosobowej wersji z mapy.
 - **6 503 grup nie ma w ogóle mówcy** — przed paczką trzeba ustalić, kto mówi.
 
-## Co jest jeszcze do zrobienia
+## 7. Mapowanie mówców — czym mówca jest identyfikowany
 
-1. **5 859 brakujących dialogów rejestru — lista jest znana, źródła nie ma.**
-   Z rejestru `MANIFEST` wyliczono dokładnie, które `dialog_no` brakują
-   (`analiza/brakujace_dialogi.json`; pokrycie 92,18%). Przeskanowano jednak
-   **wszystkie pliki z czterech archiwów na Dysku** pod kątem `TimelinePObject`:
+Raport `analiza/mapowanie_mowcow.json` (liczony z `index/`):
 
-   | plik | TimelinePObject | czym jest |
-   |---|---|---|
-   | `data201`–`data208`, `data3`, `data1200` | 6 926 / 10 600 / 8 939 / 8 811 / 12 272 / 8 484 / 11 847 / 7 042 / 25 / 27 | timeline'e dialogowe — **wszystkie już w `index/`** |
-   | `data209`–`data212` | 0 | dane modelowe: kolory, LOD, ścieżki assetów (`C2/char/...`) |
-   | `data200`, `data1`, `data2` | 0 | dane skilli (`SkillTimelineNode`, `timeline_only_calc_hit`) |
-   | `data4`–`data11`, `data1001` | 0 | tabele kontekstowe, bez timeline'ów |
+- **Nazwa mówcy jest w 100% kwestii poza 232** (0,13%) — `mowca` nie jest luką.
+- **`speaker_no` brakuje w 58 008 kwestiach (32,5%)** — występuje tam, gdzie mówca
+  jest generyczny lub głośnik jest wspólny dla kilku linii.
+- Identyfikatorem mówcy **nie jest sama nazwa**: 26 006 par (`mowca`, `speaker_no`)
+  przy 17 491 nazwach. **3 478 nazw ma więcej niż jeden `speaker_no`** (maksymalnie
+  401 numery na jedną nazwę) i **2 625 `speaker_no` ma więcej niż jedną nazwę** —
+  czyli relacja nazwa ↔ encja nie jest 1:1 i scalać po samym `speaker_no` nie wolno.
+- 1 500 nazw ma więcej niż jeden `skeleton`, 2 338 nazw nie ma skeletonu wcale.
+- **`entity_name` (prawdziwe imię) jest w grze zawsze puste**: 0 niepustych wartości
+  na 84 393 wystąpieniach w `data201`–`data206`. Pole istnieje w strukturze
+  timeline'u, ale gra go nie wypełnia — **nie uzupełnia brakujących mówców**.
+- **52 nazwy dłuższe niż 20 znaków to nie imiona**, a etykiety wystąpień scenicznych,
+  np. `天水集-军备区-角楼外长廊一段-汉人中年男-士兵3` (lokalizacja + typ + wariant).
+  Dla tłumacza oznaczają „NPC w tle", nie osobę — nie tłumaczyć jak imion własnych.
 
-   Wniosek: **brakujące dialogi nie są w żadnym pliku, który mamy** — rejestr
-   zna 74 951 `dialog_timelines`, a timeline'e istnieją tylko dla 69 092 z nich.
-   Żeby domknąć pokrycie do 100%, potrzebne są pliki, których na Dysku nie ma
-   (najpewniej partie timeline'ów wydzielone do osobnego zasobu).
-2. **27 `text_id` ze scen nie ma wpisie w mapie `zh_cn`** — wszystkie z
-   `data1200_patch`. Trzeba albo dopisać te wpisy do mapy, albo ustalić, skąd
-   brać dla nich tłumaczenie.
-3. Sprawdzenie w grze, który wariant linii (z dopiskiem w nawiasach czy bez)
-   renderuje klient — dotyczy 2 638 tekstów.
-4. Rozpis per grupa dialogowa (`analiza/dialog_mowca_grupy.jsonl`, ok. 18 MB)
-   jest generowany na żądanie: `python3 tools/analiza_korpusu.py --wyj analiza --grupy`.
-   Celowo nie trafia do repo.
+## 8. Co blokuje 100% w czterech filarach
 
-## Jak odtworzyć raporty wymagające plików poza repozytorium
+Raport `analiza/co_brakuje.json` — po jednym wpisowi na filar, z listą plików do
+dostarczenia. W skrócie:
 
-`elementy_poza_scenami.json` i pozostałe pięć raportów liczą się z samym
-`index/`. Dwa pomiary potrzebują plików z Dysku Google (pobieranych przez
-connector do `google_drive/`, katalog ignorowany przez git):
+| filar | stan | czego brakuje |
+|---|---|---|
+| pokrycie danych | **92,18%** (69 092 / 74 951 dialogów), lista 5 859 brakujących znana | źródła: wszystkie pliki z timeline'ami są już w `index/`; `data209`–`data212` to dane modelowe, `data200`/`data1`/`data2` to skille, `data4`–`data11`/`data1001` to tabele bez timeline'ów |
+| kategorie tekstów | 428 560 unikalnych tekstów poza scenami, podział tylko po cechach (długość, tokeny) | kategorii gry: `storyline` w rejestrze to animacje awatara, `new_graph_cues` (2 442) nie powiązane z `dialog_no` ani `timeline_id` (0 trafień), `maps` to hex_world, a `data200` nie zawiera kluczy ani tekstów mapy (0/300) |
+| mapowanie mówców | identyfikator = para (`mowca`, `speaker_no`), `entity_name` puste | źródła imion/encji do rozstrzygnięcia 2 625 numerów z wieloma nazwami |
+| chronologia | 0 scen niemonotonicznych w obrębie pliku, kolejność `(czas, kolejność)` spójna | mapy scena → misja → rozdział (danych misji nie ma w dostarczonych plikach) |
 
-    python3 tools/analiza_korpusu.py --wyj analiza \
-        --mapa google_drive/translate_words_map_zh_cn \
-        --rejestr local/rejestr/MANIFEST
+## Co jest jeszcze do zrobienia (skrót)
 
-`--mapa` dopisze `analiza/mapa_zh_cn.json` (elementy poza scenami, unikalne
-teksty, 27 `text_id` bez wpisu w mapie), `--rejestr` — `analiza/brakujace_dialogi.json`
-(lista 5 859 brakujących `dialog_no`). Oba pliki są w repo jako wynik pomiaru,
-ale nie da się ich odtworzyć bez tych danych wejściowych.
+1. **Pokrycie do 100%** — potrzebne pliki z timeline'ami dialogowymi, których nie ma
+   w dostarczonych archiwach. Lista brakujących `dialog_no` jest gotowa
+   (`analiza/brakujace_dialogi.json`).
+2. **Kategorie tekstów do 100%** — potrzebne dane gry przypisujące klucze mapy do
+   kategorii (przedmioty, questy, interfejs) albo decyzja, że kategorie ustala
+   właściciel/tłumacz ręcznie.
+3. **Mapowanie mówców do 100%** — potrzebne źródło encji/imion (pliki NPC z gry).
+4. **Chronologia do 100%** — potrzebne dane misji/questów wskazujące sceny zadania.
+
+**Nie budujemy paczki dla tłumacza, dopóki te cztery filary nie są zamknięte.**
+Paczka (`sceny.zip` + `widoki.zip` w formacie SRW Y) jest ostatnim etapem; narzędzia
+do jej zbudowania są gotowe i przetestowane (`tools/build_scene_pack.py`,
+`tools/build_translator_pack.py`, wejście z `index/` przez
+`tools/sceny_z_indeksu.py`).
