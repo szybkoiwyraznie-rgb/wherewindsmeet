@@ -587,3 +587,41 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** PowerShell nie jest zainstalowany w środowisku Linux, więc
   poprawionego BAT-a nie uruchomiono tutaj; wynik CI dla tego commita trzeba
   sprawdzić osobno. Nie testowano na komputerze właściciela ani na grze.
+
+## 2026-11-11 — odbiór wyniku zbieracza i rozpoznanie kontenera map
+
+- **Odbiór:** właściciel wgrał `WWM_DANE_20261111_181913_13ff7ac1.zip`
+  (72 995 594 B, poniżej limitu 100 MiB). Pobrano prywatnie do ignorowanego
+  `local/`; SHA-256 archiwum `29f5914aadc66b2f736062948e5f4f4deedcfd58af9e4ec12050958439820261`.
+  CRC wszystkich 11 wpisów poprawne.
+- **Walidator odrzucił archiwum:** `unsafe archive member path`. Przyczyna:
+  Windows PowerShell 5.1 / .NET Framework zapisał nazwy wpisów z `\`
+  (`pliki\000001_…`), a specyfikacja ZIP wymaga `/`. Dane były kompletne.
+- **Raport wyniku:** `status: partial`, 0 problemów, build `25906190`, inwentarz
+  640 plików, 9 kandydatów, 1 pominięty przez limit (`translate_words_map_zh_cn`,
+  69 470 988 B), 73 878 943 B unikalnych kopii. Obecne:
+  `Package/HD/oversea/locale/translate_words_map_en` (50 550 179 B),
+  `…_en_diff` w `Package` (751 922 B) i w `LocalData/Patch` (1 122 346 B),
+  `MANIFEST` w obu gałęziach, `data3` (10 829 572 B), `data205` (7 564 939 B),
+  `…_zh_cn_diff` (233 290 B). Nieobecne: oba warianty `__small`.
+  W katalogu `locale` są też mapy innych języków (m.in. `th`, `ru`, `vi`, `fr`,
+  `ja`, `de`, `ko`, `es`, `pt_br`) — nie kopiowano ich zgodnie z zakresem.
+- **Struktura:** `0xDEADBEEF` + wersja 1 + `uint64` liczba chunków + tabela
+  `uint32` offsetów; ostatni offset + koniec tablicy = rozmiar pliku dokładnie,
+  ostatni wpis ma 0 B (wartownik). Chunki: 8-bajtowy prefiks + ramka zstd;
+  wszystkie **4386/4386** rozpakowują się bez błędu. Payload: nagłówek
+  `uint64, uint64, uint32 0x595896DC, uint32 0`, region indeksu i jawny tekst
+  z markupem (`#Y…#E`, `$T(…)`, `{}`). Szczegóły w
+  [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md).
+- **Naprawa zbieracza:** `zbierz.ps1` buduje teraz archiwum przez
+  `System.IO.Compression.ZipArchive` i `CreateEntry` z nazwami normalizowanymi
+  do `/`, z kontrolą `..` i wiodącego `/`; `CreateFromDirectory` usunięto.
+  Walidator przy backslashach zwraca czytelny powód. Dodano dwa testy
+  (`tests/test_collector_kit.py`, `tests/test_collector_return.py`).
+- **Kontrole:** `python tools/run_tests.py` — **184/184**. ZIP zbieracza
+  zbudowany ponownie: **33 111 B**, SHA-256
+  `b156eabb7624b2a8b707af73272641765938dbc02725960f8cf377b30c3a8b2e`.
+- **Ograniczenia:** poprawionego zapisu ZIP nie uruchomiono na Windows (brak
+  PowerShell w tym środowisku); wynik CI trzeba sprawdzić osobno. Znaczenie pól
+  nagłówka, wiązanie łańcuchów z kluczami i zapis zwrotny pozostają nieznane.
+  Zmierzona liczba fragmentów tekstu jest heurystyczna, nie jest liczbą wpisów.

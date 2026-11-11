@@ -77,6 +77,16 @@ class CollectorKitTests(unittest.TestCase):
         self.assertIn("-Filter *.ps1", launcher)
         self.assertIn("2>nul", launcher)
 
+    def test_collector_writes_zip_members_with_forward_slashes(self):
+        script = kit.kit_files()["zbierz.ps1"].decode("utf-8-sig")
+        # .NET Framework CreateFromDirectory emits "\\" separators, which the
+        # validator rejects; the collector must build entries itself.
+        self.assertNotIn("[IO.Compression.ZipFile]::CreateFromDirectory(", script)
+        self.assertIn("ZipArchiveMode]::Create", script)
+        self.assertIn("CreateEntry($entryName", script)
+        self.assertIn(".Replace('\\', '/')", script)
+        self.assertIn("$entryName.Contains('..')", script)
+
     def test_readme_discloses_the_policy_handling(self):
         readme = kit.kit_files()["CZYTAJ_TO.txt"].decode("utf-8-sig")
         self.assertIn("-ExecutionPolicy", readme)

@@ -42,6 +42,23 @@ rosnącym `AGENTS.md`.
 - Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
   [PRIOR_ART.md](PRIOR_ART.md); odtworzono również ZIP z generatora
   `build_kod_kit.py`. Jego ustalenia o SRW nie są ustaleniami o WWM.
+- **2026-11-11 odebrano wynik zbieracza** (`WWM_DANE_20261111_181913_13ff7ac1.zip`,
+  72 995 594 B, prywatnie w `local/`). Stan `partial` z powodu pominięcia mapy
+  `zh_cn` (69 470 988 B) przez limit 90 MiB; 0 problemów odczytu, build
+  `25906190` zgodny ze zgłoszonym. Inwentarz 640 plików w `Package`
+  i `LocalData/Patch`. Mapy EN: główna 50 550 179 B plus dwa `_diff`
+  (1 122 346 B z `LocalData/Patch`, 751 922 B z `Package`), `MANIFEST` ×2,
+  `data3` 10 829 572 B, `data205` 7 564 939 B.
+- **Rozpoznano kontener map** (szczegóły i liczby w
+  [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)): `0xDEADBEEF`, wersja 1, liczba
+  chunków, tabela offsetów, chunki w zstd; po dekompresji jawny tekst z markupem
+  gry. Zweryfikowano dekompresję 4386/4386 chunków mapy EN. Nie znamy jeszcze
+  wiązania łańcuchów z kluczami ani zapisu zwrotnego.
+- **Błąd zbieracza wykryty na realnym wyniku:** `CreateFromDirectory`
+  w Windows PowerShell 5.1 zapisał nazwy wpisów z `\`, sprzecznie ze
+  specyfikacją ZIP; walidator odrzucił archiwum (`unsafe archive member path`).
+  Zamieniono na ręczne wpisy `ZipArchive` z `/` oraz dodano wyraźny komunikat
+  walidatora. Dane w odebranym ZIP-ie były kompletne i zostały przeanalizowane.
 - Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
   Publiczny [przegląd wykonalności](FEASIBILITY.md) wskazuje istniejące
   narzędzia oraz ograniczenia oficjalnych warunków gry. Nie badano jeszcze
@@ -51,7 +68,7 @@ rosnącym `AGENTS.md`.
 |---|---|
 | Repozytorium i workflow | 180 testów lokalnych Linux/Python 3.11; kod zbieracza `075c8ab` przeszedł 4/4 konfiguracje CI Windows/Linux × Python 3.11/3.12. Zmiana polityki PowerShell również przeszła 4/4 konfiguracje push i PR; [dziennik](EXPERIMENT_LOG.md). |
 | Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
-| Ekstrakcja i zakres tekstów | Nie rozpoczęto; brak wiarygodnych liczników. |
+| Ekstrakcja i zakres tekstów | Kontener map rozpoznany na odebranym pliku EN; dekompresja 4386/4386 chunków. Brak ekstraktora par klucz→tekst i brak licznika wpisów z nagłówków. |
 | Pakiet tłumacza i import | Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji, importu i integracji z grą. |
 | Patcher, instalacja i przywracanie | Nie powstały; są jedynie syntetyczne modele cofania i rotacji kopii, bez zapisu. `runtime_tested: false`. |
 | Aktualizacje gry | Skaner ogólnych plików oraz syntetyczny audyt i wybór linii; brak pamięci tłumaczeń, ekstrakcji i obsługi aktualizacji WWM. |
@@ -75,6 +92,11 @@ rosnącym `AGENTS.md`.
    dodano pliku `LICENSE`.
 
 ## Następny krok
+
+Zbudować ekstraktor `translate_words_map_*` → pary (klucz, tekst) na podstawie
+[rozpoznania kontenera](LOCALE_CONTAINER.md), z licznikiem wpisów z nagłówków
+chunków i raportem wpisów nierozpoznanych; dopiero potem pakiet tłumacza.
+Wynik nadal trzymać w ignorowanym `local/`.
 
 Dostarczyć sprawdzony [zbieracz ZIP](COLLECTOR.md) inną drogą niż connector
 Dysku Google, który 2026-11-11 odrzucił archiwum przez filtr bezpieczeństwa

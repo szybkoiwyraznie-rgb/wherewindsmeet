@@ -66,6 +66,13 @@ class CollectorReturnTests(unittest.TestCase):
         with self.assertRaises(intake.InvalidReturn):
             intake.validate(self.path)
 
+    def test_rejects_member_names_with_backslashes(self):
+        # Windows PowerShell 5.1 CreateFromDirectory wrote "pliki\\name".
+        archive(self.path, extras=(("pliki\\000001_map", BASE),))
+        with self.assertRaises(intake.InvalidReturn) as caught:
+            intake.validate(self.path)
+        self.assertIn("backslashes", str(caught.exception))
+
     def test_validates_unique_and_duplicate_bytes_without_modifying_archive(self):
         archive(self.path)
         before = self.path.read_bytes()

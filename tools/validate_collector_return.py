@@ -80,6 +80,10 @@ def validate(path: Path) -> dict[str, object]:
             name = info.filename
             is_dir = info.is_dir()
             cleaned = name[:-1] if is_dir else name
+            if "\\" in cleaned:
+                # Windows PowerShell 5.1 CreateFromDirectory wrote "\\" names;
+                # the ZIP spec requires "/", so this archive is not accepted.
+                require(False, "archive member path uses backslashes")
             require(safe_relative(cleaned), "unsafe archive member path")
             require(name.casefold() not in folded, "duplicate archive member")
             folded.add(name.casefold())
