@@ -81,8 +81,12 @@ def validate(path: Path) -> dict[str, object]:
             is_dir = info.is_dir()
             cleaned = name[:-1] if is_dir else name
             if "\\" in cleaned:
-                # Windows PowerShell 5.1 CreateFromDirectory wrote "\\" names;
+                # Windows PowerShell 5.1 CreateFromDirectory wrote "\" names;
                 # the ZIP spec requires "/", so this archive is not accepted.
+                # Note: zipfile rewrites "\" to "/" while reading member names
+                # on Windows, so this branch cannot fire there. The report
+                # fields below (source, stored_as) are read from JSON, keep the
+                # separator on every platform and reject such an archive anyway.
                 require(False, "archive member path uses backslashes")
             require(safe_relative(cleaned), "unsafe archive member path")
             require(name.casefold() not in folded, "duplicate archive member")
