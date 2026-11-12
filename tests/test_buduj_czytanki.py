@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 import unittest
 import zipfile
@@ -126,6 +127,10 @@ def rich_world() -> dict:
     return data
 
 
+def _naglowki_epizody_i_sceny(text: str) -> list[str]:
+    return [line for line in text.splitlines() if line.startswith("## Epizod ") or line.startswith("### Scena ")]
+
+
 class CzytankiTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -219,7 +224,7 @@ class CzytankiTests(unittest.TestCase):
             ["Nazwa", "Opis"],
             [[
                 "Sztuka Żelaznego Deszczu",
-                "Bardzo długa technika wymagająca długiego opisu aby sprawdzić zawijanie wierszy w tabeli markdown bez znaczników HTML oraz kontrolę szerokości.",
+                "Bardzo długa technika wymagająca długiego opisu aby sprawdzić zawijanie wierszy w tabeli markdown bez użycia znaczników HTML oraz kontrolę szerokości.",
             ]],
             max_szerokosc=120,
         )
@@ -228,7 +233,7 @@ class CzytankiTests(unittest.TestCase):
             self.assertNotIn("<br>", line)
             self.assertLessEqual(len(line), 120)
 
-    def test_builds_chronological_polish_only_czytanki_with_all_books_and_zip(self):
+    def test_builds_dual_file_srwy_style_polish_only_czytanki_and_zip(self):
         out_dir = self.root / "czytanki_oba"
         out_zip = self.root / "WWM_CZYTANKI_PL.zip"
         rc = buduj_czytanki.main(
@@ -242,20 +247,14 @@ class CzytankiTests(unittest.TestCase):
                 "--wyj-zip",
                 str(out_zip),
                 "--wersja",
-                "v1",
+                "v2",
             ]
         )
         self.assertEqual(rc, 0)
         self.assertTrue(out_zip.is_file())
 
         all_md = {p.name: p.read_text(encoding="utf-8") for p in out_dir.glob("*.md")}
-        self.assertIn("README.md", all_md)
-        self.assertIn("00_prolog_i_przerywniki.md", all_md)
-        self.assertIn("01_watek_glowny.md", all_md)
-        self.assertIn("02_zadania_poboczne_i_swiat.md", all_md)
-        self.assertIn("03_encyklopedia_swiata.md", all_md)
-        self.assertIn("04_przedmioty_i_ekwipunek.md", all_md)
-        self.assertIn("05_sztuki_walki_i_zdolnosci.md", all_md)
+        self.assertEqual(set(all_md), {"README.md", "epizody.md", "kontekst_scen.md"})
 
         # ZERO wycieku angielskiego ani chińskiego tekstu nigdzie w plikach .md!
         joined = "\n".join(all_md.values())
@@ -264,53 +263,57 @@ class CzytankiTests(unittest.TestCase):
         self.assertNotIn("Chapter Two EN", joined)
         self.assertNotIn("Wake up, boy! EN", joined)
 
-        # Wątek główny: chronologia, przerywnik, warianty obu płci, wybory, streszczenie i anty-duplikacja postaci
-        main_md = all_md["01_watek_glowny.md"]
-        self.assertIn("Rozdział I — Kuźnia", main_md)
-        self.assertIn("Rozdział II — Droga", main_md)
-        self.assertLess(main_md.index("Rozdział I — Kuźnia"), main_md.index("Rozdział II — Droga"))
-        self.assertIn("Streszczenie aktu pierwszego po polsku.", main_md)
-        self.assertIn("Plansza otwarcia aktu pierwszego.", main_md)
-        self.assertIn("**Stary Kowal:** Witaj w mojej kuźni.", main_md)
-        self.assertIn("[♂ Bohater]", main_md)
-        self.assertIn("[♀ Bohaterka]", main_md)
-        self.assertIn("**Wybór 1:** Tak *(→ dialog 101)*", main_md)
-        # Pierwsza historia postaci pojawia się przy pierwszym wystąpieniu (Rozdział I), druga nie spoileruje Rozdziału II!
-        self.assertIn("Pierwszy wpis z księgi życia kowala.", main_md)
-        self.assertNotIn("Tajna druga biografia kowala.", main_md)
-        self.assertIn("Ponowne wystąpienia znanych postaci:", main_md)
+        ep_md = all_md["epizody.md"]
+        ctx_md = all_md["kontekst_scen.md"]
 
-        # Zadania poboczne z uwagą o otwartym świecie
-        side_md = all_md["02_zadania_poboczne_i_swiat.md"]
-        self.assertIn("w otwartym świecie gry można je", side_md)
-        self.assertIn("Czego szukasz wędrowcze?", side_md)
+        # Lustrzane nagłówki Epizod E / Scena E.S dokładnie 1:1 pomiędzy epizody.md i kontekst_scen.md
+        self.assertEqual(_naglowki_epizody_i_sceny(ep_md), _naglowki_epizody_i_sceny(ctx_md))
+        self.assertGreaterEqual(len(_naglowki_epizody_i_sceny(ep_md)), 6)
 
-        # Księgi i encyklopedia
-        enc_md = all_md["03_encyklopedia_swiata.md"]
-        self.assertIn("Bitwa pod Kaifengiem", enc_md)
-        self.assertIn("Księga Pierwszych Dni", enc_md)
-        self.assertIn("Pierwsza strona tej prastarej księgi.", enc_md)
-        self.assertIn("Tajna druga biografia kowala.", enc_md)
-        self.assertIn("Wpis o Kuźniach", enc_md)
-        self.assertIn("Zapisek z gościńca", enc_md)
-        self.assertIn("Poszlaka ze skrzyni", enc_md)
+        # W epizody.md: prolog, chronologiczny wątek główny, warianty płci, rozwiązane skoki wyborów, zadania poboczne
+        self.assertIn("Obudź się, chłopcze!", ep_md)
+        self.assertIn("Obudź się, dziewczyno!", ep_md)
+        self.assertIn("Rozdział I — Kuźnia", ep_md)
+        self.assertIn("Rozdział II — Droga", ep_md)
+        self.assertLess(ep_md.index("Rozdział I — Kuźnia"), ep_md.index("Rozdział II — Droga"))
+        self.assertIn("Streszczenie aktu pierwszego po polsku.", ep_md)
+        self.assertIn("Plansza otwarcia aktu pierwszego.", ep_md)
+        self.assertIn("**Stary Kowal:** Witaj w mojej kuźni.", ep_md)
+        self.assertIn("[♂ Bohater]", ep_md)
+        self.assertIn("[♀ Bohaterka]", ep_md)
+        self.assertIn("**Wybór 1:** Tak *(→ dialog 101)*", ep_md)
+        self.assertIn("w otwartym świecie gry można je podejmować w dowolnej kolejności", ep_md)
+        self.assertIn("Czego szukasz wędrowcze?", ep_md)
+        # Czysty skrypt nie zawiera ścian tabel ani biografii encyklopedycznych
+        self.assertNotIn("Pierwszy wpis z księgi życia kowala.", ep_md)
 
-        # Przedmioty i sztuki walki
-        items_md = all_md["04_przedmioty_i_ekwipunek.md"]
-        self.assertIn("Szlachetna Zbroja", items_md)
-        self.assertIn("Żelazny Miecz", items_md)
-        skills_md = all_md["05_sztuki_walki_i_zdolnosci.md"]
-        self.assertIn("Sztuka Żelaznego Deszczu", skills_md)
-        self.assertIn("Sztuka Spokojnego Serca", skills_md)
-        self.assertIn("Krok Wiatru", skills_md)
+        # W kontekst_scen.md: pierwsza historia przy scenie, brak spoilerów przed końcem, katalog reszty na końcu
+        self.assertIn("Pierwszy wpis z księgi życia kowala.", ctx_md)
+        pos_druga_bio = ctx_md.index("Tajna druga biografia kowala.")
+        pos_dalsze = ctx_md.index("## Dalsze wpisy encyklopedii postaci i relacji")
+        self.assertGreater(pos_druga_bio, pos_dalsze)
 
-        # Deterministyczny ZIP zawiera README + księgi
+        # Całe zaplecze świata jest skonsolidowane w kontekst_scen.md
+        for expected in (
+            "Bitwa pod Kaifengiem",
+            "Księga Pierwszych Dni",
+            "Pierwsza strona tej prastarej księgi.",
+            "Wpis o Kuźniach",
+            "Zapisek z gościńca",
+            "Poszlaka ze skrzyni",
+            "Szlachetna Zbroja",
+            "Sztuka Żelaznego Deszczu",
+            "Sztuka Spokojnego Serca",
+            "Krok Wiatru",
+        ):
+            self.assertIn(expected, ctx_md)
+
+        # Deterministyczny ZIP zawiera README + oba pliki główne
         with zipfile.ZipFile(out_zip) as zf:
-            self.assertIn("README.md", zf.namelist())
-            self.assertIn("01_watek_glowny.md", zf.namelist())
+            self.assertEqual(sorted(zf.namelist()), ["README.md", "epizody.md", "kontekst_scen.md"])
 
-    def test_gender_filter_and_zakres_kompletne_rozdzialy_and_splitting(self):
-        # 1. Filtrowanie płci --plec bohaterka wyklucza kwestie [♂ Bohater] i męską kwestię prologu
+    def test_gender_filter_and_zakres_kompletne_rozdzialy_and_splitting_and_main_only(self):
+        # 1. Filtrowanie płci --plec bohaterka + wymuszone dzielenie --podziel-powyzej 500
         out_f = self.root / "czytanki_f"
         rc = buduj_czytanki.main(
             [
@@ -321,24 +324,40 @@ class CzytankiTests(unittest.TestCase):
                 "--plec",
                 "bohaterka",
                 "--podziel-powyzej",
-                "400",
+                "500",
                 "--wyj-katalog",
                 str(out_f),
             ]
         )
         self.assertEqual(rc, 0)
-        prolog_f = (out_f / "00_prolog_i_przerywniki.md").read_text(encoding="utf-8")
-        self.assertIn("Obudź się, dziewczyno!", prolog_f)
-        self.assertNotIn("Obudź się, chłopcze!", prolog_f)
+        czesci_ep = sorted(out_f.glob("epizody_czesc_*.md"))
+        self.assertGreaterEqual(len(czesci_ep), 2)
+        caly_ep_f = "\n".join(p.read_text(encoding="utf-8") for p in czesci_ep)
+        self.assertIn("Obudź się, dziewczyno!", caly_ep_f)
+        self.assertNotIn("Obudź się, chłopcze!", caly_ep_f)
+        self.assertIn("Zrobiłam nowy miecz.", caly_ep_f)
+        self.assertNotIn("Zrobiłem nowy miecz.", caly_ep_f)
 
-        # Wątek główny podzielił się na części przez niski --podziel-powyzej 400
-        czesci_main = sorted(out_f.glob("01_watek_glowny_czesc_*.md"))
-        self.assertGreaterEqual(len(czesci_main), 2)
-        caly_main_f = "\n".join(p.read_text(encoding="utf-8") for p in czesci_main)
-        self.assertIn("Zrobiłam nowy miecz.", caly_main_f)
-        self.assertNotIn("Zrobiłem nowy miecz.", caly_main_f)
+        # 2. --tylko-watek-glowny wyklucza zadania poboczne z epizodów
+        out_main = self.root / "czytanki_main_only"
+        rc_m = buduj_czytanki.main(
+            [
+                "--indeks",
+                str(self.root / "index"),
+                "--magazyn",
+                str(self.magazyn_dir),
+                "--tylko-watek-glowny",
+                "--wyj-katalog",
+                str(out_main),
+            ]
+        )
+        self.assertEqual(rc_m, 0)
+        ep_main = (out_main / "epizody.md").read_text(encoding="utf-8")
+        self.assertIn("Rozdział I — Kuźnia", ep_main)
+        self.assertNotIn("Sprawa na targu", ep_main)
+        self.assertNotIn("Czego szukasz wędrowcze?", ep_main)
 
-        # 2. Zakres kompletne-rozdzialy pomija Rozdział II (bo ma nieprzetłumaczone U+32), zachowuje Rozdział I!
+        # 3. Zakres kompletne-rozdzialy pomija Rozdział II (bo ma nieprzetłumaczone U+32), zachowuje Rozdział I!
         out_comp = self.root / "czytanki_comp"
         rc2 = buduj_czytanki.main(
             [
@@ -353,11 +372,11 @@ class CzytankiTests(unittest.TestCase):
             ]
         )
         self.assertEqual(rc2, 0)
-        main_comp = (out_comp / "01_watek_glowny.md").read_text(encoding="utf-8")
-        self.assertIn("Rozdział I — Kuźnia", main_comp)
-        self.assertNotIn("Rozdział II — Droga", main_comp)
+        ep_comp = (out_comp / "epizody.md").read_text(encoding="utf-8")
+        self.assertIn("Rozdział I — Kuźnia", ep_comp)
+        self.assertNotIn("Rozdział II — Droga", ep_comp)
 
-        # 3. Zakres wszystko jawnie oznacza brakujący tekst bez wstawiania angielskiego lub chińskiego
+        # 4. Zakres wszystko jawnie oznacza brakujący tekst bez wstawiania angielskiego lub chińskiego
         out_all = self.root / "czytanki_all"
         rc3 = buduj_czytanki.main(
             [
@@ -372,12 +391,12 @@ class CzytankiTests(unittest.TestCase):
             ]
         )
         self.assertEqual(rc3, 0)
-        main_all = (out_all / "01_watek_glowny.md").read_text(encoding="utf-8")
-        self.assertIn("[Brak polskiego tekstu (", main_all)
-        self.assertNotIn("Untranslated English Line Sentinel", main_all)
-        self.assertNotIn("Nieznana fraza bez polskiego przekładu", main_all)
+        ep_all = (out_all / "epizody.md").read_text(encoding="utf-8")
+        self.assertIn("[Brak polskiego tekstu (", ep_all)
+        self.assertNotIn("Untranslated English Line Sentinel", ep_all)
+        self.assertNotIn("Nieznana fraza bez polskiego przekładu", ep_all)
 
-        # 4. Bezpośrednio z częściowej zwrotki (--zwrotka + --tylko-zwrotka)
+        # 5. Bezpośrednio z częściowej zwrotki (--zwrotka + --tylko-zwrotka)
         paczka_dir = self.root / "paczka_do_zwrotki"
         buduj_paczke.zbuduj(self.ix, paczka_dir, wersja="1", data="2026-01-01", zip_=False)
         zwrotka_md = self.root / "zwrotka_czytanki.md"
@@ -399,11 +418,9 @@ class CzytankiTests(unittest.TestCase):
             ]
         )
         self.assertEqual(rc4, 0)
-        self.assertIn("Cześć z samej zwrotki!", (out_zwr / "01_watek_glowny.md").read_text(encoding="utf-8"))
+        self.assertIn("Cześć z samej zwrotki!", (out_zwr / "epizody.md").read_text(encoding="utf-8"))
 
     def test_podglad_en_and_merges_identical_gender_variants(self):
-        # W trybie --podglad-en angielskie warianty T+3 i T+4 są różne (testuje rozdział),
-        # ale jeśli w magazynie PL przypiszemy identyczny tekst dla @T+3 i @T+4, tryb `oba` scali je w jedną linię.
         mag_same = tlumaczenie.Magazyn()
         mag_same.ustaw(f"@{T + 3:016x}", "To samo zdanie dla obu płci.")
         mag_same.ustaw(f"@{T + 4:016x}", "To samo zdanie dla obu płci.")
@@ -422,11 +439,10 @@ class CzytankiTests(unittest.TestCase):
             ]
         )
         self.assertEqual(rc_same, 0)
-        main_same = (out_same / "01_watek_glowny.md").read_text(encoding="utf-8")
-        self.assertEqual(main_same.count("To samo zdanie dla obu płci."), 1)
-        self.assertNotIn("[♂ Bohater]", main_same)
+        ep_same = (out_same / "epizody.md").read_text(encoding="utf-8")
+        self.assertEqual(ep_same.count("To samo zdanie dla obu płci."), 1)
+        self.assertNotIn("[♂ Bohater]", ep_same)
 
-        # Jawny tryb --podglad-en pokazuje angielskie teksty do oceny układu
         out_en = self.root / "czytanki_en"
         rc_en = buduj_czytanki.main(
             [
@@ -439,7 +455,7 @@ class CzytankiTests(unittest.TestCase):
         )
         self.assertEqual(rc_en, 0)
         self.assertIn("Podgląd formy czytanek (EN", (out_en / "README.md").read_text(encoding="utf-8"))
-        self.assertIn("Chapter Two EN", (out_en / "01_watek_glowny.md").read_text(encoding="utf-8"))
+        self.assertIn("Chapter Two EN", (out_en / "epizody.md").read_text(encoding="utf-8"))
 
     def test_table_preserves_hex_ids_and_keeps_filenames_intact(self):
         lines = buduj_czytanki.formatuj_tabele(
@@ -447,13 +463,13 @@ class CzytankiTests(unittest.TestCase):
             [
                 ["Przedmiot #102020", "A common fish lure.", ""],
                 ["#102022", "Grain or dough bait.", "Made using flour."],
-                ["02_zadania_poboczne_i_swiat.md", "Bardzo długi opis księgi zadań pobocznych pogrupowanych według kategorii gry.", "100/100"],
+                ["kontekst_scen.md", "Bardzo długi opis towarzysza kontekstowego wszystkich scen w dwuplikowym układzie.", "100/100"],
             ],
         )
         rendered = "\n".join(lines)
         self.assertIn("Przedmiot #102020", rendered)
         self.assertIn("#102022", rendered)
-        self.assertIn("02_zadania_poboczne_i_swiat.md", rendered)
+        self.assertIn("kontekst_scen.md", rendered)
         self.assertTrue(all(len(line) <= 120 for line in lines if line.startswith("|")))
 
     def test_cutscene_context_you_xia_and_replay_linking(self):
@@ -507,7 +523,6 @@ class CzytankiTests(unittest.TestCase):
             V + 21: "We reached this point at last.",
         }
         data = rich_world()
-        # Dialog z generyczną nazwą gracza (主角 -> You Xia) oraz prawdziwym przebraniem (曹静观音 -> You Xia (Przebrana Cao))
         data["dialog_timelines.300"] = list(
             rows([
                 group("ja_gen", 1, 0, V + 1, [text_track([span(T + 2, 0.0, 1)])]),
@@ -519,7 +534,6 @@ class CzytankiTests(unittest.TestCase):
             (11, {"no": 11, "group": 5, "task_type": 1, "pre_task": [10], "task_name": V + 19, "finish_dialogs": 300}),
         ]
         data["group_tasks"] = [(5, [1, 2, 3, 11]), (6, [10]), (20, [20])]
-        # Encyklopedia z WVPV dla Han Xiangxun (w bazie gry description ma kropkę/interpunkcję i osobny klucz od text_msg)
         data["world_view_person_info"] = [
             *data["world_view_person_info"],
             (12, {"id": 12, "name": V + 6, "people_identity": [T + 10], "story": []}),
@@ -531,9 +545,6 @@ class CzytankiTests(unittest.TestCase):
             (1, {"id": 1, "time": 1.0, "duration": 2.0, "speaker": 2, "text": V + 4}),
             (2, {"id": 2, "time": 3.0, "duration": 2.0, "speaker": 1, "text": V + 5}),
         ]
-        # 10 ciągłych napisów text_msg + tabela sound_data mapująca te zdania na audio_name
-        # (poligon Tian Yinga `vo_sm_xsm9p4` z 1-wierszową kolizją `vo_sm_kfm8_pma_53`,
-        # linią z WVPV (V+7), wołaczem 寒姨 (V+14) oraz prefiksem `我 ` (V+15)).
         data["text_msg"] = [
             (591342, {"id": 591342, "content": V + 8}),
             (591343, {"id": 591343, "content": V + 9}),
@@ -611,49 +622,201 @@ class CzytankiTests(unittest.TestCase):
             ]
         )
         self.assertEqual(rc, 0)
-        prolog = (out_c / "00_prolog_i_przerywniki.md").read_text(encoding="utf-8")
-        main_md = (out_c / "01_watek_glowny.md").read_text(encoding="utf-8")
+        ep_md = (out_c / "epizody.md").read_text(encoding="utf-8")
+        ctx_md = (out_c / "kontekst_scen.md").read_text(encoding="utf-8")
+
+        self.assertEqual(_naglowki_epizody_i_sceny(ep_md), _naglowki_epizody_i_sceny(ctx_md))
 
         # 1. Zero generycznego "Gracz" / "You Xia (Bohater)"; poprawne "You Xia" i "You Xia (Przebrana Cao)"
-        self.assertNotIn("**Gracz:**", main_md)
-        self.assertNotIn("You Xia (Bohater)", main_md)
-        self.assertIn("**You Xia:** Kuję od rana!", main_md)
-        self.assertIn("**You Xia (Przebrana Cao):** Wypowiedź w przebraniu.", main_md)
+        self.assertNotIn("**Gracz:**", ep_md)
+        self.assertNotIn("You Xia (Bohater)", ep_md)
+        self.assertIn("**You Xia:** Kuję od rana!", ep_md)
+        self.assertIn("**You Xia (Przebrana Cao):** Wypowiedź w przebraniu.", ep_md)
 
         # 2. Intro ma You Xia i Gwardię Cesarską
-        self.assertIn("Mówca 2 (Gwardia Cesarska):", prolog)
-        self.assertIn("**You Xia:** Ja?", prolog)
+        self.assertIn("Mówca 2 (Gwardia Cesarska):", ep_md)
+        self.assertIn("**You Xia:** Ja?", ep_md)
 
         # 3. `vo_sm_xsm9p4` trafia do Poligonu Tian Yinga (nie Prologu!)
-        self.assertIn("Qinghe — poligon Tian Yinga", prolog)
-        self.assertNotIn("Prolog — zasadzka w ulewie", prolog)
+        self.assertIn("Qinghe — poligon Tian Yinga", ep_md)
+        self.assertNotIn("Prolog — zasadzka w ulewie", ep_md)
 
         # 4. Wygładzona 1-wierszowa kolizja V+10 nie przypisała błędnie `You Xia`,
         # a cała scena 591342–591351 pozostała jednym spójnym blokiem
-        self.assertEqual(prolog.count("591342–591351"), 1)
-        self.assertNotIn("**You Xia:** Wyjaśnij, dlaczego tak się stało.", prolog)
-        self.assertIn("Wyjaśnij, dlaczego tak się stało.", prolog)
+        self.assertEqual(ep_md.count("591342–591351"), 1)
+        self.assertNotIn("**You Xia:** Wyjaśnij, dlaczego tak się stało.", ep_md)
+        self.assertIn("Wyjaśnij, dlaczego tak się stało.", ep_md)
 
         # 5. WVPV przypisało polską nazwę "Ciocia Han" (bez wycieku EN "Han Xiangxun")
-        self.assertIn("**Ciocia Han:** W końcu doszliśmy do tego miejsca.", prolog)
-        self.assertNotIn("Han Xiangxun", prolog)
+        self.assertIn("**Ciocia Han:** W końcu doszliśmy do tego miejsca.", ep_md)
+        self.assertNotIn("Han Xiangxun", ep_md)
+        # Jednocześnie w kontekst_scen.md dla tej sceny pojawia się karta postaci Ciocia Han!
+        self.assertIn("**Ciocia Han** *(mówca w cutscenie)*", ctx_md)
 
-        # 6. Wołacz V+14 NIE przypisał Cioci Han, prefiks V+15 dał You Xia bez podwójnego "Ja:",
-        # a wzorzec NPC pod płeć gracza (`_npc_pma_`) na V+16 NIE daje fałszywego You Xia
-        self.assertNotIn("**Ciocia Han:** Ciociu Han, byłaś w chatce w gaju?", prolog)
-        self.assertIn("Ciociu Han, byłaś w chatce w gaju?", prolog)
-        self.assertIn("**You Xia:** Wrócę lepiej pierwszy.", prolog)
-        self.assertNotIn("**You Xia:** Masz odwagę.", prolog)
-        self.assertIn("Masz odwagę.", prolog)
-        self.assertNotIn("**You Xia:** Ja: Wrócę lepiej pierwszy.", prolog)
+        # 6. Wołacz V+14 NIE przypisał Cioci Han, prefiks V+15 dał You Xia bez podwójnego "Ja:"
+        self.assertNotIn("**Ciocia Han:** Ciociu Han, byłaś w chatce w gaju?", ep_md)
+        self.assertIn("Ciociu Han, byłaś w chatce w gaju?", ep_md)
+        self.assertIn("**You Xia:** Wrócę lepiej pierwszy.", ep_md)
+        self.assertNotIn("**You Xia:** Masz odwagę.", ep_md)
+        self.assertIn("Masz odwagę.", ep_md)
+        self.assertNotIn("**You Xia:** Ja: Wrócę lepiej pierwszy.", ep_md)
 
-        # 7. Powtórka #30999 z `task_cutscene_replay` weszła do zadania #11 w 01_watek_glowny,
-        # nie powtórzyła się w 00_prolog_i_przerywniki, a klon #10030888 został pominięty
-        self.assertIn("Przerywnik fabularny w dzienniku (#30999):", main_md)
-        self.assertIn("Streszczenie przypisane bezpośrednio do zadania jedenastego.", main_md)
-        self.assertNotIn("#30999", prolog)
-        self.assertIn("- **#30888:** Krótka plansza czarnego ekranu.", prolog)
-        self.assertNotIn("#10030888", prolog)
+        # 7. Powtórka #30999 z `task_cutscene_replay` weszła do zadania #11 w Epizodzie, nie jako luźny wpis,
+        # a klon #10030888 został pominięty
+        self.assertIn("Streszczenie przypisane bezpośrednio do zadania jedenastego.", ep_md)
+        self.assertIn("- **#30888:** Krótka plansza czarnego ekranu.", ep_md)
+        self.assertNotIn("#10030888", ep_md)
+
+    def test_v2_associations_int_speakers_w2_arrays_ac_boundaries_and_spoilers(self):
+        """Testuje nowe mechanizmy v2: mówcy int + `entity_no`, kolumny `[]`, `w[2]`, AC i anty-duplikację."""
+        W = T + 7000
+        zh = {
+            **ZH_CZYTANKI,
+            W + 1: "冯继升",
+            W + 2: "红线_kolizja",
+            W + 3: "墨山道门人",
+            W + 4: "墨山道传人描述",
+            W + 5: "我",
+            W + 6: "大师你好，听说墨山道和青溪有旧！",
+            W + 7: "你们在找绿林好汉吗？",
+            W + 8: "墨山道",
+            W + 9: "兼爱非攻",
+            W + 10: "隐匿墨山",
+            W + 11: "古老的机关门派，弟子常行侠义之事。",
+            W + 12: "墨山道建立",
+            W + 13: "公元940年",
+            W + 14: "冯继升的秘密信件",
+            W + 15: "信中记录了冯继升调查墨山道的经过。",
+            W + 16: "关系故事一：初识墨山。",
+            W + 17: "关系故事二：结局秘密（剧透）。",
+            W + 18: "诗句第一行",
+            W + 19: "诗句第二行",
+            W + 20: "暗涌标题",
+            W + 21: "暗涌详情",
+            W + 22: "Iron",
+            W + 23: "Ironsmith",
+            W + 24: "This ironsmith stands near the gate.",
+            W + 25: "Iron Guild description",
+        }
+        en = {
+            **EN_CZYTANKI,
+            W + 1: "Feng Jisheng",
+            W + 2: "RubyCollision",
+            W + 3: "Mohist Disciple",
+            W + 4: "A wandering Mohist disciple.",
+            W + 5: "Me",
+            W + 6: "Hello master, I heard about the Mohist Order!",
+            W + 7: "Are you looking for wanderers?",
+            W + 8: "Mohist Order",
+            W + 9: "Universal Love",
+            W + 10: "Hidden Mohist Peak",
+            W + 11: "An ancient order of master artisans.",
+            W + 12: "Mohist Founding",
+            W + 13: "940 CE",
+            W + 14: "Feng's Secret Letter",
+            W + 15: "Letter tracing Feng Jisheng's investigation.",
+            W + 16: "Amity story 1: first meeting.",
+            W + 17: "Amity story 2: endgame spoiler.",
+            W + 18: "Poem line one",
+            W + 19: "Poem line two",
+            W + 20: "Dark surge step",
+            W + 21: "Dark surge step detail",
+            W + 22: "Iron",
+            W + 23: "Ironsmith",
+            W + 24: "This ironsmith stands near the gate.",
+            W + 25: "Iron Guild description",
+        }
+        data = rich_world()
+        # Entity #8801 należy do prawdziwego Feng Jishenga, mimo że w scenie o[3] skolidował się na W+2!
+        data["entity_init_data"] = [
+            *data["entity_init_data"],
+            (8801, {"id": 8801, "attr_id": 885, "billboard_data": {"name": W + 1, "title": W + 3}}),
+        ]
+        data["entity_attr"] = [(885, {"id": 885, "introduction": W + 4})]
+        # Tabele z `[]`, `w[2]`, amity, listami i granicami słów AC
+        data["world_view_shili_data"] = [
+            (1, {"id": 1, "name": W + 8, "introduction_short": W + 9, "introduction_location": W + 10, "introduction_long": W + 11}),
+            (2, {"id": 2, "name": W + 22, "introduction_short": W + 25}),
+        ]
+        data["world_view_history_info"] = [
+            *data["world_view_history_info"],
+            (101, {"id": 101, "name": W + 12, "time_2": W + 13}),
+        ]
+        data["npc_amity_relation_data"] = [
+            (50, {"id": 50, "amity_target_name": W + 1, "story_1": W + 16, "story_2": W + 17}),
+        ]
+        data["tasks_envelop_data"] = [
+            (99, {"id": 99, "to": W + 14, "text": W + 15}),
+        ]
+        data["task_progress_dark_info"] = [
+            (101, {"id": 101, "content": W + 20, "introduction": W + 21}),
+        ]
+        data["task_progress_dark_group"] = [
+            (101, {"id": 101, "steps": [{"name": W + 20, "small_point_describe": W + 21}, {"name": W + 18, "small_point_describe": W + 19}]}),
+        ]
+        # Dialog 400 i 401 z mówcą int (0 / 1) oraz kolizją person[3], użyte w zadaniu #12/#13 (grupa 5)
+        data["dialog_timelines.400"] = list(
+            rows([
+                group("我", 1, 0, "", [text_track([span(W + 6, 0.0, 0)])]),
+                group("feng", 2, 8801, W + 2, [text_track([span(W + 7, 1.0, 1)])]),
+            ]).items()
+        )
+        data["dialog_timelines.401"] = list(
+            rows([
+                group("我", 1, 0, "", [text_track([span(W + 24, 0.0, 0)])]),
+                group("feng", 2, 8801, W + 2, [text_track([span(W + 8, 1.0, 1)])]),
+            ]).items()
+        )
+        data["branch_data"] = [
+            *data["branch_data"],
+            ("9_2", {"ques_argue_no": 9, "ques_each_no": 2, "main_title": T + 62, "choice_1": T + 60, "choice_dialogs_1": 400, "ques_stop_dialogs": [[200]]}),
+        ]
+        data["tasks"] = [
+            *data["tasks"],
+            (12, {"no": 12, "group": 5, "task_type": 1, "pre_task": [10], "task_name": W + 1, "finish_dialogs": 400}),
+            (13, {"no": 13, "group": 5, "task_type": 1, "pre_task": [12], "task_name": W + 23, "finish_dialogs": 401}),
+        ]
+        data["group_tasks"] = [(5, [1, 2, 3, 12, 13]), (6, [10]), (20, [20])]
+
+        root_v = self.root / "v2_assoc"
+        wyciag.zbuduj(FakeBaza(data), zh, en, root_v / "index", {"opis": "v2 assoc"}, log=lambda _t: None)
+        ix_v = indeks.wczytaj(root_v / "index")
+        builder = buduj_czytanki.BudowniczyCzytanek(ix_v, buduj_czytanki.ZrodloPodgladuEN(ix_v), zakres="wszystko")
+        pliki, epizody = builder.buduj_z_epizodami()
+        by_name = {p.nazwa: "\n".join(p.linie) for p in pliki}
+        ep_txt = by_name["epizody.md"]
+        ctx_txt = by_name["kontekst_scen.md"]
+
+        # 1. Mówca int i kolizja: prawdziwy Feng Jisheng mówi w dialogu 400, NIGDY "Postać (1)" ani RubyCollision!
+        self.assertIn("**Feng Jisheng:** Are you looking for wanderers?", ep_txt)
+        self.assertNotIn("**Postać (1):**", ep_txt)
+        self.assertNotIn("RubyCollision", ep_txt)
+        # Rozwiązany skok wyboru na konkretną Scenę E.S:
+        self.assertRegex(ep_txt, r"→ Scena \d+\.\d+, dialog 400")
+
+        # 2. Karta Feng Jishenga przy pierwszym wystąpieniu zawiera opis `entity_attr` i relację `story_1`,
+        # ale NIE `story_2` (ochrona przed spoilerem — ląduje w sekcji końcowej!).
+        self.assertIn("A wandering Mohist disciple.", ctx_txt)
+        self.assertIn("Amity story 1: first meeting.", ctx_txt)
+        pos_s2 = ctx_txt.index("Amity story 2: endgame spoiler.")
+        pos_end = ctx_txt.index("## Dalsze wpisy encyklopedii postaci i relacji")
+        self.assertGreater(pos_s2, pos_end)
+
+        # 3. Pośrednio po unikalnym imieniu Feng Jishenga podpiął się list `Feng's Secret Letter`!
+        self.assertIn("Feng's Secret Letter", ctx_txt)
+        self.assertIn("powiązane przez postać: Feng Jisheng", ctx_txt)
+
+        # 4. Z tekstu dialogu podpięła się frakcja `Mohist Order` wraz z jej kalendarium (`Mohist Founding`)
+        self.assertIn("An ancient order of master artisans.", ctx_txt)
+        self.assertIn("Mohist Founding", ctx_txt)
+        # Drugie wystąpienie w dialogu 401 pokazuje skrócony zbiorczy odsyłacz `*Wcześniej opisane:*`
+        self.assertIn("*Wcześniej opisane:*", ctx_txt)
+
+        # 5. Granica słów AC dla łaciny: `"Ironsmith"` w dialogu 401 NIE przyciąga frakcji `"Iron"` do sceny!
+        sc_401_start = ctx_txt.index("(dialog 401)")
+        sc_401_end = ctx_txt.index("## ", sc_401_start)
+        sc_401_block = ctx_txt[sc_401_start:sc_401_end]
+        self.assertNotIn("Iron Guild description", sc_401_block)
 
 
 if __name__ == "__main__":

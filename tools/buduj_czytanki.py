@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Generator polskich czytanek `.md` i archiwum `WWM_CZYTANKI_PL.zip` dla Where Winds Meet.
 
-Wzorowany na edycjach czytelniczych SRW Y / SRW OE, dopasowany do struktury WWM:
-- wyłącznie polski tekst (zero cichego wstawiania angielskiego lub chińskiego źródła),
-- chronologiczny scenariusz (Prolog/cutsceny, Akty Wątku Głównego z łańcuchami
-  zadań, wyborami gracza, przerywnikami, wizytówkami i streszczeniami z gry,
-  zadania poboczne wg kategorii z adnotacją o nieliniowości otwartego świata),
-- kontekst zintegrowany przy rozdziałach z ochroną powtórzeń i spoilerów
-  (postacie z encyklopedii przy pierwszym wystąpieniu, listy, poszlaki,
-  wzmiankowane pojęcia/przedmioty/techniki),
-- osobne księgi kompendialne: encyklopedia świata i księgi z gry, przedmioty
-  i ekwipunek, sztuki walki i zdolności,
-- tabele Markdown zawijane do 120 znaków bez `<br>`, przyjazne zarówno dla
-  czytników Markdown, jak i zwykłych edytorów tekstu.
+Wzorowany na dwuplikowym układzie czytelniczym SRW Y, dopasowanym do korpusu WWM:
+- `README.md` — metryczka edycji, pokrycie tłumaczeń oraz spis ponumerowanych epizodów,
+- `epizody.md` — czysty, nieprzerwany scenariusz fabularny (Prolog, Wątek Główny,
+  zadania poboczne i sekwencje cutscen) z jednolitą numeracją `Epizod E` / `Scena E.S`,
+  narracjami otwierającymi z gry, wyborami gracza (ze wskazaniem docelowych scen),
+  rozpoznanymi mówcami cutscen oraz nazwą bohatera `You Xia` (z zaznaczeniem przebrań),
+- `kontekst_scen.md` — jeden samowystarczalny towarzysz kontekstowy o lustrzanych
+  nagłówkach `Epizod E` / `Scena E.S`, skupiający przy każdej scenie maksymalny
+  kontekst z całej bazy `index/` i tabel `widoki/`: opisy NPC z obsady, karty
+  encyklopedii postaci (bez spoilerów dalszych wspomnień), głosy, relacje, bossów,
+  frakcje i sekty, lokacje/podobszary/poematy miejsc/ekrany ładowania, kalendarium,
+  księgi, zapiski regionalne, poszlaki, listy, przedmioty, sztuki walki oraz wątki
+  cienia (`Dark Surge`) i wskazówki UI, a na końcu dalsze wpisy odblokowywane
+  później w grze oraz katalog pozostałych nieprzypisanych haseł.
 
 Przykłady:
     python3 tools/buduj_czytanki.py \\
@@ -31,8 +33,9 @@ from __future__ import annotations
 
 import argparse
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -45,6 +48,7 @@ try:
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import powiazania_czytanek as pc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -53,13 +57,14 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import powiazania_czytanek as pc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
 
-FORMAT = "wwm-czytanki-v1"
+FORMAT = "wwm-czytanki-v2"
 STALA_DATA_ZIP = (2026, 1, 1, 0, 0, 0)
-DOMYSLNY_LIMIT_BAJTOW = 1_500_000
+DOMYSLNY_LIMIT_BAJTOW = 0
 MAX_SZEROKOSC_TABELI = 120
 ZAKRES_PROLOG_TM = kc.ZAKRES_PROLOG_TM
 
@@ -89,7 +94,6 @@ _RE_TAG_XML = re.compile(r"</?(?:LINK|IMAGE|COLOR|FONT|SIZE|STYLE|OUTLINE)(?:\s[
 _RE_KOLOR = re.compile(r"#(?:[0-9a-fA-F]{6}|[A-Z])")
 _RE_WIELE_SPACJI = re.compile(r"[ \t]{2,}")
 _RE_PUSTE_LINIE = re.compile(r"\n{3,}")
-_RE_SLOWA = re.compile(r"\w+")
 
 _GENERYCZNE_NAZWY_GRACZA_ZH = kc.GENERYCZNE_NAZWY_GRACZA_ZH
 _GENERYCZNE_NAZWY_GRACZA_TXT = kc.GENERYCZNE_NAZWY_GRACZA_TXT
@@ -97,8 +101,6 @@ _MOWCY_CUTSCEN_EN_IGNORUJ = kc.MOWCY_CUTSCEN_EN_IGNORUJ
 _MOWCY_CUTSCEN_ZH_NA_EN = kc.MOWCY_CUTSCEN_ZH_NA_EN
 _MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA = kc.MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA
 _MOWCY_ROLE_PL = kc.MOWCY_ROLE_PL
-_VO_DOMENY = kc.VO_DOMENY
-_KOTWICE_SCEN_TM = kc.KOTWICE_SCEN_TM
 
 _norm_cut_zh = kc.norm_cut_zh
 _wvpv_pid = kc.wvpv_pid
@@ -113,7 +115,6 @@ def oczysc_tekst(text: str, *, jedna_linia: bool = False) -> str:
     if not text:
         return ""
     cleaned = text.replace("\r\n", "\n").replace("\r", "\n").replace("\t", " ")
-    # Odnośniki rich-text mogą być zagnieżdżone, więc rozwijamy w pętli.
     for _ in range(4):
         updated = _RE_ODNOSNIK.sub(r"\1", cleaned)
         if updated == cleaned:
@@ -147,20 +148,15 @@ def formatuj_tabele(
     max_szerokosc: int = MAX_SZEROKOSC_TABELI,
 ) -> list[str]:
     """Zbuduj tabelę Markdown zawijaną do `max_szerokosc` znaków bez `<br>` (wiersze kontynuacji)."""
-    if not naglowki:
+    if not naglowki or not wiersze:
         return []
     cols = len(naglowki)
-    if not wiersze:
-        return []
-
-    # Najpierw normalizacja i wstępne obliczenie rozsądnych szerokości kolumn (bez ponownego cięcia #rrggbb na gotowych etykietach).
     norm_headers = [_escapuj_komorke(h, jedna_linia=True) for h in naglowki]
     norm_rows: list[list[str]] = []
     for row in wiersze:
         padded = list(row[:cols]) + [""] * max(0, cols - len(row))
         norm_rows.append([_escapuj_komorke(str(cell)) for cell in padded])
 
-    # Ile miejsca zostaje na treść kolumn poza separatorami `| ` + ` | ` + ` |`
     overhead = 3 * cols + 1
     budget = max(cols * 8, max_szerokosc - overhead)
 
@@ -172,12 +168,9 @@ def formatuj_tabele(
         )
         natural_widths.append(max(len(norm_headers[idx]), min(cell_max, budget)))
 
-    # Proporcjonalne przycięcie kolumn, jeśli suma przekracza budżet.
     widths = list(natural_widths)
     total = sum(widths)
     if total > budget:
-        # Najpierw zachowujemy pełną szerokość bez rozcinania pojedynczych długich wyrazów (np. nazw plików),
-        # oraz krótkich kolumn do 42 znaków, o ile mieści się to w budżecie wiersza.
         longest_tokens = [
             max(
                 [len(norm_headers[i])]
@@ -202,8 +195,7 @@ def formatuj_tabele(
             flex_sum = sum(flex)
             if flex_sum > 0:
                 for i in range(cols):
-                    add = (rem * flex[i]) // flex_sum
-                    widths[i] += add
+                    widths[i] += (rem * flex[i]) // flex_sum
                 leftover = budget - sum(widths)
                 for i in sorted(range(cols), key=lambda k: flex[k], reverse=True):
                     if leftover <= 0:
@@ -247,6 +239,8 @@ def formatuj_tabele(
 class ZrodloPL:
     """Warstwa odczytu wyłącznie polskich przekładów z magazynu + wariantów."""
 
+    jest_podgladem_en = False
+
     def __init__(self, ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, tylko_klucze: set[str] | None = None):
         self.ix = ix
         self.magazyn = magazyn
@@ -259,7 +253,6 @@ class ZrodloPL:
         if not slot:
             return None
         if self.tylko_klucze is not None and slot not in self.tylko_klucze:
-            # Gdy tryb --tylko-zwrotka, dopuszczamy jeszcze główny klucz wariantu, jeśli był w zwrotce.
             if not (slot.startswith("@") and self.ix.warianty.get(slot[1:], {}).get("k") in self.tylko_klucze):
                 return None
         done = self.magazyn.przeklad(slot)
@@ -314,12 +307,58 @@ class ZrodloPodgladuEN:
 
 
 def _naturalny(value: str):
-    head, _, tail = value.partition("#")
-    if tail.isdigit():
-        return (0, int(tail), value)
-    if head.lstrip("-").isdigit():
-        return (0, int(head), value)
-    return (1, 0, value)
+    return pc._naturalny(value)
+
+
+@dataclass
+class _Scena:
+    uid: str
+    epizod_nr: int
+    scena_nr: int
+    tytul: str
+    rodzaj: str  # "dialog" | "przerywnik" | "dziennik" | "intro" | "text_msg" | "film"
+    dialog_no: int | None = None
+    miejsce_ukladu: object | None = None
+    zadanie_id: int | None = None
+    przerywnik_no: int | None = None
+    powtorka_row: dict | None = None
+    cut_moment: str = ""
+    segment: dict | None = None
+    intro_rows: list[dict] = field(default_factory=list)
+    film_rows: list[dict] = field(default_factory=list)
+    film_id: int | None = None
+    tekst_zh_do_skanu: str = ""
+    przestrzenie: set[int] = field(default_factory=set)
+    linie_skryptu: list[str] = field(default_factory=list)
+    mowcy_cutsceny: list[tuple[str | None, str | None]] = field(default_factory=list)
+    obsada_dodatkowa: list[str] = field(default_factory=list)
+    done: int = 0
+    total: int = 0
+    pokaz_zadanie_info: bool = False
+
+    @property
+    def etykieta_krotka(self) -> str:
+        return f"Scena {self.epizod_nr}.{self.scena_nr}"
+
+    @property
+    def naglowek(self) -> str:
+        return f"Scena {self.epizod_nr}.{self.scena_nr} — {self.tytul}"
+
+
+@dataclass
+class _Epizod:
+    nr: int
+    kategoria: str  # "prolog" | "watek_glowny" | "poboczne" | "cutsceny" | "otoczenie"
+    tytul: str
+    typ_zadania: int | None = None
+    grupa: int | None = None
+    projekt: str | None = None
+    tlo_klucz: tuple | None = None
+    notka_kategorii: str = ""
+    sceny: list[_Scena] = field(default_factory=list)
+    zadania_ids: list[int] = field(default_factory=list)
+    done: int = 0
+    total: int = 0
 
 
 @dataclass
@@ -332,7 +371,7 @@ class ZbudowanyPlik:
 
 
 class BudowniczyCzytanek:
-    """Składa komplet czytanek WWM z `index/` oraz polskiego magazynu tłumaczeń."""
+    """Składa dwuplikowy zestaw czytanek WWM (`epizody.md` + `kontekst_scen.md`) z `index/` oraz przekładów."""
 
     def __init__(
         self,
@@ -342,6 +381,7 @@ class BudowniczyCzytanek:
         zakres: str = "przetlumaczone",
         plec: str = "oba",
         z_otoczeniem: bool = False,
+        tylko_watek_glowny: bool = False,
         wersja: str = "v1",
     ):
         if zakres not in ("przetlumaczone", "kompletne-rozdzialy", "wszystko"):
@@ -353,72 +393,62 @@ class BudowniczyCzytanek:
         self.zakres = zakres
         self.plec = plec
         self.z_otoczeniem = z_otoczeniem
+        self.tylko_watek_glowny = tylko_watek_glowny
         self.wersja = wersja
         self.uklad = uklad_scen.uloz(ix)
         self._przygotuj_indeksy()
 
     def _przygotuj_indeksy(self) -> None:
         ix = self.ix
-        # 1. Tabele kontekstowe w jednym przebiegu po ix.teksty.
-        chciane = {
-            "manual_items",
-            "region_collect_jianwen_data",
-            "book_config",
-            "ever_know_clue_data",
-            "tasks_envelop_data",
-            "world_view_person_info",
-            "world_view_region_info",
-            "world_view_shili_data",
-            "world_view_history_info",
-            "school_sect_chuancheng_data",
-            "xinhu_menpai_list",
-            "equip_items",
-            "stuff_items",
-            "kongfu",
-            "xinfa",
-            "jianghu_skills",
-            "qishu_combat_data",
-            "entity_attr",
-        }
-        self.tabele: dict[str, dict[str, dict[str, str]]] = {name: {} for name in chciane}
+        self.baza = pc.zbuduj_baze(ix)
+        self.tabele = self.baza.tabele
+        self.encyklopedia_po_kluczu = self.baza.encyklopedia_po_kluczu
+        self.encyklopedia_po_id = self.baza.encyklopedia_po_id
+        self.encyklopedia_po_en = self.baza.encyklopedia_po_en
+
+        # Słowniki nazw i lokalnych opisów NPC do rozwiązywania mówców i obsady
         self.nazwa_po_tekscie: dict[str, str] = {}
         self.klucz_nazwy_po_en: dict[str, str] = {}
         wvpv_raw: dict[str, str] = {}
         for kl, text in ix.teksty.items():
             zr = ix.zrodlo(text)
             if text.zrodlo:
-                if text.zrodlo not in self.nazwa_po_tekscie and zr and any(part in zr[1] for part in ("name", "title", "nazwa")):
+                if text.zrodlo not in self.nazwa_po_tekscie and zr and any(p in zr[1] for p in ("name", "title", "nazwa")):
                     self.nazwa_po_tekscie[text.zrodlo] = kl
                 en_val = (ix.en(kl) or "").strip()
                 if en_val and len(en_val) <= 64 and zr and (
                     zr[0] in ("entity_billboard", "world_view_person_info", "cutscene_person_info_config", "avatars")
-                    or any(part in zr[1] for part in ("name", "title", "nazwa"))
+                    or any(p in zr[1] for p in ("name", "title", "nazwa"))
                 ):
-                    # Preferujemy nazwy z entity_billboard / encyklopedii / cutscen nad przypadkowymi opisami
                     if en_val not in self.klucz_nazwy_po_en or zr[0] in ("entity_billboard", "world_view_person_info", "cutscene_person_info_config"):
                         self.klucz_nazwy_po_en[en_val] = kl
-            if not zr:
+            if zr and zr[0] == "world_view_person_voice" and zr[1] == "description" and text.zrodlo:
+                wvpv_raw[zr[2]] = text.zrodlo
+
+        # Zbiorczy słownik opisów/tytułów wyłącznie dla wiarygodnych unikalnych postaci z `ix.postacie`
+        self.npc_tytul_po_nazwie: dict[str, str] = {}
+        self.npc_opis_po_nazwie: dict[str, str] = {}
+        opisy_per_klucz: dict[str, set[str]] = defaultdict(set)
+        tytuly_per_klucz: dict[str, set[str]] = defaultdict(set)
+        for prow in ix.postacie.values():
+            nk = prow.get("n")
+            if not nk:
                 continue
-            tbl, col, row_id = zr
-            if tbl in chciane:
-                self.tabele[tbl].setdefault(row_id, {})[col] = kl
-            elif tbl == "world_view_person_voice" and col == "description" and text.zrodlo:
-                wvpv_raw[row_id] = text.zrodlo
+            zh_n = pc._oczysc_do_dopasowania(ix.zh(nk))
+            if not zh_n or zh_n in pc.GENERYCZNE_ROLE_ZH or zh_n.lower() in pc.GENERYCZNE_ROLE_LAT:
+                continue
+            if prow.get("t"):
+                tytuly_per_klucz[nk].add(prow["t"])
+            if prow.get("o"):
+                opisy_per_klucz[nk].add(prow["o"])
+        for nk, vals in tytuly_per_klucz.items():
+            if len(vals) == 1:
+                self.npc_tytul_po_nazwie[nk] = next(iter(vals))
+        for nk, vals in opisy_per_klucz.items():
+            if len(vals) == 1:
+                self.npc_opis_po_nazwie[nk] = next(iter(vals))
 
-        # 2. Encyklopedia postaci indeksowana po kluczu nazwy, id wpisu oraz angielskim imieniu.
-        self.encyklopedia_po_kluczu: dict[str, dict] = {}
-        self.encyklopedia_po_id: dict[int, dict] = dict(ix.encyklopedia)
-        self.encyklopedia_po_en: dict[str, dict] = {}
-        for row in ix.encyklopedia.values():
-            for field in ("nazwa", "inna_nazwa"):
-                if row.get(field):
-                    self.encyklopedia_po_kluczu.setdefault(row[field], row)
-            if row.get("nazwa"):
-                en_name = (ix.en(row["nazwa"]) or "").strip()
-                if en_name:
-                    self.encyklopedia_po_en.setdefault(en_name, row)
-
-        # 3. Wybory po dialogu oraz przypisania powtórek/przerywników do zadań i grup.
+        # Wybory po dialogu, streszczenia i powtórki cutscen
         self.wybory_po: dict[int, list[dict]] = defaultdict(list)
         for row in ix.wybory.values():
             for dialog_no in row.get("po_dialogach", ()):
@@ -448,31 +478,18 @@ class BudowniczyCzytanek:
             if row.get("grupa"):
                 self.powtorki_po_grupie[row["grupa"]].append(row)
 
-        # Przypisania przerywników użytych już przy zadaniach (uzupełniane też w trakcie budowania ksiąg zadań).
         self.przerywniki_w_zadaniach: set[int] = set()
         for task in ix.zadania.values():
             for lst in (task.get("przerywniki") or {}).values():
-                self.przerywniki_w_zadaniu_add(lst)
+                self.przerywniki_w_zadaniach.update(lst)
 
-        # 4. Słownik jednoznacznych mówców dla cutscen `text_msg` (głosy encyklopedii + dokładne powtórzenia).
-        self._przygotuj_mowcow_napisow(wvpv_raw)
-        self._kandydaci_wzmianek: list[tuple[str, str, str, tuple[str, ...]]] | None = None
-
-    def _przygotuj_mowcow_napisow(self, wvpv_raw: dict[str, str]) -> None:
         (
             self.glos_wvpv_dokladny,
             self.mowca_napisow_exact,
             self.mowca_napisow_dlugie,
-        ) = kc.zbuduj_indeksy_mowcow(self.ix, wvpv_raw, self.encyklopedia_po_id)
+        ) = kc.zbuduj_indeksy_mowcow(ix, wvpv_raw, self.encyklopedia_po_id)
 
-    @staticmethod
-    def _bezposredni_mowca_en(row: dict, zh: str, en_txt: str, *, ignoruj_audio: bool = False) -> str | None:
-        return kc.bezposredni_mowca_en(row, zh, en_txt, ignoruj_audio=ignoruj_audio)
-
-    def przerywniki_w_zadaniu_add(self, lst) -> None:
-        self.przerywniki_w_zadaniach.update(lst)
-
-    # -------------------------------------------------------- pomocniki PL-only
+    # -------------------------------------------------------- pomocniki językowe PL-only
 
     def _tekst(self, slot: str | None, *, fallback_label: str = "", jedna_linia: bool = False) -> str | None:
         val = self.pl.tekst(slot, jedna_linia=jedna_linia)
@@ -497,8 +514,8 @@ class BudowniczyCzytanek:
             return "Zadania bez przypisanego rozdziału"
         row = self.ix.grupy.get(grupa) or {}
         parts = []
-        for field in ("numer_tytulu", "tytul", "nazwa"):
-            val = self.pl.tekst(row.get(field), jedna_linia=True)
+        for field_name in ("numer_tytulu", "tytul", "nazwa"):
+            val = self.pl.tekst(row.get(field_name), jedna_linia=True)
             if val:
                 parts.append(val)
         if parts:
@@ -508,47 +525,82 @@ class BudowniczyCzytanek:
     def _nazwa_zadania(self, tid: int) -> str:
         row = self.ix.zadania.get(tid) or {}
         val = self.pl.tekst(row.get("nazwa"), jedna_linia=True)
-        return val or f"Zadanie #{tid} [brak polskiego tytułu]"
+        if val:
+            return val
+        if self.zakres == "wszystko":
+            return f"Zadanie #{tid} [brak polskiego tytułu]"
+        return f"Zadanie #{tid}"
 
-    def _miejsce(self, numer: int) -> str | None:
-        row = self.ix.miejsca.get(numer)
-        if not row:
-            return f"Obszar #{numer}"
-        val = self.pl.tekst(row.get("nazwa"), jedna_linia=True)
-        return val or (f"Obszar #{numer}" if self.zakres == "wszystko" else None)
+    def _miejsce(self, space_id: int | None) -> str | None:
+        if space_id is None:
+            return None
+        row = self.ix.miejsca.get(space_id) or {}
+        if row.get("nazwa"):
+            pl_val = self.pl.tekst(row["nazwa"], jedna_linia=True)
+            if pl_val:
+                return pl_val
+        return None
 
-    def _mowca(self, scena: dict, numer: int, podmiana: str | None = None) -> str:
-        if numer < 0 or numer >= len(scena.get("o", ())):
-            return "Nieznany mówca"
-        person = scena["o"][numer]
-        name_key = podmiana or (person[3] if len(person) > 3 else None)
-        if len(person) > 1 and person[1] == 1:
-            if name_key:
-                pl_name = self.pl.tekst(name_key, jedna_linia=True)
-                zh_raw = (self.ix.teksty[name_key].zrodlo or "").strip() if name_key in self.ix.teksty else ""
-                if (
-                    pl_name
-                    and zh_raw not in _GENERYCZNE_NAZWY_GRACZA_ZH
-                    and pl_name.strip().lower() not in _GENERYCZNE_NAZWY_GRACZA_TXT
+    def _znajdz_osobe(self, scena: dict, osoba_id) -> list | None:
+        obsada = scena.get("o") or ()
+        if isinstance(osoba_id, int) and 0 <= osoba_id < len(obsada):
+            return obsada[osoba_id]
+        for person in obsada:
+            if person[0] == osoba_id:
+                return person
+        return None
+
+    def _dane_osoby_w_scenie(self, person: list) -> tuple[str | None, str | None, str | None, str | None]:
+        """Zwróć `(name_kl, tyt_kl, opis_kl, role_kind)` preferując autorytatywne `ix.postacie[entity_no]`."""
+        role_kind = person[1] if len(person) > 1 else None
+        entity_no = person[2] if len(person) > 2 and isinstance(person[2], int) else None
+        prow = self.ix.postacie.get(entity_no) if entity_no else None
+        raw_n = person[3] if len(person) > 3 else None
+        raw_t = person[4] if len(person) > 4 and person[4] else None
+        raw_o = person[5] if len(person) > 5 and person[5] else None
+        if prow and prow.get("n"):
+            name_kl = prow["n"]
+            zgodny_raw = (raw_n is None or raw_n == name_kl)
+            tyt_kl = prow.get("t") or (raw_t if zgodny_raw else None)
+            opis_kl = prow.get("o") or (raw_o if zgodny_raw else None)
+            return name_kl, tyt_kl, opis_kl, role_kind
+        return raw_n, raw_t, raw_o, role_kind
+
+    def _mowca(self, scena: dict, osoba_id, przebranie_klucz: str | None = None) -> str:
+        person = self._znajdz_osobe(scena, osoba_id)
+        if person is not None:
+            name_key, _, _, role_kind = self._dane_osoby_w_scenie(person)
+            en_name = (self.ix.en(name_key) or "").strip() if name_key else ""
+            zh_name = (self.ix.zh(name_key) or "").strip() if name_key else ""
+            pl_name = self.pl.tekst(name_key, jedna_linia=True) if name_key else None
+            czy_gracz = (
+                role_kind == "gracz"
+                or role_kind == 1
+                or (person[0] in ("我", "player", "主角"))
+                or zh_name in _GENERYCZNE_NAZWY_GRACZA_ZH
+                or en_name.lower() in _GENERYCZNE_NAZWY_GRACZA_TXT
+                or (pl_name or "").lower() in _GENERYCZNE_NAZWY_GRACZA_TXT
+            )
+            if czy_gracz:
+                if przebranie_klucz:
+                    przebr = self._tekst(przebranie_klucz, fallback_label="przebrania", jedna_linia=True)
+                    if przebr:
+                        return f"You Xia ({przebr})"
+                if pl_name and not (
+                    zh_name in _GENERYCZNE_NAZWY_GRACZA_ZH
+                    or en_name.lower() in _GENERYCZNE_NAZWY_GRACZA_TXT
+                    or pl_name.lower() in _GENERYCZNE_NAZWY_GRACZA_TXT
                 ):
                     return f"You Xia ({pl_name})"
-            return "You Xia"
-        tag = person[0] if person else ""
-        if name_key:
-            pl_name = self.pl.tekst(name_key, jedna_linia=True)
+                return "You Xia"
             if pl_name:
                 return pl_name
-            return f"Postać #{name_key[:6]}" if self.zakres == "wszystko" else "Nieznany mówca"
-        if tag in ("玩家", "主角"):
-            return "You Xia"
-        if tag and tag in self.nazwa_po_tekscie:
-            pl_name = self.pl.tekst(self.nazwa_po_tekscie[tag], jedna_linia=True)
-            if pl_name:
-                return pl_name
-        return "Rozmówca"
+            if self.zakres == "wszystko" and name_key:
+                return f"[Brak polskiej nazwy mówcy: {name_key}]"
+            return f"Postać ({osoba_id})"
+        return "You Xia" if osoba_id in ("ja", 0) else f"Postać ({osoba_id})"
 
     def _tlumacz_mowce_cutsceny(self, en_name: str) -> str | None:
-        """Przetłumacz nazwę mówcy z cutsceny zgodnie z aktualnym źródłem (PL albo `--podglad-en`)."""
         if not en_name:
             return None
         if en_name in ("You Xia", "Me", "Player", "Main Character"):
@@ -567,7 +619,6 @@ class BudowniczyCzytanek:
                 return pl_val
         if en_name in _MOWCY_ROLE_PL:
             return _MOWCY_ROLE_PL[en_name]
-        # Sprawdź po chińskim odpowiedniku ze słowników
         for zh_tag, mapped_en in (*_MOWCY_CUTSCEN_ZH_NA_EN.items(), *_MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA.items()):
             if mapped_en == en_name and zh_tag in self.nazwa_po_tekscie:
                 pl_val = self.pl.tekst(self.nazwa_po_tekscie[zh_tag], jedna_linia=True)
@@ -575,12 +626,18 @@ class BudowniczyCzytanek:
                     return pl_val
         return None
 
-    def _rozwiaz_mowce_napisu(self, row: dict, txt: str, *, ignoruj_audio: bool = False) -> tuple[str | None, str, bool]:
-        """Ustal mówcę napisu `text_msg` i usuń zduplikowany prefiks `Mówca: ` z treści."""
+    def _klucz_mowcy_cutsceny(self, en_name: str | None) -> str | None:
+        if not en_name or en_name in ("You Xia", "Me", "Player", "Main Character"):
+            return None
+        entry = self.encyklopedia_po_en.get(en_name)
+        if entry and entry.get("nazwa"):
+            return entry["nazwa"]
+        return self.klucz_nazwy_po_en.get(en_name)
+
+    def _rozwiaz_mowce_napisu(self, row: dict, txt: str, *, ignoruj_audio: bool = False) -> tuple[str | None, str, bool, str | None]:
         kl = row["k"]
         zh = self.ix.teksty[kl].zrodlo
         en_raw = self.ix.en(kl) or ""
-
         sp_en = kc.rozwiaz_mowce_en(
             row,
             zh,
@@ -592,6 +649,7 @@ class BudowniczyCzytanek:
         )
         mowca_out = self._tlumacz_mowce_cutsceny(sp_en) if sp_en else None
         cleaned_txt, detected_sp, czy_gracz = kc.wyczysc_prefiks_mowcy(txt, sp_en, mowca_out)
+        used_en = sp_en or detected_sp
         if not mowca_out and detected_sp:
             if detected_sp == "You Xia":
                 mowca_out = "You Xia"
@@ -599,11 +657,9 @@ class BudowniczyCzytanek:
                 mowca_out = self._tlumacz_mowce_cutsceny(detected_sp) or (
                     detected_sp if getattr(self.pl, "jest_podgladem_en", False) else None
                 )
-
-        return mowca_out, cleaned_txt, czy_gracz
+        return mowca_out, cleaned_txt, czy_gracz, used_en
 
     def _pasuje_plec_elementu(self, element: list) -> tuple[bool, str]:
-        """Czy element dialogu pasuje do `--plec`; zwraca (czy_pokazac, prefiks_plci)."""
         if len(element) <= 3 or not element[3]:
             return True, ""
         w = element[3]
@@ -621,11 +677,10 @@ class BudowniczyCzytanek:
         return "@" + element[4] if len(element) > 4 and element[3] else element[2]
 
     def _stat_slotow(self, sloty: list[str]) -> tuple[int, int]:
-        """Zwróć (przetłumaczone_niepuste, wszystkich_niepustych) bez powtórek slotu."""
         unikatowe: list[str] = []
         seen = set()
         for slot in sloty:
-            if slot in seen:
+            if not slot or slot in seen:
                 continue
             seen.add(slot)
             key = self.pl.klucz_bazowy(slot)
@@ -644,233 +699,6 @@ class BudowniczyCzytanek:
             return done == total
         return done > 0
 
-    # -------------------------------------------------------- renderowanie sceny
-
-    def _renderuj_scene(self, numer_sceny: int, miejsce, *, poziom_naglowka: int = 4) -> tuple[list[str], int, int, set[int]]:
-        """Renderuje pojedynczą scenę. Zwraca (linie, przetłumaczonych, wszystkich, zbiór_id_postaci)."""
-        scena = self.ix.sceny[numer_sceny]
-        slots: list[str] = []
-        active_elements: list[tuple[list, str, str]] = []
-        for el in scena["e"]:
-            ok, prefix = self._pasuje_plec_elementu(el)
-            if not ok:
-                continue
-            slot = self._slot_sceny(el)
-            slots.append(slot)
-            active_elements.append((el, slot, prefix))
-
-        wybory = self.wybory_po.get(numer_sceny, ())
-        for row in wybory:
-            for ch in row.get("wybory", ()):
-                if ch.get("tekst"):
-                    slots.append(ch["tekst"])
-
-        done, total = self._stat_slotow(slots)
-        if not self._ma_dopuszczalne_pokrycie(done, total):
-            return [], done, total, set()
-
-        postacie_w_scenie: set[int] = set()
-        for person in scena.get("o", ()):
-            if len(person) > 3 and person[3] in self.encyklopedia_po_kluczu:
-                postacie_w_scenie.add(self.encyklopedia_po_kluczu[person[3]]["id"])
-
-        lines: list[str] = []
-        nagl = f"{'#' * poziom_naglowka} Scena — dialog {numer_sceny}"
-        miejsca_txt = [self._miejsce(m) for m in (scena.get("m") or [])[:3]]
-        miejsca_txt = [m for m in miejsca_txt if m]
-        if miejsce.moment == "numeracja":
-            nagl += " *(kolejność przybliżona)*"
-        lines.append(nagl)
-        if miejsca_txt:
-            lines.append(f"*Miejsce: {', '.join(miejsca_txt)}*")
-        if done < total and self.zakres != "wszystko":
-            lines.append(f"*Uwaga: przetłumaczono {done} z {total} wypowiedzi w tej scenie.*")
-        lines.append("")
-
-        surowe_wpisy: list[tuple[str, int, str, str, str, str]] = []
-        for el, slot, prefix in active_elements:
-            kind = el[0]
-            txt = self._tekst(slot, fallback_label="kwestii")
-            if txt is None:
-                continue
-            wariant = el[3] if len(el) > 3 and el[3] else 0
-            bazowy = el[2]
-            mowca = self._mowca(scena, el[1], el[5] if len(el) > 5 else None) if kind == "k" else ""
-            surowe_wpisy.append((kind, wariant, bazowy, mowca, txt, prefix))
-
-        blok_wiersze: list[str] = []
-        idx = 0
-        while idx < len(surowe_wpisy):
-            kind, wariant, bazowy, mowca, txt, prefix = surowe_wpisy[idx]
-            if (
-                self.plec == "oba"
-                and idx + 1 < len(surowe_wpisy)
-                and {wariant, surowe_wpisy[idx + 1][1]} == {1, 2}
-                and surowe_wpisy[idx + 1][0] == kind
-                and surowe_wpisy[idx + 1][2] == bazowy
-                and surowe_wpisy[idx + 1][3] == mowca
-                and surowe_wpisy[idx + 1][4] == txt
-            ):
-                prefix = ""
-                idx += 2
-            else:
-                idx += 1
-
-            if kind == "k":
-                akapit = txt.replace("\n", " ")
-                blok_wiersze.append(f"**{prefix}{mowca}:** {akapit}")
-            elif kind in ("p", "o", "i"):
-                akapit = txt.replace("\n", " ")
-                blok_wiersze.append(f"*{prefix}{akapit}*")
-            elif kind == "wi":
-                blok_wiersze.append(f"> **Wizytówka — {txt}**")
-            elif kind == "wt":
-                blok_wiersze.append(f"> *{txt}*")
-            else:
-                blok_wiersze.append(f"> {prefix}{txt.replace(chr(10), ' ')}")
-
-        if blok_wiersze:
-            lines.extend(blok_wiersze)
-
-        for row in wybory:
-            tytul_w = self._tekst(row.get("tytul"), fallback_label="pytania", jedna_linia=True)
-            opcje: list[str] = []
-            for ch in row.get("wybory", ()):
-                t_opcji = self._tekst(ch.get("tekst"), fallback_label="opcji wyboru", jedna_linia=True)
-                if t_opcji is None:
-                    continue
-                cele = [str(d) for d in ch.get("dialogi", ())]
-                cel_txt = f" *(→ dialog {', '.join(cele)})*" if cele else ""
-                opcje.append(f"- **Wybór {ch['nr']}:** {t_opcji}{cel_txt}")
-            if opcje:
-                lines.append("")
-                if tytul_w:
-                    lines.append(f"**Wybór gracza — {tytul_w}:**")
-                else:
-                    lines.append("**Wybór gracza:**")
-                lines.extend(opcje)
-
-        lines.append("")
-        return lines, done, total, postacie_w_scenie
-
-    # -------------------------------------------------------- kontekst w rozdziale
-
-    def _kontekst_rozdzialu(
-        self,
-        postacie_ids: set[int],
-        rozdzial_tytul: str,
-        widziane_postacie: dict[int, str],
-        teksty_rozdzialu: str,
-        wzmiankowane_przedmioty: set[str],
-    ) -> list[str]:
-        """Zbuduj sekcję kontekstową z ochroną przed duplikacją i spoilerami."""
-        lines: list[str] = []
-        nowe_postacie: list[str] = []
-        powrotne_postacie: list[str] = []
-
-        for pid in sorted(postacie_ids):
-            entry = self.encyklopedia_po_id.get(pid)
-            if not entry:
-                continue
-            pl_name = self.pl.tekst(entry.get("nazwa"), jedna_linia=True)
-            if not pl_name:
-                if self.zakres == "wszystko" and entry.get("nazwa"):
-                    pl_name = f"[Brak polskiej nazwy postaci: {entry['nazwa']}]"
-                else:
-                    continue
-            if pid in widziane_postacie:
-                powrotne_postacie.append(f"{pl_name} *(pierwsze wystąpienie: {widziane_postacie[pid]})*")
-                continue
-            tozsamosc = [
-                t for t in (self.pl.tekst(k, jedna_linia=True) for k in entry.get("tozsamosc", ())) if t
-            ]
-            # Ostrożnie przed spoilerami: do rozdziału włączamy wyłącznie 1. podstawowy wpis biograficzny,
-            # pełna reszta odblokowywanych wspomnień znajduje się w księdze 03_encyklopedia_swiata.md.
-            pierwsza_historia = None
-            for item in entry.get("historie", ())[:1]:
-                if isinstance(item, (list, tuple)):
-                    czesci = [self.pl.tekst(k, jedna_linia=True) for k in item if k]
-                    czesci = [c for c in czesci if c]
-                    if czesci:
-                        pierwsza_historia = " — ".join(czesci)
-                        break
-                elif isinstance(item, str):
-                    pierwsza_historia = self.pl.tekst(item, jedna_linia=True)
-                    if pierwsza_historia:
-                        break
-            if tozsamosc or pierwsza_historia:
-                widziane_postacie[pid] = rozdzial_tytul
-                opis = f"- **{pl_name}**"
-                if tozsamosc:
-                    opis += f" — {'; '.join(tozsamosc)}"
-                if pierwsza_historia:
-                    opis += f"\n  - *Pierwszy wpis z księgi postaci:* {pierwsza_historia}"
-                    if len(entry.get("historie", ())) > 1:
-                        opis += " *(dalsze wpisy biograficzne w `03_encyklopedia_swiata.md`)*"
-                nowe_postacie.append(opis)
-
-        if nowe_postacie or powrotne_postacie:
-            lines.append("#### Postacie napotkane w tym rozdziale (encyklopedia gry)")
-            lines.extend(nowe_postacie)
-            if powrotne_postacie:
-                lines.append(f"- *Ponowne wystąpienia znanych postaci:* {', '.join(powrotne_postacie)}")
-            lines.append("")
-
-        # Wzmiankowane w tekście rozdziału przedmioty lub techniki (dopasowanie z zachowaniem wielkości liter,
-        # bez jednosłownych nazw pospolitych z tabeli stuff_items, z jednorazowym cache dla szybkości).
-        if self._kandydaci_wzmianek is None:
-            kandydaci: list[tuple[str, str, str, tuple[str, ...]]] = []
-            for tbl_name, kategoria in (
-                ("equip_items", "Wyposażenie"),
-                ("stuff_items", "Przedmiot"),
-                ("kongfu", "Styl walki"),
-                ("xinfa", "Sztuka wewnętrzna"),
-                ("jianghu_skills", "Umiejętność Jianghu"),
-            ):
-                for _rid, cols in sorted(self.tabele.get(tbl_name, {}).items(), key=lambda x: _naturalny(x[0])):
-                    n_kl = cols.get("name") or cols.get("jianghu_skill_name")
-                    if not n_kl:
-                        continue
-                    pl_n = self.pl.tekst(n_kl, jedna_linia=True)
-                    if not pl_n or len(pl_n) < 5:
-                        continue
-                    toks = tuple(_RE_SLOWA.findall(pl_n))
-                    if not toks:
-                        continue
-                    if tbl_name == "stuff_items" and len(toks) < 2:
-                        continue
-                    d_kl = cols.get("brief_describe_str") or cols.get("describe_str") or cols.get("description") or cols.get("jianghu_brief_description")
-                    pl_d = self.pl.tekst(d_kl, jedna_linia=True) if d_kl else None
-                    if not pl_d:
-                        continue
-                    kandydaci.append((pl_n, kategoria, pl_d, toks))
-            self._kandydaci_wzmianek = kandydaci
-
-        znalezione_rzeczy: list[tuple[str, str, str]] = []
-        word_set = set(_RE_SLOWA.findall(teksty_rozdzialu))
-        for pl_n, kategoria, pl_d, toks in self._kandydaci_wzmianek:
-            if pl_n in wzmiankowane_przedmioty:
-                continue
-            if not all(tok in word_set for tok in toks):
-                continue
-            if re.search(rf"(?<!\w){re.escape(pl_n)}(?!\w)", teksty_rozdzialu):
-                znalezione_rzeczy.append((pl_n, kategoria, pl_d))
-                wzmiankowane_przedmioty.add(pl_n)
-                if len(znalezione_rzeczy) >= 8:
-                    break
-
-        if znalezione_rzeczy:
-            lines.append("#### Wzmiankowane przedmioty i techniki")
-            lines.extend(formatuj_tabele(["Nazwa", "Rodzaj", "Opis z gry"], znalezione_rzeczy))
-            lines.append("")
-
-        return lines
-
-    # -------------------------------------------------------- budowa ksiąg
-
-    def _dopasuj_domene_vo(self, aud: str) -> tuple[str, str, int | None, tuple[int, ...]] | None:
-        return kc.dopasuj_domene_vo(aud)
-
     def _tytul_powtorki(self, cut_no: int) -> str | None:
         prow = self.powtorka_po_no.get(cut_no)
         if not prow:
@@ -878,66 +706,37 @@ class BudowniczyCzytanek:
         pn = self.pl.tekst(prow.get("nazwa"), jedna_linia=True)
         pr = self.pl.tekst(prow.get("rozdzial"), jedna_linia=True)
         psp_id = prow.get("przestrzen")
-        psp = None
-        if psp_id not in (None, 501, 502, 504):
-            psp = self._miejsce(psp_id)
+        psp = self._miejsce(psp_id) if psp_id not in (None, 501, 502, 504) else None
         czesci = [c for c in (pn, pr, psp) if c]
         return " — ".join(czesci) if czesci else None
 
-    def _segmentuj_ciag_napisow(self, ciag: list[dict]) -> list[dict]:
-        """Podziel ciągły blok `text_msg` na logiczne pod-sceny z metadanymi kontekstowymi."""
-        return kc.segmentuj_ciag_napisow(ciag)
+    # -------------------------------------------------------- zbieranie epizodów i scen (Przebieg 1)
 
-    def _buduj_prolog_i_przerywniki(self) -> ZbudowanyPlik:
+    def _zbierz_epizody(self) -> list[_Epizod]:
         ix = self.ix
-        lines: list[str] = [
-            "# Prolog i przerywniki filmowe — Where Winds Meet",
-            "",
-            "Zbiór sekwencji wprowadzających, Prologu, napisów przerywników (`text_msg`) oraz plansz",
-            "nieprzypisanych bezpośrednio do pojedynczego zadania.",
-            "",
-        ]
-        done_total = 0
-        all_total = 0
+        epizody: list[_Epizod] = []
+        ep_nr = 0
 
-        # 1. Intro (`wds_oneday_intro_cutscene_data`)
-        intro = sorted((r for r in ix.cutsceny_kontekst.get("intro", ()) if r.get("k") in ix.teksty), key=lambda r: r["id"])
-        intro_slots = [r["k"] for r in intro]
-        d_i, t_i = self._stat_slotow(intro_slots)
-        done_total += d_i
-        all_total += t_i
-        if self._ma_dopuszczalne_pokrycie(d_i, t_i):
-            lines.append(f"## Intro otwierające ({d_i}/{t_i} linii)")
-            lines.append("*Sekwencja wprowadzająca — „One Day in the Imperial Service” (`wds_oneday_intro_cutscene_data`).*")
-            lines.append("")
-            for r in intro:
-                txt = self._tekst(r["k"], fallback_label="napisu intro", jedna_linia=True)
-                if txt:
-                    if r["mowca"] == 1:
-                        mowca_lbl = "You Xia"
-                    elif r["mowca"] == 2:
-                        mowca_lbl = "Mówca 2 (Gwardia Cesarska)"
-                    else:
-                        mowca_lbl = f"Mówca {r['mowca']}"
-                    lines.append(f"- `{r['czas']:.1f}s` **{mowca_lbl}:** {txt}")
-            lines.append("")
-
-        # 2. Ciągi cutscen `text_msg` (w tym pasmo 590291–590459 jako wyróżniona pierwsza sekcja)
-        napisy = sorted((r for r in ix.cutsceny_kontekst.get("napis", ()) if r.get("k") in ix.teksty), key=lambda r: r["wiersz"])
+        # ---- Przygotowanie danych cutscen text_msg i intro ----
+        intro_rows = sorted(
+            (r for r in ix.cutsceny_kontekst.get("intro", ()) if r.get("k") in ix.teksty),
+            key=lambda r: r["id"],
+        )
+        napisy = sorted(
+            (r for r in ix.cutsceny_kontekst.get("napis", ()) if r.get("k") in ix.teksty),
+            key=lambda r: r["wiersz"],
+        )
         ciagi: list[list[dict]] = []
         for row in napisy:
             if not ciagi or row["wiersz"] - ciagi[-1][-1]["wiersz"] > 1:
                 ciagi.append([row])
             else:
                 ciagi[-1].append(row)
-
-        # Wykrywanie par męski/żeński w ciągach
         plec_wiersza = kc.wykryj_plec_napisow(napisy, ix.teksty)
-
         prolog_ciagi = [c for c in ciagi if not (c[-1]["wiersz"] < ZAKRES_PROLOG_TM[0] or c[0]["wiersz"] > ZAKRES_PROLOG_TM[1])]
         inne_ciagi = [c for c in ciagi if c not in prolog_ciagi]
 
-        def renderuj_podscene(seg: dict, tytul_nagl: str, poziom_nagl: int) -> tuple[list[str], int, int]:
+        def _zbuduj_scene_segmentu(seg: dict, tytul_bazowy: str, ep_id: int, sc_idx: int) -> tuple[_Scena | None, int, int]:
             filtrowane: list[tuple[dict, str, str]] = []
             for row in seg["rows"]:
                 p = plec_wiersza.get(row["wiersz"], "")
@@ -949,16 +748,13 @@ class BudowniczyCzytanek:
                 filtrowane.append((row, p, pref))
             d_s, t_s = self._stat_slotow([r["k"] for r, _, _ in filtrowane])
             if not self._ma_dopuszczalne_pokrycie(d_s, t_s):
-                return [], d_s, t_s
+                return None, d_s, t_s
 
-            out_lines: list[str] = [f"{'#' * poziom_nagl} {tytul_nagl} ({d_s}/{t_s} napisów)"]
-
-            # Kontekst z bazy gry (wyłącznie w aktualnym języku przekładu / podglądu)
+            out_lines: list[str] = []
             if seg["grupa"] is not None:
-                row_g = self.ix.grupy.get(seg["grupa"]) or {}
+                row_g = ix.grupy.get(seg["grupa"]) or {}
                 if any(self.pl.tekst(row_g.get(f), jedna_linia=True) for f in ("numer_tytulu", "tytul", "nazwa")):
                     out_lines.append(f"*Wątek:* {self._nazwa_grupy(seg['grupa'])}")
-
             cut_opisy = []
             for cno in seg.get("cuts", ()):
                 ct = self._tytul_powtorki(cno)
@@ -966,53 +762,50 @@ class BudowniczyCzytanek:
                     cut_opisy.append(f"#{cno} ({ct})")
             if cut_opisy:
                 out_lines.append(f"*Powiązane cutsceny w dzienniku:* {', '.join(cut_opisy)}")
-
             if seg.get("notka"):
                 out_lines.append(f"*{seg['notka']}*")
 
-            # Render linii + zliczanie rozpoznanych mówców i nieoznaczonych wierszy
             rendered_dialog: list[str] = []
             rozpoznani_mowcy: list[str] = []
+            mowcy_pary: list[tuple[str | None, str | None]] = []
             widziani_mowcy: set[str] = set()
             brak_mowcy = 0
             last_vo = ""
             wygl_wiersze = seg.get("wygladzono_audio") or set()
+            zh_parts: list[str] = []
             i = 0
             while i < len(filtrowane):
                 row, p, pref = filtrowane[i]
+                zh_parts.append(ix.zh(row["k"]))
                 txt = self._tekst(row["k"], fallback_label="napisu", jedna_linia=True)
                 if not txt:
                     i += 1
                     continue
-
                 ignoruj_a1 = row["wiersz"] in wygl_wiersze
-                mowca1, clean_txt1, czy_gracz1 = self._rozwiaz_mowce_napisu(row, txt, ignoruj_audio=ignoruj_a1)
+                mowca1, clean_txt1, _, sp_en1 = self._rozwiaz_mowce_napisu(row, txt, ignoruj_audio=ignoruj_a1)
                 merged_pair = False
                 if self.plec == "oba" and p and i + 1 < len(filtrowane):
                     row2, p2, _ = filtrowane[i + 1]
                     if {p, p2} == {"bohater", "bohaterka"}:
                         txt2 = self._tekst(row2["k"], fallback_label="napisu", jedna_linia=True)
                         if txt2 is not None:
-                            mowca2, clean_txt2, _ = self._rozwiaz_mowce_napisu(
-                                row2,
-                                txt2,
-                                ignoruj_audio=row2["wiersz"] in wygl_wiersze,
+                            mowca2, clean_txt2, _, _ = self._rozwiaz_mowce_napisu(
+                                row2, txt2, ignoruj_audio=row2["wiersz"] in wygl_wiersze
                             )
                             if clean_txt2 == clean_txt1 and (mowca2 == mowca1 or not mowca2):
                                 merged_pair = True
                                 pref = ""
                 i += 2 if merged_pair else 1
-
                 aud = row.get("audio") or ""
                 vo = "_".join([part for part in aud.split("_") if not part.isdigit()][:3]) if aud else ""
                 if vo and vo != last_vo and last_vo and rendered_dialog:
                     rendered_dialog.append("")
                 last_vo = vo
-
                 if mowca1:
                     if mowca1 not in widziani_mowcy:
                         widziani_mowcy.add(mowca1)
                         rozpoznani_mowcy.append(mowca1)
+                        mowcy_pary.append((self._klucz_mowcy_cutsceny(sp_en1), sp_en1))
                     rendered_dialog.append(f"**{pref}{mowca1}:** {clean_txt1}")
                 elif pref:
                     brak_mowcy += 1
@@ -1024,320 +817,350 @@ class BudowniczyCzytanek:
             if rozpoznani_mowcy and brak_mowcy > 0 and len(rendered_dialog) >= 4:
                 out_lines.append(
                     f"*Rozpoznani mówcy: {', '.join(rozpoznani_mowcy)} "
-                    "(część napisów tej sekwencji zapisano w tabeli `text_msg` bez etykiety mówcy).*"
+                    "(część napisów zapisano w tabeli `text_msg` bez etykiety mówcy).*"
                 )
             elif not rozpoznani_mowcy and brak_mowcy >= 4:
-                out_lines.append("*Uwaga: w źródłowej tabeli `text_msg` tej sekwencji brak przypisanych etykiet mówcy przy napisach.*")
+                out_lines.append("*Uwaga: w źródłowej tabeli `text_msg` tej sekwencji brak przypisanych etykiet mówcy.*")
 
-            out_lines.append("")
+            if out_lines:
+                out_lines.append("")
             out_lines.extend(rendered_dialog)
             out_lines.append("")
-            return out_lines, d_s, t_s
 
-        def dodaj_ciag(tytul_h2: str, ciag: list[dict], *, zawsze_podsceny: bool = False) -> None:
-            nonlocal done_total, all_total
-            segmenty = self._segmentuj_ciag_napisow(ciag)
-            if len(segmenty) == 1 and not zawsze_podsceny:
-                seg = segmenty[0]
-                t_nagl = seg["tytul"] or tytul_h2
-                if seg["tytul"]:
-                    t_nagl = f"{seg['tytul']} (napisy {ciag[0]['wiersz']}–{ciag[-1]['wiersz']})"
-                s_lines, d_c, t_c = renderuj_podscene(seg, t_nagl, poziom_nagl=2)
-                done_total += d_c
-                all_total += t_c
-                lines.extend(s_lines)
-                return
+            w0, w1 = seg["rows"][0]["wiersz"], seg["rows"][-1]["wiersz"]
+            sc = _Scena(
+                uid=f"tm_{w0}_{w1}",
+                epizod_nr=ep_id,
+                scena_nr=sc_idx,
+                tytul=f"{tytul_bazowy} (napisy {w0}–{w1}, {d_s}/{t_s})",
+                rodzaj="text_msg",
+                segment=seg,
+                tekst_zh_do_skanu="\n".join(zh_parts),
+                linie_skryptu=out_lines,
+                mowcy_cutsceny=mowcy_pary,
+                done=d_s,
+                total=t_s,
+            )
+            return sc, d_s, t_s
 
-            # Sekcja nadrzędna `##` z pod-scenami `###`
-            sub_chunks: list[list[str]] = []
-            d_sum = 0
-            t_sum = 0
-            for sub_idx, seg in enumerate(segmenty, 1):
-                w0, w1 = seg["rows"][0]["wiersz"], seg["rows"][-1]["wiersz"]
-                podtytul = seg["tytul"] or f"Sekwencja {sub_idx}"
-                t_nagl = f"{podtytul} (napisy {w0}–{w1})"
-                s_lines, d_s, t_s = renderuj_podscene(seg, t_nagl, poziom_nagl=3)
-                d_sum += d_s
-                t_sum += t_s
-                if s_lines:
-                    sub_chunks.append(s_lines)
+        # ---- EPIZOD 1: Intro i Prolog ----
+        prolog_sceny: list[_Scena] = []
+        p_done = 0
+        p_all = 0
+        next_ep = 1
+        sc_idx = 0
 
-            done_total += d_sum
-            all_total += t_sum
-            if not sub_chunks:
-                return
-            lines.append(f"## {tytul_h2} ({d_sum}/{t_sum} napisów)")
-            lines.append("")
-            for chunk in sub_chunks:
-                lines.extend(chunk)
-
-        for idx, c in enumerate(prolog_ciagi, 1):
-            if len(c) >= 10:
-                dodaj_ciag(
-                    f"Prolog i kluczowe sceny Rozdziału I — sekwencja {idx} (napisy {c[0]['wiersz']}–{c[-1]['wiersz']})"
-                    if len(prolog_ciagi) > 1
-                    else f"Prolog i kluczowe sceny Rozdziału I (napisy {c[0]['wiersz']}–{c[-1]['wiersz']})",
-                    c,
-                    zawsze_podsceny=True,
+        if intro_rows:
+            intro_slots = [r["k"] for r in intro_rows]
+            d_i, t_i = self._stat_slotow(intro_slots)
+            p_done += d_i
+            p_all += t_i
+            if self._ma_dopuszczalne_pokrycie(d_i, t_i):
+                sc_idx += 1
+                s_lines = ["*Sekwencja wprowadzająca — „One Day in the Imperial Service” (`wds_oneday_intro_cutscene_data`).*", ""]
+                zh_i = []
+                for r in intro_rows:
+                    zh_i.append(ix.zh(r["k"]))
+                    txt = self._tekst(r["k"], fallback_label="napisu intro", jedna_linia=True)
+                    if txt:
+                        mowca_lbl = "You Xia" if r["mowca"] == 1 else ("Mówca 2 (Gwardia Cesarska)" if r["mowca"] == 2 else f"Mówca {r['mowca']}")
+                        s_lines.append(f"- `{r['czas']:.1f}s` **{mowca_lbl}:** {txt}")
+                s_lines.append("")
+                prolog_sceny.append(
+                    _Scena(
+                        uid="intro_0",
+                        epizod_nr=next_ep,
+                        scena_nr=sc_idx,
+                        tytul=f"Intro otwierające ({d_i}/{t_i} linii)",
+                        rodzaj="intro",
+                        intro_rows=intro_rows,
+                        tekst_zh_do_skanu="\n".join(zh_i),
+                        linie_skryptu=s_lines,
+                        done=d_i,
+                        total=t_i,
+                    )
                 )
-            else:
-                dodaj_ciag(f"Prolog — sekwencja {idx} (napisy {c[0]['wiersz']}–{c[-1]['wiersz']})", c)
 
-        nr_sekwencji = 0
-        for c in inne_ciagi:
-            w0, w1 = c[0]["wiersz"], c[-1]["wiersz"]
-            seg_probe = self._segmentuj_ciag_napisow(c)
-            if len(seg_probe) == 1:
-                dodaj_ciag(f"Sekwencja cutscen (napisy {w0}–{w1})", c)
-            else:
-                nr_sekwencji += 1
-                if w0 >= 591487 and len(c) >= 20:
-                    nagl_c = f"Sekwencje cutscen — część {nr_sekwencji} (warianty napisów i nowe akty, {w0}–{w1})"
-                else:
-                    nagl_c = f"Sekwencje cutscen — część {nr_sekwencji} (napisy {w0}–{w1})"
-                dodaj_ciag(nagl_c, c)
+        for idx_c, ciag in enumerate(prolog_ciagi, 1):
+            segmenty = kc.segmentuj_ciag_napisow(ciag)
+            for sub_idx, seg in enumerate(segmenty, 1):
+                tyt_seg = seg["tytul"] or (f"Prolog — sekwencja {idx_c}.{sub_idx}" if len(segmenty) > 1 else f"Prolog — sekwencja {idx_c}")
+                sc, ds, ts = _zbuduj_scene_segmentu(seg, tyt_seg, next_ep, sc_idx + 1)
+                p_done += ds
+                p_all += ts
+                if sc is not None and not (self.zakres == "kompletne-rozdzialy" and ds < ts):
+                    sc_idx += 1
+                    sc.scena_nr = sc_idx
+                    prolog_sceny.append(sc)
 
-        # 3. Filmy (`entry_collect_movie_subtitle_data`)
-        by_film: dict[int, list[dict]] = defaultdict(list)
-        for r in ix.cutsceny_kontekst.get("film", ()):
-            if r.get("k") in ix.teksty:
-                by_film[r["film"]].append(r)
-        for film_id, rows in sorted(by_film.items()):
-            rows.sort(key=lambda r: (r["czas"], r["id"]))
-            d_f, t_f = self._stat_slotow([r["k"] for r in rows])
-            done_total += d_f
-            all_total += t_f
-            if not self._ma_dopuszczalne_pokrycie(d_f, t_f):
-                continue
-            lines.append(f"## Film #{film_id} ({d_f}/{t_f} napisów)")
-            lines.append("")
-            for r in rows:
-                txt = self._tekst(r["k"], fallback_label="napisu filmowego", jedna_linia=True)
-                if txt:
-                    lines.append(f"- `{r['czas']:.1f}s` {txt}")
-            lines.append("")
+        if prolog_sceny and not (self.zakres == "kompletne-rozdzialy" and p_done < p_all):
+            epizody.append(
+                _Epizod(
+                    nr=next_ep,
+                    kategoria="prolog",
+                    tytul="Prolog i sekwencje otwierające",
+                    sceny=prolog_sceny,
+                    done=p_done,
+                    total=p_all,
+                )
+            )
+            ep_nr = next_ep
 
-        # 4. Przerywniki nieprzypisane do żadnego zadania (z pominięciem duplikatów platformowych >= 10_000_000)
-        luźne = []
-        for no, row in sorted(ix.przerywniki.items()):
-            if no in self.przerywniki_w_zadaniach:
-                continue
-            if no >= 10_000_000 and (no % 10_000_000) in ix.przerywniki:
-                base_row = ix.przerywniki[no % 10_000_000]
+        # ---- EPIZODY WĄTKU GŁÓWNEGO ORAZ ZADAŃ POBOCZNYCH ----
+        przerywniki_uzyte: set[int] = set()
+        powtorki_uzyte: set[int] = set()
+
+        def _renderuj_dialog(numer_sceny: int, miejsce_uk, tid: int, *, jest_pierwsza_w_zadaniu: bool) -> tuple[_Scena | None, int, int]:
+            scena = ix.sceny[numer_sceny]
+            slots: list[str] = []
+            active: list[tuple[list, str, str]] = []
+            for el in scena["e"]:
+                ok, prefix = self._pasuje_plec_elementu(el)
+                if not ok:
+                    continue
+                slot = self._slot_sceny(el)
+                slots.append(slot)
+                active.append((el, slot, prefix))
+
+            wybory = self.wybory_po.get(numer_sceny, ())
+            for row in wybory:
+                for ch in row.get("wybory", ()):
+                    if ch.get("tekst"):
+                        slots.append(ch["tekst"])
+
+            done, total = self._stat_slotow(slots)
+            if not self._ma_dopuszczalne_pokrycie(done, total):
+                return None, done, total
+
+            s_lines: list[str] = []
+            miejsca_txt = [self._miejsce(m) for m in (scena.get("m") or [])[:3]]
+            miejsca_txt = [m for m in miejsca_txt if m]
+            if miejsca_txt:
+                s_lines.append(f"*Miejsce: {', '.join(miejsca_txt)}*")
+            if miejsce_uk.moment == "numeracja":
+                s_lines.append("*Kolejność przybliżona według numeracji dialogów gry.*")
+            if done < total and self.zakres != "wszystko":
+                s_lines.append(f"*Uwaga: przetłumaczono {done} z {total} wypowiedzi w tej scenie.*")
+            if s_lines:
+                s_lines.append("")
+
+            surowe_wpisy: list[tuple[str, int, str, str, str, str]] = []
+            for el, slot, prefix in active:
+                kind = el[0]
+                txt = self._tekst(slot, fallback_label="kwestii")
+                if txt is None:
+                    continue
+                wariant = el[3] if len(el) > 3 and el[3] else 0
+                bazowy = el[2]
+                mowca = self._mowca(scena, el[1], el[5] if len(el) > 5 else None) if kind == "k" else ""
+                surowe_wpisy.append((kind, wariant, bazowy, mowca, txt, prefix))
+
+            blok: list[str] = []
+            i = 0
+            while i < len(surowe_wpisy):
+                kind, wariant, bazowy, mowca, txt, prefix = surowe_wpisy[i]
                 if (
-                    self.pl.tekst(row.get("tekst")) == self.pl.tekst(base_row.get("tekst"))
-                    and self.pl.tekst(row.get("streszczenie")) == self.pl.tekst(base_row.get("streszczenie"))
+                    self.plec == "oba"
+                    and i + 1 < len(surowe_wpisy)
+                    and {wariant, surowe_wpisy[i + 1][1]} == {1, 2}
+                    and surowe_wpisy[i + 1][0] == kind
+                    and surowe_wpisy[i + 1][2] == bazowy
+                    and surowe_wpisy[i + 1][3] == mowca
+                    and surowe_wpisy[i + 1][4] == txt
                 ):
-                    continue
-            luźne.append((no, row))
-        if luźne:
-            bogate_lines: list[str] = []
-            plansze_lines: list[str] = []
-            for no, row in luźne:
-                slots = [row[f] for f in ("tekst", "streszczenie") if row.get(f)]
-                d_p, t_p = self._stat_slotow(slots)
-                done_total += d_p
-                all_total += t_p
-                if not self._ma_dopuszczalne_pokrycie(d_p, t_p):
-                    continue
-                t_pl = self._tekst(row.get("tekst"), fallback_label="planszy przerywnika")
-                s_pl = self._tekst(row.get("streszczenie"), fallback_label="streszczenia przerywnika")
-                tyt_powt = self._tytul_powtorki(no)
-                if s_pl or tyt_powt:
-                    nagl_p = f"### Przerywnik #{no}" + (f" — {tyt_powt}" if tyt_powt else "")
-                    bogate_lines.append(nagl_p)
-                    if t_pl:
-                        bogate_lines.append(t_pl)
-                    if s_pl:
-                        bogate_lines.append(f"*Streszczenie:* {s_pl}")
-                    bogate_lines.append("")
-                elif t_pl:
-                    plansze_lines.append(f"- **#{no}:** {t_pl.replace(chr(10), ' ')}")
+                    prefix = ""
+                    i += 2
+                else:
+                    i += 1
+                if kind == "k":
+                    blok.append(f"**{prefix}{mowca}:** {txt.replace(chr(10), ' ')}")
+                elif kind in ("p", "o", "i"):
+                    blok.append(f"*{prefix}{txt.replace(chr(10), ' ')}*")
+                elif kind == "wi":
+                    blok.append(f"> **Wizytówka — {txt}**")
+                elif kind == "wt":
+                    blok.append(f"> *{txt}*")
+                else:
+                    blok.append(f"> {prefix}{txt.replace(chr(10), ' ')}")
+            if blok:
+                s_lines.extend(blok)
 
-            if bogate_lines or plansze_lines:
-                lines.append("## Pozostałe plansze i streszczenia przerywników")
-                lines.append("")
-                lines.extend(bogate_lines)
-                if plansze_lines:
-                    lines.append("### Pozostałe plansze przejściowe (czarny ekran)")
-                    lines.append("")
-                    lines.extend(plansze_lines)
-                    lines.append("")
+            for row in wybory:
+                tytul_w = self._tekst(row.get("tytul"), fallback_label="pytania", jedna_linia=True)
+                opcje = []
+                for ch in row.get("wybory", ()):
+                    t_opcji = self._tekst(ch.get("tekst"), fallback_label="opcji wyboru", jedna_linia=True)
+                    if t_opcji is None:
+                        continue
+                    cele = ch.get("dialogi", ())
+                    if cele:
+                        # Placeholder z markowaniem docelowych dialogów — podmienimy po zamknięciu numeracji scen na `Scena X.Y (dialog ...)`!
+                        cele_txt = ", ".join(f"@@CEL_DIALOG:{d}@@" for d in cele)
+                        opcje.append(f"- **Wybór {ch['nr']}:** {t_opcji} *(→ {cele_txt})*")
+                    else:
+                        opcje.append(f"- **Wybór {ch['nr']}:** {t_opcji}")
+                if opcje:
+                    s_lines.append("")
+                    s_lines.append(f"**Wybór gracza — {tytul_w}:**" if tytul_w else "**Wybór gracza:**")
+                    s_lines.extend(opcje)
+            s_lines.append("")
 
-        return ZbudowanyPlik(
-            nazwa="00_prolog_i_przerywniki.md",
-            tytul="Prolog i przerywniki filmowe",
-            opis="Napisy wprowadzające, Prolog, cutsceny fabularne oraz nieprzypisane plansze.",
-            linie=lines,
-            statystyka={"przetlumaczono": done_total, "wszystkich": all_total},
-        )
+            # Tekst ZH do skanowania powiązań: dialog + czysta obsada + metadane zadania
+            tr = ix.zadania[tid]
+            zh_parts = [ix.zh(el[2]) for el in scena["e"] if el[2]]
+            for o in scena.get("o", ()):
+                nk, tk, ok, _rk = self._dane_osoby_w_scenie(o)
+                for k_os in (nk, tk, ok):
+                    if k_os:
+                        zh_parts.append(ix.zh(k_os))
+            for f in ("nazwa", "cel", "opis"):
+                if tr.get(f):
+                    zh_parts.append(ix.zh(tr[f]))
+            przestrzenie = set(scena.get("m") or ())
+            if tr.get("przestrzen") is not None:
+                przestrzenie.add(tr["przestrzen"])
 
-    def _buduj_sekcje_zadan(
-        self,
-        *,
-        nazwa_pliku: str,
-        tytul: str,
-        opis: str,
-        wstep: list[str],
-        tylko_watek_glowny: bool,
-    ) -> ZbudowanyPlik:
-        ix = self.ix
-        lines: list[str] = [f"# {tytul}", "", *wstep, ""]
-        done_total = 0
-        all_total = 0
-        sekcji_wypisanych = 0
-        zadan_wypisanych = 0
-        scen_wypisanych = 0
+            tyt_zad = self._nazwa_zadania(tid)
+            tyt_sceny = f"{tyt_zad} (dialog {numer_sceny})"
+            return (
+                _Scena(
+                    uid=f"dlg_{numer_sceny}",
+                    epizod_nr=0,
+                    scena_nr=0,
+                    tytul=tyt_sceny,
+                    rodzaj="dialog",
+                    dialog_no=numer_sceny,
+                    miejsce_ukladu=miejsce_uk,
+                    zadanie_id=tid,
+                    tekst_zh_do_skanu="\n".join(p for p in zh_parts if p),
+                    przestrzenie=przestrzenie,
+                    linie_skryptu=s_lines,
+                    done=done,
+                    total=total,
+                    pokaz_zadanie_info=jest_pierwsza_w_zadaniu,
+                ),
+                done,
+                total,
+            )
 
-        widziane_postacie: dict[int, str] = {}
-        wzmiankowane_przedmioty: set[str] = set()
-        przerywniki_wypisane: set[int] = set()
-        powtorki_wypisane: set[int] = set()
+        def _renderuj_przerywnik_zadania(cut_no: int, tid: int, moment_lbl: str, prow: dict | None = None) -> tuple[_Scena | None, int, int]:
+            crow = ix.przerywniki.get(cut_no) or {}
+            t_slot = crow.get("tekst")
+            s_slot = crow.get("streszczenie") or (prow.get("streszczenie") if prow else None)
+            c_slots = [s for s in (t_slot, s_slot) if s]
+            cd, ct = self._stat_slotow(c_slots) if c_slots else (0, 0)
+            tyt_p = self._tytul_powtorki(cut_no)
+            ma_crow = bool(c_slots) and self._ma_dopuszczalne_pokrycie(cd, ct)
+            if not ma_crow and not (prow and tyt_p):
+                return None, cd, ct
 
-        current_type = object()
+            s_lines: list[str] = [f"*[Przerywnik fabularny #{cut_no} — {moment_lbl}]*"]
+            t_pl = self._tekst(t_slot, fallback_label="planszy przerywnika") if t_slot else None
+            s_pl = self._tekst(s_slot, fallback_label="streszczenia") if s_slot else None
+            if t_pl:
+                s_lines.append("")
+                s_lines.append(t_pl)
+            if s_pl:
+                s_lines.append("")
+                s_lines.append(f"> **Streszczenie z dziennika:** {s_pl}")
+            s_lines.append("")
+
+            zh_parts = [ix.zh(s) for s in c_slots if s]
+            tr = ix.zadania[tid]
+            for f in ("nazwa", "cel", "opis"):
+                if tr.get(f):
+                    zh_parts.append(ix.zh(tr[f]))
+            przestrzenie = {tr["przestrzen"]} if tr.get("przestrzen") is not None else set()
+            tyt_zad = self._nazwa_zadania(tid)
+            nazwa_cut = tyt_p or f"Przerywnik #{cut_no}"
+            return (
+                _Scena(
+                    uid=f"cut_{cut_no}_{tid}",
+                    epizod_nr=0,
+                    scena_nr=0,
+                    tytul=f"{tyt_zad} — {nazwa_cut}",
+                    rodzaj="przerywnik",
+                    zadanie_id=tid,
+                    przerywnik_no=cut_no,
+                    powtorka_row=prow,
+                    cut_moment=moment_lbl,
+                    tekst_zh_do_skanu="\n".join(p for p in zh_parts if p),
+                    przestrzenie=przestrzenie,
+                    linie_skryptu=s_lines,
+                    done=cd,
+                    total=ct,
+                ),
+                cd,
+                ct,
+            )
 
         for sekcja in self.uklad.sekcje:
             is_main = sekcja.typ == uklad_scen.TYP_WATKU_GLOWNEGO
-            if is_main != tylko_watek_glowny:
+            if self.tylko_watek_glowny and not is_main:
                 continue
 
-            rozdzial_tytul = self._nazwa_grupy(sekcja.grupa)
-            rozdzial_body: list[str] = []
-            postacie_rozdzialu: set[int] = set()
-            teksty_rozdzialu_buf: list[str] = []
-            rozdzial_done = 0
-            rozdzial_all = 0
-            rozdzial_scen = 0
-            rozdzial_zadan = 0
-
-            # Streszczenia rozdziału z `plot_recap_data`
-            for srow in self.streszczenia_grupy.get(sekcja.grupa, ()):
-                s_pl = self._tekst(srow.get("tekst"), fallback_label="streszczenia fabuły")
-                if s_pl:
-                    rozdzial_body.append(f"> **Kronika rozdziału:** {s_pl}")
-            if rozdzial_body:
-                rozdzial_body.append("")
-
+            ep_sceny: list[_Scena] = []
+            ep_done = 0
+            ep_all = 0
             last_meta: tuple[str, str | None, str | None] | None = None
             seen_metas: set[tuple[str, str | None, str | None]] = set()
+            ep_zadania: list[int] = []
+            szac_ep_nr = ep_nr + 1
+
             for tid in sekcja.zadania:
                 trow = ix.zadania[tid]
                 miejsca_sceny = self.uklad.sceny_zadania.get(tid, ())
-                zad_sceny_lines: list[str] = []
+                zad_sceny: list[_Scena] = []
                 zad_done = 0
                 zad_all = 0
-                zad_scen = 0
+                pierwsza_dla_zadania = True
 
-                # Powiązane przerywniki przy przyjęciu
                 for cut_no in (trow.get("przerywniki") or {}).get("przyjecie", ()):
-                    if cut_no in przerywniki_wypisane:
+                    if cut_no in przerywniki_uzyte:
                         continue
-                    crow = ix.przerywniki.get(cut_no)
-                    if not crow:
-                        continue
-                    c_slots = [crow[f] for f in ("tekst", "streszczenie") if crow.get(f)]
-                    cd, ct = self._stat_slotow(c_slots)
+                    sc_c, cd, ct = _renderuj_przerywnik_zadania(cut_no, tid, "rozpoczęcie zadania")
                     zad_done += cd
                     zad_all += ct
-                    if self._ma_dopuszczalne_pokrycie(cd, ct):
-                        przerywniki_wypisane.add(cut_no)
-                        powtorki_wypisane.add(cut_no)
+                    if sc_c is not None:
+                        przerywniki_uzyte.add(cut_no)
+                        powtorki_uzyte.add(cut_no)
                         self.przerywniki_w_zadaniach.add(cut_no)
-                        tyt_p = self._tytul_powtorki(cut_no)
-                        t_pl = self._tekst(crow.get("tekst"), fallback_label="planszy przerywnika")
-                        s_pl = self._tekst(crow.get("streszczenie"), fallback_label="streszczenia")
-                        zad_sceny_lines.append(
-                            f"*[Przerywnik #{cut_no}"
-                            + (f" — {tyt_p}" if tyt_p else "")
-                            + " — rozpoczęcie zadania]*"
-                        )
-                        if t_pl:
-                            zad_sceny_lines.append(t_pl)
-                            teksty_rozdzialu_buf.append(t_pl)
-                        if s_pl:
-                            zad_sceny_lines.append(f"*Streszczenie:* {s_pl}")
-                            teksty_rozdzialu_buf.append(s_pl)
-                        zad_sceny_lines.append("")
+                        zad_sceny.append(sc_c)
+                        pierwsza_dla_zadania = False
 
                 for m in miejsca_sceny:
-                    s_lines, sd, st, s_chars = self._renderuj_scene(
-                        m.dialog,
-                        m,
-                        poziom_naglowka=4 if tylko_watek_glowny else 5,
-                    )
+                    sc_d, sd, st = _renderuj_dialog(m.dialog, m, tid, jest_pierwsza_w_zadaniu=pierwsza_dla_zadania)
                     zad_done += sd
                     zad_all += st
-                    postacie_rozdzialu.update(s_chars)
-                    if s_lines:
-                        zad_scen += 1
-                        zad_sceny_lines.extend(s_lines)
-                        teksty_rozdzialu_buf.extend(s_lines)
+                    if sc_d is not None:
+                        zad_sceny.append(sc_d)
+                        pierwsza_dla_zadania = False
 
-                # Przerywniki po zakończeniu zadania
                 for cut_no in (trow.get("przerywniki") or {}).get("zakonczenie", ()):
-                    if cut_no in przerywniki_wypisane:
+                    if cut_no in przerywniki_uzyte:
                         continue
-                    crow = ix.przerywniki.get(cut_no)
-                    if not crow:
-                        continue
-                    c_slots = [crow[f] for f in ("tekst", "streszczenie") if crow.get(f)]
-                    cd, ct = self._stat_slotow(c_slots)
+                    sc_c, cd, ct = _renderuj_przerywnik_zadania(cut_no, tid, "zakończenie zadania")
                     zad_done += cd
                     zad_all += ct
-                    if self._ma_dopuszczalne_pokrycie(cd, ct):
-                        przerywniki_wypisane.add(cut_no)
-                        powtorki_wypisane.add(cut_no)
+                    if sc_c is not None:
+                        przerywniki_uzyte.add(cut_no)
+                        powtorki_uzyte.add(cut_no)
                         self.przerywniki_w_zadaniach.add(cut_no)
-                        tyt_p = self._tytul_powtorki(cut_no)
-                        t_pl = self._tekst(crow.get("tekst"), fallback_label="planszy przerywnika")
-                        s_pl = self._tekst(crow.get("streszczenie"), fallback_label="streszczenia")
-                        zad_sceny_lines.append(
-                            f"*[Przerywnik #{cut_no}"
-                            + (f" — {tyt_p}" if tyt_p else "")
-                            + " — zakończenie zadania]*"
-                        )
-                        if t_pl:
-                            zad_sceny_lines.append(t_pl)
-                            teksty_rozdzialu_buf.append(t_pl)
-                        if s_pl:
-                            zad_sceny_lines.append(f"*Streszczenie:* {s_pl}")
-                            teksty_rozdzialu_buf.append(s_pl)
-                        zad_sceny_lines.append("")
+                        zad_sceny.append(sc_c)
 
-                # Powtórki cutscen powiązane z zadaniem (`task_cutscene_replay`) nieujęte wyżej w `przerywniki`
                 for prow in self.powtorki_po_zadaniu.get(tid, ()):
                     pno = prow.get("no")
-                    if pno in powtorki_wypisane or pno in przerywniki_wypisane:
+                    if pno in powtorki_uzyte or pno in przerywniki_uzyte:
                         continue
-                    tyt_p = self._tytul_powtorki(pno)
-                    crow = ix.przerywniki.get(pno) or {}
-                    t_slot = crow.get("tekst")
-                    s_slot = crow.get("streszczenie") or prow.get("streszczenie")
-                    c_slots = [s for s in (t_slot, s_slot) if s]
-                    cd, ct = self._stat_slotow(c_slots) if c_slots else (0, 0)
-                    ma_crow = bool(c_slots) and self._ma_dopuszczalne_pokrycie(cd, ct)
-                    if tyt_p or ma_crow:
-                        powtorki_wypisane.add(pno)
-                        przerywniki_wypisane.add(pno)
+                    sc_p, pd, pt = _renderuj_przerywnik_zadania(pno, tid, "powtórka w dzienniku", prow=prow)
+                    if sc_p is not None:
+                        zad_done += pd
+                        zad_all += pt
+                        powtorki_uzyte.add(pno)
+                        przerywniki_uzyte.add(pno)
                         self.przerywniki_w_zadaniach.add(pno)
-                        if ma_crow:
-                            zad_done += cd
-                            zad_all += ct
-                        zad_sceny_lines.append(
-                            f"> **Przerywnik fabularny w dzienniku (#{pno}):** {tyt_p or ''}"
-                        )
-                        if ma_crow:
-                            t_pl = self._tekst(t_slot, fallback_label="planszy przerywnika")
-                            s_pl = self._tekst(s_slot, fallback_label="streszczenia")
-                            if t_pl:
-                                zad_sceny_lines.append(t_pl)
-                                teksty_rozdzialu_buf.append(t_pl)
-                            if s_pl:
-                                zad_sceny_lines.append(f"*Streszczenie:* {s_pl}")
-                                teksty_rozdzialu_buf.append(s_pl)
-                        zad_sceny_lines.append("")
+                        zad_sceny.append(sc_p)
 
-                # Metadane zadania (nazwa, cel, opis w dzienniku)
                 nazwa_z = self.pl.tekst(trow.get("nazwa"), jedna_linia=True)
                 cel_z = self.pl.tekst(trow.get("cel"), jedna_linia=True)
                 opis_z = self.pl.tekst(trow.get("opis"))
@@ -1346,225 +1169,1327 @@ class BudowniczyCzytanek:
                 zad_done += md
                 zad_all += mt
 
-                ma_tresc = bool(zad_sceny_lines) or self._ma_dopuszczalne_pokrycie(zad_done, zad_all)
+                ma_tresc = bool(zad_sceny) or self._ma_dopuszczalne_pokrycie(zad_done, zad_all)
                 if not ma_tresc:
                     continue
                 if self.zakres == "kompletne-rozdzialy" and zad_done < zad_all:
-                    rozdzial_all += zad_all
-                    rozdzial_done += zad_done
+                    ep_all += zad_all
+                    ep_done += zad_done
                     continue
 
                 tyt = nazwa_z or (f"Zadanie #{tid} [brak polskiego tytułu]" if self.zakres == "wszystko" else f"Zadanie #{tid}")
                 cur_meta = (tyt, cel_z, opis_z)
-
-                # W WWM ten sam rozdział miewa wiele kolejnych kroków technicznych o identycznej nazwie i opisie.
-                # Scalamy je czytelnie w jeden nurt, zamiast powtarzać identyczny nagłówek i opis co zadanie.
-                if (last_meta == cur_meta or cur_meta in seen_metas) and not zad_sceny_lines:
-                    continue
-                if last_meta == cur_meta:
-                    rozdzial_done += zad_done
-                    rozdzial_all += zad_all
-                    rozdzial_scen += zad_scen
-                    rozdzial_zadan += 1
-                    rozdzial_body.extend(zad_sceny_lines)
+                if (last_meta == cur_meta or cur_meta in seen_metas) and not zad_sceny:
                     continue
                 seen_metas.add(cur_meta)
 
-                rozdzial_done += zad_done
-                rozdzial_all += zad_all
-                rozdzial_scen += zad_scen
-                rozdzial_zadan += 1
-
-                if last_meta and last_meta[0] == tyt and nazwa_z is not None:
-                    nowe_etapy = False
-                    if (
-                        len(rozdzial_body) >= 2
-                        and rozdzial_body[-1] == ""
-                        and rozdzial_body[-2].startswith(("- **Kolejny etap / cel:**", "- **Dalszy opis:**"))
-                    ):
-                        rozdzial_body.pop()
-                    if cel_z and cel_z != last_meta[1]:
-                        rozdzial_body.append(f"- **Kolejny etap / cel:** {cel_z}")
-                        nowe_etapy = True
-                    if opis_z and opis_z != last_meta[2]:
-                        rozdzial_body.append(f"- **Dalszy opis:** {opis_z}")
-                        nowe_etapy = True
-                    if zad_sceny_lines:
-                        if rozdzial_body and rozdzial_body[-1] != "":
-                            rozdzial_body.append("")
-                        rozdzial_body.extend(zad_sceny_lines)
-                    elif nowe_etapy:
-                        rozdzial_body.append("")
-                else:
-                    nagl_zad = "### " if tylko_watek_glowny else "#### "
-                    rozdzial_body.append(f"{nagl_zad}{tyt}")
+                # Jeśli zadanie ma tylko opis/cel bez dialogów ani przerywników -> Scena dziennikowa
+                if not zad_sceny:
+                    j_lines = []
                     miejsce_z = self._miejsce(trow["przestrzen"]) if trow.get("przestrzen") is not None else None
                     if miejsce_z:
-                        rozdzial_body.append(f"- **Miejsce:** {miejsce_z}")
+                        j_lines.append(f"*Miejsce: {miejsce_z}*")
                     if cel_z:
-                        rozdzial_body.append(f"- **Cel w dzienniku:** {cel_z}")
+                        j_lines.append(f"- **Cel w dzienniku:** {cel_z}")
                     if opis_z:
-                        rozdzial_body.append(f"- **Opis zadania:** {opis_z}")
-                    rozdzial_body.append("")
-                    rozdzial_body.extend(zad_sceny_lines)
+                        j_lines.append(f"- **Opis zadania:** {opis_z}")
+                    j_lines.append("")
+                    zh_j = " ".join(ix.zh(trow.get(f)) for f in ("nazwa", "cel", "opis") if trow.get(f))
+                    zad_sceny.append(
+                        _Scena(
+                            uid=f"zad_{tid}",
+                            epizod_nr=szac_ep_nr,
+                            scena_nr=0,
+                            tytul=f"{tyt} (wpis w dzienniku)",
+                            rodzaj="dziennik",
+                            zadanie_id=tid,
+                            tekst_zh_do_skanu=zh_j,
+                            przestrzenie={trow["przestrzen"]} if trow.get("przestrzen") is not None else set(),
+                            linie_skryptu=j_lines,
+                            done=zad_done,
+                            total=zad_all,
+                            pokaz_zadanie_info=True,
+                        )
+                    )
+                else:
+                    # Do pierwszej sceny zadania dodajemy na górze dyskretną metkę celu/opisu, jeśli jest nowa
+                    if not (last_meta and last_meta == cur_meta):
+                        prefix_lines: list[str] = []
+                        if last_meta and last_meta[0] == tyt and nazwa_z is not None:
+                            if cel_z and cel_z != last_meta[1]:
+                                prefix_lines.append(f"> **Cel etapu:** {cel_z}")
+                            if opis_z and opis_z != last_meta[2]:
+                                prefix_lines.append(f"> **Dalszy opis:** {opis_z}")
+                        else:
+                            if cel_z:
+                                prefix_lines.append(f"> **Cel w dzienniku:** {cel_z}")
+                            if opis_z:
+                                prefix_lines.append(f"> **Opis w dzienniku:** {opis_z}")
+                        if prefix_lines:
+                            prefix_lines.append("")
+                            zad_sceny[0].linie_skryptu = prefix_lines + zad_sceny[0].linie_skryptu
+                        zad_sceny[0].pokaz_zadanie_info = True
+
                 last_meta = cur_meta
-                teksty_rozdzialu_buf.extend(part for part in (tyt, cel_z, opis_z) if part)
+                ep_done += zad_done
+                ep_all += zad_all
+                ep_zadania.append(tid)
+                ep_sceny.extend(zad_sceny)
 
-            done_total += rozdzial_done
-            all_total += rozdzial_all
-            if rozdzial_zadan == 0:
+            if not ep_sceny:
                 continue
-            if self.zakres == "kompletne-rozdzialy" and rozdzial_done < rozdzial_all:
+            if self.zakres == "kompletne-rozdzialy" and ep_done < ep_all:
                 continue
 
-            sekcji_wypisanych += 1
-            zadan_wypisanych += rozdzial_zadan
-            scen_wypisanych += rozdzial_scen
-
-            if not tylko_watek_glowny and sekcja.typ != current_type:
-                current_type = sekcja.typ
-                lines.append(f"## Kategoria: {self._nazwa_typu(sekcja.typ)}")
-                lines.append("")
-
-            nagl_rozdz = "## " if tylko_watek_glowny else "### "
-            lines.append(f"{nagl_rozdz}{rozdzial_tytul}")
-            lines.append(f"*Zadań w sekcji: {rozdzial_zadan} · scen dialogowych: {rozdzial_scen} · przetłumaczenie: {rozdzial_done}/{rozdzial_all}*")
-            lines.append("")
-            lines.extend(rozdzial_body)
-
-            kontekst = self._kontekst_rozdzialu(
-                postacie_rozdzialu,
-                rozdzial_tytul,
-                widziane_postacie,
-                "\n".join(teksty_rozdzialu_buf),
-                wzmiankowane_przedmioty,
+            ep_nr += 1
+            for idx_s, sc in enumerate(ep_sceny, 1):
+                sc.epizod_nr = ep_nr
+                sc.scena_nr = idx_s
+            nazwa_kat = self._nazwa_typu(sekcja.typ)
+            tyt_ep = f"{nazwa_kat}: {self._nazwa_grupy(sekcja.grupa)}"
+            epizody.append(
+                _Epizod(
+                    nr=ep_nr,
+                    kategoria="watek_glowny" if is_main else "poboczne",
+                    tytul=tyt_ep,
+                    typ_zadania=sekcja.typ,
+                    grupa=sekcja.grupa,
+                    notka_kategorii=(
+                        ""
+                        if is_main
+                        else "Uwaga: zadania tej kategorii w otwartym świecie można podejmować w dowolnej kolejności."
+                    ),
+                    sceny=ep_sceny,
+                    zadania_ids=ep_zadania,
+                    done=ep_done,
+                    total=ep_all,
+                )
             )
-            if kontekst:
-                lines.extend(kontekst)
 
-        if sekcji_wypisanych == 0:
-            lines.append("*W aktualnym zakresie i zbiorze polskich tłumaczeń brak jeszcze ukończonych rozdziałów do tej księgi.*")
+        # ---- POZOSTAŁE CUTSCENY, FILMY I LUŹNE PRZERYWNIKI (tylko gdy nie jesteśmy w wąskim trybie? Nie — zawsze, chyba że `--tylko-watek-glowny` ogranicza też poboczne napisy) ----
+        cut_sceny: list[_Scena] = []
+        cut_done = 0
+        cut_all = 0
+        cand_ep = ep_nr + 1
+
+        if not self.tylko_watek_glowny:
+            nr_sek = 0
+            for ciag in inne_ciagi:
+                segmenty = kc.segmentuj_ciag_napisow(ciag)
+                nr_sek += 1
+                for sub_idx, seg in enumerate(segmenty, 1):
+                    tyt_seg = seg["tytul"] or f"Sekwencja cutscen {nr_sek}.{sub_idx}"
+                    sc, ds, ts = _zbuduj_scene_segmentu(seg, tyt_seg, cand_ep, len(cut_sceny) + 1)
+                    cut_done += ds
+                    cut_all += ts
+                    if sc is not None and not (self.zakres == "kompletne-rozdzialy" and ds < ts):
+                        cut_sceny.append(sc)
+
+            by_film: dict[int, list[dict]] = defaultdict(list)
+            for r in ix.cutsceny_kontekst.get("film", ()):
+                if r.get("k") in ix.teksty:
+                    by_film[r["film"]].append(r)
+            for film_id, rows in sorted(by_film.items()):
+                rows.sort(key=lambda r: (r["czas"], r["id"]))
+                df, tf = self._stat_slotow([r["k"] for r in rows])
+                cut_done += df
+                cut_all += tf
+                if not self._ma_dopuszczalne_pokrycie(df, tf):
+                    continue
+                if self.zakres == "kompletne-rozdzialy" and df < tf:
+                    continue
+                f_lines = []
+                zh_f = []
+                for r in rows:
+                    zh_f.append(ix.zh(r["k"]))
+                    txt = self._tekst(r["k"], fallback_label="napisu filmowego", jedna_linia=True)
+                    if txt:
+                        f_lines.append(f"- `{r['czas']:.1f}s` {txt}")
+                f_lines.append("")
+                cut_sceny.append(
+                    _Scena(
+                        uid=f"film_{film_id}",
+                        epizod_nr=cand_ep,
+                        scena_nr=len(cut_sceny) + 1,
+                        tytul=f"Sekwencja filmowa #{film_id} ({df}/{tf} napisów)",
+                        rodzaj="film",
+                        film_id=film_id,
+                        film_rows=rows,
+                        tekst_zh_do_skanu="\n".join(zh_f),
+                        linie_skryptu=f_lines,
+                        done=df,
+                        total=tf,
+                    )
+                )
+
+            # Luźne przerywniki nieprzypisane do żadnego zadania
+            luzne = []
+            for no, row in sorted(ix.przerywniki.items()):
+                if no in self.przerywniki_w_zadaniach or no in przerywniki_uzyte:
+                    continue
+                if no >= 10_000_000 and (no % 10_000_000) in ix.przerywniki:
+                    base_row = ix.przerywniki[no % 10_000_000]
+                    if (
+                        self.pl.tekst(row.get("tekst")) == self.pl.tekst(base_row.get("tekst"))
+                        and self.pl.tekst(row.get("streszczenie")) == self.pl.tekst(base_row.get("streszczenie"))
+                    ):
+                        continue
+                luzne.append((no, row))
+
+            plansze_buf: list[tuple[int, str, str]] = []  # (no, txt_pl, zh)
+            for no, row in luzne:
+                slots = [row[f] for f in ("tekst", "streszczenie") if row.get(f)]
+                dp, tp = self._stat_slotow(slots)
+                cut_done += dp
+                cut_all += tp
+                if not self._ma_dopuszczalne_pokrycie(dp, tp):
+                    continue
+                if self.zakres == "kompletne-rozdzialy" and dp < tp:
+                    continue
+                t_pl = self._tekst(row.get("tekst"), fallback_label="planszy przerywnika")
+                s_pl = self._tekst(row.get("streszczenie"), fallback_label="streszczenia przerywnika")
+                tyt_powt = self._tytul_powtorki(no)
+                if s_pl or tyt_powt:
+                    p_lines: list[str] = []
+                    if t_pl:
+                        p_lines.append(t_pl)
+                    if s_pl:
+                        p_lines.append(f"> **Streszczenie:** {s_pl}")
+                    p_lines.append("")
+                    cut_sceny.append(
+                        _Scena(
+                            uid=f"cut_loose_{no}",
+                            epizod_nr=cand_ep,
+                            scena_nr=len(cut_sceny) + 1,
+                            tytul=f"Przerywnik #{no}" + (f" — {tyt_powt}" if tyt_powt else ""),
+                            rodzaj="przerywnik",
+                            przerywnik_no=no,
+                            tekst_zh_do_skanu="\n".join(ix.zh(s) for s in slots),
+                            linie_skryptu=p_lines,
+                            done=dp,
+                            total=tp,
+                        )
+                    )
+                elif t_pl:
+                    plansze_buf.append((no, t_pl.replace("\n", " "), ix.zh(row.get("tekst"))))
+
+            if plansze_buf:
+                pl_lines = [f"- **#{no}:** {txt}" for no, txt, _ in plansze_buf] + [""]
+                cut_sceny.append(
+                    _Scena(
+                        uid="cut_blackscreens",
+                        epizod_nr=cand_ep,
+                        scena_nr=len(cut_sceny) + 1,
+                        tytul=f"Plansze przejściowe ({len(plansze_buf)} wpisów)",
+                        rodzaj="przerywnik",
+                        tekst_zh_do_skanu="\n".join(z for _, _, z in plansze_buf if z),
+                        linie_skryptu=pl_lines,
+                        done=len(plansze_buf),
+                        total=len(plansze_buf),
+                    )
+                )
+
+            if cut_sceny:
+                ep_nr = cand_ep
+                for idx_s, sc in enumerate(cut_sceny, 1):
+                    sc.epizod_nr = ep_nr
+                    sc.scena_nr = idx_s
+                epizody.append(
+                    _Epizod(
+                        nr=ep_nr,
+                        kategoria="cutsceny",
+                        tytul="Pozostałe sekwencje filmowe, cutsceny i plansze przejściowe",
+                        sceny=cut_sceny,
+                        done=cut_done,
+                        total=cut_all,
+                    )
+                )
+
+        # ---- OPCJONALNIE: OTOCZENIE (`--z-otoczeniem`) ----
+        if self.z_otoczeniem:
+            def _dodaj_epizod_otoczenia(tytul_o: str, numery: list[int], *, projekt: str | None = None, tlo_k: tuple | None = None) -> None:
+                nonlocal ep_nr
+                sc_list: list[_Scena] = []
+                d_o = 0
+                t_o = 0
+                for dno in numery:
+                    scena = ix.sceny[dno]
+                    slots = []
+                    active = []
+                    for el in scena["e"]:
+                        ok, prefix = self._pasuje_plec_elementu(el)
+                        if not ok:
+                            continue
+                        slot = self._slot_sceny(el)
+                        slots.append(slot)
+                        active.append((el, slot, prefix))
+                    ds, ts = self._stat_slotow(slots)
+                    d_o += ds
+                    t_o += ts
+                    if not self._ma_dopuszczalne_pokrycie(ds, ts):
+                        continue
+                    s_lines = []
+                    miejsca_txt = [m for m in (self._miejsce(mm) for mm in (scena.get("m") or [])[:3]) if m]
+                    if miejsca_txt:
+                        s_lines.append(f"*Miejsce: {', '.join(miejsca_txt)}*")
+                        s_lines.append("")
+                    for el, slot, prefix in active:
+                        txt = self._tekst(slot, fallback_label="kwestii")
+                        if not txt:
+                            continue
+                        if el[0] == "k":
+                            mowca = self._mowca(scena, el[1], el[5] if len(el) > 5 else None)
+                            s_lines.append(f"**{prefix}{mowca}:** {txt.replace(chr(10), ' ')}")
+                        else:
+                            s_lines.append(f"*{prefix}{txt.replace(chr(10), ' ')}*")
+                    s_lines.append("")
+                    zh_p = [ix.zh(el[2]) for el in scena["e"] if el[2]]
+                    sc_list.append(
+                        _Scena(
+                            uid=f"env_{dno}",
+                            epizod_nr=ep_nr + 1,
+                            scena_nr=len(sc_list) + 1,
+                            tytul=f"Rozmowa świata (dialog {dno})",
+                            rodzaj="dialog",
+                            dialog_no=dno,
+                            miejsce_ukladu=self.uklad.miejsca[dno],
+                            tekst_zh_do_skanu="\n".join(zh_p),
+                            przestrzenie=set(scena.get("m") or ()),
+                            linie_skryptu=s_lines,
+                            done=ds,
+                            total=ts,
+                        )
+                    )
+                if not sc_list:
+                    return
+                ep_nr += 1
+                for idx_s, sc in enumerate(sc_list, 1):
+                    sc.epizod_nr = ep_nr
+                    sc.scena_nr = idx_s
+                epizody.append(
+                    _Epizod(
+                        nr=ep_nr,
+                        kategoria="otoczenie",
+                        tytul=tytul_o,
+                        projekt=projekt,
+                        tlo_klucz=tlo_k,
+                        notka_kategorii="Katalog dialogów bez powiązania z zadaniami oraz rozmów tła NPC (kolejność katalogowa).",
+                        sceny=sc_list,
+                        done=d_o,
+                        total=t_o,
+                    )
+                )
+
+            for project, numbers in self.uklad.projekty:
+                _dodaj_epizod_otoczenia(f"Rozmowy świata — projekt: {project or '(bez nazwy)'}", numbers, projekt=project)
+            for (kind, value), numbers in self.uklad.tlo:
+                miejsce_lbl = (self._miejsce(value) or f"Obszar #{value}") if kind == "miejsce" else f"Reakcje NPC: {value}"
+                _dodaj_epizod_otoczenia(f"Rozmowy tła — {miejsce_lbl}", numbers, tlo_k=(kind, value))
+
+        # Rozwiązanie docelowych odnośników wyborów (`@@CEL_DIALOG:<id>@@` -> `Scena E.S (dialog <id>)`)
+        dialog_na_scene: dict[int, str] = {}
+        for ep in epizody:
+            for sc in ep.sceny:
+                if sc.dialog_no is not None and sc.dialog_no not in dialog_na_scene:
+                    dialog_na_scene[sc.dialog_no] = sc.etykieta_krotka
+        re_cel = re.compile(r"@@CEL_DIALOG:(\d+)@@")
+        for ep in epizody:
+            for sc in ep.sceny:
+                sc.linie_skryptu = [
+                    re_cel.sub(
+                        lambda m: f"{dialog_na_scene[int(m.group(1))]}, dialog {m.group(1)}"
+                        if int(m.group(1)) in dialog_na_scene
+                        else f"dialog {m.group(1)}",
+                        line,
+                    )
+                    for line in sc.linie_skryptu
+                ]
+
+        return epizody
+
+    # -------------------------------------------------------- budowa `epizody.md` i `kontekst_scen.md`
+
+    def _narracja_otwierajaca_epizodu(self, ep: _Epizod) -> list[str]:
+        """Narracja otwierająca rozdział/epizod z gry (`main_storyline_activity_config`, `task_group_info`, `plot_recap_data`)."""
+        linie: list[str] = []
+        if ep.grupa is not None:
+            # 1. Poemat otwierający rozdział (`task_group_info`: text_shang[] + text_xia[])
+            gid_s = str(ep.grupa)
+            poemat_g = self.baza.wszystkie_klucze("task_group_info", gid_s, "text_shang[]")
+            poemat_d = self.baza.wszystkie_klucze("task_group_info", gid_s, "text_xia[]")
+            wiersze_p = [
+                t for t in (self.pl.tekst(k, jedna_linia=True) for k in (*poemat_g, *poemat_d)) if t
+            ]
+            if wiersze_p:
+                linie.append("> " + " / ".join(wiersze_p))
+            # 2. Opis głównego aktu z `main_storyline_activity_config`
+            for act_id, target_gr in pc.AKTY_FABULARNE_DO_GRUPY.items():
+                if target_gr == ep.grupa:
+                    des_kl = self.baza.pierwszy_klucz("main_storyline_activity_config", act_id, "des", z_w2=False)
+                    des_pl = self.pl.tekst(des_kl)
+                    if des_pl:
+                        linie.append(f"> **Wprowadzenie do aktu:** {des_pl}")
+            # 3. Kronika rozdziału z `plot_recap_data`
+            for srow in self.streszczenia_grupy.get(ep.grupa, ()):
+                s_pl = self._tekst(srow.get("tekst"), fallback_label="streszczenia fabuły")
+                if s_pl:
+                    linie.append(f"> **Kronika rozdziału:** {s_pl}")
+        if ep.notka_kategorii:
+            linie.insert(0, f"*{ep.notka_kategorii}*")
+        if linie:
+            linie.append("")
+        return linie
+
+    def _buduj_epizody_md(self, epizody: list[_Epizod]) -> ZbudowanyPlik:
+        lines: list[str] = [
+            "# Where Winds Meet — Scenariusz fabularny (Epizody)",
+            "",
+            "Czysty scenariusz do ciągłej lektury: Prolog, Wątek Główny, wątki poboczne oraz sekwencje przerywników.",
+            "Wszystkie powiązane biografie, opisy NPC, frakcje, miejsca, księgi, poszlaki, listy, przedmioty i techniki",
+            "znajdziesz pod identycznymi numerami `Epizod E` i `Scena E.S` w równoległym pliku `kontekst_scen.md`.",
+            "",
+        ]
+        done_total = 0
+        all_total = 0
+        scen_total = 0
+        prev_kat = None
+        naglowki_kat = {
+            "prolog": "Część I — Prolog i sekwencje otwierające",
+            "watek_glowny": "Część II — Wątek Główny (chronologicznie)",
+            "poboczne": "Część III — Zadania poboczne i historie świata",
+            "cutsceny": "Część IV — Pozostałe sekwencje filmowe, cutsceny i plansze",
+            "otoczenie": "Część V — Rozmowy świata poza zadaniami",
+        }
+
+        for ep in epizody:
+            if ep.kategoria != prev_kat:
+                prev_kat = ep.kategoria
+                lines.append(f"# {naglowki_kat.get(ep.kategoria, ep.kategoria)}")
+                lines.append("")
+                if ep.kategoria == "poboczne":
+                    lines.append(
+                        "> **Uwaga dla czytelnika:** Zadania poboczne (Spotkania, Kampanie, Dziedzictwo Jianghu, Sprawy świata itp.) "
+                        "są uporządkowane według kategorii i wewnętrznych łańcuchów zależności, lecz w otwartym świecie gry można je podejmować w dowolnej kolejności."
+                    )
+                    lines.append("")
+
+            lines.append(f"## Epizod {ep.nr} — {ep.tytul}")
+            lines.append(f"*Scen: {len(ep.sceny)} · przetłumaczenie: {ep.done}/{ep.total}*")
+            lines.append("")
+            lines.extend(self._narracja_otwierajaca_epizodu(ep))
+
+            for sc in ep.sceny:
+                lines.append(f"### {sc.naglowek}")
+                lines.append("")
+                lines.extend(sc.linie_skryptu)
+                scen_total += 1
+
+            done_total += ep.done
+            all_total += ep.total
+
+        if not epizody:
+            lines.append("*W aktualnym zakresie i zbiorze polskich tłumaczeń brak jeszcze ukończonych epizodów.*")
             lines.append("")
 
         return ZbudowanyPlik(
-            nazwa=nazwa_pliku,
-            tytul=tytul,
-            opis=opis,
+            nazwa="epizody.md",
+            tytul="Scenariusz fabularny (Epizody)",
+            opis="Numerowany skrypt Prologu, Wątku Głównego, zadań pobocznych i cutscen.",
             linie=lines,
             statystyka={
-                "rozdzialow": sekcji_wypisanych,
-                "zadan": zadan_wypisanych,
-                "scen": scen_wypisanych,
+                "epizodow": len(epizody),
+                "scen": scen_total,
                 "przetlumaczono": done_total,
                 "wszystkich": all_total,
             },
         )
 
-    def _zbierz_wiersze_tabeli(self, tbl: str) -> list[tuple[str, dict[str, str]]]:
-        rows = self.tabele.get(tbl, {})
-        return sorted(rows.items(), key=lambda x: _naturalny(x[0]))
+    # -------------------------------------------------------- budowa `kontekst_scen.md`
 
-    def _buduj_encyklopedie_swiata(self) -> ZbudowanyPlik:
+    def _zbierz_wiersz_tabeli_pl(self, tbl: str, rid: str, pola: list[tuple[str, str]], *, uzyj_w2: bool = True) -> tuple[str | None, list[tuple[str, str]], int, int]:
+        """Odczytaj nazwę i opisane pola wiersza wyłącznie przez `self.pl`."""
+        nazwa_kl = self.baza.pierwszy_klucz(tbl, rid, pola[0][0], z_w2=uzyj_w2)
+        sloty: list[str] = [nazwa_kl] if nazwa_kl else []
+        for col, _lbl in pola[1:]:
+            sloty.extend(self.baza.wszystkie_klucze(tbl, rid, col))
+        d_r, t_r = self._stat_slotow(sloty)
+        if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
+            return None, [], d_r, t_r
+        nazwa = self._tekst(nazwa_kl, fallback_label="nazwy", jedna_linia=True) if nazwa_kl else None
+        detale: list[tuple[str, str]] = []
+        for col, lbl in pola[1:]:
+            klucze = self.baza.wszystkie_klucze(tbl, rid, col)
+            teksty = []
+            seen_t = set()
+            for kl in klucze:
+                val = self._tekst(kl, fallback_label=lbl.lower())
+                if val and val not in seen_t:
+                    seen_t.add(val)
+                    teksty.append(val)
+            if teksty:
+                detale.append((lbl, "\n".join(teksty)))
+        return nazwa, detale, d_r, t_r
+
+    def _renderuj_karte_postaci_pelna(
+        self,
+        *,
+        imie_pl: str,
+        rola_sceny: str,
+        tytul_pl: str | None = None,
+        opis_npc_pl: str | None = None,
+        enc_entry: dict | None = None,
+        amity_rids: list[str] = (),
+        boss_rids: list[str] = (),
+        fuben_boss_rids: list[str] = (),
+        mistrz_rids: list[str] = (),
+        wiz_cut_rids: list[str] = (),
+        dalsze_wpisy_buf: list[tuple[str, list[str]]],
+    ) -> list[str]:
+        out: list[str] = []
+        tyt_dodatki = [x for x in (tytul_pl,) if x]
+        for wr in wiz_cut_rids:
+            b_kl = self.baza.pierwszy_klucz("cutscene_person_info_config", wr, "base_info", "base_info_en", z_w2=False)
+            b_pl = self.pl.tekst(b_kl, jedna_linia=True)
+            if b_pl and b_pl not in tyt_dodatki:
+                tyt_dodatki.append(b_pl)
+        if enc_entry and enc_entry.get("inna_nazwa"):
+            inna = self.pl.tekst(enc_entry["inna_nazwa"], jedna_linia=True)
+            if inna and inna != imie_pl:
+                tyt_dodatki.append(f"inne miano: {inna}")
+        if enc_entry and enc_entry.get("urodziny"):
+            ur = self.pl.tekst(enc_entry["urodziny"], jedna_linia=True)
+            if ur:
+                tyt_dodatki.append(f"urodziny: {ur}")
+
+        nagl = f"- **{imie_pl}** *({rola_sceny})*"
+        if tyt_dodatki:
+            nagl += f" — {'; '.join(tyt_dodatki)}"
+        out.append(nagl)
+
+        if opis_npc_pl:
+            out.append(f"  - *Opis postaci w scenie (`entity_attr`):* {opis_npc_pl}")
+
+        dalsze_linie_tej_postaci: list[str] = []
+        if enc_entry:
+            toz = [t for t in (self.pl.tekst(k, jedna_linia=True) for k in enc_entry.get("tozsamosc", ())) if t]
+            if toz:
+                out.append(f"  - *Tożsamość (encyklopedia):* {'; '.join(toz)}")
+            historie = enc_entry.get("historie", ())
+            pierwsza_ok = False
+            for idx_h, item in enumerate(historie, 1):
+                if isinstance(item, (list, tuple)):
+                    cz = [self.pl.tekst(k) for k in item if k]
+                    cz = [c for c in cz if c]
+                    h_txt = " — ".join(cz) if cz else None
+                elif isinstance(item, str):
+                    h_txt = self.pl.tekst(item)
+                else:
+                    h_txt = None
+                if not h_txt:
+                    continue
+                if not pierwsza_ok:
+                    pierwsza_ok = True
+                    out.append(f"  - *Biografia (wpis 1):* {h_txt}")
+                else:
+                    dalsze_linie_tej_postaci.append(f"- **Wpis biograficzny {idx_h}:** {h_txt}")
+
+            pid = enc_entry["id"]
+            glosy = self.baza.glosy_postaci.get(pid, ())
+            for t_kl, d_kl in glosy[:2]:
+                g_txt = self.pl.tekst(d_kl, jedna_linia=True)
+                if g_txt:
+                    g_tyt = self.pl.tekst(t_kl, jedna_linia=True) if t_kl else None
+                    out.append(f"  - *Cytat postaci" + (f" ({g_tyt})" if g_tyt else "") + f":* „{g_txt}”")
+
+        for mr in mistrz_rids:
+            id_kl = self.baza.pierwszy_klucz("school_chuancheng_npc_data", mr, "generation_identity", z_w2=False)
+            ds_kl = self.baza.pierwszy_klucz("school_chuancheng_npc_data", mr, "generation_description", z_w2=False)
+            id_pl = self.pl.tekst(id_kl, jedna_linia=True)
+            ds_pl = self.pl.tekst(ds_kl)
+            if id_pl or ds_pl:
+                out.append("  - *Dziedzictwo sekty:* " + " — ".join(x for x in (id_pl, ds_pl) if x))
+
+        for br in boss_rids:
+            dng = self.pl.tekst(self.baza.pierwszy_klucz("single_world_boss_data", br, "sidepage_danger_txt", z_w2=False), jedna_linia=True)
+            dsc = self.pl.tekst(self.baza.pierwszy_klucz("single_world_boss_data", br, "sidepage_boss_desc", z_w2=False))
+            txt_b = self.pl.tekst(self.baza.pierwszy_klucz("single_world_boss_data", br, "sidepage_boss_txt", z_w2=False))
+            czesci = [c for c in (dng, dsc, txt_b) if c]
+            if czesci:
+                out.append(f"  - *Profil World Bossa:* {' — '.join(czesci)}")
+
+        for fbr in fuben_boss_rids:
+            umiej = []
+            for sk_i in range(1, 10):
+                sn = self.pl.tekst(self.baza.pierwszy_klucz("fuben_boss_tips", fbr, f"boss_skill{sk_i}_name", z_w2=False), jedna_linia=True)
+                si = self.pl.tekst(self.baza.pierwszy_klucz("fuben_boss_tips", fbr, f"boss_skill{sk_i}_intro", z_w2=False), jedna_linia=True)
+                if sn or si:
+                    umiej.append(f"**{sn or f'Atak {sk_i}'}:** {si}" if si else f"**{sn}**")
+            if umiej:
+                out.append(f"  - *Umiejętności bossa (`fuben_boss_tips`):* {'; '.join(umiej)}")
+
+        for ar in amity_rids:
+            s1 = self.pl.tekst(self.baza.pierwszy_klucz("npc_amity_relation_data", ar, "story_1", z_w2=False))
+            if s1:
+                out.append(f"  - *Relacja / historia 1 (`npc_amity`):* {s1}")
+            for st_i in range(2, 5):
+                sn_txt = self.pl.tekst(self.baza.pierwszy_klucz("npc_amity_relation_data", ar, f"story_{st_i}", z_w2=False))
+                if sn_txt:
+                    dalsze_linie_tej_postaci.append(f"- *Relacja / historia {st_i} (`npc_amity`):* {sn_txt}")
+
+        if dalsze_linie_tej_postaci:
+            out.append("  - *Uwaga bezspoilerowa:* dalsze wpisy biograficzne/relacyjne znajdują się na końcu tego pliku w sekcji „Dalsze wpisy encyklopedii postaci i relacji”.")
+            dalsze_wpisy_buf.append((imie_pl, dalsze_linie_tej_postaci))
+
+        return out
+
+    def _buduj_kontekst_scen_md(self, epizody: list[_Epizod]) -> tuple[ZbudowanyPlik, dict]:
+        ix = self.ix
+        baza = self.baza
+
+        # 1. Zbiorcze szybkie skanowanie Aho-Corasick dla wszystkich scen tego wydania
+        wszystkie_sceny_skan: dict[str, tuple[str, set[int]]] = {
+            sc.uid: (sc.tekst_zh_do_skanu, sc.przestrzenie)
+            for ep in epizody
+            for sc in ep.sceny
+            if sc.tekst_zh_do_skanu
+        }
+        wzmianki_per_scena = pc.skanuj_wzmianki_w_scenach(baza, wszystkie_sceny_skan)
+
+        # Stan śledzenia pierwszego wystąpienia (anty-duplikacja w `kontekst_scen.md`)
+        pierwsze_postacie: dict[str, str] = {}   # id_kanoniczne -> "Scena E.S"
+        pierwsze_opisy_postaci: dict[str, str] = {}  # id_kanoniczne -> lokalny opis z pierwszego wystąpienia
+        pierwsze_rekordy: dict[tuple[str, str], str] = {}  # (tbl, rid) -> "Scena E.S"
+        pierwsze_podobszary: dict[str, str] = {}  # area_kl -> "Scena E.S"
+        uzyte_rekordy: dict[str, set[str]] = defaultdict(set)
+        uzyte_postacie_enc: set[int] = set()
+        uzyte_amity: set[str] = set()
+        uzyte_bossy: set[str] = set()
+        uzyte_mistrzowie: set[str] = set()
+        uzyte_dark: set[str] = set()
+        uzyte_ending: set[str] = set()
+        uzyte_preludes: set[str] = set()
+        dalsze_wpisy_spotkanych: list[tuple[str, list[str]]] = []
+        widziane_dalsze_klucze: set[str] = set()
+
         lines: list[str] = [
-            "# Encyklopedia świata, bohaterowie i księgi — Where Winds Meet",
+            "# Where Winds Meet — Skonsolidowany kontekst scen i encyklopedia świata",
             "",
-            "Kompendium wiedzy o świecie gry: kalendarium historyczne, regiony, sekty i frakcje,",
-            "biografie bohaterów Jianghu, zapiski regionalne, księgi z gry oraz listy i poszlaki.",
+            "Pełny towarzysz kontekstowy do równoległego pliku `epizody.md`. Zawiera powiązane",
+            "karty postaci, opisy NPC z obsady, frakcje, miejsca, poezję lokacji, karty ładowania,",
+            "księgi, zapiski regionalne, poszlaki, listy, przedmioty, sztuki walki oraz wątki cienia",
+            "pod identycznymi numerami `Epizod E` i `Scena E.S`, dzięki czemu nie trzeba zaglądać do innych plików.",
+            "",
+            "## Zakres i zasady odczytu",
+            "",
+            "- **Numeracja 1:1:** nagłówki `Epizod E` i `Scena E.S` odpowiadają dokładnie numerom w `epizody.md`.",
+            "- **Warstwy powiązań:** łączymy (1) bezpośrednie relacje z `index/` (`tasks`, `task_group_info`, `task_progress_light_info`, `sceny.o`, `entity_attr`, `world_view_person_*`, `opcje_npc`, `guider_task`, `region_game_config`, `spaces.*.region`), (2) rozpoznania tekstowe z dialogów, opisów zadań i tytułów obsady (automat Aho-Corasick po frazach źródłowych), oraz (3) poszlaki, listy, maile i księgi powiązane jednoznacznym imieniem własnym postaci danej sceny.",
+            "- **Anty-duplikacja:** każde hasło (postać, frakcja, miejsce, przedmiot, księga, poszlaka, technika) pojawia się w pełni przy pierwszym wystąpieniu; kolejne sceny podają zwięzły odsyłacz do `Scena E.S`.",
+            "- **Ochrona przed spoilerami:** w kartach przy scenach pokazujemy wyłącznie pierwszy wpis biograficzny postaci z encyklopedii oraz pierwszą historię relacji (`npc_amity`); dalsze odblokowywane wpisy umieszczono w sekcji końcowej dokumentu.",
+            "- **Zasady języka:** " + (
+                "tryb `--podglad-en` (angielski podgląd układu)."
+                if getattr(self.pl, "jest_podgladem_en", False)
+                else "wyłącznie język polski (nieprzetłumaczone wpisy są pomijane lub oznaczone w trybie `--zakres wszystko`)."
+            ),
             "",
         ]
-        done_total = 0
-        all_total = 0
 
-        def sekcja_tabelowa(
-            tytul: str,
-            tbl: str,
-            map_col: list[tuple[str, str]],
-            *,
-            jak_lista: bool = False,
-            domyslny_prefiks: str = "Wpis",
-        ) -> None:
-            nonlocal done_total, all_total
-            rows = self._zbierz_wiersze_tabeli(tbl)
-            if not rows:
+        done_ctx = 0
+        all_ctx = 0
+
+        def _oznaczenie_powtorzenia(tbl: str, rid: str, tytul_baz: str, sc_label: str, powt_buf: list[tuple[str, str]]) -> bool:
+            """Zwróć True jeśli to powtórzenie (dopisuje zwięźle do `powt_buf`), False dla pierwszego wystąpienia."""
+            kl = (tbl, rid)
+            if kl in pierwsze_rekordy:
+                powt_buf.append((tytul_baz, pierwsze_rekordy[kl]))
+                return True
+            pierwsze_rekordy[kl] = sc_label
+            uzyte_rekordy[tbl].add(rid)
+            return False
+
+        def _dopisz_powtorzenia(target_lines: list[str], powt_buf: list[tuple[str, str]]) -> None:
+            if not powt_buf:
                 return
-            wypisane_wiersze: list[list[str]] = []
-            sekcja_linie: list[str] = []
-            d_s = 0
-            t_s = 0
-            for rid, cols in rows:
-                sloty = [cols[k] for k, _ in map_col if k in cols]
-                d_r, t_r = self._stat_slotow(sloty)
-                d_s += d_r
-                t_s += t_r
-                if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
+            widziane_nazwy: set[str] = set()
+            wpisy: list[str] = []
+            for nazwa_p, sc_p in powt_buf:
+                if nazwa_p in widziane_nazwy:
                     continue
-                if jak_lista:
-                    nazwa = self._tekst(cols.get(map_col[0][0]), fallback_label="tytułu", jedna_linia=True) or f"{domyslny_prefiks} #{rid}"
-                    sekcja_linie.append(f"### {nazwa}")
-                    for col_key, label in map_col[1:]:
-                        val = self._tekst(cols.get(col_key), fallback_label=label.lower())
-                        if val:
-                            sekcja_linie.append(f"- **{label}:** {val}")
-                    sekcja_linie.append("")
-                else:
-                    wiersz = [
-                        self._tekst(cols.get(col_key), fallback_label=label.lower(), jedna_linia=True) or ""
-                        for col_key, label in map_col
+                widziane_nazwy.add(nazwa_p)
+                wpisy.append(f"{nazwa_p} (*{sc_p}*)")
+            if wpisy:
+                target_lines.append(f"- *Wcześniej opisane:* {', '.join(wpisy)}")
+
+        # ---- RENDEROWANIE EPIZODÓW I SCEN W `kontekst_scen.md` ----
+        for ep in epizody:
+            lines.append(f"## Epizod {ep.nr} — {ep.tytul}")
+            lines.append("")
+
+            # Kontekst na poziomie Epizodu (grupa zadań / rozdział / Dark Surge)
+            ep_meta_lines: list[str] = []
+            if ep.grupa is not None:
+                gid_s = str(ep.grupa)
+                for act_id, target_gr in pc.AKTY_FABULARNE_DO_GRUPY.items():
+                    if target_gr == ep.grupa:
+                        n_kl = baza.pierwszy_klucz("main_storyline_activity_config", act_id, "name", z_w2=False)
+                        d_kl = baza.pierwszy_klucz("main_storyline_activity_config", act_id, "des", z_w2=False)
+                        n_pl = self.pl.tekst(n_kl, jedna_linia=True)
+                        d_pl = self.pl.tekst(d_kl)
+                        if d_pl:
+                            ep_meta_lines.append(f"- **Akt fabularny ({n_pl or gid_s}):** {d_pl}")
+
+                for col_k, col_lbl in (
+                    ("before_fetch_des", "Wprowadzenie przed podjęciem wątku"),
+                    ("qiyu_chufa_tip", "Wskazówka rozpoczęcia"),
+                    ("qiyu_jiequ_tip", "Wskazówka podjęcia"),
+                    ("unlock_des[]", "Warunek odblokowania"),
+                    ("touch_suc_discr", "Zaliczenie odkrycia"),
+                    ("finish_des[]", "Podsumowanie zakończenia"),
+                    ("finish_summarize", "Finałowa kronika grupy"),
+                ):
+                    vals = [
+                        self._tekst(k, fallback_label=col_lbl.lower())
+                        for k in baza.wszystkie_klucze("task_group_info", gid_s, col_k)
                     ]
-                    if any(wiersz):
-                        wypisane_wiersze.append(wiersz)
-            done_total += d_s
-            all_total += t_s
-            if jak_lista and sekcja_linie:
-                lines.append(f"## {tytul} ({d_s}/{t_s})")
-                lines.append("")
-                lines.extend(sekcja_linie)
-            elif wypisane_wiersze:
-                lines.append(f"## {tytul} ({d_s}/{t_s})")
-                lines.append("")
-                lines.extend(formatuj_tabele([label for _, label in map_col], wypisane_wiersze))
+                    vals = [v for v in vals if v]
+                    if vals:
+                        ep_meta_lines.append(f"- **{col_lbl}:** {' / '.join(dict.fromkeys(vals))}")
+
+                for srow in self.streszczenia_grupy.get(ep.grupa, ()):
+                    s_pl = self._tekst(srow.get("tekst"), fallback_label="streszczenia fabuły")
+                    if s_pl:
+                        ep_meta_lines.append(f"- **Kronika rozdziału (`plot_recap_data`):** {s_pl}")
+
+                # Dark Surge przypisane do aktu (1->1xx, 4->2xx, 6->3xx, 7->4xx)
+                dark_pref = next((p for p, g in pc.DARK_GRUPA_DO_AKTU.items() if g == ep.grupa), None)
+                if dark_pref is not None:
+                    dark_lines: list[str] = []
+                    for rid, _cols in baza.wiersze("task_progress_dark_info"):
+                        if rid.isdigit() and int(rid) // 100 == dark_pref:
+                            d_nm, d_det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                                "task_progress_dark_info", rid, [("content", "Wątek"), ("introduction", "Opis")]
+                            )
+                            done_ctx += dd
+                            all_ctx += dt
+                            if d_nm or d_det:
+                                uzyte_dark.add(rid)
+                                tyt_d = d_nm or f"Wątek cienia #{rid}"
+                                opis_d = d_det[0][1] if d_det else ""
+                                dark_lines.append(f"- **{tyt_d}:** {opis_d}" if opis_d else f"- **{tyt_d}**")
+                            # Powiązane kroki `task_progress_dark_group`
+                            names = baza.wszystkie_klucze("task_progress_dark_group", rid, "[].name")
+                            descs = baza.wszystkie_klucze("task_progress_dark_group", rid, "[].small_point_describe")
+                            for idx_k in range(max(len(names), len(descs))):
+                                kn = self.pl.tekst(names[idx_k], jedna_linia=True) if idx_k < len(names) else None
+                                kd = self.pl.tekst(descs[idx_k]) if idx_k < len(descs) else None
+                                if kn or kd:
+                                    uzyte_rekordy["task_progress_dark_group"].add(rid)
+                                    dark_lines.append(f"  - *{kn or f'Etap {idx_k+1}'}:* {kd or ''}".rstrip())
+                    if dark_lines:
+                        ep_meta_lines.append("- **Wątek cienia aktu (Dark Surge — tło poza głównym szlakiem):**")
+                        ep_meta_lines.extend(f"  {dl}" for dl in dark_lines)
+
+                for end_rid, target_gr in pc.ZAKONCZENIA_DO_GRUPY.items():
+                    if target_gr == ep.grupa and end_rid in baza.tabele.get("task_progress_ending", {}):
+                        en_nm, en_det, ed, et = self._zbierz_wiersz_tabeli_pl(
+                            "task_progress_ending",
+                            end_rid,
+                            [
+                                ("name", "Zakończenie"),
+                                ("stuff_lock_description[]", "Warunek"),
+                                ("stuff_unlock_description", "Odblokowanie"),
+                                ("ending_descri", "Opis zakończenia"),
+                            ],
+                        )
+                        done_ctx += ed
+                        all_ctx += et
+                        if en_nm or en_det:
+                            uzyte_ending.add(end_rid)
+                            ep_meta_lines.append(f"- **Zakończenie aktu ({en_nm or f'#{end_rid}'}):** " + " · ".join(f"{l}: {v}" for l, v in en_det))
+
+            # Przestrzenie występujące w tym epizodzie
+            ep_przestrzenie = sorted({sp for sc in ep.sceny for sp in sc.przestrzenie})
+            miejsca_ep = [m for m in (self._miejsce(sp) for sp in ep_przestrzenie) if m]
+            if miejsca_ep:
+                ep_meta_lines.append(f"- **Lokacje / mapy epizodu:** {', '.join(dict.fromkeys(miejsca_ep))}")
+
+            if ep_meta_lines:
+                lines.append("#### Kontekst całego epizodu")
+                lines.extend(ep_meta_lines)
                 lines.append("")
 
-        sekcja_tabelowa(
-            "Kalendarium i wydarzenia historyczne",
-            "world_view_history_info",
-            [("name", "Wydarzenie"), ("time_1", "Era / rok chiński"), ("time_2", "Data")],
-        )
-        sekcja_tabelowa(
-            "Regiony świata",
-            "world_view_region_info",
-            [("name", "Region"), ("introduction", "Opis regionu")],
-            jak_lista=True,
-            domyslny_prefiks="Region",
-        )
-        sekcja_tabelowa(
-            "Frakcje i ugrupowania (Shili)",
-            "world_view_shili_data",
-            [
-                ("name", "Frakcja"),
-                ("introduction_short", "Motto / skrót"),
-                ("introduction_location", "Siedziba"),
-                ("introduction_long", "Historia i charakterystyka"),
-            ],
-            jak_lista=True,
-            domyslny_prefiks="Frakcja",
-        )
-        sekcja_tabelowa(
-            "Linie dziedzictwa sekt",
-            "school_sect_chuancheng_data",
-            [
-                ("school_name", "Sekta"),
-                *[(f"generation_description_{i}", f"Pokolenie {i}") for i in range(1, 11)],
-            ],
-            jak_lista=True,
-            domyslny_prefiks="Sekta",
-        )
+            # ---- POSZCZEGÓLNE SCENY EPIZODU ----
+            for sc in ep.sceny:
+                sc_label = sc.etykieta_krotka
+                lines.append(f"### {sc.naglowek}")
+                lines.append("")
+                sc_blocks: list[str] = []
+                wzmianki = wzmianki_per_scena.get(sc.uid, {})
 
-        # Postacie z encyklopedii (`ix.encyklopedia` + `world_view_person_info`)
-        postacie_linie: list[str] = []
-        d_p_sum = 0
-        t_p_sum = 0
-        for pid, entry in sorted(self.ix.encyklopedia.items()):
+                # 1. Zadanie, dziennik, Bright Tide, opcje NPC i wskazówki UI
+                zad_lines: list[str] = []
+                if sc.zadanie_id is not None and sc.pokaz_zadanie_info:
+                    trow = ix.zadania.get(sc.zadanie_id, {})
+                    cel_z = self.pl.tekst(trow.get("cel"), jedna_linia=True)
+                    opis_z = self.pl.tekst(trow.get("opis"))
+                    m_z = self._miejsce(trow.get("przestrzen"))
+                    zad_lines.append(f"- **Zadanie #{sc.zadanie_id}:** {self._nazwa_zadania(sc.zadanie_id)}" + (f" *(miejsce: {m_z})*" if m_z else ""))
+                    if cel_z:
+                        zad_lines.append(f"  - *Cel w dzienniku:* {cel_z}")
+                    if opis_z:
+                        zad_lines.append(f"  - *Opis w dzienniku:* {opis_z}")
+
+                    tid_s = str(sc.zadanie_id)
+                    if tid_s in baza.tabele.get("task_progress_light_info", {}):
+                        bt_nm, bt_det, bd, bt = self._zbierz_wiersz_tabeli_pl(
+                            "task_progress_light_info", tid_s, [("content", "Tytuł"), ("introduction", "Opis")]
+                        )
+                        done_ctx += bd
+                        all_ctx += bt
+                        if bt_nm or bt_det:
+                            uzyte_rekordy["task_progress_light_info"].add(tid_s)
+                            zad_lines.append(f"  - *Kamień milowy (Bright Tide — {bt_nm or tid_s}):* {bt_det[0][1] if bt_det else ''}".rstrip())
+
+                    if tid_s in baza.tabele.get("guider_task", {}):
+                        gt_parts = []
+                        for col_g in ("pop_title", "talk_content[]"):
+                            for kl in baza.wszystkie_klucze("guider_task", tid_s, col_g):
+                                v = self.pl.tekst(kl, jedna_linia=True)
+                                if v:
+                                    gt_parts.append(v)
+                        if gt_parts:
+                            uzyte_rekordy["guider_task"].add(tid_s)
+                            zad_lines.append(f"  - *Wskazówka z gry (`guider_task`):* {' — '.join(dict.fromkeys(gt_parts))}")
+
+                    if tid_s in baza.tabele.get("region_game_config", {}):
+                        rg_kl = baza.pierwszy_klucz("region_game_config", tid_s, "name")
+                        rg_pl = self.pl.tekst(rg_kl, jedna_linia=True)
+                        if rg_pl:
+                            uzyte_rekordy["region_game_config"].add(tid_s)
+                            zad_lines.append(f"  - *Aktywność regionalna (`region_game_config`):* {rg_pl}")
+
+                if sc.dialog_no is not None:
+                    opcje = baza.opcje_npc_po_dialogu.get(sc.dialog_no, ())
+                    for op_row in opcje:
+                        op_txt = []
+                        for opt in op_row.get("opcje", ()):
+                            t_op = self.pl.tekst(opt.get("tekst"), jedna_linia=True)
+                            if t_op:
+                                p_str = str(opt.get("parametr") or "")
+                                cel = f" → dialog {p_str}" if p_str.isdigit() else ""
+                                op_txt.append(f"{t_op}{cel}")
+                        if op_txt:
+                            zad_lines.append(f"- *Opcje rozmowy z NPC (`opcje_npc`):* {' | '.join(op_txt)}")
+
+                if sc.powtorka_row:
+                    pno = sc.powtorka_row.get("no")
+                    tyt_p = self._tytul_powtorki(pno)
+                    if tyt_p:
+                        zad_lines.append(f"- *Powiązana powtórka w dzienniku (#{pno}):* {tyt_p}")
+
+                if zad_lines:
+                    sc_blocks.append("#### Zadanie, dziennik i rozgrywka")
+                    sc_blocks.extend(zad_lines)
+                    sc_blocks.append("")
+
+                # 2. Postacie w scenie + wzmiankowani bohaterowie + powiązane poszlaki/listy/księgi
+                # Zbieramy kandydatów postaci dla tej sceny:
+                # [(kanoniczny_id, rola_sceny, name_kl, tytul_kl, opis_kl, enc_pid)]
+                postacie_sceny: list[tuple[str, str, str | None, str | None, str | None, int | None]] = []
+                widziane_w_scenie: set[str] = set()
+                nazwy_dla_posrednich: list[tuple[str, str]] = []  # (norm_zh, imie_pl)
+
+                if sc.dialog_no is not None:
+                    scena_raw = ix.sceny[sc.dialog_no]
+                    for person in scena_raw.get("o", ()):
+                        name_kl, tyt_raw, ops_raw, role_kind = self._dane_osoby_w_scenie(person)
+                        if not name_kl:
+                            continue
+                        zh_n = (ix.zh(name_kl) or "").strip()
+                        en_n = (ix.en(name_kl) or "").strip()
+                        if role_kind in ("gracz", 1) or (person[0] in ("我", "player", "主角")) or zh_n in _GENERYCZNE_NAZWY_GRACZA_ZH or en_n.lower() in _GENERYCZNE_NAZWY_GRACZA_TXT:
+                            continue
+                        tyt_kl = tyt_raw or self.npc_tytul_po_nazwie.get(name_kl)
+                        ops_kl = ops_raw or self.npc_opis_po_nazwie.get(name_kl)
+                        enc = self.encyklopedia_po_kluczu.get(name_kl)
+                        enc_pid = enc["id"] if enc else None
+                        kan_id = f"enc:{enc_pid}" if enc_pid is not None else f"name:{zh_n or name_kl}"
+                        if kan_id not in widziane_w_scenie:
+                            widziane_w_scenie.add(kan_id)
+                            postacie_sceny.append((kan_id, "w obsadzie", name_kl, tyt_kl, ops_kl, enc_pid))
+
+                for m_kl, m_en in sc.mowcy_cutsceny:
+                    if m_en and m_en in ("You Xia", "Me", "Player", "Main Character"):
+                        continue
+                    enc = (self.encyklopedia_po_en.get(m_en) if m_en else None) or (self.encyklopedia_po_kluczu.get(m_kl) if m_kl else None)
+                    enc_pid = enc["id"] if enc else None
+                    eff_kl = (enc["nazwa"] if enc and enc.get("nazwa") else m_kl)
+                    zh_n = (ix.zh(eff_kl) or m_en or "").strip()
+                    kan_id = f"enc:{enc_pid}" if enc_pid is not None else f"name:{zh_n or eff_kl}"
+                    if kan_id not in widziane_w_scenie:
+                        widziane_w_scenie.add(kan_id)
+                        postacie_sceny.append(
+                            (
+                                kan_id,
+                                "mówca w cutscenie",
+                                eff_kl,
+                                self.npc_tytul_po_nazwie.get(eff_kl) if eff_kl else None,
+                                self.npc_opis_po_nazwie.get(eff_kl) if eff_kl else None,
+                                enc_pid,
+                            )
+                        )
+
+                for rid in wzmianki.get("encyklopedia", ()):
+                    if rid.isdigit() and int(rid) in ix.encyklopedia:
+                        enc_pid = int(rid)
+                        kan_id = f"enc:{enc_pid}"
+                        if kan_id not in widziane_w_scenie:
+                            widziane_w_scenie.add(kan_id)
+                            enc = ix.encyklopedia[enc_pid]
+                            n_kl = enc.get("nazwa")
+                            postacie_sceny.append(
+                                (
+                                    kan_id,
+                                    "wspomniany w scenie",
+                                    n_kl,
+                                    self.npc_tytul_po_nazwie.get(n_kl) if n_kl else None,
+                                    self.npc_opis_po_nazwie.get(n_kl) if n_kl else None,
+                                    enc_pid,
+                                )
+                            )
+
+                # Dodatkowi bossowie / mistrzowie / relacje / wizytówki znalezieni wprost przez automat AC
+                for tbl_os, rola_lbl in (
+                    ("single_world_boss_data", "World Boss wspomniany w scenie"),
+                    ("school_chuancheng_npc_data", "postać sekty wspomniana w scenie"),
+                    ("npc_amity_relation_data", "postać relacji wspomniana w scenie"),
+                    ("cutscene_person_info_config", "postać z wizytówki wspomniana w scenie"),
+                ):
+                    col_n = {"single_world_boss_data": "boss_name", "school_chuancheng_npc_data": "generation_name", "npc_amity_relation_data": "amity_target_name", "cutscene_person_info_config": "name"}[tbl_os]
+                    for rid in wzmianki.get(tbl_os, ()):
+                        n_kl = baza.pierwszy_klucz(tbl_os, rid, col_n)
+                        if not n_kl:
+                            continue
+                        zh_n = (ix.zh(n_kl) or "").strip()
+                        enc = self.encyklopedia_po_kluczu.get(n_kl)
+                        enc_pid = enc["id"] if enc else None
+                        kan_id = f"enc:{enc_pid}" if enc_pid is not None else f"name:{zh_n or n_kl}"
+                        if kan_id not in widziane_w_scenie:
+                            widziane_w_scenie.add(kan_id)
+                            postacie_sceny.append((kan_id, rola_lbl, n_kl, None, None, enc_pid))
+
+                postacie_lines: list[str] = []
+                dodatkowe_zh_z_postaci: list[str] = []
+                for kan_id, rola_sceny, name_kl, tyt_kl, opis_kl, enc_pid in postacie_sceny:
+                    enc_entry = ix.encyklopedia.get(enc_pid) if enc_pid is not None else None
+                    eff_name_kl = (enc_entry.get("nazwa") if enc_entry and enc_entry.get("nazwa") else name_kl)
+                    imie_pl = self._tekst(eff_name_kl, fallback_label="imienia", jedna_linia=True) if eff_name_kl else None
+                    if not imie_pl:
+                        continue
+                    tytul_pl = self.pl.tekst(tyt_kl, jedna_linia=True) if tyt_kl else None
+                    opis_pl = self.pl.tekst(opis_kl) if opis_kl else None
+
+                    # Dopasowania specjalnych kart po imieniu
+                    klucze_szukania = {
+                        pc._oczysc_do_dopasowania(x).lower()
+                        for x in (
+                            ix.zh(eff_name_kl) if eff_name_kl else "",
+                            ix.en(eff_name_kl) if eff_name_kl else "",
+                        )
+                        if x
+                    }
+                    amity_rids = sorted({r for k in klucze_szukania for r in baza.amity_po_nazwie.get(k, ())}, key=_naturalny)
+                    boss_rids = sorted({r for k in klucze_szukania for r in baza.boss_swiatowy_po_nazwie.get(k, ())}, key=_naturalny)
+                    fuben_boss_rids = sorted({r for k in klucze_szukania for r in baza.boss_fuben_po_nazwie.get(k, ())}, key=_naturalny)
+                    mistrz_rids = sorted({r for k in klucze_szukania for r in baza.mistrz_sekty_po_nazwie.get(k, ())}, key=_naturalny)
+                    wiz_rids = sorted({r for k in klucze_szukania for r in baza.wizytowka_cutsceny_po_nazwie.get(k, ())}, key=_naturalny)
+
+                    # Pomijamy bezimienne tłumy bez żadnego tytułu/opisu/karty (np. "Wieśniak" bez opisu)
+                    ma_bogate_dane = bool(tytul_pl or opis_pl or enc_entry or amity_rids or boss_rids or fuben_boss_rids or mistrz_rids or wiz_rids)
+                    if not ma_bogate_dane and rola_sceny == "w obsadzie":
+                        continue
+
+                    if kan_id in pierwsze_postacie:
+                        linia = f"- **{imie_pl}** *({rola_sceny})* — pełna karta przy pierwszym wystąpieniu: *{pierwsze_postacie[kan_id]}*"
+                        if opis_pl and opis_pl != pierwsze_opisy_postaci.get(kan_id):
+                            linia += f" *(lokalny opis: {opis_pl})*"
+                        postacie_lines.append(linia)
+                        continue
+
+                    pierwsze_postacie[kan_id] = sc_label
+                    if opis_pl:
+                        pierwsze_opisy_postaci[kan_id] = opis_pl
+                    if enc_pid is not None:
+                        uzyte_postacie_enc.add(enc_pid)
+                    uzyte_amity.update(amity_rids)
+                    uzyte_bossy.update(boss_rids)
+                    uzyte_mistrzowie.update(mistrz_rids)
+                    for br in fuben_boss_rids:
+                        uzyte_rekordy["fuben_boss_tips"].add(br)
+
+                    if tyt_kl:
+                        dodatkowe_zh_z_postaci.append(ix.zh(tyt_kl))
+                    if opis_kl:
+                        dodatkowe_zh_z_postaci.append(ix.zh(opis_kl))
+
+                    # Zarejestruj do pośredniego przyciągania poszlak/listów/ksiąg jeśli unikalne imię własne
+                    zh_imie_norm = pc._oczysc_do_dopasowania(ix.zh(eff_name_kl) if eff_name_kl else "").lower()
+                    if zh_imie_norm and zh_imie_norm in baza.unikalne_postacie_zh:
+                        nazwy_dla_posrednich.append((zh_imie_norm, imie_pl))
+
+                    karta = self._renderuj_karte_postaci_pelna(
+                        imie_pl=imie_pl,
+                        rola_sceny=rola_sceny,
+                        tytul_pl=tytul_pl,
+                        opis_npc_pl=opis_pl,
+                        enc_entry=enc_entry,
+                        amity_rids=amity_rids,
+                        boss_rids=boss_rids,
+                        fuben_boss_rids=fuben_boss_rids,
+                        mistrz_rids=mistrz_rids,
+                        wiz_cut_rids=wiz_rids,
+                        dalsze_wpisy_buf=dalsze_wpisy_spotkanych,
+                    )
+                    postacie_lines.extend(karta)
+
+                if postacie_lines:
+                    sc_blocks.append("#### Postacie i obsada sceny")
+                    sc_blocks.extend(postacie_lines)
+                    sc_blocks.append("")
+
+                # Wzbogacenie wykrytych wzmianek o nazwy frakcji/organizacji występujących w opisach nowych postaci
+                if dodatkowe_zh_z_postaci:
+                    extra_wzm = pc.skanuj_wzmianki_w_scenach(baza, {"__extra": ("\n".join(dodatkowe_zh_z_postaci), sc.przestrzenie)}).get("__extra", {})
+                    for etbl, erids in extra_wzm.items():
+                        lst = wzmianki.setdefault(etbl, [])
+                        for er in erids:
+                            if er not in lst:
+                                lst.append(er)
+
+                # 3. Frakcje, sekty i ugrupowania
+                frakcje_lines: list[str] = []
+                frakcje_powt: list[tuple[str, str]] = []
+                for rid in wzmianki.get("world_view_shili_data", ()):
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                        "world_view_shili_data",
+                        rid,
+                        [
+                            ("name", "Frakcja"),
+                            ("introduction_short", "Motto / skrót"),
+                            ("introduction_location", "Siedziba"),
+                            ("introduction_long", "Historia i charakterystyka"),
+                        ],
+                    )
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_f = nm or f"Frakcja #{rid}"
+                    if not _oznaczenie_powtorzenia("world_view_shili_data", rid, tyt_f, sc_label, frakcje_powt):
+                        frakcje_lines.append(f"- **{tyt_f}**")
+                        for lbl, val in det:
+                            frakcje_lines.append(f"  - *{lbl}:* {val}")
+                        # Powiązane kalendarium frakcji (`world_view_history_info`)
+                        kal_items: list[str] = []
+                        for hrid in baza.historia_po_frakcji.get(rid, ()):
+                            hnm, hdet, hd, ht = self._zbierz_wiersz_tabeli_pl(
+                                "world_view_history_info", hrid, [("name", "Wydarzenie"), ("time_1", "Era / rok"), ("time_2", "Data")]
+                            )
+                            done_ctx += hd
+                            all_ctx += ht
+                            if hnm or hdet:
+                                uzyte_rekordy["world_view_history_info"].add(hrid)
+                                pierwsze_rekordy[("world_view_history_info", hrid)] = sc_label
+                                daty = " · ".join(v for _, v in hdet)
+                                kal_items.append(f"{hnm or f'Wydarzenie #{hrid}'}" + (f" ({daty})" if daty else ""))
+                        if kal_items:
+                            frakcje_lines.append(f"  - *Kalendarium frakcji:* {'; '.join(kal_items)}")
+
+                for rid in wzmianki.get("school_sect_chuancheng_data", ()):
+                    pola_s = [("school_name", "Sekta"), *[(f"generation_description_{i}", f"Pokolenie {i}") for i in range(1, 11)]]
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl("school_sect_chuancheng_data", rid, pola_s)
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_s = nm or f"Sekta #{rid}"
+                    if not _oznaczenie_powtorzenia("school_sect_chuancheng_data", rid, tyt_s, sc_label, frakcje_powt):
+                        frakcje_lines.append(f"- **{tyt_s}** *(dziedzictwo sekty)*")
+                        for lbl, val in det:
+                            frakcje_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(frakcje_lines, frakcje_powt)
+                if frakcje_lines:
+                    sc_blocks.append("#### Frakcje i sekty")
+                    sc_blocks.extend(frakcje_lines)
+                    sc_blocks.append("")
+
+                # 4. Lokacje, podobszary, poematy miejsc i karty ładowania
+                lok_lines: list[str] = []
+                lok_powt: list[tuple[str, str]] = []
+                for rid_sp in wzmianki.get("space_region", ()):
+                    kl_area = baza.podobszary_klucze.get(rid_sp)
+                    area_pl = self.pl.tekst(kl_area, jedna_linia=True) if kl_area else None
+                    if area_pl:
+                        sp_id = rid_sp.partition(":")[0]
+                        if kl_area in pierwsze_podobszary:
+                            lok_powt.append((f"Podobszar: {area_pl}", pierwsze_podobszary[kl_area]))
+                        else:
+                            pierwsze_podobszary[kl_area] = sc_label
+                            lok_lines.append(f"- **Podobszar: {area_pl}** *(potwierdzony obszar mapy #{sp_id})*")
+
+                for tbl_l, kat_l, pola_l in (
+                    ("display_poem_text_config", "Poemat miejsca", [("name", "Miejsce"), ("description[]", "Wiersz / poemat")]),
+                    ("loading_base_config", "Karta świata / ładowania", [("title", "Tytuł"), ("tips[]", "Opis / wskazówka")]),
+                    ("region_story_act_data", "Akt regionalny", [("name", "Nazwa"), ("backing_area", "Obszar")]),
+                    ("normal_story_act_data", "Strefa opowieści", [("name", "Nazwa")]),
+                    ("task_space_replay", "Przestrzeń fabularna", [("space_name", "Nazwa")]),
+                    ("fuben_info", "Instancja / loch", [("instance_name", "Nazwa"), ("hard_level_description", "Opis"), ("suggest_qishu_title[]", "Zalecana technika"), ("suggest_qishu_hint[]", "Wskazówka")]),
+                ):
+                    for rid in wzmianki.get(tbl_l, ()):
+                        nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(tbl_l, rid, pola_l)
+                        done_ctx += dd
+                        all_ctx += dt
+                        if not (nm or det):
+                            continue
+                        tyt_l = nm or f"{kat_l} #{rid}"
+                        if not _oznaczenie_powtorzenia(tbl_l, rid, tyt_l, sc_label, lok_powt):
+                            lok_lines.append(f"- **{tyt_l}** *({kat_l})*")
+                            for lbl, val in det:
+                                lok_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(lok_lines, lok_powt)
+                if lok_lines:
+                    sc_blocks.append("#### Lokacje, poezja miejsc i opisy świata")
+                    sc_blocks.extend(lok_lines)
+                    sc_blocks.append("")
+
+                # 5. Kalendarium, wyprawy, kompendium, zapiski i księgi
+                wiedza_lines: list[str] = []
+                wiedza_powt: list[tuple[str, str]] = []
+                for rid in wzmianki.get("world_view_history_info", ()):
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                        "world_view_history_info", rid, [("name", "Wydarzenie"), ("time_1", "Era / rok chiński"), ("time_2", "Data")]
+                    )
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_h = nm or f"Wydarzenie #{rid}"
+                    shili_nm = self.pl.tekst(baza.pierwszy_klucz("world_view_shili_data", str(int(rid) // 100), "name"), jedna_linia=True) if rid.isdigit() else None
+                    et_h = f"{shili_nm}: {tyt_h}" if shili_nm else tyt_h
+                    if not _oznaczenie_powtorzenia("world_view_history_info", rid, et_h, sc_label, wiedza_powt):
+                        wiedza_lines.append(f"- **{et_h}** *(kalendarium)* — {'; '.join(f'{l}: {v}' for l, v in det)}")
+
+                for rid in wzmianki.get("manual_items", ()):
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                        "manual_items",
+                        rid,
+                        [("bowu_name", "Hasło"), ("describe", "Opis"), ("locate_describe", "Występowanie"), ("shiyi_show_word", "Cytat / przekaz"), ("shiyi_show_word_from", "Źródło")],
+                    )
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_m = nm or f"Kompendium #{rid}"
+                    if not _oznaczenie_powtorzenia("manual_items", rid, tyt_m, sc_label, wiedza_powt):
+                        wiedza_lines.append(f"- **{tyt_m}** *(kompendium świata)*")
+                        for lbl, val in det:
+                            wiedza_lines.append(f"  - *{lbl}:* {val}")
+
+                # Zapiski regionalne i księgi: bezpośrednie z tekstu + przypisane przez unikalną postać debiutującą w scenie
+                zapiski_kandydaci: list[tuple[str, str]] = [(r, "wzmianka w scenie") for r in wzmianki.get("region_collect_jianwen_data", ())]
+                ksiegi_kandydaci: list[tuple[str, str]] = [(r, "wzmianka w scenie") for r in wzmianki.get("book_config", ())]
+                for zh_imie, pl_imie in nazwy_dla_posrednich:
+                    for r in baza.zapiski_po_postaci.get(zh_imie, ()):
+                        zapiski_kandydaci.append((r, f"powiązane przez postać: {pl_imie}"))
+                    for r in baza.ksiegi_po_postaci.get(zh_imie, ()):
+                        ksiegi_kandydaci.append((r, f"powiązane przez postać: {pl_imie}"))
+
+                widz_zapiski = set()
+                for rid, powod in zapiski_kandydaci:
+                    if rid in widz_zapiski:
+                        continue
+                    widz_zapiski.add(rid)
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                        "region_collect_jianwen_data",
+                        rid,
+                        [("jianwen_title", "Tytuł"), ("jianwen_text", "Treść"), ("jianwen_from", "Źródło")],
+                    )
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_j = nm or f"Zapisek #{rid}"
+                    if ("region_collect_jianwen_data", rid) in pierwsze_rekordy:
+                        if powod == "wzmianka w scenie":
+                            wiedza_powt.append((tyt_j, pierwsze_rekordy[("region_collect_jianwen_data", rid)]))
+                    else:
+                        pierwsze_rekordy[("region_collect_jianwen_data", rid)] = sc_label
+                        uzyte_rekordy["region_collect_jianwen_data"].add(rid)
+                        wiedza_lines.append(f"- **{tyt_j}** *(zapisek regionalny — {powod})*")
+                        for lbl, val in det:
+                            wiedza_lines.append(f"  - *{lbl}:* {val}")
+
+                widz_ksiegi = set()
+                for rid, powod in ksiegi_kandydaci:
+                    if rid in widz_ksiegi:
+                        continue
+                    widz_ksiegi.add(rid)
+                    page_cols = sorted(
+                        (c for c in baza.tabele.get("book_config", {}).get(rid, {}) if c.startswith("page_")),
+                        key=lambda x: (0, int(x.split("_")[1])) if x.split("_")[1].isdigit() else (1, 0),
+                    )
+                    nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                        "book_config",
+                        rid,
+                        [("name", "Tytuł"), ("author", "Autor"), *[(p, f"Strona {idx_p}") for idx_p, p in enumerate(page_cols, 1)]],
+                    )
+                    done_ctx += dd
+                    all_ctx += dt
+                    if not (nm or det):
+                        continue
+                    tyt_b = nm or f"Księga #{rid}"
+                    if ("book_config", rid) in pierwsze_rekordy:
+                        if powod == "wzmianka w scenie":
+                            wiedza_powt.append((tyt_b, pierwsze_rekordy[("book_config", rid)]))
+                    else:
+                        pierwsze_rekordy[("book_config", rid)] = sc_label
+                        uzyte_rekordy["book_config"].add(rid)
+                        wiedza_lines.append(f"- **{tyt_b}** *(księga z gry — {powod})*")
+                        for lbl, val in det:
+                            wiedza_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(wiedza_lines, wiedza_powt)
+                if wiedza_lines:
+                    sc_blocks.append("#### Kalendarium, kompendium, zapiski i księgi")
+                    sc_blocks.extend(wiedza_lines)
+                    sc_blocks.append("")
+
+                # 6. Poszlaki, dochodzenia, listy i korespondencja
+                trop_lines: list[str] = []
+                trop_powt: list[tuple[str, str]] = []
+                for rid in wzmianki.get("ever_know_content_data", ()):
+                    nm, _, dd, dt = self._zbierz_wiersz_tabeli_pl("ever_know_content_data", rid, [("title", "Wątek śledztwa")])
+                    done_ctx += dd
+                    all_ctx += dt
+                    if nm and not _oznaczenie_powtorzenia("ever_know_content_data", rid, nm, sc_label, trop_powt):
+                        trop_lines.append(f"- **Wątek dochodzenia:** {nm}")
+
+                poszlaki_kand: list[tuple[str, str]] = []
+                listy_kand: list[tuple[str, str]] = []
+                maile_kand: list[tuple[str, str]] = []
+                for zh_imie, pl_imie in nazwy_dla_posrednich:
+                    for r in baza.poszlaki_po_postaci.get(zh_imie, ()):
+                        poszlaki_kand.append((r, pl_imie))
+                    for r in baza.listy_po_postaci.get(zh_imie, ()):
+                        listy_kand.append((r, pl_imie))
+                    for r in baza.maile_po_postaci.get(zh_imie, ()):
+                        maile_kand.append((r, pl_imie))
+
+                for tbl_k, tyt_kat, pola_k, kand_list in (
+                    ("ever_know_clue_data", "Poszlaka", [("clue", "Poszlaka"), ("record", "Gdzie odnotowano")], poszlaki_kand),
+                    ("tasks_envelop_data", "List / koperta z misji", [("to", "Adresat / tytuł"), ("from", "Nadawca"), ("text", "Treść"), ("melody_solved_text", "Rozwiązanie")], listy_kand),
+                    ("emails_data", "Wiadomość / list", [("mail_title", "Tytuł"), ("sender_title", "Nadawca"), ("content", "Treść")], maile_kand),
+                ):
+                    widz_k = set()
+                    for rid, pl_imie in kand_list:
+                        if rid in widz_k or (tbl_k, rid) in pierwsze_rekordy:
+                            continue
+                        widz_k.add(rid)
+                        nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(tbl_k, rid, pola_k)
+                        done_ctx += dd
+                        all_ctx += dt
+                        if not (nm or det):
+                            continue
+                        pierwsze_rekordy[(tbl_k, rid)] = sc_label
+                        uzyte_rekordy[tbl_k].add(rid)
+                        tyt_p = nm or f"{tyt_kat} #{rid}"
+                        trop_lines.append(f"- **{tyt_p}** *({tyt_kat} — powiązane przez postać: {pl_imie})*")
+                        for lbl, val in det:
+                            trop_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(trop_lines, trop_powt)
+                if trop_lines:
+                    sc_blocks.append("#### Poszlaki, listy i korespondencja")
+                    sc_blocks.extend(trop_lines)
+                    sc_blocks.append("")
+
+                # 7. Przedmioty, ekwipunek, stroje, tytuły i sztuki walki
+                rzeczy_lines: list[str] = []
+                rzeczy_powt: list[tuple[str, str]] = []
+                for tbl_r, kat_r, pola_r in (
+                    ("equip_items", "Wyposażenie", [("name", "Nazwa"), ("describe_str", "Opis"), ("story_describe_str", "Historia")]),
+                    ("stuff_items", "Przedmiot", [("name", "Nazwa"), ("brief_describe_str", "Skrót"), ("describe_str", "Opis"), ("story_describe_str", "Historia / pochodzenie")]),
+                    ("fashion_items", "Strój / poza", [("name", "Nazwa"), ("describe_str", "Opis"), ("story_describe_str", "Historia")]),
+                    ("title", "Tytuł", [("name", "Tytuł"), ("des", "Opis"), ("get_des", "Jak zdobyć")]),
+                    ("kongfu", "Styl walki (Kongfu)", [("name", "Styl"), ("description", "Opis"), ("attr_tip[]", "Atut / typ")]),
+                    ("xinfa", "Sztuka wewnętrzna (Xinfa)", [("name", "Sztuka"), ("passive_skill_brief_description", "Efekt / opis")]),
+                    ("jianghu_skills", "Umiejętność Jianghu", [("jianghu_skill_name", "Umiejętność"), ("jianghu_description", "Opis"), ("jianghu_background", "Tło fabularne")]),
+                    ("qishu_combat_data", "Zdolność bojowa (Qishu)", [("name", "Zdolność"), ("description", "Opis")]),
+                ):
+                    for rid in wzmianki.get(tbl_r, ()):
+                        nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(tbl_r, rid, pola_r)
+                        done_ctx += dd
+                        all_ctx += dt
+                        if not (nm or det):
+                            continue
+                        tyt_r = nm or f"{kat_r} #{rid}"
+                        if not _oznaczenie_powtorzenia(tbl_r, rid, tyt_r, sc_label, rzeczy_powt):
+                            rzeczy_lines.append(f"- **{tyt_r}** *({kat_r})*")
+                            for lbl, val in det:
+                                rzeczy_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(rzeczy_lines, rzeczy_powt)
+                if rzeczy_lines:
+                    sc_blocks.append("#### Wzmiankowane przedmioty, stroje, tytuły i sztuki walki")
+                    sc_blocks.extend(rzeczy_lines)
+                    sc_blocks.append("")
+
+                # 8. Powiązane wpisy UI / poradników i osiągnięć (`widoki/`)
+                ui_lines: list[str] = []
+                ui_powt: list[tuple[str, str]] = []
+                for tbl_u, kat_u, pola_u in (
+                    ("guider_tujian_data", "Wpis przewodnika", [("manual_name", "Temat"), ("talk_title[]", "Nagłówek"), ("talk_content[]", "Treść")]),
+                    ("ac_raw", "Osiągnięcie", [("achievement_name", "Osiągnięcie"), ("achievement_info", "Warunek"), ("achievement_text", "Opis")]),
+                ):
+                    for rid in wzmianki.get(tbl_u, ()):
+                        nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(tbl_u, rid, pola_u)
+                        done_ctx += dd
+                        all_ctx += dt
+                        if not (nm or det):
+                            continue
+                        tyt_u = nm or f"{kat_u} #{rid}"
+                        if not _oznaczenie_powtorzenia(tbl_u, rid, tyt_u, sc_label, ui_powt):
+                            ui_lines.append(f"- **{tyt_u}** *({kat_u})*")
+                            for lbl, val in det:
+                                ui_lines.append(f"  - *{lbl}:* {val}")
+
+                _dopisz_powtorzenia(ui_lines, ui_powt)
+                if ui_lines:
+                    sc_blocks.append("#### Powiązane wpisy interfejsu i przewodników")
+                    sc_blocks.extend(ui_lines)
+                    sc_blocks.append("")
+
+                if sc_blocks:
+                    lines.extend(sc_blocks)
+                else:
+                    lines.append("*Brak dodatkowych powiązań kontekstowych dla tej sceny poza treścią skryptu w `epizody.md`.*")
+                    lines.append("")
+
+        # ---- SEKCJA KOŃCOWA 1: DALSZE WPISY ENCYKLOPEDII POSTACI I RELACJI (BEZ SPOILERÓW WCZESNYCH SCEN) ----
+        dalsze_linie_sekcji: list[str] = []
+        for imie_pl, wpisy_l in dalsze_wpisy_spotkanych:
+            if imie_pl in widziane_dalsze_klucze:
+                continue
+            widziane_dalsze_klucze.add(imie_pl)
+            dalsze_linie_sekcji.append(f"### {imie_pl} — dalsze wpisy odblokowywane w toku gry")
+            dalsze_linie_sekcji.extend(wpisy_l)
+            dalsze_linie_sekcji.append("")
+
+        # Postacie z encyklopedii, które w ogóle nie pojawiły się w żadnej ze scen tego wydania
+        for pid, entry in sorted(ix.encyklopedia.items()):
+            if pid in uzyte_postacie_enc:
+                continue
             hist_keys = [
                 k
                 for item in entry.get("historie", ())
@@ -1573,330 +2498,242 @@ class BudowniczyCzytanek:
             ]
             slots = [s for s in [entry.get("nazwa"), entry.get("inna_nazwa"), *entry.get("tozsamosc", ()), *hist_keys] if s]
             d_p, t_p = self._stat_slotow(slots)
-            d_p_sum += d_p
-            t_p_sum += t_p
+            done_ctx += d_p
+            all_ctx += t_p
             if not self._ma_dopuszczalne_pokrycie(d_p, t_p):
                 continue
             toz = [t for t in (self._tekst(k, jedna_linia=True) for k in entry.get("tozsamosc", ())) if t]
-            hist_wypisy: list[str] = []
-            for idx, item in enumerate(entry.get("historie", ()), 1):
+            hist_wypisy = []
+            for idx_h, item in enumerate(entry.get("historie", ()), 1):
                 if isinstance(item, (list, tuple)):
-                    tyt_h = self._tekst(item[0] if len(item) > 0 else None, jedna_linia=True)
-                    opis_h = self._tekst(item[1] if len(item) > 1 else None)
-                    if tyt_h and opis_h:
-                        hist_wypisy.append(f"- **Wpis biograficzny {idx} — {tyt_h}:** {opis_h}")
-                    elif tyt_h or opis_h:
-                        hist_wypisy.append(f"- **Wpis biograficzny {idx}:** {tyt_h or opis_h}")
+                    cz = [self._tekst(k) for k in item if k]
+                    cz = [c for c in cz if c]
+                    if cz:
+                        hist_wypisy.append(f"- **Wpis biograficzny {idx_h}:** {' — '.join(cz)}")
                 elif item:
-                    h_pl = self._tekst(item)
-                    if h_pl:
-                        hist_wypisy.append(f"- **Wpis biograficzny {idx}:** {h_pl}")
+                    hp = self._tekst(item)
+                    if hp:
+                        hist_wypisy.append(f"- **Wpis biograficzny {idx_h}:** {hp}")
             if not toz and not hist_wypisy and self.zakres != "wszystko":
                 continue
             nazwa = self._tekst(entry.get("nazwa"), fallback_label="imienia", jedna_linia=True) or f"Postać #{pid}"
             inna = self._tekst(entry.get("inna_nazwa"), jedna_linia=True)
-            postacie_linie.append(f"### {nazwa}" + (f" ({inna})" if inna else ""))
+            dalsze_linie_sekcji.append(f"### {nazwa}" + (f" ({inna})" if inna else "") + " *(poza scenami tego wydania)*")
             if toz:
-                postacie_linie.append(f"- **Tożsamość:** {'; '.join(toz)}")
-            postacie_linie.extend(hist_wypisy)
-            postacie_linie.append("")
-        done_total += d_p_sum
-        all_total += t_p_sum
-        if postacie_linie:
-            lines.append(f"## Postacie Jianghu — encyklopedia ({d_p_sum}/{t_p_sum})")
+                dalsze_linie_sekcji.append(f"- **Tożsamość:** {'; '.join(toz)}")
+            dalsze_linie_sekcji.extend(hist_wypisy)
+            dalsze_linie_sekcji.append("")
+
+        if dalsze_linie_sekcji:
+            lines.append("## Dalsze wpisy encyklopedii postaci i relacji (odblokowywane w miarę postępów fabuły)")
             lines.append("")
-            lines.extend(postacie_linie)
+            lines.append("*Poniżej znajdują się późniejsze wspomnienia bohaterów (`historie[1:]`), dalsze stopnie relacji (`npc_amity_relation_data`) oraz postacie z encyklopedii niewystępujące bezpośrednio w scenach tego wydania.*")
+            lines.append("")
+            lines.extend(dalsze_linie_sekcji)
 
-        sekcja_tabelowa(
-            "Kompendium świata (Archiwum)",
-            "manual_items",
-            [
-                ("bowu_name", "Hasło"),
-                ("describe", "Opis"),
-                ("shiyi_show_word", "Cytat / przekaz"),
-                ("shiyi_show_word_from", "Źródło"),
-            ],
-            jak_lista=True,
-        )
-        sekcja_tabelowa(
-            "Opowieści i zapiski regionalne",
-            "region_collect_jianwen_data",
-            [("jianwen_title", "Tytuł"), ("jianwen_text", "Treść"), ("jianwen_from", "Źródło")],
-            jak_lista=True,
-        )
+        # ---- SEKCJA KOŃCOWA 2: POZOSTAŁE WĄTKI CIENIA (DARK SURGE), ZAKOŃCZENIA I WSPOMNIENIA ----
+        cien_lines: list[str] = []
+        for rid, _ in baza.wiersze("task_progress_dark_info"):
+            if rid in uzyte_dark:
+                continue
+            nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl("task_progress_dark_info", rid, [("content", "Wątek"), ("introduction", "Opis")])
+            done_ctx += dd
+            all_ctx += dt
+            if nm or det:
+                cien_lines.append(f"- **{nm or f'Wątek cienia #{rid}'}:** {det[0][1] if det else ''}".rstrip())
+        for rid, _ in baza.wiersze("task_progress_dark_group"):
+            if rid in uzyte_rekordy["task_progress_dark_group"]:
+                continue
+            names = baza.wszystkie_klucze("task_progress_dark_group", rid, "[].name")
+            descs = baza.wszystkie_klucze("task_progress_dark_group", rid, "[].small_point_describe")
+            for idx_k in range(max(len(names), len(descs))):
+                kn = self.pl.tekst(names[idx_k], jedna_linia=True) if idx_k < len(names) else None
+                kd = self.pl.tekst(descs[idx_k]) if idx_k < len(descs) else None
+                if kn or kd:
+                    cien_lines.append(f"- **{kn or f'Wątek #{rid}.{idx_k+1}'}:** {kd or ''}".rstrip())
+        for rid, _ in baza.wiersze("task_progress_ending"):
+            if rid in uzyte_ending:
+                continue
+            nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                "task_progress_ending", rid, [("name", "Zakończenie"), ("stuff_lock_description[]", "Warunek"), ("stuff_unlock_description", "Odblokowanie"), ("ending_descri", "Opis")]
+            )
+            done_ctx += dd
+            all_ctx += dt
+            if nm or det:
+                cien_lines.append(f"- **Zakończenie ({nm or f'#{rid}'}):** " + " · ".join(f"{l}: {v}" for l, v in det))
+        for rid, _ in baza.wiersze("task_prelude_custom_config"):
+            nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(
+                "task_prelude_custom_config", rid, [("title_name", "Wspomnienie"), ("text_shang[]", "Tekst")]
+            )
+            done_ctx += dd
+            all_ctx += dt
+            if nm or det:
+                cien_lines.append(f"- **{nm or f'Wspomnienie #{rid}'}** *(fragmenty w nieokreślonej kolejności)*:")
+                for _, val in det:
+                    for wers in val.splitlines():
+                        if wers.strip():
+                            cien_lines.append(f"  - {wers.strip()}")
+        if cien_lines:
+            lines.append("## Pozostałe wątki cienia (Dark Surge), zakończenia i wspomnienia")
+            lines.append("")
+            lines.extend(cien_lines)
+            lines.append("")
 
-        # Księgi z gry (`book_config`: name, author, page_1..page_8)
-        book_rows = self._zbierz_wiersze_tabeli("book_config")
-        book_lines: list[str] = []
-        d_b_sum = 0
-        t_b_sum = 0
-        for rid, cols in book_rows:
+        # ---- SEKCJA KOŃCOWA 3: KATALOG NIEPRZYPISANYCH HASEŁ ZE ŚWIATA GRY ----
+        katalog_lines: list[str] = []
+
+        def _dodaj_nieprzypisana_tabele(tytul_kat: str, tbl: str, map_col: list[tuple[str, str]], *, jak_lista: bool = False, dom_pref: str = "Wpis") -> None:
+            nonlocal done_ctx, all_ctx
+            uzyte = uzyte_rekordy.get(tbl, set())
+            rows = [(rid, cols) for rid, cols in baza.wiersze(tbl) if rid not in uzyte]
+            if not rows:
+                return
+            wiersze_tab: list[list[str]] = []
+            lista_out: list[str] = []
+            d_s = 0
+            t_s = 0
+            for rid, _cols in rows:
+                nm, det, dd, dt = self._zbierz_wiersz_tabeli_pl(tbl, rid, map_col)
+                d_s += dd
+                t_s += dt
+                if not self._ma_dopuszczalne_pokrycie(dd, dt):
+                    continue
+                if jak_lista:
+                    tyt = nm or f"{dom_pref} #{rid}"
+                    lista_out.append(f"#### {tyt}")
+                    for lbl, val in det:
+                        lista_out.append(f"- **{lbl}:** {val}")
+                    lista_out.append("")
+                else:
+                    det_map = dict(det)
+                    row_vals = [nm or f"{dom_pref} #{rid}"] + [det_map.get(lbl, "").replace("\n", " ") for _, lbl in map_col[1:]]
+                    if any(row_vals):
+                        wiersze_tab.append(row_vals)
+            done_ctx += d_s
+            all_ctx += t_s
+            if jak_lista and lista_out:
+                katalog_lines.append(f"### {tytul_kat} ({d_s}/{t_s})")
+                katalog_lines.append("")
+                katalog_lines.extend(lista_out)
+            elif wiersze_tab:
+                katalog_lines.append(f"### {tytul_kat} ({d_s}/{t_s})")
+                katalog_lines.append("")
+                katalog_lines.extend(formatuj_tabele([lbl for _, lbl in map_col], wiersze_tab))
+                katalog_lines.append("")
+
+        # Nieprzypisane wydarzenia z kalendarium historycznego (z nazwą frakcji!)
+        hist_uzyte = uzyte_rekordy.get("world_view_history_info", set())
+        hist_rows: list[list[str]] = []
+        d_hi = 0
+        t_hi = 0
+        for rid, _ in baza.wiersze("world_view_history_info"):
+            if rid in hist_uzyte:
+                continue
+            nm, det, dh, th = self._zbierz_wiersz_tabeli_pl(
+                "world_view_history_info", rid, [("name", "Wydarzenie"), ("time_1", "Era / rok chiński"), ("time_2", "Data")]
+            )
+            d_hi += dh
+            t_hi += th
+            if not self._ma_dopuszczalne_pokrycie(dh, th):
+                continue
+            shili_id = str(int(rid) // 100) if rid.isdigit() else ""
+            shili_nm = (self.pl.tekst(baza.pierwszy_klucz("world_view_shili_data", shili_id, "name"), jedna_linia=True) if shili_id else None) or f"#{shili_id}"
+            det_m = dict(det)
+            hist_rows.append([shili_nm, nm or f"Wydarzenie #{rid}", det_m.get("Era / rok chiński", ""), det_m.get("Data", "")])
+        done_ctx += d_hi
+        all_ctx += t_hi
+        if hist_rows:
+            katalog_lines.append(f"### Kalendarium i wydarzenia historyczne ({d_hi}/{t_hi})")
+            katalog_lines.append("")
+            katalog_lines.extend(formatuj_tabele(["Frakcja", "Wydarzenie", "Era / rok chiński", "Data"], hist_rows))
+            katalog_lines.append("")
+        _dodaj_nieprzypisana_tabele("Frakcje i ugrupowania (Shili)", "world_view_shili_data", [("name", "Frakcja"), ("introduction_short", "Motto"), ("introduction_location", "Siedziba"), ("introduction_long", "Historia")], jak_lista=True, dom_pref="Frakcja")
+        _dodaj_nieprzypisana_tabele("Linie dziedzictwa sekt", "school_sect_chuancheng_data", [("school_name", "Sekta"), *[(f"generation_description_{i}", f"Pokolenie {i}") for i in range(1, 11)]], jak_lista=True, dom_pref="Sekta")
+        _dodaj_nieprzypisana_tabele("Kompendium świata (Archiwum)", "manual_items", [("bowu_name", "Hasło"), ("describe", "Opis"), ("shiyi_show_word", "Cytat / przekaz"), ("shiyi_show_word_from", "Źródło")], jak_lista=True)
+        _dodaj_nieprzypisana_tabele("Opowieści i zapiski regionalne", "region_collect_jianwen_data", [("jianwen_title", "Tytuł"), ("jianwen_text", "Treść"), ("jianwen_from", "Źródło")], jak_lista=True)
+
+        # Nieprzypisane księgi z gry (`book_config`)
+        book_uzyte = uzyte_rekordy.get("book_config", set())
+        book_out: list[str] = []
+        d_bk = 0
+        t_bk = 0
+        for rid, cols in baza.wiersze("book_config"):
+            if rid in book_uzyte:
+                continue
             page_cols = sorted(
                 (c for c in cols if c.startswith("page_")),
                 key=lambda x: (0, int(x.split("_")[1])) if x.split("_")[1].isdigit() else (1, 0),
             )
-            sloty = [cols[c] for c in ("name", "author", *page_cols) if c in cols]
-            d_b, t_b = self._stat_slotow(sloty)
-            d_b_sum += d_b
-            t_b_sum += t_b
-            if not self._ma_dopuszczalne_pokrycie(d_b, t_b):
+            nm, det, db, tb = self._zbierz_wiersz_tabeli_pl(
+                "book_config", rid, [("name", "Tytuł"), ("author", "Autor"), *[(p, f"Strona {idx_p}") for idx_p, p in enumerate(page_cols, 1)]]
+            )
+            d_bk += db
+            t_bk += tb
+            if not self._ma_dopuszczalne_pokrycie(db, tb):
                 continue
-            tytul_k = self._tekst(cols.get("name"), fallback_label="tytułu księgi", jedna_linia=True) or f"Księga #{rid}"
-            autor_k = self._tekst(cols.get("author"), jedna_linia=True)
-            book_lines.append(f"### {tytul_k}" + (f" — *{autor_k}*" if autor_k else ""))
-            for idx, pcol in enumerate(page_cols, 1):
-                tresc = self._tekst(cols.get(pcol), fallback_label=f"strony {idx}")
-                if tresc:
-                    book_lines.append(f"**Strona {idx}:**\n{tresc}\n")
-            book_lines.append("")
-        done_total += d_b_sum
-        all_total += t_b_sum
-        if book_lines:
-            lines.append(f"## Księgi z gry ({d_b_sum}/{t_b_sum})")
+            autor_txt = next((v for l, v in det if l == "Autor"), None)
+            book_out.append(f"#### {nm or f'Księga #{rid}'}" + (f" — *{autor_txt}*" if autor_txt else ""))
+            for lbl, val in det:
+                if lbl != "Autor":
+                    book_out.append(f"**{lbl}:**\n{val}\n")
+            book_out.append("")
+        done_ctx += d_bk
+        all_ctx += t_bk
+        if book_out:
+            katalog_lines.append(f"### Księgi z gry ({d_bk}/{t_bk})")
+            katalog_lines.append("")
+            katalog_lines.extend(book_out)
+
+        _dodaj_nieprzypisana_tabele("Listy i koperty z misji", "tasks_envelop_data", [("to", "Adresat / tytuł"), ("text", "Treść listu"), ("melody_solved_text", "Rozwiązanie / szyfr")], jak_lista=True)
+        _dodaj_nieprzypisana_tabele("Notatnik poszlak i śledztw", "ever_know_clue_data", [("clue", "Poszlaka"), ("record", "Gdzie odnotowano")])
+        _dodaj_nieprzypisana_tabele("Wyposażenie (broń, pancerz i narzędzia)", "equip_items", [("name", "Nazwa"), ("describe_str", "Opis"), ("story_describe_str", "Historia")], dom_pref="Przedmiot")
+        _dodaj_nieprzypisana_tabele("Przedmioty, artefakty i zasoby", "stuff_items", [("name", "Nazwa"), ("brief_describe_str", "Skrót"), ("describe_str", "Opis"), ("story_describe_str", "Historia / pochodzenie")], dom_pref="Przedmiot")
+        _dodaj_nieprzypisana_tabele("Style walki (Kongfu)", "kongfu", [("name", "Styl"), ("description", "Opis"), ("attr_tip[]", "Atut / typ")], dom_pref="Styl")
+        _dodaj_nieprzypisana_tabele("Sztuki wewnętrzne (Xinfa)", "xinfa", [("name", "Sztuka"), ("passive_skill_brief_description", "Efekt / opis")], dom_pref="Sztuka")
+        _dodaj_nieprzypisana_tabele("Umiejętności Jianghu", "jianghu_skills", [("jianghu_skill_name", "Umiejętność"), ("function_description", "Rola"), ("jianghu_description", "Opis działania"), ("jianghu_background", "Tło fabularne")], dom_pref="Umiejętność")
+        _dodaj_nieprzypisana_tabele("Zdolności bojowe (Qishu)", "qishu_combat_data", [("name", "Zdolność"), ("description", "Opis")], dom_pref="Zdolność")
+
+        if katalog_lines:
+            lines.append("## Katalog nieprzypisanych haseł ze świata gry")
             lines.append("")
-            lines.extend(book_lines)
-
-        sekcja_tabelowa(
-            "Listy i koperty z misji",
-            "tasks_envelop_data",
-            [("to", "Adresat / tytuł"), ("text", "Treść listu"), ("melody_solved_text", "Rozwiązanie / szyfr")],
-            jak_lista=True,
-        )
-        sekcja_tabelowa(
-            "Notatnik poszlak i śledztw",
-            "ever_know_clue_data",
-            [("clue", "Poszlaka"), ("record", "Gdzie odnotowano")],
-        )
-
-        if done_total == 0 and self.zakres != "wszystko":
-            lines.append("*Brak przetłumaczonych haseł encyklopedycznych w wybranym zakresie.*")
+            lines.append("*Wszystkie pozostałe przetłumaczone wpisy ze świata gry (kompendium, księgi, zapiski, poszlaki, listy, ekwipunek, przedmioty i sztuki walki), których nie powiązano bezpośrednio z żadną ze scen tego wydania.*")
             lines.append("")
+            lines.extend(katalog_lines)
 
-        return ZbudowanyPlik(
-            nazwa="03_encyklopedia_swiata.md",
-            tytul="Encyklopedia świata, bohaterowie i księgi",
-            opis="Historia, regiony, sekty, biografie postaci, kompendium, księgi z gry oraz poszlaki.",
-            linie=lines,
-            statystyka={"przetlumaczono": done_total, "wszystkich": all_total},
-        )
-
-    def _buduj_przedmioty(self) -> ZbudowanyPlik:
-        lines: list[str] = [
-            "# Przedmioty i ekwipunek — Where Winds Meet",
-            "",
-            "Zestawienie wyposażenia, artefaktów, materiałów i przedmiotów fabularnych wraz z ich historią.",
-            "",
-        ]
-        done_total = 0
-        all_total = 0
-
-        for tytul, tbl in (
-            ("Wyposażenie (broń, pancerz i narzędzia)", "equip_items"),
-            ("Przedmioty, artefakty i zasoby", "stuff_items"),
-        ):
-            rows = self._zbierz_wiersze_tabeli(tbl)
-            wiersze_tab: list[list[str]] = []
-            d_s = 0
-            t_s = 0
-            for rid, cols in rows:
-                sloty = [cols[c] for c in ("name", "brief_describe_str", "describe_str", "story_describe_str") if c in cols]
-                d_r, t_r = self._stat_slotow(sloty)
-                d_s += d_r
-                t_s += t_r
-                if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
-                    continue
-                nazwa = self._tekst(cols.get("name"), fallback_label="nazwy", jedna_linia=True) or f"Przedmiot #{rid}"
-                opis_kr = self._tekst(cols.get("brief_describe_str"), jedna_linia=True)
-                opis_dl = self._tekst(cols.get("describe_str"), jedna_linia=True)
-                historia = self._tekst(cols.get("story_describe_str"), jedna_linia=True)
-                opis_polaczony = " — ".join(p for p in (opis_kr, opis_dl) if p and p != opis_kr) if (opis_kr and opis_dl) else (opis_dl or opis_kr or "")
-                wiersze_tab.append([nazwa, opis_polaczony, historia or ""])
-            done_total += d_s
-            all_total += t_s
-            if wiersze_tab:
-                lines.append(f"## {tytul} ({d_s}/{t_s})")
-                lines.append("")
-                lines.extend(formatuj_tabele(["Nazwa", "Opis", "Historia / pochodzenie"], wiersze_tab))
-                lines.append("")
-
-        if done_total == 0 and self.zakres != "wszystko":
-            lines.append("*Brak przetłumaczonych opisów przedmiotów lub ekwipunku w wybranym zakresie.*")
-            lines.append("")
-
-        return ZbudowanyPlik(
-            nazwa="04_przedmioty_i_ekwipunek.md",
-            tytul="Przedmioty i ekwipunek",
-            opis="Katalog wyposażenia oraz przedmiotów fabularnych z opisem i historią.",
-            linie=lines,
-            statystyka={"przetlumaczono": done_total, "wszystkich": all_total},
-        )
-
-    def _buduj_sztuki_walki(self) -> ZbudowanyPlik:
-        lines: list[str] = [
-            "# Sztuki walki i zdolności — Where Winds Meet",
-            "",
-            "Style walki (Kongfu), Sztuki Wewnętrzne (Xinfa), techniki Jianghu oraz zdolności bojowe.",
-            "",
-        ]
-        done_total = 0
-        all_total = 0
-
-        konfiguracje = [
-            ("Style walki (Kongfu)", "kongfu", [("name", "Styl"), ("description", "Opis"), ("attr_tip[]", "Atut / typ")]),
-            ("Sztuki wewnętrzne (Xinfa)", "xinfa", [("name", "Sztuka"), ("passive_skill_brief_description", "Efekt / opis")]),
-            (
-                "Umiejętności Jianghu",
-                "jianghu_skills",
-                [
-                    ("jianghu_skill_name", "Umiejętność"),
-                    ("function_description", "Rola"),
-                    ("jianghu_description", "Opis działania"),
-                    ("jianghu_background", "Tło fabularne"),
-                ],
+        stat = {
+            "epizodow": len(epizody),
+            "postaci_przypisanych": len(pierwsze_postacie),
+            "przetlumaczono": done_ctx,
+            "wszystkich": all_ctx,
+        }
+        return (
+            ZbudowanyPlik(
+                nazwa="kontekst_scen.md",
+                tytul="Skonsolidowany kontekst scen i encyklopedia świata",
+                opis="Biografie postaci, opisy NPC, frakcje, miejsca, księgi, poszlaki, przedmioty i sztuki walki pod każdą sceną.",
+                linie=lines,
+                statystyka=stat,
             ),
-            ("Zdolności bojowe (Qishu)", "qishu_combat_data", [("name", "Zdolność"), ("description", "Opis")]),
-        ]
-
-        for tytul, tbl, kolumny in konfiguracje:
-            rows = self._zbierz_wiersze_tabeli(tbl)
-            wiersze_tab: list[list[str]] = []
-            d_s = 0
-            t_s = 0
-            for rid, cols in rows:
-                # Nazwy kolumn w kongfu czasem mają `name` lub brak osobnej kolumny; fallback po pierwszej pasującej
-                sloty = [cols[c] for c, _ in kolumny if c in cols]
-                if not sloty and cols:
-                    sloty = list(cols.values())
-                d_r, t_r = self._stat_slotow(sloty)
-                d_s += d_r
-                t_s += t_r
-                if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
-                    continue
-                wiersz = [
-                    self._tekst(cols.get(col_k), fallback_label=lbl.lower(), jedna_linia=True) or ""
-                    for col_k, lbl in kolumny
-                ]
-                if not wiersz[0] and not any(wiersz[1:]):
-                    continue
-                if not wiersz[0]:
-                    wiersz[0] = f"{kolumny[0][1]} #{rid}"
-                wiersze_tab.append(wiersz)
-            done_total += d_s
-            all_total += t_s
-            if wiersze_tab:
-                lines.append(f"## {tytul} ({d_s}/{t_s})")
-                lines.append("")
-                lines.extend(formatuj_tabele([lbl for _, lbl in kolumny], wiersze_tab))
-                lines.append("")
-
-        if done_total == 0 and self.zakres != "wszystko":
-            lines.append("*Brak przetłumaczonych sztuk walki lub zdolności w wybranym zakresie.*")
-            lines.append("")
-
-        return ZbudowanyPlik(
-            nazwa="05_sztuki_walki_i_zdolnosci.md",
-            tytul="Sztuki walki i zdolności",
-            opis="Style walki, sztuki wewnętrzne, techniki Jianghu i umiejętności bojowe.",
-            linie=lines,
-            statystyka={"przetlumaczono": done_total, "wszystkich": all_total},
+            stat,
         )
 
-    def _buduj_otoczenie(self) -> ZbudowanyPlik:
-        lines: list[str] = [
-            "# Rozmowy świata i sceny poboczne poza zadaniami — Where Winds Meet",
-            "",
-            "> **Uwaga redakcyjna:** Ta część grupuje dialogi bez wpisu w tabelach zadań (projekty oraz rozmowy tła NPC).",
-            "> Ich kolejność ma charakter katalogowy, nie chronologiczny.",
-            "",
-        ]
-        done_total = 0
-        all_total = 0
-        scen_cnt = 0
-
-        if self.uklad.projekty:
-            for project, numbers in self.uklad.projekty:
-                sec_lines: list[str] = []
-                for numer in numbers:
-                    s_lines, sd, st, _ = self._renderuj_scene(numer, self.uklad.miejsca[numer])
-                    done_total += sd
-                    all_total += st
-                    if s_lines:
-                        scen_cnt += 1
-                        sec_lines.extend(s_lines)
-                if sec_lines:
-                    lines.append(f"## Projekt: {project or '(bez nazwy)'}")
-                    lines.append("")
-                    lines.extend(sec_lines)
-
-        for (kind, value), numbers in self.uklad.tlo:
-            sec_lines = []
-            for numer in numbers:
-                s_lines, sd, st, _ = self._renderuj_scene(numer, self.uklad.miejsca[numer])
-                done_total += sd
-                all_total += st
-                if s_lines:
-                    scen_cnt += 1
-                    sec_lines.extend(s_lines)
-            if sec_lines:
-                miejsce_lbl = (self._miejsce(value) or f"Obszar #{value}") if kind == "miejsce" else f"Reakcje NPC: {value}"
-                lines.append(f"## {miejsce_lbl}")
-                lines.append("")
-                lines.extend(sec_lines)
-
-        return ZbudowanyPlik(
-            nazwa="06_rozmowy_otoczenia.md",
-            tytul="Rozmowy świata i sceny poza zadaniami",
-            opis="Katalog dialogów bez powiązania z zadaniami oraz rozmów tła NPC.",
-            linie=lines,
-            statystyka={"scen": scen_cnt, "przetlumaczono": done_total, "wszystkich": all_total},
-        )
+    def buduj_z_epizodami(self) -> tuple[list[ZbudowanyPlik], list[_Epizod]]:
+        epizody = self._zbierz_epizody()
+        plik_epizody = self._buduj_epizody_md(epizody)
+        plik_kontekst, _ = self._buduj_kontekst_scen_md(epizody)
+        return [plik_epizody, plik_kontekst], epizody
 
     def buduj(self) -> list[ZbudowanyPlik]:
-        # Najpierw budujemy księgi zadań, aby wszystkie przerywniki i powtórki włączone przy zadaniach
-        # trafiły do `self.przerywniki_w_zadaniach` i nie zostały powielone na końcu `00_prolog_i_przerywniki.md`.
-        glowny = self._buduj_sekcje_zadan(
-            nazwa_pliku="01_watek_glowny.md",
-            tytul="Wątek główny — scenariusz chronologiczny",
-            opis="Główna linia fabularna w kolejności rozdziałów, łańcuchów zadań, scen i wyborów.",
-            wstep=[
-                "Główna linia fabularna ułożona według rozdziałów oraz łańcuchów zależności zadań z gry.",
-                "Sceny bez pewnego zaczepienia zdarzeniem oznaczono `*(kolejność przybliżona)*` (według numeracji dialogów gry).",
-                "Przy każdym rozdziale znajdziesz również pierwsze pojawienia bohaterów z encyklopedii oraz wzmiankowane pojęcia.",
-            ],
-            tylko_watek_glowny=True,
-        )
-        poboczne = self._buduj_sekcje_zadan(
-            nazwa_pliku="02_zadania_poboczne_i_swiat.md",
-            tytul="Zadania poboczne, kampanie i historie świata",
-            opis="Zadania poboczne pogrupowane według kategorii aktywności gry.",
-            wstep=[
-                "> **Uwaga dla czytelnika:** Zadania w tej księdze (Spotkania, Kampanie, Dziedzictwo Jianghu, Sprawy świata itp.)",
-                "> są uporządkowane według kategorii i wewnętrznych łańcuchów zależności, lecz w otwartym świecie gry można je",
-                "> podejmować w dowolnej kolejności. Sceny bez pewnego punktu zaczepienia oznaczono `*(kolejność przybliżona)*`.",
-            ],
-            tylko_watek_glowny=False,
-        )
-        prolog = self._buduj_prolog_i_przerywniki()
-        pliki = [
-            prolog,
-            glowny,
-            poboczne,
-            self._buduj_encyklopedie_swiata(),
-            self._buduj_przedmioty(),
-            self._buduj_sztuki_walki(),
-        ]
-        if self.z_otoczeniem:
-            pliki.append(self._buduj_otoczenie())
+        pliki, _ = self.buduj_z_epizodami()
         return pliki
 
 
 def _podziel_na_czesci(plik: ZbudowanyPlik, limit_bajtow: int) -> list[tuple[str, list[str], dict]]:
-    """Jeśli treść przekracza `limit_bajtow`, dziel ją na granicach sekcji `## `."""
+    """Jeśli treść przekracza `limit_bajtow` (> 0), dziel ją na granicach sekcji `## `."""
     pelny_tekst = "\n".join(plik.linie).rstrip("\n") + "\n"
     if limit_bajtow <= 0 or len(pelny_tekst.encode("utf-8")) <= limit_bajtow:
         return [(plik.nazwa, [pelny_tekst], plik.statystyka)]
 
-    # Wydziel nagłówek wstępny przed pierwszą sekcją `## `.
     intro: list[str] = []
     sekcje: list[list[str]] = []
     biezaca: list[str] | None = None
@@ -1948,6 +2785,7 @@ def zapisz_czytanki(
     pliki: list[ZbudowanyPlik],
     wyj_katalog: Path,
     *,
+    epizody: list[_Epizod] | None = None,
     wyj_zip: Path | None = None,
     limit_bajtow: int = DOMYSLNY_LIMIT_BAJTOW,
     zakres: str = "przetlumaczone",
@@ -1956,7 +2794,7 @@ def zapisz_czytanki(
     zrodlo_przekladow: str = "",
     podglad_en: bool = False,
 ) -> dict:
-    """Zapisz pliki czytanek, `README.md` oraz opcjonalny deterministyczny ZIP."""
+    """Zapisz pliki czytanek (`epizody.md`, `kontekst_scen.md`, `README.md`) oraz opcjonalny deterministyczny ZIP."""
     if wyj_katalog.exists():
         shutil.rmtree(wyj_katalog)
     wyj_katalog.mkdir(parents=True, exist_ok=True)
@@ -1977,7 +2815,6 @@ def zapisz_czytanki(
                 }
             )
 
-    # README.md ze spisem treści i metryczką edycji
     zakres_opis = {
         "przetlumaczone": "wyłącznie przetłumaczone kwestie, wpisy i rozdziały z magazynu/zwrotki",
         "kompletne-rozdzialy": "wyłącznie sekcje i rozdziały przetłumaczone w 100%",
@@ -2004,9 +2841,9 @@ def zapisz_czytanki(
     readme: list[str] = [
         tytul_glowny,
         "",
-        "Zestaw plików `.md` do czytania fabuły i encyklopedii świata gry poza grą",
-        "(w edytorze tekstu lub przeglądarce Markdown). Wygenerowano automatycznie z wyciągu",
-        "`index/` oraz polskich przekładów gry." if not podglad_en else "`index/` w trybie podglądu angielskiego.",
+        "Dwuplikowy zestaw `.md` do czytania fabuły i całego kontekstu świata Where Winds Meet",
+        "wzorowany na układzie SRW Y. Cały scenariusz mieści się w `epizody.md`, a cały",
+        "powiązany kontekst pod każdą numerowaną sceną — w równoległym `kontekst_scen.md`.",
         "",
         f"- **Data wygenerowania:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
         f"- **Zakres wydania:** {zakres} ({zakres_opis})",
@@ -2029,16 +2866,25 @@ def zapisz_czytanki(
             ],
         ),
         "",
-        "## Jak czytać chronologicznie",
+        "## Jak czytać parę plików",
         "",
-        "1. Zacznij od `00_prolog_i_przerywniki.md` (sekwencja intro oraz napisy filmowego Prologu).",
-        "2. Przejdź do `01_watek_glowny.md` — rozdziały i zadania idą w kolejności fabularnej gry;",
-        "   pod każdym rozdziałem znajdują się pierwsze wpisy bohaterów z encyklopedii oraz wzmiankowane techniki.",
-        "3. Wątki poboczne i opowieści regionów czytaj w `02_zadania_poboczne_i_swiat.md`.",
-        "4. Gdy chcesz zajrzeć do całych ksiąg z gry, listów, kalendarium lub pełnych biografii, otwórz `03_encyklopedia_swiata.md`,",
-        "   a do opisów przedmiotów i sztuk walki — `04_przedmioty_i_ekwipunek.md` oraz `05_sztuki_walki_i_zdolnosci.md`.",
+        "1. Otwórz `epizody.md` — znajdziesz tam czysty, numerowany scenariusz (`Epizod E` / `Scena E.S`)",
+        "   od Prologu i Wątku Głównego po wątki poboczne i sekwencje cutscen.",
+        "2. Równolegle otwórz `kontekst_scen.md` — pod identycznymi numerami `Epizod E` i `Scena E.S`",
+        "   zebrano opisy NPC, karty postaci, frakcje, miejsca, poematy, księgi, poszlaki, listy,",
+        "   przedmioty, sztuki walki oraz wątki cienia (`Dark Surge`), bez potrzeby skakania po innych plikach.",
+        "3. Na końcu `kontekst_scen.md` umieszczono dalsze odblokowywane wpisy postaci (bez spoilerów przy",
+        "   wczesnych scenach) oraz katalog nieprzypisanych haseł ze świata gry.",
         "",
     ]
+
+    if epizody:
+        readme.append("## Spis numerowanych epizodów")
+        readme.append("")
+        for ep in epizody:
+            readme.append(f"- **Epizod {ep.nr}** — {ep.tytul} *(scen: {len(ep.sceny)}, {ep.done}/{ep.total})*")
+        readme.append("")
+
     readme_text = "\n".join(readme)
     (wyj_katalog / "README.md").write_text(readme_text, encoding="utf-8", newline="\n")
 
@@ -2054,7 +2900,6 @@ def zapisz_czytanki(
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 zf.writestr(info, file_path.read_bytes())
-        import hashlib
         sha = hashlib.sha256(wyj_zip.read_bytes()).hexdigest()
         zip_info = {
             "zip": str(wyj_zip),
@@ -2125,9 +2970,10 @@ def main(argv: list[str] | None = None) -> int:
         default="oba",
         help="wariant płci w dialogach zależnych od płci gracza",
     )
-    parser.add_argument("--z-otoczeniem", action="store_true", help="dołącz dodatkowy plik rozmów poza zadaniami")
+    parser.add_argument("--z-otoczeniem", action="store_true", help="dołącz rozmowy poza zadaniami do epizodów i kontekstu")
+    parser.add_argument("--tylko-watek-glowny", action="store_true", help="uwzględnij wyłącznie Prolog i Wątek Główny (+ powiązany kontekst)")
     parser.add_argument("--podglad-en", action="store_true", help="tryb podglądu formy z angielskim tekstem z index/ (bez tłumaczenia PL)")
-    parser.add_argument("--podziel-powyzej", type=int, default=DOMYSLNY_LIMIT_BAJTOW, help="limit bajtów pliku przed podziałem na części (0 = nie dziel)")
+    parser.add_argument("--podziel-powyzej", type=int, default=DOMYSLNY_LIMIT_BAJTOW, help="limit bajtów pliku przed podziałem na części (0 = nie dziel, domyślnie)")
     parser.add_argument("--wersja", default="v1", help="etykieta wersji w README (domyślnie: v1)")
     parser.add_argument("--wyj-katalog", default="dist/czytanki", help="katalog docelowy plików .md")
     parser.add_argument("--wyj-zip", default="", help="opcjonalny plik ZIP z gotowymi czytankami")
@@ -2156,12 +3002,14 @@ def main(argv: list[str] | None = None) -> int:
             zakres=args.zakres,
             plec=args.plec,
             z_otoczeniem=args.z_otoczeniem,
+            tylko_watek_glowny=args.tylko_watek_glowny,
             wersja=args.wersja,
         )
-        pliki = builder.buduj()
+        pliki, epizody = builder.buduj_z_epizodami()
         raport = zapisz_czytanki(
             pliki,
             Path(args.wyj_katalog),
+            epizody=epizody,
             wyj_zip=Path(args.wyj_zip) if args.wyj_zip else None,
             limit_bajtow=args.podziel_powyzej,
             zakres=args.zakres,
