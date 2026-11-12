@@ -277,6 +277,61 @@ class CollectorReturnTests(unittest.TestCase):
         with self.assertRaises(intake.InvalidReturn):
             intake.validate(self.path)
 
+    def test_validates_v2_batch_and_incremental_state_metadata(self):
+        payload = b"synthetic changed patch file"
+        digest = hashlib.sha256(payload).hexdigest()
+        unchanged_digest = hashlib.sha256(b"older base file").hexdigest()
+        report = {
+            "format": "wwm-collection-v2",
+            "collector_version": "1.3.0",
+            "mode": "aktualizacja",
+            "status": "collected",
+            "batch": {"id": "20261113_120000_abcd1234", "part": 1, "parts": 2, "split": True},
+            "state": {
+                "enabled": True,
+                "full_snapshot": False,
+                "state_path_redacted": True,
+                "unchanged_files": 1,
+                "unchanged": [
+                    {
+                        "source": "Package/HD/oversea/locale/translate_words_map_zh_cn",
+                        "bytes": 15,
+                        "sha256": unchanged_digest,
+                        "archive": "WWM_AKTUALIZACJA_20261112_000000_11112222_czesc1.zip",
+                    }
+                ],
+            },
+            "inventory": {"path": "INWENTARZ.jsonl", "files": 1},
+            "payload_bytes": len(payload),
+            "files": [
+                {"source": "LocalData/Patch/HD/oversea/data1001", "kind": "db_data", "bytes": len(payload),
+                 "status": "copied", "sha256": digest, "stored_as": "pliki/000001_data1001"},
+            ],
+            "problems": [],
+        }
+        inventory = [{"path": "LocalData/Patch/HD/oversea/data1001", "bytes": len(payload), "modified_utc": "2026-11-13T00:00:00Z"}]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            with ZipFile(self.path, "w", compression=ZIP_DEFLATED) as z:
+                z.writestr("RAPORT.json", json.dumps(report).encode())
+                z.writestr("RAPORT.txt", b"update result\n")
+                z.writestr("INWENTARZ.jsonl", b"".join(json.dumps(r).encode() + b"\n" for r in inventory))
+                z.writestr("pliki/000001_data1001", payload)
+        result = intake.validate(self.path)
+        self.assertEqual(result["part"], 1)
+        self.assertEqual(result["parts"], 2)
+        self.assertEqual(result["unchanged_files"], 1)
+
+        # Unsafe base archive traversal inside state.unchanged must be rejected.
+        report["state"]["unchanged"][0]["archive"] = "../secret.zip"
+        with ZipFile(self.path, "w", compression=ZIP_DEFLATED) as z:
+            z.writestr("RAPORT.json", json.dumps(report).encode())
+            z.writestr("RAPORT.txt", b"update result\n")
+            z.writestr("INWENTARZ.jsonl", b"".join(json.dumps(r).encode() + b"\n" for r in inventory))
+            z.writestr("pliki/000001_data1001", payload)
+        with self.assertRaises(intake.InvalidReturn):
+            intake.validate(self.path)
+
 
 if __name__ == "__main__":
     unittest.main()

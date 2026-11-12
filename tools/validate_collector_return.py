@@ -186,6 +186,32 @@ def validate(path: Path) -> dict[str, object]:
             else:
                 require(not failed and not problems and english_maps > 0, "success conflicts with missing or failed files")
 
+        batch_summary = None
+        if "batch" in report:
+            batch = report.get("batch")
+            require(isinstance(batch, dict), "invalid batch metadata")
+            part = batch.get("part")
+            parts = batch.get("parts")
+            require(nonnegative_int(part) and nonnegative_int(parts) and 1 <= part <= parts, "invalid batch part range")
+            batch_summary = (part, parts)
+
+        unchanged_count = None
+        if "state" in report:
+            state = report.get("state")
+            require(isinstance(state, dict), "invalid state metadata")
+            unchanged = state.get("unchanged", [])
+            require(isinstance(unchanged, list) and len(unchanged) <= MAX_MEMBERS, "invalid unchanged list")
+            for u in unchanged:
+                require(isinstance(u, dict) and in_scanned_tree(u.get("source")), "unsafe unchanged path")
+                require(nonnegative_int(u.get("bytes")), "invalid unchanged size")
+                require(isinstance(u.get("sha256"), str) and bool(SHA256.fullmatch(u["sha256"])), "invalid unchanged SHA-256")
+                arch = u.get("archive")
+                if arch is not None and arch != "":
+                    require(isinstance(arch, str) and "/" not in arch and "\\" not in arch and ":" not in arch
+                            and "\x00" not in arch and ".." not in arch, "unsafe archive reference")
+            unchanged_count = state.get("unchanged_files", len(unchanged))
+            require(nonnegative_int(unchanged_count) and unchanged_count == len(unchanged), "unchanged count mismatch")
+
         for name, (_, expected) in referenced.items():
             digest = hashlib.sha256()
             with archive.open(name) as stream:
@@ -210,7 +236,7 @@ def validate(path: Path) -> dict[str, object]:
                 inventory_rows += 1
                 require(inventory_rows <= MAX_INVENTORY_ROWS, "inventory row limit exceeded")
         require(inventory_rows == inventory_info["files"], "inventory count mismatch")
-        return {
+        summary_out: dict[str, object] = {
             "validation": "passed",
             "collection_status": report["status"],
             "inventory_files": inventory_rows,
@@ -220,6 +246,12 @@ def validate(path: Path) -> dict[str, object]:
             "payload_bytes": report["payload_bytes"],
             "limitations": "Consistency only; not authenticity, game-version proof or complete context.",
         }
+        if batch_summary is not None:
+            summary_out["part"] = batch_summary[0]
+            summary_out["parts"] = batch_summary[1]
+        if unchanged_count is not None:
+            summary_out["unchanged_files"] = unchanged_count
+        return summary_out
 
 
 def main(argv: list[str] | None = None) -> int:

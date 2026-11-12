@@ -145,19 +145,43 @@ Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
 same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
 `MANIFEST` wymienia 74 950 tabel dialogów (budowa bazy: [BAZA_GRY.md](BAZA_GRY.md)).
 
-Do cotygodniowych patchy służy `URUCHOM_AKTUALIZACJE.bat` (`zbierz.ps1 -Tryb aktualizacja`),
-który zbiera do jednego ZIP-a (<90 MiB, format `wwm-collection-v2`):
-- potrzebne pliki z `LocalData/Patch/HD/oversea/` (`MANIFEST`, `data*`, `index*`, `locale/translate_words_map_{zh_cn,en}(_diff)`),
-- `Package/HD/oversea/MANIFEST`, `data1001`, `data1200`, `index1001`, `index1200`,
-- mapę źródłową `translate_words_map_zh_cn` oraz warstwy `_diff` wyłącznie dla `zh_cn` i `en` (wszystkie inne języki jak `de`, `es`, `fr`, `ja`, `ko`, `pt_br`, `ru`, `th`, `vi`, `zh_tw`, warianty `__small`/`_mobile`, katalogi `model/` i `bulk_data/` oraz pliki binarne/audiowizualne typu `.mpk`, `.bin`, `CameraZone.json`, `VirtualWindow.json`, `Audio_Area*` są na jawnej blackliście — natomiast pliki `index*` muszą pozostać, bo `baza_gry.py` wymaga ich do dekodowania schematów kolumn i offsetów rekordów w `data*`).
+Do wszystkich aktualizacji po patchu gry (zarówno małych cotygodniowych,
+jak i dużych patchy) służy **jeden przycisk** `URUCHOM_AKTUALIZACJE.bat`
+(`zbierz.ps1 -Tryb aktualizacja`), format `wwm-collection-v2`:
 
-Gdy duża aktualizacja klienta zmieni też bazę `Package/HD/oversea/data*`
-powyżej 90 MiB, służy osobny skrypt `spakuj_dane.ps1` (z wygodnym skrótem
-dwukliku `SPAKUJ_DANE.bat`, który automatycznie szuka gry w Steam), który
-**tylko czyta** katalog gry, zachowuje pełne ścieżki względne pod `pliki/`,
-liczy SHA-256, zapisuje `SPIS.json`, stosuje tę samą czarną listę zbędnych
-języków i zasobów i automatycznie dzieli wynik na części po ok. 85 MiB
-(poniżej limitu 100 MiB pobierania z Dysku):
+- **Stan wysłanych plików po SHA-256:** skrypt pamięta w katalogu lokalnym
+  `%LOCALAPPDATA%\WWM_ZBIERACZ_STAN\stan_wyslanych.json` (poza instalacją
+  gry, ścieżka nie trafia do `RAPORT.json`) sumy SHA-256 oraz nazwy archiwów
+  poprzednio spakowanych plików. Dzięki temu przy kolejnym uruchomieniu:
+  - pomija niezmienione pliki (zapisując w `RAPORT.json -> state.unchanged`
+    listę pominiętych plików, ich SHA-256 oraz nazwy wcześniejszych paczek na
+    Dysku),
+  - pakuje **wyłącznie nowe i zmienione** pliki ze zbioru dozwolonych
+    (`LocalData/Patch/HD/oversea/*` oraz `Package/HD/oversea/{MANIFEST, data*,
+    index*, locale/translate_words_map_{zh_cn,en}(_diff)?}`),
+  - jeśli nic się nie zmieniło — nie tworzy pustego ZIP-a i kończy kodem `0`.
+- **Automatyczny wybór 1 ZIP vs podział na części:**
+  - gdy łączny rozmiar unikalnych zmienionych plików mieści się w `<= 90 MiB`,
+    powstaje **jeden** ZIP `WWM_AKTUALIZACJA_<data>_<id>.zip`,
+  - gdy przekracza `90 MiB` (np. pierwszy pełny zrzut albo duży patch bazy),
+    skrypt sam dzieli wynik na ponumerowane części po ok. `85 MiB`
+    (`WWM_AKTUALIZACJA_<data>_<id>_czesc1.zip`, `_czesc2.zip`, ...) — każda
+    część jest samodzielnym archiwum `wwm-collection-v2` przechodzącym
+    `validate_collector_return.py` i mieści się poniżej `100 MiB` Dysku Google.
+- **Przełączniki opcjonalne:** `-PelnyZrzut` (ignoruje pamięć stanu i pakuje
+  pełny zestaw od nowa, aktualizując stan), `-BezStanu` (jednorazowe
+  zbieranie bez czytania/zapisu stanu), `-KatalogStanu <dir>`, `-BezMapyZh`.
+- **Jawna blacklista:** wszystkie inne języki niż `zh_cn` i `en` (`de`, `es`,
+  `fr`, `ja`, `ko`, `pt_br`, `ru`, `th`, `vi`, `zh_tw`), warianty
+  `__small`/`_mobile`, katalogi `model/` i `bulk_data/` oraz pliki
+  binarne/audiowizualne (`.mpk`, `.bin`, `CameraZone.json`,
+  `VirtualWindow.json`, `Audio_Area*`) są odfiltrowywane — natomiast pliki
+  `index*` zostają, bo `baza_gry.py` wymaga ich do dekodowania schematów
+  kolumn i offsetów rekordów w `data*`.
+
+Osobny skrypt `spakuj_dane.ps1` (`SPAKUJ_DANE.bat`) zostaje w pakiecie jako
+narzędzie pomocnicze do ręcznego eksportu wskazanego wycinka (`-Zakres`),
+stosujące tę samą czarną listę zbędnych języków i zasobów:
 
 ```powershell
 # duża aktualizacja (domyślne: data*, index*, MANIFEST, mapy zh_cn/en i ich _diff, LocalData/Patch)

@@ -8,34 +8,40 @@ Nie trzeba instalować Pythona. Potrzebne są Windows i Windows PowerShell 5.1.
 
 KTÓRY PLIK URUCHOMIĆ
 
-- Pierwsze rozpoznanie albo pełna kopia mapy EN: kliknij dwa razy URUCHOM.bat.
-  Na Pulpicie powstanie jeden plik WWM_DANE_<data>_<losowy-id>.zip.
-- Cotygodniowa aktualizacja po patchu gry: kliknij dwa razy
-  URUCHOM_AKTUALIZACJE.bat. Na Pulpicie powstanie plik
-  WWM_AKTUALIZACJA_<data>_<losowy-id>.zip (zawiera inwentarz, pliki z
-  LocalData\Patch\HD\oversea, index*/data*/MANIFEST, mapę zh_cn oraz
-  warstwy _diff dla zh_cn i en — bez innych języków i zbędnych zasobów).
-- Gdy duża aktualizacja zmieni wiele plików Package/HD/oversea/data*
-  powyżej 90 MiB: kliknij dwa razy SPAKUJ_DANE.bat (automatycznie wykrywa
-  grę w Steam, zbiera data*, index*, MANIFEST oraz mapy zh_cn/en i ich
-  warstwy _diff — z pominięciem innych języków oraz plików z blacklisty
-  takich jak CameraZone, VirtualWindow, Audio_Area, bulk_data czy model —
-  i dzieli wynik na części po ok. 85 MiB na Pulpicie). Możesz też
-  uruchomić ręcznie spakuj_dane.ps1 w PowerShell z własnym -Zakres.
+- Każda aktualizacja po patchu gry (zarówno mała, jak i duża): kliknij dwa
+  razy URUCHOM_AKTUALIZACJE.bat.
+  Program pamięta na dysku sumy SHA-256 wcześniej wysłanych plików
+  (%LOCALAPPDATA%\WWM_ZBIERACZ_STAN\stan_wyslanych.json) i zbiera wyłącznie
+  pliki nowe lub zmienione (MANIFEST, data*, index*, zh_cn, en oraz _diff
+  dla zh_cn/en — bez innych języków, __small/_mobile i plików z blacklisty).
+  * Jeśli zmiany mieszczą się w 90 MiB → powstaje jeden ZIP na Pulpicie:
+    WWM_AKTUALIZACJA_<data>_<losowy-id>.zip.
+  * Jeśli zmiany przekraczają 90 MiB (np. pierwszy pełny zrzut albo duży
+    patch) → skrypt automatycznie dzieli wynik na części po ok. 85 MiB:
+    WWM_AKTUALIZACJA_<data>_<losowy-id>_czesc1.zip, _czesc2.zip, ...
+  * Jeśli od ostatniego razu nic się nie zmieniło → nie tworzy pustego ZIP-a.
+  (Jeśli z jakiegoś powodu chcesz pominąć pamięć stanu i wysłać wszystko od
+  zera, uruchom zbierz.ps1 z parametrem -PelnyZrzut albo usuń plik stanu.)
+- Pierwsze szybkie rozpoznanie bez zapisu stanu (do 90 MiB, format v1):
+  kliknij dwa razy URUCHOM.bat → powstanie WWM_DANE_<data>_<losowy-id>.zip.
+- Ręczne pakowanie wybranego zakresu (opcjonalne narzędzie pomocnicze):
+  SPAKUJ_DANE.bat albo spakuj_dane.ps1 z parametrem -Zakres.
 
 CO ZROBIĆ KROK PO KROKU
 
 1. Zamknij grę i poczekaj, aż Steam zakończy aktualizację.
 2. Rozpakuj cały otrzymany ZIP do nowego folderu poza grą, np. na Pulpicie.
-3. Kliknij dwa razy URUCHOM_AKTUALIZACJE.bat (po zwykłym patchu),
-   SPAKUJ_DANE.bat (po dużym patchu zmieniającym pliki data* powyżej 90 MiB)
-   albo URUCHOM.bat (pełne pierwsze rozpoznanie). Program spróbuje znaleźć grę
+3. Kliknij dwa razy URUCHOM_AKTUALIZACJE.bat (zalecane przy każdym patchu —
+   samo dobiera jeden ZIP albo podział na części). Program spróbuje znaleźć grę
    w bibliotekach Steam. Jeśli jest kilka instalacji, wybierz numer; jeśli jej
    nie znajdzie, otworzy okno wyboru głównego folderu gry (tego z folderem Package).
-   Możesz też przeciągnąć folder gry na odpowiedni plik .bat.
-4. Poczekaj — skanowanie i kopiowanie mogą potrwać kilka minut. Okno zostanie
-   otwarte. Program pokaże pełną ścieżkę, rozmiar i SHA-256 wynikowego ZIP-a.
-5. Wgraj powstały ZIP z Pulpitu na swój Dysk Google i napisz mi, że jest.
+   Możesz też przeciągnąć folder gry na plik .bat.
+4. Poczekaj — skanowanie i liczenie SHA-256 mogą potrwać chwilę. Okno zostanie
+   otwarte. Program pokaże pełną ścieżkę, rozmiar i SHA-256 wynikowego ZIP-a
+   (lub kolejnych części).
+5. Wgraj powstały ZIP (lub wszystkie części _czesc1, _czesc2...) z Pulpitu
+   na swój Dysk Google i napisz mi, że jest. Nie kasuj z Dysku poprzednich
+   paczek bazowych, bo kolejne małe aktualizacje odnoszą się tylko do zmian.
    Jeżeli napisze UWAGA o niepełnym wyniku, ten ZIP też jest przydatny:
    wyślij go mimo to. Jeśli ZIP przekracza 100 MiB, napisz mi najpierw —
    obecne połączenie do Dysku ma limit 100 MiB na pojedyncze pobranie;
@@ -44,13 +50,14 @@ CO ZROBIĆ KROK PO KROKU
 CO ZNAJDUJE SIĘ W WYNIKOWYM ZIP-IE
 
 - RAPORT.txt i RAPORT.json: stan, tryb, brakujące nazwy, błędy, rozmiary,
-  SHA-256 oraz informacja o świadomych ograniczeniach.
+  SHA-256, informacja o pominiętych niezmienionych plikach (i nazwach
+  poprzednich archiwów bazowych) oraz o świadomych ograniczeniach.
 - INWENTARZ.jsonl: względne nazwy, rozmiary i daty plików z gałęzi Package
   i LocalData/Patch. Nie ma w nim pełnej ścieżki do katalogu instalacji.
-- pliki/: kopie wybranych map i plików bazy (w trybie aktualizacji:
-  LocalData\Patch\HD\oversea, potrzebne pliki index*/data*/MANIFEST,
-  mapa zh_cn oraz warstwy _diff wyłącznie dla zh_cn i en; pozostałe
-  języki i warianty __small/_mobile są pomijane).
+- pliki/: kopie wyłącznie nowych lub zmienionych plików bazy i map
+  (MANIFEST, data*, index*, zh_cn, en oraz _diff dla zh_cn i en; pozostałe
+  języki, warianty __small/_mobile oraz CameraZone/Audio_Area/bulk_data/model
+  są pomijane przez blacklistę).
   RAPORT.json wiąże je ze ścieżkami w instalacji. Identyczne bajty mogą
   być zapisane tylko raz, a raport wskazuje wspólną kopię.
 
