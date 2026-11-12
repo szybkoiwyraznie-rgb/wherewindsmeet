@@ -15,18 +15,20 @@ KTÓRY PLIK URUCHOMIĆ
   WWM_AKTUALIZACJA_<data>_<losowy-id>.zip (zawiera inwentarz, pliki z
   LocalData\Patch\HD\oversea, wszystkie mapy _diff oraz mapę zh_cn).
 - Gdy duża aktualizacja zmieni wiele plików Package/HD/oversea/data*
-  powyżej 90 MiB: uruchom spakuj_dane.ps1 w PowerShell (dzieli wynik
-  automatycznie na części po ok. 85 MiB, żeby zmieściły się w limicie
-  pobierania Dysku).
+  powyżej 90 MiB: kliknij dwa razy SPAKUJ_DANE.bat (automatycznie wykrywa
+  grę w Steam, zbiera data*, index*, MANIFEST i mapy oraz dzieli wynik
+  na części po ok. 85 MiB na Pulpicie). Możesz też uruchomić ręcznie
+  spakuj_dane.ps1 w PowerShell z własnym parametrem -Zakres.
 
 CO ZROBIĆ KROK PO KROKU
 
 1. Zamknij grę i poczekaj, aż Steam zakończy aktualizację.
 2. Rozpakuj cały otrzymany ZIP do nowego folderu poza grą, np. na Pulpicie.
-3. Kliknij dwa razy URUCHOM_AKTUALIZACJE.bat (po patchu) albo URUCHOM.bat
-   (pełne rozpoznanie). Program spróbuje znaleźć grę w bibliotekach Steam.
-   Jeśli jest kilka instalacji, wybierz numer; jeśli jej nie znajdzie,
-   otworzy okno wyboru głównego folderu gry (tego z folderem Package).
+3. Kliknij dwa razy URUCHOM_AKTUALIZACJE.bat (po zwykłym patchu),
+   SPAKUJ_DANE.bat (po dużym patchu zmieniającym pliki data* powyżej 90 MiB)
+   albo URUCHOM.bat (pełne pierwsze rozpoznanie). Program spróbuje znaleźć grę
+   w bibliotekach Steam. Jeśli jest kilka instalacji, wybierz numer; jeśli jej
+   nie znajdzie, otworzy okno wyboru głównego folderu gry (tego z folderem Package).
    Możesz też przeciągnąć folder gry na odpowiedni plik .bat.
 4. Poczekaj — skanowanie i kopiowanie mogą potrwać kilka minut. Okno zostanie
    otwarte. Program pokaże pełną ścieżkę, rozmiar i SHA-256 wynikowego ZIP-a.

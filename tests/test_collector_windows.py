@@ -87,13 +87,15 @@ if os.name == "nt":
             return report, inventory, payload, summary
 
         def test_real_windows_powershell_parser(self):
-            path = str(self.kit / "zbierz.ps1").replace("'", "''")
-            command = ("$tok=$null; $err=$null; "
-                       f"$null=[System.Management.Automation.Language.Parser]::ParseFile('{path}',[ref]$tok,[ref]$err); "
-                       "if ($err.Count) {$err | ForEach-Object {Write-Host $_}; exit 1}; exit 0")
-            result = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
-                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
-            self.assertEqual(result.returncode, 0, self.detail(result))
+            for script_name in ("zbierz.ps1", "spakuj_dane.ps1"):
+                with self.subTest(script=script_name):
+                    path = str(self.kit / script_name).replace("'", "''")
+                    command = ("$tok=$null; $err=$null; "
+                               f"$null=[System.Management.Automation.Language.Parser]::ParseFile('{path}',[ref]$tok,[ref]$err); "
+                               "if ($err.Count) {$err | ForEach-Object {Write-Host $_}; exit 1}; exit 0")
+                    result = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
+                    self.assertEqual(result.returncode, 0, self.detail(result))
 
         def test_collects_maps_context_and_inventory_without_private_files(self):
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
@@ -307,6 +309,31 @@ if os.name == "nt":
                         self.assertEqual(archive.read(row["stored_as"]), (self.game / row["path"]).read_bytes())
             self.assertIn("Package/HD/oversea/MANIFEST", seen_sources)
             self.assertIn("LocalData/Patch/HD/oversea/MANIFEST", seen_sources)
+            self.assertEqual(self.original, self.game_files())
+
+        def test_spakuj_dane_bat_autodetects_steam_and_runs_without_args(self):
+            self.write("LocalData/Patch/HD/oversea/MANIFEST", b"patch manifest bytes")
+            self.write("LocalData/Patch/HD/oversea/data1001", b"patch data1001 bytes")
+            steam = self.root / "SteamSplit"
+            (steam / "steamapps").mkdir(parents=True)
+            library = self.game.parent.parent.parent
+            (steam / "steamapps" / "libraryfolders.vdf").write_text(
+                f'"libraryfolders"\n{{\n\t"1"\t"{str(library).replace(chr(92), chr(92) * 2)}"\n}}\n',
+                encoding="utf-8",
+            )
+            (library / "steamapps" / "appmanifest_3564740.acf").write_text(
+                '"AppState"\n{\n\t"installdir"\t"Where Winds Meet"\n\t"buildid"\t"25906190"\n}\n',
+                encoding="utf-8",
+            )
+            self.original = self.game_files()
+            dest = self.root / "UzupelnienieBat"
+            bat = self.kit / "SPAKUJ_DANE.bat"
+            command = f'"{bat}" -SteamRoot "{steam}" -Wyjscie "{dest}" -LimitCzesciBajtow 40 -NonInteractive'
+            result = subprocess.run(command, shell=True, input=b"\r\n", stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, timeout=180, check=False)
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            parts = sorted(self.root.glob("UzupelnienieBat_czesc*.zip"))
+            self.assertGreaterEqual(len(parts), 2)
             self.assertEqual(self.original, self.game_files())
 
 

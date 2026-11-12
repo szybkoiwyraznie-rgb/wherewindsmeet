@@ -131,8 +131,8 @@ python tools/build_collector_kit.py --output artifacts/WWM_ZBIERZ_DANE.zip
 python tools/run_tests.py
 ```
 
-Archiwum ma stałe znaczniki czasu, pięć plików (`CZYTAJ_TO.txt`, `URUCHOM.bat`,
-`URUCHOM_AKTUALIZACJE.bat`, `zbierz.ps1`, `spakuj_dane.ps1`), brak kompresji
+Archiwum ma stałe znaczniki czasu, sześć plików (`CZYTAJ_TO.txt`, `URUCHOM.bat`,
+`URUCHOM_AKTUALIZACJE.bat`, `SPAKUJ_DANE.bat`, `zbierz.ps1`, `spakuj_dane.ps1`), brak kompresji
 i jest czytane ponownie przy budowie. BAT jest ASCII/CRLF; PowerShell — UTF-8 BOM/CRLF.
 Git ignoruje artefakty ZIP. Testy Windows wykonują **rozpakowane** BAT i
 Windows PowerShell na fikcyjnej instalacji, a testy Linux sprawdzają builder,
@@ -152,10 +152,11 @@ który zbiera do jednego ZIP-a (<90 MiB, format `wwm-collection-v2`):
 - mapę źródłową `translate_words_map_zh_cn` oraz wszystkie warstwy `translate_words_map_*_diff`.
 
 Gdy duża aktualizacja klienta zmieni też bazę `Package/HD/oversea/data*`
-powyżej 90 MiB, służy osobny skrypt `spakuj_dane.ps1`, który **tylko czyta**
-katalog gry, zachowuje pełne ścieżki względne pod `pliki/`, liczy SHA-256,
-zapisuje `SPIS.json` i automatycznie dzieli wynik na części po ok. 85 MiB
-(poniżej limitu 100 MiB pobierania z Dysku):
+powyżej 90 MiB, służy osobny skrypt `spakuj_dane.ps1` (z wygodnym skrótem
+dwukliku `SPAKUJ_DANE.bat`, który automatycznie szuka gry w Steam), który
+**tylko czyta** katalog gry, zachowuje pełne ścieżki względne pod `pliki/`,
+liczy SHA-256, zapisuje `SPIS.json` i automatycznie dzieli wynik na części
+po ok. 85 MiB (poniżej limitu 100 MiB pobierania z Dysku):
 
 ```powershell
 # duża aktualizacja (domyślne: data*, index*, MANIFEST, zh_cn, en, *_diff, LocalData/Patch)

@@ -5,7 +5,8 @@
 # dzieli wynik na czesci ponizej LimitCzesciMB (domyslnie 85 MiB).
 # Nie modyfikuje gry, nie czyta zapisow, nie dotyka rejestru ani polityki skryptow.
 #
-# Uruchomienie (Bypass dotyczy tylko tego procesu):
+# Uruchomienie dwuklikiem: SPAKUJ_DANE.bat (automatycznie szuka gry w Steam)
+# Recznie (Bypass dotyczy tylko tego procesu):
 #   powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\Steam\steamapps\common\Where Winds Meet" -Zakres duza_aktualizacja
 #
 # Zakresy:
@@ -17,12 +18,14 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)][string] $Gra,
-    [string] $Wyjscie = (Join-Path ([Environment]::GetFolderPath('Desktop')) 'WWM_UZUPELNIENIE'),
+    [Parameter(Position = 0)][string] $Gra = '',
+    [string] $Wyjscie = '',
+    [string] $SteamRoot = '',
     [ValidateSet('dialogi', 'kontekst', 'duza_aktualizacja', 'wszystko')][string] $Zakres = 'duza_aktualizacja',
     [int] $LimitCzesciMB = 85,
     [long] $LimitCzesciBajtow = 0,
-    [switch] $BezZip
+    [switch] $BezZip,
+    [switch] $NonInteractive
 )
 
 $ErrorActionPreference = 'Stop'
@@ -35,6 +38,121 @@ function Assert-NoReparseAncestors([string] $Path) {
         }
         $item = $item.Parent
     }
+}
+
+function Is-GameRoot([string] $Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    try {
+        $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        if (-not $item.PSIsContainer) { return $false }
+        Assert-NoReparseAncestors $item.FullName
+        $package = Join-Path $item.FullName 'Package'
+        $patch = Join-Path $item.FullName 'LocalData\Patch'
+        return ((Test-Path -LiteralPath $package -PathType Container) -or
+                (Test-Path -LiteralPath $patch -PathType Container))
+    } catch { return $false }
+}
+
+function Get-AcfValue([string] $Path, [string] $Key) {
+    try {
+        if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return '' }
+        $text = [IO.File]::ReadAllText($Path)
+        $pattern = '(?im)^\s*"' + [regex]::Escape($Key) + '"\s*"([^"\r\n]*)"'
+        $match = [regex]::Match($text, $pattern)
+        if ($match.Success) { return $match.Groups[1].Value }
+    } catch { }
+    return ''
+}
+
+function Find-SteamCandidates([string] $Override) {
+    $steamDirs = New-Object 'System.Collections.Generic.List[string]'
+    if (-not [string]::IsNullOrWhiteSpace($Override)) {
+        [void] $steamDirs.Add($Override)
+    } else {
+        foreach ($registry in @('HKCU:\Software\Valve\Steam', 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam')) {
+            try {
+                $props = Get-ItemProperty -LiteralPath $registry -ErrorAction Stop
+                foreach ($value in @($props.SteamPath, $props.InstallPath)) {
+                    if ($value -and -not $steamDirs.Contains([string] $value)) { [void] $steamDirs.Add([string] $value) }
+                }
+            } catch { }
+        }
+        foreach ($base in @(${env:ProgramFiles(x86)}, $env:ProgramFiles)) {
+            if ($base) {
+                $value = Join-Path $base 'Steam'
+                if (-not $steamDirs.Contains($value)) { [void] $steamDirs.Add($value) }
+            }
+        }
+    }
+
+    $libraries = New-Object 'System.Collections.Generic.List[string]'
+    foreach ($dir in $steamDirs) {
+        if (-not $libraries.Contains($dir)) { [void] $libraries.Add($dir) }
+        $vdf = Join-Path $dir 'steamapps\libraryfolders.vdf'
+        try {
+            if (Test-Path -LiteralPath $vdf -PathType Leaf) {
+                $text = [IO.File]::ReadAllText($vdf)
+                $matches = [regex]::Matches($text, '(?im)^\s*"(?:path|[0-9]+)"\s*"([^"\r\n]+)"\s*$')
+                foreach ($match in $matches) {
+                    $library = $match.Groups[1].Value.Replace('\\', '\')
+                    if ([IO.Path]::IsPathRooted($library) -and -not $libraries.Contains($library)) {
+                        [void] $libraries.Add($library)
+                    }
+                }
+            }
+        } catch { }
+    }
+
+    $found = New-Object 'System.Collections.Generic.List[object]'
+    $seen = @{}
+    foreach ($library in $libraries) {
+        $apps = Join-Path $library 'steamapps'
+        $acf = Join-Path $apps 'appmanifest_3564740.acf'
+        $installDir = Get-AcfValue $acf 'installdir'
+        $names = @('Where Winds Meet')
+        if ($installDir -and $installDir -notin @('.', '..') -and
+            [IO.Path]::GetFileName($installDir) -eq $installDir -and $installDir -notmatch '[:/\\]') {
+            $names = @($installDir, 'Where Winds Meet')
+        }
+        foreach ($name in $names) {
+            $path = Join-Path (Join-Path $apps 'common') $name
+            if (Is-GameRoot $path) {
+                $full = (Get-Item -LiteralPath $path -Force).FullName
+                $key = $full.ToLowerInvariant()
+                if (-not $seen.ContainsKey($key)) {
+                    $seen[$key] = $true
+                    [void] $found.Add($full)
+                }
+            }
+        }
+    }
+    return $found.ToArray()
+}
+
+function Choose-GameRoot {
+    $found = @(Find-SteamCandidates $SteamRoot)
+    if ($found.Count -eq 1) { return $found[0] }
+    if ($found.Count -gt 1) {
+        if ($NonInteractive) { throw 'Znaleziono kilka instalacji. Wskaz folder gry przez -Gra.' }
+        Write-Host 'Znaleziono kilka instalacji. Wybierz numer:'
+        for ($i = 0; $i -lt $found.Count; $i++) { Write-Host (('{0}. {1}' -f ($i + 1), $found[$i])) }
+        $choice = Read-Host 'Numer'
+        $number = 0
+        if ([int]::TryParse($choice, [ref] $number) -and $number -ge 1 -and $number -le $found.Count) {
+            return $found[$number - 1]
+        }
+        throw 'Nie wybrano instalacji.'
+    }
+    if ($NonInteractive) { throw 'Nie znaleziono gry w bibliotekach Steam.' }
+    Write-Host 'Nie znaleziono gry automatycznie. Wybierz glowny folder gry (z folderem Package).'
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dialog.Description = 'Wybierz glowny folder Where Winds Meet'
+        $dialog.ShowNewFolderButton = $false
+        if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { return $dialog.SelectedPath }
+    } catch { Write-Host 'Nie mozna otworzyc okna wyboru folderu.' }
+    return (Read-Host 'Wpisz pelna sciezke do folderu gry albo nacisnij Enter, aby przerwac')
 }
 
 function Assert-SafeFile([string] $Path) {
@@ -81,10 +199,23 @@ if ($LimitCzesciMB -lt 1 -or $LimitCzesciMB -gt 95) {
 $running = @(Get-Process -Name @('WhereWindsMeet', 'WWM', 'WWM_Game', 'yysls') -ErrorAction SilentlyContinue)
 if ($running.Count -gt 0) { throw 'Wyglada na to, ze gra dziala. Zamknij ja i sprobuj ponownie.' }
 
+if ([string]::IsNullOrWhiteSpace($Gra)) {
+    $Gra = Choose-GameRoot
+}
+if ([string]::IsNullOrWhiteSpace($Gra)) {
+    throw 'Przerwano - nie wskazano folderu gry.'
+}
+
 $graItem = Get-Item -LiteralPath $Gra -Force -ErrorAction Stop
 if (-not $graItem.PSIsContainer) { throw 'Wskazana sciezka gry nie jest folderem.' }
 Assert-NoReparseAncestors $graItem.FullName
 $graRoot = $graItem.FullName.TrimEnd('\')
+Write-Host ('Folder gry: {0}' -f $graRoot)
+
+if ([string]::IsNullOrWhiteSpace($Wyjscie)) {
+    $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+    $Wyjscie = Join-Path ([Environment]::GetFolderPath('Desktop')) ("WWM_UZUPELNIENIE_$stamp")
+}
 
 $wyjscieFull = [IO.Path]::GetFullPath($Wyjscie).TrimEnd('\')
 if ($wyjscieFull -ieq $graRoot -or $wyjscieFull.StartsWith($graRoot + '\', [StringComparison]::OrdinalIgnoreCase)) {

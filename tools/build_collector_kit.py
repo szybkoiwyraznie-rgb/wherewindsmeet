@@ -23,6 +23,7 @@ MEMBERS = (
     "CZYTAJ_TO.txt",
     "URUCHOM.bat",
     "URUCHOM_AKTUALIZACJE.bat",
+    "SPAKUJ_DANE.bat",
     "zbierz.ps1",
     "spakuj_dane.ps1",
 )
@@ -50,6 +51,7 @@ def kit_files() -> dict[str, bytes]:
         "CZYTAJ_TO.txt": readme_windows,
         "URUCHOM.bat": windows_lines((COLLECTOR / "URUCHOM.bat").read_bytes(), bom=False, ascii_only=True),
         "URUCHOM_AKTUALIZACJE.bat": windows_lines((COLLECTOR / "URUCHOM_AKTUALIZACJE.bat").read_bytes(), bom=False, ascii_only=True),
+        "SPAKUJ_DANE.bat": windows_lines((COLLECTOR / "SPAKUJ_DANE.bat").read_bytes(), bom=False, ascii_only=True),
         "zbierz.ps1": windows_lines((COLLECTOR / "zbierz.ps1").read_bytes(), bom=True),
         "spakuj_dane.ps1": windows_lines((COLLECTOR / "spakuj_dane.ps1").read_bytes(), bom=True),
     }

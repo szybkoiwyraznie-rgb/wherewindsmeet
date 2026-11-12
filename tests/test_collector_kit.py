@@ -29,8 +29,10 @@ class CollectorKitTests(unittest.TestCase):
         self.assertTrue(files["CZYTAJ_TO.txt"].startswith(b"\xef\xbb\xbf"))
         self.assertFalse(files["URUCHOM.bat"].startswith(b"\xef\xbb\xbf"))
         self.assertFalse(files["URUCHOM_AKTUALIZACJE.bat"].startswith(b"\xef\xbb\xbf"))
+        self.assertFalse(files["SPAKUJ_DANE.bat"].startswith(b"\xef\xbb\xbf"))
         files["URUCHOM.bat"].decode("ascii")
         files["URUCHOM_AKTUALIZACJE.bat"].decode("ascii")
+        files["SPAKUJ_DANE.bat"].decode("ascii")
         for name, data in files.items():
             with self.subTest(name=name):
                 self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
@@ -75,6 +77,15 @@ class CollectorKitTests(unittest.TestCase):
         self.assertIn('-File "%~dp0zbierz.ps1" -Tryb aktualizacja %*', launcher)
         self.assertIn("Unblock-File", launcher)
         self.assertNotIn("Set-ExecutionPolicy", launcher)
+
+    def test_split_pack_launcher_runs_spakuj_dane_without_permanent_changes(self):
+        launcher = kit.kit_files()["SPAKUJ_DANE.bat"].decode("ascii")
+        self.assertIn("-ExecutionPolicy Bypass", launcher)
+        self.assertIn('-File "%~dp0spakuj_dane.ps1" %*', launcher)
+        self.assertIn("Unblock-File", launcher)
+        self.assertIn("pause", launcher)
+        self.assertNotIn("Set-ExecutionPolicy", launcher)
+        self.assertNotIn("python.exe", launcher.lower())
 
     def test_launcher_bypasses_policy_only_for_its_own_process(self):
         launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
