@@ -31,6 +31,7 @@ import tempfile
 
 try:
     from tools import build_installer_kit
+    from tools import build_standalone_patcher
     from tools import indeks as indeks_mod
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
@@ -39,6 +40,7 @@ try:
 except ImportError:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import build_installer_kit
+    from tools import build_standalone_patcher
     from tools import indeks as indeks_mod
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
@@ -99,23 +101,72 @@ def _klucz_dla_wpisu(ix: indeks_mod.Indeks, zh_raw: str, current: str) -> str | 
 def zbuduj_paczke_testowa(
     *,
     indeks_dir: str | Path,
-    zh_paths: list[str | Path],
-    cel_paths: list[str | Path],
-    mapa_pairs: list[tuple[str, str | Path]],
+    zh_paths: list[str | Path] = (),
+    cel_paths: list[str | Path] = (),
+    mapa_pairs: list[tuple[str, str | Path]] = (),
     wyj_zip: str | Path,
     build_gry: str = "",
     poziom: int = 9,
     zakres: str = "ui+prolog",
 ) -> dict:
-    """Zbuduj testowy ZIP instalacyjny dla wybranych napisów UI i/lub prologu; nie modyfikuje oryginałów."""
-    if not cel_paths and not mapa_pairs:
-        raise ValueError("podaj co najmniej jedno --cel albo --mapa")
+    """Zbuduj testowy ZIP instalacyjny (domyślnie standalone bez binarek gry, albo binarny gdy podano --zh/--mapa)."""
     if zakres not in ZAKRESY:
         raise ValueError(f"nieznany zakres testu: {zakres!r} (dozwolone: {', '.join(ZAKRESY)})")
 
     use_ui = zakres in ("ui", "ui+prolog")
     use_prolog = zakres in ("prolog", "ui+prolog")
     prolog_by_pair = {(en, zh_key): pl for en, zh_key, pl in PROLOG_LINES}
+
+    use_binary = bool(zh_paths or cel_paths or mapa_pairs)
+    if not use_binary:
+        ix = indeks_mod.wczytaj(indeks_dir, sceny=False)
+        store = magazyn_mod.Magazyn()
+        matched_ui: dict[str, int] = {}
+        matched_prolog: dict[str, int] = {}
+        for key, row in ix.teksty.items():
+            en_raw = row.en or ""
+            en_stripped = en_raw.strip()
+            zh_stripped = row.zrodlo.strip()
+            if use_ui and en_raw in TEST_LABELS:
+                slot_key = _klucz_dla_wpisu(ix, row.zrodlo, en_raw) if not row.z_en else key
+                if slot_key == key:
+                    store.ustaw(key, TEST_LABELS[en_raw])
+                    matched_ui[en_raw] = matched_ui.get(en_raw, 0) + 1
+            if use_prolog and not row.z_en:
+                prolog_pl = prolog_by_pair.get((en_stripped, zh_stripped))
+                if prolog_pl:
+                    slot_key = _klucz_dla_wpisu(ix, row.zrodlo, en_raw)
+                    if slot_key == key:
+                        store.ustaw(key, prolog_pl)
+                        matched_prolog[en_stripped] = matched_prolog.get(en_stripped, 0) + 1
+        if not len(store):
+            raise ValueError(f"nie znaleziono żadnej z testowych etykiet dla zakresu {zakres!r} w indeksie {indeks_dir}")
+        matched_labels = dict(matched_ui)
+        for label, count in matched_prolog.items():
+            matched_labels[label] = matched_labels.get(label, 0) + count
+        plan = build_standalone_patcher.zbuduj_plan(ix, store, jezyk_celu="en", build_gry=build_gry)
+        out_zip = Path(wyj_zip)
+        digest, size, zip_members = build_standalone_patcher.build_standalone_zip(out_zip, plan)
+        return {
+            "ok": True,
+            "tryb": "standalone",
+            "zakres": zakres,
+            "zip": str(out_zip),
+            "bajtow": size,
+            "sha256": digest,
+            "plikow_w_zip": len(zip_members),
+            "dopasowane_etykiety": dict(sorted(matched_labels.items())),
+            "dopasowane_ui": dict(sorted(matched_ui.items())),
+            "dopasowane_prolog": dict(sorted(matched_prolog.items())),
+            "slotow_testowych": len(store),
+            "pliki_gry": [],
+            "build_gry": build_gry,
+        }
+
+    if not cel_paths and not mapa_pairs:
+        raise ValueError("podaj co najmniej jedno --cel albo --mapa")
+    if not zh_paths:
+        raise ValueError("tryb binarny wymaga także --zh")
 
     ix = indeks_mod.wczytaj(indeks_dir, teksty=False)
     zh = mapa_tekstow.zloz(zh_paths)
@@ -195,10 +246,10 @@ def zbuduj_paczke_testowa(
 
 def main(argv: list[str] | None = None) -> int:
     wypisz.utf8()
-    parser = argparse.ArgumentParser(description="Zbuduj małą łatkę testową UI i/lub prologu dla polskich znaków z instalatorem Windows.")
+    parser = argparse.ArgumentParser(description="Zbuduj małą łatkę testową UI i/lub prologu dla polskich znaków (domyślnie standalone bez binarek).")
     parser.add_argument("--indeks", default="index")
-    parser.add_argument("--zh", nargs="+", required=True, help="mapa zh_cn i jej warstwy _diff")
-    parser.add_argument("--cel", action="append", default=[], help="plik mapy docelowej")
+    parser.add_argument("--zh", nargs="+", default=[], help="opcjonalnie: mapa zh_cn i warstwy _diff (tryb binarny)")
+    parser.add_argument("--cel", action="append", default=[], help="opcjonalnie: plik mapy docelowej (tryb binarny)")
     parser.add_argument("--mapa", nargs=2, action="append", default=[], metavar=("SCIEZKA_W_GRZE", "PLIK"))
     parser.add_argument("--build-gry", default="")
     parser.add_argument("--zakres", choices=ZAKRESY, default="ui+prolog", help="co podmienić: ui, prolog, czy ui+prolog (domyślnie)")

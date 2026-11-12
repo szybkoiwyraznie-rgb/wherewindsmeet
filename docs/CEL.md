@@ -32,10 +32,15 @@ Drobne braki są dopuszczalne — właściciel zgłosi je podczas gry.
 
 ## Jak pracujemy
 
-- **Pliki gry:** właściciel wrzuca dowolne pliki na Dysk Google (folder
-  `Where Winds Meet`); agent pobiera je connectorem do ignorowanego
-  `google_drive/` i rozpakowuje do `local/`. Lista i sumy:
-  [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md).
+- **Pliki gry:** właściciel wrzuca pliki gry na Dysk Google (folder
+  `Where Winds Meet`) **wyłącznie na potrzeby etapu eksploracji i aktualizacji
+  wyciągu `index/`**. Po zbudowaniu `index/` wszystkie narzędzia potoku
+  (pakiety dla tłumacza, Czytanki, audyt aktualizacji, łatka testowa oraz
+  `WWM_LATKA_PL.zip` ze zwrotek) działają **w 100% samowystarczalnie na
+  samym repozytorium (`index/` + `tlumaczenie/`)**, bez pobierania binarnych
+  plików gry z Dysku Google i bez pakowania zmodyfikowanych plików gry do
+  dystrybuowanej łatki ([OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md),
+  [PATCHER_WWM.md](PATCHER_WWM.md)).
 - **Skrypty u właściciela:** agent przygotowuje ZIP z BAT-em i skryptem
   (`ps1` albo `py`), właściciel go uruchamia, wynik ląduje na pulpicie i wraca
   przez Dysk. Wzór: `collector/`. Właściciel dopuszcza też skrypty czytające

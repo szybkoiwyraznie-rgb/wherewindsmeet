@@ -1,31 +1,63 @@
 # Patcher — jak działa i jak go używać
 
+## Zasada samowystarczalności (standalone, zero binarek gry)
+
+Pliki binarne gry przechowywane na Dysku Google służą **wyłącznie** do etapu
+eksploracji oraz okresowego aktualizowania wyciągu `index/` (`tools/wyciag.py`).
+Po wyekstrahowaniu danych cały dalszy potok — w tym **budowanie Czytanek**,
+**audyt aktualizacji**, **budowanie łatki z dowolnej zwrotki (`WWM_LATKA_PL.zip`)**
+oraz **małej łatki testowej (`WWM_LATKA_TEST_PL.zip`)** — jest w pełni
+samowystarczalny i opiera się wyłącznie na plikach w repozytorium (`index/`,
+`tlumaczenie/`, `tools/`), bez pobierania binarnych plików gry z Dysku Google
+i bez rozsyłania zmodyfikowanych plików gry w archiwach łatki (wzorem SRW Y / SRW OE).
+
 ## Jedno polecenie z dowolnej zwrotki (`tools/one_click_patch.py`)
 
 Gdy spłynie od tłumacza częściowa albo pełna zwrotka (kilka plików `.md`,
-katalog albo archiwum `.zip` z częściowo wypełnionymi polami `PL:`) oraz zrzut
-z gry (`WWM_DANE_*.zip` ze zbieracza `collector/` lub rozpakowany katalog
-map), jedno polecenie buduje gotowy one-clickowy instalator `WWM_LATKA_PL.zip`
-dla Windows:
+katalog albo archiwum `.zip` z częściowo wypełnionymi polami `PL:`), jedno
+polecenie buduje gotowy samowystarczalny instalator `WWM_LATKA_PL.zip` dla
+Windows — **bez żadnych plików gry na wejściu**:
 
 ```bash
 python3 tools/one_click_patch.py \
   --zwrotka zwrotka_czesc1.zip [plik2.md ...] \
-  --dane-gry WWM_DANE_20261111_181913_13ff7ac1.zip \
   --wyj-zip dist/WWM_LATKA_PL.zip
 ```
 
-Skrypt w jednym przebiegu:
+Albo bezpośrednio z utrwalonego w repozytorium magazynu `tlumaczenie/`:
+
+```bash
+python3 tools/one_click_patch.py \
+  --tylko-magazyn \
+  --wyj-zip dist/WWM_LATKA_PL.zip
+```
+
+Skrypt w jednym przebiegu (tryb domyślny — **standalone**):
 1. importuje wyłącznie wypełnione linie `PL:` (puste `PL:` pomija bezpiecznie — obsługuje częściowe zwrotki),
 2. łączy zwrotkę z bazowym magazynem `--magazyn tlumaczenie` (o ile istnieje i nie podano `--tylko-zwrotka`; opcjonalnie utrwala go przez `--zapisz-magazyn`),
-3. odczytuje `RAPORT.json` i automatycznie wykrywa mapy `zh_cn`, docelowe mapy języka (`Package/...` i `LocalData/Patch/...`) oraz `steam_build_id`,
-4. przepisuje binarne mapy gry z obsługą wariantów płci i kolizji fabularnych oraz weryfikuje każdy wpis,
-5. pakuje wynik razem z `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) do jednego gotowego `WWM_LATKA_PL.zip`.
+3. eksportuje z `index/` i magazynu czysty plan tekstowy `narzedzia/plan_latki.json` (`wwm-plan-latki-v1` — z obsługą płci bohatera, kolizji `index/kolizje.jsonl` oraz jednoznacznego fallbacku EN),
+4. pakuje plan z lokalnym patcherem (`tools/patcher_wwm.py` + `tools/{apply_translation,locale_container,locale_records,mapa_tekstow}.py`) oraz skryptami `ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat` i `CZYTAJ_TO.txt` do jednego małego archiwum `WWM_LATKA_PL.zip` (kilkadziesiąt KB–kilka MB czystego JSON + kodu, zero plików z gry).
 
-W przypadku błędów w zwrotce (np. zgubione tokeny lub złamana linia) domyślnie
-przerywa z listą błędów w JSON (`exit code 2`); flaga `--pomin-bledne` pozwala
-zbudować łatkę wyłącznie z poprawnych wpisów. Zamiast `--dane-gry` można też
-podać jawnie `--zh`, `--mapa` i `--build-gry`.
+### Jak działa instalacja na komputerze gracza (Windows)
+
+- `ZAINSTALUJ.bat` uruchamia `narzedzia/patcher_wwm.py` (używa zainstalowanego Pythona 3.10+ z `zstandard` albo automatycznie tworzy osobne środowisko `narzedzia\.venv` i instaluje `zstandard`),
+- automatycznie wykrywa instalację Steam gry (`3564740`, przez rejestr, `libraryfolders.vdf` i `appmanifest_3564740.acf`) — albo przyjmuje ścieżkę przez przeciągnięcie folderu gry na `.bat`,
+- sprawdza brak uruchomionej gry oraz brak punktów reparse/symlinków,
+- odczytuje zainstalowane mapy `translate_words_map_zh_cn*` i `translate_words_map_en*` z `Package/HD/oversea/locale/` oraz `LocalData/Patch/HD/oversea/locale/`,
+- kopiuje oryginały poza katalog gry do `%LOCALAPPDATA%\WhereWindsMeetPL\kopia_standalone_<hash>\` (z pełną weryfikacją SHA-256) i nie nadpisuje zachowanego oryginału przy aktualizacjach łatki `v1 -> v2` (a po aktualizacji gry przez Steam automatycznie zachowuje nową wersję oryginału przed nałożeniem przekładów),
+- przepisuje mapy lokalnie na maszynie gracza, weryfikuje każdy zmieniony wpis i wgrywa transakcyjnie (z pełnym rollbackiem przy błędzie).
+- `PRZYWROC.bat` przywraca oryginały (i blokuje nadpisanie, jeśli plik w grze zmienił się z zewnątrz np. przez Steam, chyba że użyto `--wymus`), a `SPRAWDZ_STAN.bat` odczytuje bieżący stan plików i kopii bez zmian na dysku.
+
+W przypadku błędów w zwrotce (np. zgubione tokeny lub złamana linia) `one_click_patch.py`
+domyślnie przerywa z listą błędów w JSON (`exit code 2`); flaga `--pomin-bledne`
+pozwala zbudować łatkę wyłącznie z poprawnych wpisów.
+
+### Opcjonalny tryb z gotowymi mapami binarnymi (zgodność)
+
+Jeśli w piaskownicy przekażesz jawnie `--dane-gry` albo `--zh` + `--mapa` / `--cel`,
+`one_click_patch.py` działa w trybie binarnym (`tools/zbuduj_latke.py` + `instalator/`),
+budując paczkę `wwm-latka-v1` z prebuilt mapami. Ten tryb jest tylko opcją —
+domyślna dystrybucja korzysta z czystego trybu standalone.
 
 ## Budowa łatki krok po kroku (`tools/zbuduj_latke.py`)
 
@@ -98,7 +130,7 @@ przepakowuje tabele z nowymi offsetami i weryfikuje wynik przed zapisem.
 
 - **Nie przetestowano łatki w rzeczywistej grze** (klient może sprawdzać sumy kontrolne plików przy starcie lub aktualizacji, czcionki mogą nie mieć wszystkich polskich znaków, a pola interfejsu mają nieznane limity szerokości).
 - **Nie wybrano docelowo zastępowanego języka klienta** (dotychczasowe próby na mapie EN w piaskownicy).
-- **Skrypty instalatora i przywracania (`instalator/`)** przeszły automatyczne testy Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie), ale **nie były jeszcze uruchamiane na rzeczywistej instalacji gry właściciela** ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
+- **Skrypty instalatora i przywracania (`patcher_wwm.py` w trybie standalone oraz `instalator/` w trybie binarnym)** przeszły automatyczne testy na Linuksie i w Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, wykrywanie aktualizacji gry, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie), ale **nie były jeszcze uruchamiane na rzeczywistej instalacji gry właściciela** ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
 
 ## Wynik na realnych mapach w piaskownicy
 

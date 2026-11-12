@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+import sys
 import json
 import tempfile
 import unittest
@@ -12,7 +14,7 @@ from tests.test_mapa_tekstow import diff_container
 from tests.test_potok_tlumaczenia import fill
 from tests.test_wyciag_indeks import EN, ZH, K, T
 from tests.test_zrodla_tekstow import FakeBaza
-from tools import apply_translation, buduj_paczke, indeks, one_click_patch, tlumaczenie, wyciag
+from tools import apply_translation, buduj_paczke, indeks, latka_testowa, mapa_tekstow, one_click_patch, tlumaczenie, wyciag
 
 ZH_ALL = {**ZH, **ZH_EXTRA}
 EN_ALL = {**EN, **EN_EXTRA}
@@ -285,6 +287,209 @@ class OneClickPatchTests(unittest.TestCase):
                 )
             }
             self.assertEqual(patch_diff[T + 20].decode("utf-8"), "Miecz PL")
+
+    def test_standalone_default_mode_builds_without_game_binaries_and_patches_end_to_end(self):
+        # Zwrotka + magazyn bez JAKIEJKOLWIEK paczki binarnej gry (--dane-gry/--zh/--mapa pominięte).
+        t_only_en = T + 999
+        t_col_a = T + 910
+        t_col_b = T + 911
+        custom_world = world()
+        zh_all = {**ZH_ALL, T + 100: "唯一", t_col_a: "十步", t_col_b: "十步"}
+        en_all = {
+            **EN_ALL,
+            T + 100: "Unique English Label",
+            t_only_en: "Fresh Hotfix Line",
+            t_col_a: "Line Alpha",
+            t_col_b: "Line Beta",
+        }
+        custom_world["text_msg"] = [(590438, {"content": t_col_a})]
+        custom_world["buff"] = [*custom_world["buff"], (10, {"buff_name": T + 100}), (11, {"buff_name": t_only_en}), (12, {"buff_name": t_col_b})]
+        ix_dir = self.root / "ix_standalone"
+        wyciag.zbuduj(FakeBaza(custom_world), zh_all, en_all, ix_dir, {"opis": "test standalone"}, log=lambda _t: None)
+        ix_local = indeks.wczytaj(ix_dir)
+        paczka_dir = self.root / "paczka_standalone"
+        buduj_paczke.zbuduj(ix_local, paczka_dir, wersja="1", data="2026-01-01", zip_=False)
+
+        raw_sceny = (paczka_dir / "sceny/01_watek-glowny_rozdzial-1_01.md").read_text(encoding="utf-8")
+        md1 = self.root / "zwrotka_sa" / "01.md"
+        md1.parent.mkdir(parents=True, exist_ok=True)
+        md1.write_text(
+            fill(
+                raw_sceny,
+                {
+                    K("kwestia kowala"): "Cześć, wędrowcze!",
+                    f"@{T + 3:016x}": "Zrobiłem to",
+                },
+            ),
+            encoding="utf-8",
+        )
+        raw_wid = (paczka_dir / "widoki/03_przedmioty_01.md").read_text(encoding="utf-8")
+        md2 = self.root / "zwrotka_sa" / "02.md"
+        md2.write_text(fill(raw_wid, {K("Opis miecza"): "Zażółć gęślą jaźń"}), encoding="utf-8")
+        hotfix_key = K("Fresh Hotfix Line")
+        col_a_key = mapa_tekstow.klucz_wariantu("十步", "Line Alpha")
+        hotfix_sources = [p for p in paczka_dir.rglob("*.md") if hotfix_key in p.read_text(encoding="utf-8")]
+        col_sources = [p for p in paczka_dir.rglob("*.md") if col_a_key in p.read_text(encoding="utf-8")]
+        self.assertTrue(hotfix_sources)
+        self.assertTrue(col_sources)
+        md3 = self.root / "zwrotka_sa" / "03.md"
+        md3.write_text(fill(hotfix_sources[0].read_text(encoding="utf-8"), {hotfix_key: "Świeża linia z hotfixa", col_a_key: "Linia Alfa PL"}), encoding="utf-8")
+        md4 = self.root / "zwrotka_sa" / "04.md"
+        md4.write_text(fill(col_sources[0].read_text(encoding="utf-8"), {hotfix_key: "Świeża linia z hotfixa", col_a_key: "Linia Alfa PL"}), encoding="utf-8")
+
+        out_zip = self.root / "dist_sa" / "WWM_LATKA_PL.zip"
+        raport_path = self.root / "dist_sa" / "raport.json"
+        rc = one_click_patch.main(
+            [
+                "--zwrotka",
+                str(md1),
+                str(md2),
+                str(md3),
+                str(md4),
+                "--indeks",
+                str(ix_dir),
+                "--tylko-zwrotka",
+                "--wyj-zip",
+                str(out_zip),
+                "--raport",
+                str(raport_path),
+            ]
+        )
+        self.assertEqual(rc, 0)
+        raport = json.loads(raport_path.read_text(encoding="utf-8"))
+        self.assertEqual(raport["format"], "wwm-one-click-standalone-v1")
+        self.assertEqual(raport["tryb"], "standalone")
+        self.assertGreaterEqual(raport["plan"]["po_id"], 2)  # T+3 i dziedziczący T+4!
+        self.assertEqual(raport["plan"]["kolizje"], 1)
+
+        # Wewnątrz ZIP nie może być ani jednego pliku binarnego gry, tylko plan + lokalny patcher.
+        with zipfile.ZipFile(out_zip) as zf:
+            names = set(zf.namelist())
+            self.assertIn("ZAINSTALUJ.bat", names)
+            self.assertIn("PRZYWROC.bat", names)
+            self.assertIn("SPRAWDZ_STAN.bat", names)
+            self.assertIn("narzedzia/plan_latki.json", names)
+            self.assertIn("narzedzia/patcher_wwm.py", names)
+            self.assertFalse(any(n.startswith("pliki/") for n in names))
+            unpack_dir = self.root / "unpacked_sa"
+            zf.extractall(unpack_dir)
+
+        # Fikcyjna instalacja gry na dysku gracza.
+        game = self.root / "game_sa"
+        backup = self.root / "backup_sa"
+        (game / "Package/HD/oversea/locale").mkdir(parents=True, exist_ok=True)
+        (game / "LocalData/Patch/HD/oversea/locale").mkdir(parents=True, exist_ok=True)
+        zh_orig = container([table([(T + 1, ZH[T + 1].encode("utf-8")), (T + 3, ZH[T + 3].encode("utf-8")), (T + 4, ZH[T + 4].encode("utf-8")), (T + 21, ZH[T + 21].encode("utf-8")), (t_col_a, "十步".encode("utf-8")), (t_col_b, "十步".encode("utf-8"))])], with_metadata=True)
+        en_base_orig = container([table([(T + 1, b"smith line"), (T + 3, b"male version"), (T + 4, b"female version"), (t_col_a, b"Line Alpha"), (t_col_b, b"Line Beta")])], with_metadata=True)
+        en_pkg_diff_orig = diff_container([0], 1, [table([(T + 21, b"Sword description")])])
+        # Świeży wpis w LocalData/Patch bez odpowiadającego wpisu w zh_cn (test fallbacku EN!).
+        en_patch_diff_orig = diff_container([0], 1, [table([(t_only_en, b"Fresh Hotfix Line")])])
+
+        (game / "Package/HD/oversea/locale/translate_words_map_zh_cn").write_bytes(zh_orig)
+        (game / "Package/HD/oversea/locale/translate_words_map_en").write_bytes(en_base_orig)
+        (game / "Package/HD/oversea/locale/translate_words_map_en_diff").write_bytes(en_pkg_diff_orig)
+        (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").write_bytes(en_patch_diff_orig)
+
+        tools_dir = unpack_dir / "narzedzia"
+        res_ins = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive", "--json"],
+            cwd=str(tools_dir),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_ins.returncode, 0, res_ins.stderr or res_ins.stdout)
+
+        patched_base = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "Package/HD/oversea/locale/translate_words_map_en").read_bytes())}
+        self.assertEqual(patched_base[T + 1], "Cześć, wędrowcze!")
+        self.assertEqual(patched_base[T + 3], "Zrobiłem to")
+        self.assertEqual(patched_base[T + 4], "Zrobiłem to")  # dziedziczenie rodzeństwa w plan_latki.json!
+        self.assertEqual(patched_base[t_col_a], "Linia Alfa PL")  # rozstrzygnięta kolizja!
+        self.assertEqual(patched_base[t_col_b], "Line Beta")  # nieprzetłumaczony wariant nietknięty!
+
+        patched_pkg_diff = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "Package/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
+        self.assertEqual(patched_pkg_diff[T + 21], "Zażółć gęślą jaźń")
+
+        patched_patch_diff = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
+        self.assertEqual(patched_patch_diff[t_only_en], "Świeża linia z hotfixa")
+
+        # Upgrade łatki v1 -> v2 (np. zmiana tekstu T+21 na v2): nie może nadpisać backupu oryginału!
+        md2.write_text(fill(raw_wid, {K("Opis miecza"): "Zażółć gęślą jaźń v2"}), encoding="utf-8")
+        out_zip2 = self.root / "dist_sa" / "WWM_LATKA_PL_v2.zip"
+        self.assertEqual(one_click_patch.main(["--zwrotka", str(md1), str(md2), str(md3), str(md4), "--indeks", str(ix_dir), "--tylko-zwrotka", "--wyj-zip", str(out_zip2)]), 0)
+        unpack2 = self.root / "unpacked_sa2"
+        with zipfile.ZipFile(out_zip2) as zf:
+            zf.extractall(unpack2)
+        res_up = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_up.returncode, 0, res_up.stderr or res_up.stdout)
+        self.assertEqual((backup / "pliki/Package/HD/oversea/locale/translate_words_map_en").read_bytes(), en_base_orig)
+        patched_pkg_diff_v2 = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "Package/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
+        self.assertEqual(patched_pkg_diff_v2[T + 21], "Zażółć gęślą jaźń v2")
+
+        # Symulacja aktualizacji Steam na jednym z plików: odmowa przywracania bez --wymus,
+        # a ponowna instalacja zapisuje kopię nowej wersji gry i nakłada łatkę na nową mapę.
+        new_steam_patch_diff = diff_container([0], 1, [table([(t_only_en, b"Fresh Hotfix Line"), (T + 998, b"New Steam Line")])])
+        (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").write_bytes(new_steam_patch_diff)
+        res_refuse = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "przywroc", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_refuse.returncode, 1)
+        res_repatch = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_repatch.returncode, 0, res_repatch.stderr or res_repatch.stdout)
+        self.assertEqual((backup / "pliki/LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff)
+        patched_after_steam = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
+        self.assertEqual(patched_after_steam[t_only_en], "Świeża linia z hotfixa")
+        self.assertEqual(patched_after_steam[T + 998], "New Steam Line")
+
+        # Przywrócenie oryginałów przywraca już nową wersję Steam w zmodyfikowanym pliku oraz pierwotną bazę EN!
+        res_rest = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "przywroc", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_rest.returncode, 0, res_rest.stderr or res_rest.stdout)
+        self.assertEqual((game / "Package/HD/oversea/locale/translate_words_map_en").read_bytes(), en_base_orig)
+        self.assertEqual((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff)
+
+    def test_latka_testowa_standalone_mode_builds_without_game_binaries(self):
+        t_cut = T + 860
+        t_prolog = T + 861
+        t_settings = T + 862
+        zh_dict = {**ZH_ALL, t_cut: "十步杀一人", t_prolog: "是啊 来抓你", t_settings: "设置"}
+        en_dict = {**EN_ALL, t_cut: "Cut them down, left and right", t_prolog: "That's right, here to take you in.", t_settings: "Settings"}
+        custom = world()
+        custom["text_msg"] = [(590438, {"content": t_cut}), (590337, {"content": t_prolog}), (1, {"content": t_settings})]
+        ix_dir = self.root / "ix_latka_sa"
+        wyciag.zbuduj(FakeBaza(custom), zh_dict, en_dict, ix_dir, {}, log=lambda _t: None)
+
+        out_zip = self.root / "WWM_LATKA_TEST_STANDALONE.zip"
+        rc = latka_testowa.main(["--indeks", str(ix_dir), "--zakres", "ui+prolog", "--wyj-zip", str(out_zip)])
+        self.assertEqual(rc, 0)
+        with zipfile.ZipFile(out_zip) as zf:
+            names = set(zf.namelist())
+            self.assertIn("narzedzia/plan_latki.json", names)
+            self.assertFalse(any(n.startswith("pliki/") for n in names))
+            plan = json.loads(zf.read("narzedzia/plan_latki.json").decode("utf-8"))
+            self.assertEqual(plan["format"], "wwm-plan-latki-v1")
+            self.assertGreaterEqual(len(plan["po_kluczu"]), 3)
 
 
 if __name__ == "__main__":

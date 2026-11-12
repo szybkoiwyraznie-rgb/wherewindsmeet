@@ -20,24 +20,23 @@ Projekt nie gwarantuje bezpieczeństwa konta ani zgodności z warunkami wydawcy.
 
 ---
 
-## Krok 1: Zbudowanie małej paczki testowej (po stronie narzędzi)
+## Krok 1: Zbudowanie małej paczki testowej (standalone, z samego repozytorium)
 
-Narzędzie `tools/latka_testowa.py` tworzy w izolowanym folderze tymczasowym
-zestaw etykiet UI (`TEST_LABELS`) i pierwszych napisów prologu
-(`PROLOG_LINES`, dopasowywanych parą `(EN, ZH)`, bez ruszania magazynu
-`tlumaczenie/`) i pakuje gotowy ZIP ze skryptami z `instalator/`:
+Narzędzie `tools/latka_testowa.py` tworzy — **wyłącznie z `index/` w repozytorium,
+bez pobierania plików binarnych gry z Dysku Google** — zestaw etykiet UI
+(`TEST_LABELS`) i pierwszych napisów prologu (`PROLOG_LINES`, bez ruszania
+magazynu `tlumaczenie/`) i pakuje gotowy samowystarczalny ZIP (~27 KB)
+z lokalnym patcherem `patcher_wwm.py` i skryptami `.bat`:
 
 ```bash
 python3 tools/latka_testowa.py \
   --indeks index \
-  --zh sciezka/translate_words_map_zh_cn sciezka/translate_words_map_zh_cn_diff \
-  --mapa Package/HD/oversea/locale/translate_words_map_en sciezka/pkg_en \
-  --mapa Package/HD/oversea/locale/translate_words_map_en_diff sciezka/pkg_en_diff \
-  --mapa LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff sciezka/patch_en_diff \
-  --build-gry 25906190 \
   --zakres ui+prolog \
   --wyj-zip dist/WWM_LATKA_TEST_PL.zip
 ```
+
+*(Opcjonalnie, gdy podasz jawnie `--zh` + `--mapa` / `--cel`, narzędzie może nadal
+zbudować wariant z prebuilt mapami i skryptami `instalator/`.)*
 
 Zakres można też zawęzić przez `--zakres ui` (samo menu) albo `--zakres prolog`
 (same napisy cutscenki otwarcia).
@@ -74,11 +73,14 @@ Testowane kwestie prologu (dopasowanie `(EN, ZH)` z `text_msg 590291–590459` z
 2. Rozpakuj `WWM_LATKA_TEST_PL.zip` do nowego folderu poza katalogiem gry (np. na Pulpicie).
 3. Opcjonalnie kliknij `SPRAWDZ_STAN.bat`, aby zobaczyć stan przed zmianą (`ORYGINAL`).
 4. Kliknij dwa razy `ZAINSTALUJ.bat` (albo przeciągnij na niego główny folder gry).
-   - Skrypt sprawdzi, czy gra jest wyłączona, czy `buildid` ze Steam pasuje do łatki
-     oraz czy każdy plik w grze ma dokładny oryginalny skrót SHA-256.
-   - Zapisze oryginały poza folderem gry w `%LOCALAPPDATA%\WhereWindsMeetPL\kopia`.
-   - Dopiero potem skopiuje zmienione mapy i sprawdzi ich SHA-256 po zapisie.
-   - Jeśli dowolny krok się nie powiedzie, automatycznie cofnie zmienione pliki.
+   - Przy pierwszym uruchomieniu skrypt użyje Pythona 3.10+ z `zstandard` albo
+     założy izolowane `narzedzia\.venv` i dociągnie `zstandard` (~0,5 MB).
+   - Sprawdzi, czy gra jest wyłączona i czy katalog nie jest linkiem symbolicznym.
+   - Zapisze kopię oryginalnych map z Twojego dysku poza folderem gry w
+     `%LOCALAPPDATA%\WhereWindsMeetPL\kopia_standalone_<hash>` (z weryfikacją SHA-256).
+   - Lokalnie przepisze mapy `translate_words_map_en*` w oparciu o `plan_latki.json`
+     i `translate_words_map_zh_cn*` z instalacji gry, sprawdzi każdy zmieniony wpis
+     i wgra go transakcyjnie (z automatycznym cofnięciem przy błędzie).
 
 ---
 

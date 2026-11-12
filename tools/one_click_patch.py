@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Jedno polecenie: częściowa lub pełna zwrotka tłumacza -> one-clickowy ZIP łatki Windows.
+"""Jedno polecenie: częściowa lub pełna zwrotka tłumacza -> gotowy ZIP łatki Windows.
+
+Tryb domyślny — **samowystarczalny (standalone, ZERO binarek gry i Google Drive)**:
 
     python3 tools/one_click_patch.py \
         --zwrotka zwrotka.zip [plik1.md plik2.md ...] \
-        --dane-gry WWM_DANE_20261111_...zip \
         --wyj-zip dist/WWM_LATKA_PL.zip
 
-Lub przy jawnych plikach map:
+Lub z istniejącego magazynu `tlumaczenie/`:
+
+    python3 tools/one_click_patch.py --tylko-magazyn --wyj-zip dist/WWM_LATKA_PL.zip
+
+Opcjonalny tryb binarny (gdy podano `--dane-gry` lub jawne `--zh`/`--mapa`):
 
     python3 tools/one_click_patch.py \
         --zwrotka zwrotka_czesc1.md zwrotka_czesc2.md \
@@ -21,12 +26,12 @@ Co robi w jednym przebiegu:
 1. wczytuje istniejący magazyn `--magazyn` (o ile istnieje i nie podano `--tylko-zwrotka`),
 2. waliduje i dokłada wpisy ze zwrotki (`--zwrotka`: pliki `.md`, katalogi albo `.zip`) —
    puste `PL:` pomija bez błędu, więc działa na dowolnym wycinku tłumaczenia,
-3. wykrywa mapy tekstów i `build_gry` z paczki kolektora (`--dane-gry`: katalog lub
-   `WWM_DANE_*.zip` / `WWM_AKTUALIZACJA_*.zip`) albo korzysta z jawnych `--zh`/`--mapa`/`--cel`,
-4. przepisuje binarne mapy gry z obsługą wariantów płci oraz kolizji fabularnych
-   (`index/kolizje.jsonl`) i weryfikuje każdy zmieniony wpis,
-5. pakuje wynik razem z `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`)
-   do jednego gotowego archiwum `WWM_LATKA_PL.zip` dla Windows.
+3. w trybie domyślnym (standalone) eksportuje z `index/` i magazynu czysty plan
+   `plan_latki.json` (`wwm-plan-latki-v1`) oraz pakuje go z lokalnym patcherem
+   `patcher_wwm.py` (który bezpiecznie przepisuje mapy bezpośrednio z dysku gracza,
+   robiąc kopię zapasową oryginałów),
+4. albo w trybie binarnym (`--dane-gry` / `--zh` + `--mapa`) od razu przepisuje mapy
+   i pakuje z `instalator/`.
 """
 
 from __future__ import annotations
@@ -41,6 +46,7 @@ import zipfile
 
 try:
     from tools import build_installer_kit
+    from tools import build_standalone_patcher
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
     from tools import mapa_tekstow
@@ -50,6 +56,7 @@ try:
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import build_installer_kit
+    from tools import build_standalone_patcher
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
     from tools import mapa_tekstow
@@ -275,6 +282,50 @@ def zbuduj_ze_zwrotki(
             raise OneClickError("nie podano ścieżki --magazyn do zapisu")
         magazyn_mod.zapisz(magazyn_dir, magazyn)
 
+    out_zip = Path(wyj_zip)
+    use_binary_inputs = bool(dane_gry or zh_paths or mapa_pairs or cel_paths)
+
+    if not use_binary_inputs:
+        plan = build_standalone_patcher.zbuduj_plan(
+            ix,
+            magazyn,
+            jezyk_celu=jezyk_celu,
+            build_gry=build_gry.strip(),
+        )
+        digest, size, members = build_standalone_patcher.build_standalone_zip(out_zip, plan)
+        report = {
+            "ok": True,
+            "format": "wwm-one-click-standalone-v1",
+            "tryb": "standalone",
+            "zip": str(out_zip),
+            "bajtow": size,
+            "sha256": digest,
+            "plikow_w_zip": len(members),
+            "build_gry": plan.get("oczekiwany_build", ""),
+            "magazyn_zapisany": bool(zapisz_magazyn),
+            "przekladow_przed": przekladow_przed,
+            "przekladow_po": len(magazyn),
+            "plan": {
+                "po_id": len(plan["po_id"]),
+                "po_kluczu": len(plan["po_kluczu"]),
+                "kolizje": len(plan["kolizje"]),
+                "en_jednoznaczne": len(plan["en_jednoznaczne"]),
+            },
+            "import": (
+                {
+                    "plikow": import_raport["plikow"],
+                    "liczby": import_raport["liczby"],
+                    "odrzucone": import_raport["odrzucone"],
+                    "problemy_wg_rodzaju": import_raport["problemy_wg_rodzaju"],
+                    "problemy": import_raport["problemy"],
+                }
+                if import_raport is not None
+                else None
+            ),
+            "pliki_gry": [],
+        }
+        return report, 0
+
     with tempfile.TemporaryDirectory(prefix="wwm-one-click-") as tmp:
         tmp_dir = Path(tmp)
         auto_zh, auto_pairs, auto_build = (
@@ -319,12 +370,12 @@ def zbuduj_ze_zwrotki(
             raise OneClickError("budowa binarnych map łatki (zbuduj_latke) nie powiodła się")
 
         latka_manifest = json.loads((latka_dir / "latka.json").read_text(encoding="utf-8"))
-        out_zip = Path(wyj_zip)
         digest, size, members = build_installer_kit.build_zip(out_zip, latka_dir=latka_dir)
 
     report = {
         "ok": True,
         "format": "wwm-one-click-v1",
+        "tryb": "binarny",
         "zip": str(out_zip),
         "bajtow": size,
         "sha256": digest,

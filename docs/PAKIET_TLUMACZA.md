@@ -267,24 +267,31 @@ zwrotce i jest wersjonowany — to jest właściwy dorobek projektu.
 ## Łatka
 
 ```sh
-python3 tools/zbuduj_latke.py --indeks index --magazyn tlumaczenie \
-  --zh translate_words_map_zh_cn translate_words_map_zh_cn_diff \
-  --cel translate_words_map_en --cel translate_words_map_en_diff \
-  --wyj dist/latka
+# Domyślnie (standalone — zero binarek gry, wyłącznie z repozytorium index/ + tlumaczenie/):
+python3 tools/one_click_patch.py --tylko-magazyn --wyj-zip dist/WWM_LATKA_PL.zip
+
+# Albo bezpośrednio ze zwrotki:
+python3 tools/one_click_patch.py --zwrotka ZWROTKA.zip --wyj-zip dist/WWM_LATKA_PL.zip
 ```
 
+Pliki binarne gry z Dysku Google są potrzebne **wyłącznie na etapie eksploracji
+i przy aktualizowaniu wyciągu `index/`**. Budowanie Czytanek
+(`tools/buduj_czytanki.py`), budowanie pakietów (`tools/buduj_paczke.py`),
+audyt aktualizacji (`tools/audyt_aktualizacji.py`) oraz **generowanie łatki**
+(`tools/one_click_patch.py`, `tools/latka_testowa.py`) działają w 100%
+samowystarczalnie na danych z repozytorium.
+
 Gra nie ma języka polskiego, więc przekład **zastępuje teksty jednego
-z języków klienta** — plików podanych w `--cel` (mapa podstawowa i każda
-warstwa `_diff` osobno, bo klient nakłada je po kolei). Każdy plik jest po
-zapisie czytany z powrotem i porównywany wpis po wpisie. Oryginały nie są
-zmieniane, narzędzie niczego nie instaluje.
+z języków klienta** (domyślnie angielskiego `translate_words_map_en*`, na każdej
+warstwie `_diff` z osobna). W trybie standalone `WWM_LATKA_PL.zip` niesie
+wyłącznie czysty plan tekstowy (`plan_latki.json`) oraz lokalny patcher
+(`tools/patcher_wwm.py`), który dopiero na komputerze gracza zabezpiecza oryginały
+poza katalogiem gry i przepisuje je lokalnie. (Do pracy w piaskownicy na
+wskazanych plikach binarnych dostępne jest również niskopoziomowe
+`tools/zbuduj_latke.py` lub opcje `--dane-gry` / `--zh` + `--mapa`.)
 
-Próba na prawdziwych mapach w piaskownicy (sztuczne „przekłady” z prefiksem,
-nie zapisane w repozytorium): 19 630 przekładów → 95 471 zmienionych wpisów
-mapy angielskiej, 847 i 1 060 w dwóch warstwach `_diff`; po złożeniu warstw
-zmienionych 96 019 z 1 124 787, zbiór identyfikatorów bez zmian; 23 s.
-
-Gotowy katalog łatki można spakować ze skryptami z `instalator/` (`tools/build_installer_kit.py --latka dist/latka --output dist/WWM_LATKA_PL.zip`), a przed pełną łatką przeprowadzić małą próbę UI i polskich znaków opisaną w [TEST_W_GRZE.md](TEST_W_GRZE.md) (`tools/latka_testowa.py`).
+Przed pełną łatką warto przeprowadzić małą próbę UI i polskich znaków opisaną
+w [TEST_W_GRZE.md](TEST_W_GRZE.md) (`python3 tools/latka_testowa.py --wyj-zip dist/WWM_LATKA_TEST_PL.zip`).
 
 **Nie sprawdzono w grze:** czy klient przyjmie zmienione mapy (możliwa kontrola
 plików przy starcie albo aktualizacji), czy czcionki mają polskie znaki, ile
@@ -321,8 +328,8 @@ tekstu mieszczą pola. Nie obiecujemy bezpieczeństwa konta.
    `PL (już jest): …` albo znacznik „z wcześniejszego pakietu”.
 5. Commit nowego `index/` (zmieniają się tylko wiersze, które się zmieniły —
    podział plików jest stały) i kopii `README.md` + `paczka.json` w `paczki/`.
-6. Po zwrotce: import (jak wyżej), commit `tlumaczenie/`, nowa łatka na
-   aktualnych mapach.
+6. Po zwrotce: import (jak wyżej), commit `tlumaczenie/`, nowa samowystarczalna łatka
+   przez `tools/one_click_patch.py` (z samego repozytorium, bez pobierania map z Dysku).
 
 Sprawdzone na prawdziwych danych: wyciąg z samej paczki gry (bez
 `LocalData/Patch`) porównany z pełnym — 387 nowych tekstów, 64 usunięte,

@@ -65,12 +65,12 @@ instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | Ponad 325 testów (Linux + Windows PS 5.1); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
+| Repozytorium i workflow | Ponad 349 testów (Linux + Windows CI); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami — odczytane i sprawdzone na całości danych. |
 | Wyciąg i powiązania | `index/` w Git, deterministyczny, ze stałym podziałem plików. |
-| Pakiet tłumacza | Wersja 1 zbudowana i przekazana (485 047 miejsc `PL:`). Generator wspiera też `--tylko-z-en` (483 752 miejsc `PL:` po odcięciu 1 295 wpisów bez `EN`). |
-| Import zwrotki | Gotowy i przetestowany; czeka na pierwszą zwrotkę. |
-| Łatka i instalator Windows | `tools/zbuduj_latke.py` (`--mapa`, `--build-gry`) + `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) + `tools/latka_testowa.py` (UI i napisy prologu) i [TEST_W_GRZE.md](TEST_W_GRZE.md). Sprawdzone w Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
+| Pakiet tłumacza i Czytanki | Wersja v3 pakietu (`--tylko-z-en`, `index/`) i Czytanki `wwm-czytanki-v2` budują się **100% standalone z `index/`** (zero binarek gry). |
+| Import zwrotki | Gotowy i przetestowany (`tools/import_zwrotki.py`); czeka na pierwszą zwrotkę. |
+| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Sprawdzone w testach Linux + Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
