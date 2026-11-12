@@ -6,6 +6,8 @@ param(
     [string] $SteamRoot = '',
     [long] $PayloadLimitBytes = 94371840,
     [long] $ContextLimitBytes = 20971520,
+    [ValidateSet('rozpoznanie', 'aktualizacja')] [string] $Tryb = 'rozpoznanie',
+    [switch] $BezMapyZh,
     [switch] $NonInteractive
 )
 
@@ -189,18 +191,46 @@ function Candidate-ForFile($Item, [string] $Relative) {
     $name = $Item.Name.ToLowerInvariant()
     $kind = ''
     $priority = 99
-    if ($Item.Directory.Name -ieq 'locale' -and
-        $name -match '^translate_words_map_(en|zh_cn)(?:__small)?(?:_mobile)?(?:_diff)?$') {
-        if ($name -match '^translate_words_map_en') {
-            $kind = 'map_en'
-            if ($name -eq 'translate_words_map_en') { $priority = 0 }
-            elseif ($name -eq 'translate_words_map_en_diff') { $priority = 1 }
-            else { $priority = 2 }
-        } else { $kind = 'map_zh_cn'; $priority = 4 }
-    } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/MANIFEST$') {
-        $kind = 'manifest'; $priority = 3
-    } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/data(3|205)$') {
-        $kind = 'context_candidate'; $priority = 5
+    if ($Tryb -eq 'aktualizacja') {
+        if ($Item.Name -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { return }
+        if ($name -match '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|sav|save|log|dmp|bak|pem|key|p12|pfx|env)$') { return }
+        if ($Relative -match '(?i)^LocalData/Patch/HD/(oversea|v2)/(.+)$') {
+            $sub = $Matches[2].ToLowerInvariant()
+            if ($sub -match '^model/') { return }
+            if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 0 }
+            elseif ($sub -match '^locale/translate_words_map_[a-z0-9_]+_diff$') { $kind = 'map_diff'; $priority = 0 }
+            elseif ($sub -match '^locale/translate_words_map_zh_cn') { $kind = 'map_zh_cn'; $priority = 0 }
+            elseif ($sub -eq 'locale/translate_words_map_en') { $kind = 'map_en'; $priority = 5 }
+            elseif ($sub -match '^locale/translate_words_map_en') { $kind = 'map_en'; $priority = 1 }
+            elseif ($sub -match '^data[0-9]+$') { $kind = 'db_data'; $priority = 0 }
+            elseif ($sub -match '^index[0-9]+$') { $kind = 'db_index'; $priority = 0 }
+            else { $kind = 'patch_other'; $priority = 1 }
+        } elseif ($Relative -match '(?i)^Package/HD/(oversea|v2)/(.+)$') {
+            $sub = $Matches[2].ToLowerInvariant()
+            if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 1 }
+            elseif ($sub -match '^data(1001|1200)$') { $kind = 'db_data'; $priority = 1 }
+            elseif ($sub -match '^index(1001|1200)$') { $kind = 'db_index'; $priority = 1 }
+            elseif ($sub -match '^locale/translate_words_map_(zh_cn|en)_diff$') { $kind = 'map_diff'; $priority = 1 }
+            elseif ($sub -eq 'locale/translate_words_map_zh_cn' -and (-not $BezMapyZh)) { $kind = 'map_zh_cn'; $priority = 2 }
+            elseif ($sub -match '^locale/translate_words_map_[a-z0-9_]+_diff$') {
+                if ($sub -match '(_mobile|__small)') { $kind = 'map_diff'; $priority = 4 }
+                else { $kind = 'map_diff'; $priority = 3 }
+            }
+        }
+    } else {
+        if ($Item.Directory.Name -ieq 'locale' -and
+            $name -match '^translate_words_map_(en|zh_cn)(?:__small)?(?:_mobile)?(?:_diff)?$') {
+            if ($name -match '^translate_words_map_en') {
+                $kind = 'map_en'
+                if ($name -eq 'translate_words_map_en') { $priority = 0 }
+                elseif ($name -eq 'translate_words_map_en_diff') { $priority = 1 }
+                else { $priority = 2 }
+            } else { $kind = 'map_zh_cn'; $priority = 4 }
+        } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/MANIFEST$') {
+            $kind = 'manifest'; $priority = 3
+        } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/data(3|205)$') {
+            $kind = 'context_candidate'; $priority = 5
+        }
     }
     if ($kind) {
         [void] $script:Candidates.Add([pscustomobject]@{
@@ -211,22 +241,41 @@ function Candidate-ForFile($Item, [string] $Relative) {
 }
 
 function Inspect-KnownLocations {
-    foreach ($directory in @('Package/HD/oversea/locale', 'LocalData/Patch/HD/oversea/locale')) {
-        foreach ($name in @('translate_words_map_en', 'translate_words_map_en_diff', 'translate_words_map_en__small', 'translate_words_map_en__small_diff')) {
-            $relative = $directory + '/' + $name
-            $full = Join-Path $script:RootPath ($relative.Replace('/', '\'))
-            $status = 'not_found_or_unavailable'
-            try {
-                $parent = [IO.Path]::GetDirectoryName($full)
-                Assert-NoReparseAncestors $parent
-                $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
-                # Some providers return no item without raising even with -ErrorAction Stop.
-                if ($null -eq $item) { $status = 'not_found_or_unavailable' }
-                elseif (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
-                elseif (-not $item.PSIsContainer) { $status = 'present' }
-            } catch { }
-            [void] $script:Expected.Add([pscustomobject]@{ path = $relative; status = $status })
-        }
+    $targets = if ($Tryb -eq 'aktualizacja') {
+        @(
+            'LocalData/Patch/HD/oversea/MANIFEST',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff',
+            'Package/HD/oversea/MANIFEST',
+            'Package/HD/oversea/locale/translate_words_map_zh_cn',
+            'Package/HD/oversea/locale/translate_words_map_zh_cn_diff',
+            'Package/HD/oversea/locale/translate_words_map_en_diff'
+        )
+    } else {
+        @(
+            'Package/HD/oversea/locale/translate_words_map_en',
+            'Package/HD/oversea/locale/translate_words_map_en_diff',
+            'Package/HD/oversea/locale/translate_words_map_en__small',
+            'Package/HD/oversea/locale/translate_words_map_en__small_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en__small',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en__small_diff'
+        )
+    }
+    foreach ($relative in $targets) {
+        $full = Join-Path $script:RootPath ($relative.Replace('/', '\'))
+        $status = 'not_found_or_unavailable'
+        try {
+            $parent = [IO.Path]::GetDirectoryName($full)
+            Assert-NoReparseAncestors $parent
+            $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
+            # Some providers return no item without raising even with -ErrorAction Stop.
+            if ($null -eq $item) { $status = 'not_found_or_unavailable' }
+            elseif (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
+            elseif (-not $item.PSIsContainer) { $status = 'present' }
+        } catch { }
+        [void] $script:Expected.Add([pscustomobject]@{ path = $relative; status = $status })
     }
 }
 
@@ -349,9 +398,10 @@ try {
         throw 'Folder wynikowy musi znajdowac sie poza instalacja gry.'
     }
     $stamp = [DateTime]::Now.ToString('yyyyMMdd_HHmmss') + '_' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
+    $prefix = if ($Tryb -eq 'aktualizacja') { 'WWM_AKTUALIZACJA_' } else { 'WWM_DANE_' }
     $stage = Join-Path $output ('.WWM_ZBIERANIE_' + $stamp)
-    $tempZip = Join-Path $output ('WWM_DANE_' + $stamp + '.zip.tmp')
-    $finalZip = Join-Path $output ('WWM_DANE_' + $stamp + '.zip')
+    $tempZip = Join-Path $output ($prefix + $stamp + '.zip.tmp')
+    $finalZip = Join-Path $output ($prefix + $stamp + '.zip')
     if ((Test-Path -LiteralPath $stage) -or (Test-Path -LiteralPath $tempZip) -or (Test-Path -LiteralPath $finalZip)) { throw 'Kolizja nazwy wyniku. Uruchom ponownie.' }
     [void] [IO.Directory]::CreateDirectory($stage)
     $stageCreated = $true
@@ -416,17 +466,28 @@ try {
         [void] $records.Add([pscustomobject] $record)
     }
 
-    $enMaps = @($records.ToArray() | Where-Object { $_.kind -eq 'map_en' -and $_.status -in @('copied', 'duplicate') })
+    $copiedMaps = @($records.ToArray() | Where-Object { $_.status -in @('copied', 'duplicate') })
+    $enMaps = @($copiedMaps | Where-Object { $_.kind -eq 'map_en' })
     $failed = @($records.ToArray() | Where-Object { $_.status -in @('error', 'skipped_limit') })
-    $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $enMaps.Count -eq 0) { 'partial' } else { 'collected' }
+    if ($Tryb -eq 'aktualizacja') {
+        $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $copiedMaps.Count -eq 0) { 'partial' } else { 'collected' }
+        $reportFormat = 'wwm-collection-v2'
+        $collectorVer = '1.1.0'
+        $limList = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Update mode collects LocalData/Patch/HD/oversea data/index/manifest/locale, package _diff maps and zh_cn map within payload limit.', 'If the full client updated Package data* files beyond the payload limit, use spakuj_dane.ps1.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
+    } else {
+        $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $enMaps.Count -eq 0) { 'partial' } else { 'collected' }
+        $reportFormat = 'wwm-collection-v1'
+        $collectorVer = '1.0.0'
+        $limList = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Only named English/Chinese maps, manifests and bounded data3/data205 candidates are copied.', 'The inventory and named candidates do not establish text or story-context completeness.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
+    }
     $report = [ordered]@{
-        format = 'wwm-collection-v1'; collector_version = '1.0.0'; created_utc = [DateTime]::UtcNow.ToString('o')
+        format = $reportFormat; collector_version = $collectorVer; mode = $Tryb; created_utc = [DateTime]::UtcNow.ToString('o')
         status = $status; steam_app_id = '3564740'; steam_build_id = (Read-BuildForGame $script:RootPath)
         inventory = [ordered]@{ path = 'INWENTARZ.jsonl'; files = $script:InventoryCount; max_entries = $script:MaxEntries; limited = $script:InventoryLimited; skipped_private_directories = $script:SkippedPrivateDirectories; skipped_private_files = $script:SkippedPrivateFiles }
         scan_roots = @($script:ScannedRoots.ToArray()); expected = @($script:Expected.ToArray())
         payload_limit_bytes = $script:MaxPayload; context_limit_bytes = $script:MaxContext; payload_bytes = $payloadBytes
         files = @($records.ToArray()); problems = @($script:Problems.ToArray())
-        limitations = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Only named English/Chinese maps, manifests and bounded data3/data205 candidates are copied.', 'The inventory and named candidates do not establish text or story-context completeness.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
+        limitations = $limList
     }
     [IO.File]::WriteAllText((Join-Path $stage 'RAPORT.json'), ($report | ConvertTo-Json -Depth 8), $script:Utf8)
     $summary = @(

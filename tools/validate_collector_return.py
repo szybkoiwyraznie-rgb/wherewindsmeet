@@ -27,6 +27,14 @@ MAX_MEMBERS = 20_000
 MAX_LINE_BYTES = 16 * 1024
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 STORED = re.compile(r"^pliki/[0-9]{6}_(?:translate_words_map_(?:en|zh_cn)(?:__small)?(?:_mobile)?(?:_diff)?|MANIFEST|data3|data205)$", re.I)
+STORED_V2 = re.compile(r"^pliki/[0-9]{6}_[A-Za-z0-9][A-Za-z0-9._-]*$")
+BLOCKED_PAYLOAD_SUFFIXES = (
+    ".exe", ".dll", ".so", ".dylib", ".sys", ".pdb", ".bin", ".pak", ".ucas",
+    ".utoc", ".pck", ".sav", ".save", ".log", ".dmp", ".bak", ".pem", ".key",
+    ".p12", ".pfx", ".bat", ".cmd", ".ps1", ".vbs", ".js", ".msi",
+)
+KINDS_V1 = frozenset({"map_en", "map_zh_cn", "manifest", "context_candidate"})
+KINDS_V2 = KINDS_V1 | frozenset({"map_diff", "db_data", "db_index", "patch_other"})
 
 
 class InvalidReturn(ValueError):
@@ -98,7 +106,8 @@ def validate(path: Path) -> dict[str, object]:
             if is_dir:
                 require(name == "pliki/" and info.file_size == 0, "unexpected directory member")
             else:
-                require(name in ("RAPORT.json", "RAPORT.txt", "INWENTARZ.jsonl") or bool(STORED.fullmatch(name)),
+                is_payload = bool(STORED_V2.fullmatch(name)) and not name.lower().endswith(BLOCKED_PAYLOAD_SUFFIXES)
+                require(name in ("RAPORT.json", "RAPORT.txt", "INWENTARZ.jsonl") or is_payload,
                         "unexpected archive member")
                 names[name] = info
             expanded += info.file_size
@@ -111,7 +120,16 @@ def validate(path: Path) -> dict[str, object]:
         # Full reads check the ZIP CRC, including on the otherwise informational summary.
         report = decode_json(archive.read("RAPORT.json"))
         archive.read("RAPORT.txt").decode("utf-8-sig")
-        require(isinstance(report, dict) and report.get("format") == "wwm-collection-v1", "unsupported report format")
+        fmt = report.get("format") if isinstance(report, dict) else None
+        require(fmt in ("wwm-collection-v1", "wwm-collection-v2"), "unsupported report format")
+        mode = report.get("mode", "rozpoznanie") if fmt == "wwm-collection-v2" else "rozpoznanie"
+        require(mode in ("rozpoznanie", "aktualizacja"), "invalid collection mode")
+        if fmt == "wwm-collection-v1":
+            for member in names:
+                if member.startswith("pliki/"):
+                    require(bool(STORED.fullmatch(member)), "unexpected archive member")
+        allowed_kinds = KINDS_V1 if fmt == "wwm-collection-v1" else KINDS_V2
+        stored_pattern = STORED if fmt == "wwm-collection-v1" else STORED_V2
         require(report.get("status") in ("collected", "partial"), "invalid collection status")
         records = report.get("files")
         inventory_info = report.get("inventory")
@@ -137,13 +155,14 @@ def validate(path: Path) -> dict[str, object]:
             kind = record.get("kind")
             status = record.get("status")
             length = record.get("bytes")
-            require(kind in ("map_en", "map_zh_cn", "manifest", "context_candidate"), "invalid file kind")
+            require(kind in allowed_kinds, "invalid file kind")
             require(status in ("copied", "duplicate", "skipped_limit", "error"), "invalid file status")
             require(nonnegative_int(length), "invalid file size")
             stored = record.get("stored_as")
             digest = record.get("sha256")
             if status in ("copied", "duplicate"):
-                require(isinstance(stored, str) and bool(STORED.fullmatch(stored)) and stored in names,
+                require(isinstance(stored, str) and bool(stored_pattern.fullmatch(stored))
+                        and not stored.lower().endswith(BLOCKED_PAYLOAD_SUFFIXES) and stored in names,
                         "stored file missing or unsafe")
                 require(isinstance(digest, str) and bool(SHA256.fullmatch(digest)), "invalid SHA-256")
                 require(names[stored].file_size == length, "stored file size mismatch")
@@ -162,7 +181,10 @@ def validate(path: Path) -> dict[str, object]:
         require(nonnegative_int(report.get("payload_bytes")), "invalid payload size")
         require(report["payload_bytes"] == sum(length for length, _ in referenced.values()), "payload size mismatch")
         if report["status"] == "collected":
-            require(not failed and not problems and english_maps > 0, "success conflicts with missing or failed files")
+            if fmt == "wwm-collection-v2" and mode == "aktualizacja":
+                require(not failed and not problems and copied > 0, "success conflicts with missing or failed files")
+            else:
+                require(not failed and not problems and english_maps > 0, "success conflicts with missing or failed files")
 
         for name, (_, expected) in referenced.items():
             digest = hashlib.sha256()

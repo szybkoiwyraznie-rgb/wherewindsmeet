@@ -2,9 +2,10 @@
 
 ## Co to jest
 
-Jednorazowy, odczytowy zestaw do rozpoznania instalacji: rozpakuj ZIP,
-uruchom `URUCHOM.bat`, otrzymaj **jeden** ZIP na Pulpicie i przekaż go
-prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
+Odczytowy zestaw do rozpoznania instalacji i zbierania cotygodniowych
+aktualizacji gry: rozpakuj ZIP, uruchom `URUCHOM.bat` (pierwsze rozpoznanie)
+albo `URUCHOM_AKTUALIZACJE.bat` (pliki po patchu gry), otrzymaj ZIP na
+Pulpicie i przekaż go prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
 instaluje Pythona, zależności ani niczego nie pobiera przez skrypt.
 
 Na życzenie właściciela, po tym jak domyślna polityka wykonywania zablokowała
@@ -130,8 +131,9 @@ python tools/build_collector_kit.py --output artifacts/WWM_ZBIERZ_DANE.zip
 python tools/run_tests.py
 ```
 
-Archiwum ma stałe znaczniki czasu, trzy pliki, brak kompresji i jest czytane
-ponownie przy budowie. BAT jest ASCII/CRLF; PowerShell — UTF-8 BOM/CRLF.
+Archiwum ma stałe znaczniki czasu, pięć plików (`CZYTAJ_TO.txt`, `URUCHOM.bat`,
+`URUCHOM_AKTUALIZACJE.bat`, `zbierz.ps1`, `spakuj_dane.ps1`), brak kompresji
+i jest czytane ponownie przy budowie. BAT jest ASCII/CRLF; PowerShell — UTF-8 BOM/CRLF.
 Git ignoruje artefakty ZIP. Testy Windows wykonują **rozpakowane** BAT i
 Windows PowerShell na fikcyjnej instalacji, a testy Linux sprawdzają builder,
 kodowanie i walidator. Wynik dla konkretnego commita zob. w dzienniku i CI.
@@ -143,18 +145,29 @@ Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
 same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
 `MANIFEST` wymienia 74 950 tabel dialogów (budowa bazy: [BAZA_GRY.md](BAZA_GRY.md)).
 
-Do jednorazowego uzupełnienia służy osobny skrypt, który **tylko czyta** katalog gry:
-kopiuje wskazany zestaw plików do folderu tymczasowego, liczy SHA-256, zapisuje
-`SPIS.json` i pakuje ZIP do wgrania na Dysk.
+Do cotygodniowych patchy służy `URUCHOM_AKTUALIZACJE.bat` (`zbierz.ps1 -Tryb aktualizacja`),
+który zbiera do jednego ZIP-a (<90 MiB, format `wwm-collection-v2`):
+- zawartość `LocalData/Patch/HD/oversea/` (`MANIFEST`, `data*`, `index*`, `locale/*_diff`, z wykluczeniem `.bin`/`.exe`/`.dll` i nazw prywatnych),
+- `Package/HD/oversea/MANIFEST`, `data1001`, `data1200`, `index1001`, `index1200`,
+- mapę źródłową `translate_words_map_zh_cn` oraz wszystkie warstwy `translate_words_map_*_diff`.
+
+Gdy duża aktualizacja klienta zmieni też bazę `Package/HD/oversea/data*`
+powyżej 90 MiB, służy osobny skrypt `spakuj_dane.ps1`, który **tylko czyta**
+katalog gry, zachowuje pełne ścieżki względne pod `pliki/`, liczy SHA-256,
+zapisuje `SPIS.json` i automatycznie dzieli wynik na części po ok. 85 MiB
+(poniżej limitu 100 MiB pobierania z Dysku):
 
 ```powershell
-# dialogi (data200-data212 bez data205, ~133 MB)
-powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet"
+# duża aktualizacja (domyślne: data*, index*, MANIFEST, zh_cn, en, *_diff, LocalData/Patch)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres duza_aktualizacja
 
-# kontekst: pozostałe dataN, MANIFEST, CameraZone, Audio_Area, bulk_data (~80 MB)
+# same dialogi (data200-data212 bez data205, ~133 MB w częściach <85 MiB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres dialogi
+
+# kontekst: pozostałe dataN, indexN, MANIFEST, CameraZone, Audio_Area, bulk_data
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres kontekst
 
-# wszystko naraz (~215 MB)
+# wszystko naraz (w częściach po ok. 85 MiB)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres wszystko
 ```
 

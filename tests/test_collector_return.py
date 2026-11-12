@@ -227,5 +227,56 @@ class CollectorReturnTests(unittest.TestCase):
             intake.MAX_ARCHIVE_BYTES = original
 
 
+    def test_accepts_v2_weekly_update_without_english_base_and_blocks_executables(self):
+        diff = b"synthetic diff"
+        patch_data = b"synthetic data1001"
+        zh_map = b"synthetic zh_cn"
+        report = {
+            "format": "wwm-collection-v2",
+            "collector_version": "1.1.0",
+            "mode": "aktualizacja",
+            "status": "collected",
+            "inventory": {"path": "INWENTARZ.jsonl", "files": 3},
+            "payload_bytes": len(diff) + len(patch_data) + len(zh_map),
+            "files": [
+                {"source": "LocalData/Patch/HD/oversea/data1001", "kind": "db_data", "bytes": len(patch_data),
+                 "status": "copied", "sha256": hashlib.sha256(patch_data).hexdigest(), "stored_as": "pliki/000001_data1001"},
+                {"source": "Package/HD/oversea/locale/translate_words_map_fr_diff", "kind": "map_diff", "bytes": len(diff),
+                 "status": "copied", "sha256": hashlib.sha256(diff).hexdigest(), "stored_as": "pliki/000002_translate_words_map_fr_diff"},
+                {"source": "Package/HD/oversea/locale/translate_words_map_zh_cn", "kind": "map_zh_cn", "bytes": len(zh_map),
+                 "status": "copied", "sha256": hashlib.sha256(zh_map).hexdigest(), "stored_as": "pliki/000003_translate_words_map_zh_cn"},
+            ],
+            "problems": [],
+        }
+        inventory = [
+            {"path": row["source"], "bytes": row["bytes"], "modified_utc": "2026-01-01T00:00:00Z"}
+            for row in report["files"]
+        ]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            with ZipFile(self.path, "w", compression=ZIP_DEFLATED) as z:
+                z.writestr("RAPORT.json", json.dumps(report).encode())
+                z.writestr("RAPORT.txt", b"update result\n")
+                z.writestr("INWENTARZ.jsonl", b"".join(json.dumps(r).encode() + b"\n" for r in inventory))
+                z.writestr("pliki/000001_data1001", patch_data)
+                z.writestr("pliki/000002_translate_words_map_fr_diff", diff)
+                z.writestr("pliki/000003_translate_words_map_zh_cn", zh_map)
+        result = intake.validate(self.path)
+        self.assertEqual(result["collection_status"], "collected")
+        self.assertEqual(result["unique_files"], 3)
+
+        # Executable payload must remain blocked in v2.
+        report["files"][0]["stored_as"] = "pliki/000001_evil.exe"
+        with ZipFile(self.path, "w", compression=ZIP_DEFLATED) as z:
+            z.writestr("RAPORT.json", json.dumps(report).encode())
+            z.writestr("RAPORT.txt", b"update result\n")
+            z.writestr("INWENTARZ.jsonl", b"".join(json.dumps(r).encode() + b"\n" for r in inventory))
+            z.writestr("pliki/000001_evil.exe", patch_data)
+            z.writestr("pliki/000002_translate_words_map_fr_diff", diff)
+            z.writestr("pliki/000003_translate_words_map_zh_cn", zh_map)
+        with self.assertRaises(intake.InvalidReturn):
+            intake.validate(self.path)
+
+
 if __name__ == "__main__":
     unittest.main()

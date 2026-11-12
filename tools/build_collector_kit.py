@@ -2,8 +2,9 @@
 """Build the Windows read-only collection kit; no game data is included.
 
 The resulting ZIP is reproducible and belongs in an ignored artifact directory.
-Windows users only need to unpack it and run URUCHOM.bat; Python is used solely
-by the project to produce and test the kit.
+Windows users only need to unpack it and run URUCHOM.bat or
+URUCHOM_AKTUALIZACJE.bat; Python is used solely by the project to produce and
+test the kit.
 """
 from __future__ import annotations
 
@@ -18,7 +19,13 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 COLLECTOR = ROOT / "collector"
 STAMP = (2026, 11, 10, 0, 0, 0)
-MEMBERS = ("CZYTAJ_TO.txt", "URUCHOM.bat", "zbierz.ps1")
+MEMBERS = (
+    "CZYTAJ_TO.txt",
+    "URUCHOM.bat",
+    "URUCHOM_AKTUALIZACJE.bat",
+    "zbierz.ps1",
+    "spakuj_dane.ps1",
+)
 
 
 def windows_lines(data: bytes, *, bom: bool, ascii_only: bool = False) -> bytes:
@@ -42,7 +49,9 @@ def kit_files() -> dict[str, bytes]:
     return {
         "CZYTAJ_TO.txt": readme_windows,
         "URUCHOM.bat": windows_lines((COLLECTOR / "URUCHOM.bat").read_bytes(), bom=False, ascii_only=True),
+        "URUCHOM_AKTUALIZACJE.bat": windows_lines((COLLECTOR / "URUCHOM_AKTUALIZACJE.bat").read_bytes(), bom=False, ascii_only=True),
         "zbierz.ps1": windows_lines((COLLECTOR / "zbierz.ps1").read_bytes(), bom=True),
+        "spakuj_dane.ps1": windows_lines((COLLECTOR / "spakuj_dane.ps1").read_bytes(), bom=True),
     }
 
 

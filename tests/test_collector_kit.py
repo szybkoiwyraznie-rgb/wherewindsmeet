@@ -11,7 +11,7 @@ from tools import build_collector_kit as kit
 
 
 class CollectorKitTests(unittest.TestCase):
-    def test_reproducible_zip_contains_only_three_tools_and_readme(self):
+    def test_reproducible_zip_contains_all_collector_tools_and_readme(self):
         first = kit.build_bytes()
         self.assertEqual(first, kit.build_bytes())
         with ZipFile(io.BytesIO(first)) as archive:
@@ -25,9 +25,12 @@ class CollectorKitTests(unittest.TestCase):
     def test_windows_encoding_and_line_endings_are_preserved(self):
         files = kit.kit_files()
         self.assertTrue(files["zbierz.ps1"].startswith(b"\xef\xbb\xbf"))
+        self.assertTrue(files["spakuj_dane.ps1"].startswith(b"\xef\xbb\xbf"))
         self.assertTrue(files["CZYTAJ_TO.txt"].startswith(b"\xef\xbb\xbf"))
         self.assertFalse(files["URUCHOM.bat"].startswith(b"\xef\xbb\xbf"))
+        self.assertFalse(files["URUCHOM_AKTUALIZACJE.bat"].startswith(b"\xef\xbb\xbf"))
         files["URUCHOM.bat"].decode("ascii")
+        files["URUCHOM_AKTUALIZACJE.bat"].decode("ascii")
         for name, data in files.items():
             with self.subTest(name=name):
                 self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
@@ -65,6 +68,13 @@ class CollectorKitTests(unittest.TestCase):
         self.assertNotIn("python.exe", launcher.lower())
         self.assertNotIn("Set-ExecutionPolicy", launcher)
         self.assertNotIn("Unrestricted", launcher)
+
+    def test_update_launcher_runs_update_mode_without_permanent_changes(self):
+        launcher = kit.kit_files()["URUCHOM_AKTUALIZACJE.bat"].decode("ascii")
+        self.assertIn("-ExecutionPolicy Bypass", launcher)
+        self.assertIn('-File "%~dp0zbierz.ps1" -Tryb aktualizacja %*', launcher)
+        self.assertIn("Unblock-File", launcher)
+        self.assertNotIn("Set-ExecutionPolicy", launcher)
 
     def test_launcher_bypasses_policy_only_for_its_own_process(self):
         launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
