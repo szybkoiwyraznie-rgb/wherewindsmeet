@@ -204,6 +204,47 @@ class ExtractTests(unittest.TestCase):
             with self.assertRaises(indeks.IndeksError):
                 indeks.wczytaj(Path(temp) / "nie_ma")
 
+    def test_grey_tables_lose_to_base_and_story_en_collisions_split_cleanly(self):
+        t_cut = T + 500
+        t_skill_1 = T + 501
+        t_skill_2 = T + 502
+        t_tm = T + 503
+        zh = {
+            **ZH,
+            t_cut: "十步杀一人",
+            t_skill_1: "十步杀一人",
+            t_skill_2: "十步杀一人",
+            t_tm: "对话文本",
+        }
+        en = {
+            **EN,
+            t_cut: "Cut them down, left and right",
+            t_skill_1: "Relentless Advance",
+            t_skill_2: "Relentless Advance",
+            t_tm: "Dialogue text",
+        }
+        custom = tables()
+        custom["text_msg__grey"] = [(590438, {"content": t_cut}), (590439, {"content": t_tm})]
+        custom["text_msg"] = [(590438, {"content": t_cut}), (590439, {"content": t_tm})]
+        custom["buff"] = [(1, {"buff_name": t_skill_1}), (2, {"buff_name": t_skill_2})]
+        custom["sound_data"] = [(1, {"audio_name": "vo_sm_sxdm4_cs_yd_01", "text": "对话文本"})]
+        with tempfile.TemporaryDirectory(prefix="wwm-wyciag-col-") as temp:
+            out = Path(temp) / "index"
+            wyciag.zbuduj(FakeBaza(custom), zh, en, out, {"opis": "kolizje"}, log=lambda _text: None)
+            ix = indeks.wczytaj(out)
+        # text_msg__grey nie wygrywa z text_msg nawet przy kolejności przed text_msg
+        self.assertEqual(ix.zrodlo(ix.teksty[K("对话文本")])[0], "text_msg")
+        # Ten sam ZH ("十步杀一人") ma oddzielne klucze dla cutsceny (rzadszej) i buffa (częstszego)
+        k_skill = K("十步杀一人")
+        k_cut = mapa_tekstow.klucz_wariantu("十步杀一人", "Cut them down, left and right")
+        self.assertEqual(ix.teksty[k_skill].en, "Relentless Advance")
+        self.assertEqual(ix.teksty[k_cut].en, "Cut them down, left and right")
+        self.assertEqual(ix.zrodlo(ix.teksty[k_cut]), ("text_msg", "content", "590438"))
+        self.assertIn("十步杀一人", ix.kolizje)
+        napisy = {row["wiersz"]: row for row in ix.cutsceny_kontekst["napis"]}
+        self.assertEqual(napisy[590438]["k"], k_cut)
+        self.assertEqual(napisy[590439]["audio"], "vo_sm_sxdm4_cs_yd_01")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -36,7 +36,7 @@ except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import baza_gry
 
-MAKS_WYSTAPIEN = 4
+MAKS_WYSTAPIEN = 8
 _Z_CYFRA = re.compile(r"\d")
 
 
@@ -141,7 +141,11 @@ def zbierz(
     drugi raz.
     """
     skip = set(pomin_rodziny)
-    names = [name for name in baza.tabele if baza_gry.rodzina(name) not in skip]
+    # Tabele podstawowe zawsze przed bliźniakami `__grey`, z zachowaniem kolejności tabel.
+    names = sorted(
+        (name for name in baza.tabele if baza_gry.rodzina(name) not in skip),
+        key=lambda name: name.endswith("__grey"),
+    )
     result = Zrodla()
     for number, name in enumerate(names, 1):
         kind = rodzaj_tabeli(name)

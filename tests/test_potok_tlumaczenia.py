@@ -418,6 +418,46 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(got_p[T + 1], "Settings")
             self.assertIn("Nawet u kresu drogi", got_p[T + 10])
 
+    def test_patcher_separates_story_collision_variants_without_leaking(self):
+        t_cut = T + 800
+        t_skill_1 = T + 801
+        t_skill_2 = T + 802
+        zh_dict = {**ZH_ALL, t_cut: "十步杀一人", t_skill_1: "十步杀一人", t_skill_2: "十步杀一人"}
+        en_dict = {**EN_ALL, t_cut: "Cut them down, left and right", t_skill_1: "Relentless Advance", t_skill_2: "Relentless Advance"}
+        custom = world()
+        custom["text_msg"] = [(590438, {"content": t_cut})]
+        custom["buff"] = [*custom["buff"], (10, {"buff_name": t_skill_1}), (11, {"buff_name": t_skill_2})]
+        ix_dir = self.root / "ix_col"
+        wyciag.zbuduj(FakeBaza(custom), zh_dict, en_dict, ix_dir, {}, log=lambda _text: None)
+
+        maps = self.root / "mapy_col"
+        maps.mkdir(exist_ok=True)
+        zh_p = maps / "zh"
+        en_p = maps / "en"
+        zh_p.write_bytes(container([table([(t_cut, "十步杀一人".encode()), (t_skill_1, "十步杀一人".encode())])], with_metadata=True))
+        en_p.write_bytes(container([table([(t_cut, b"Cut them down, left and right"), (t_skill_1, b"Relentless Advance")])], with_metadata=True))
+
+        # 1. Gdy przetłumaczona jest tylko umiejętność, cutscena zostaje po angielsku (nie dostaje nazwy skilla).
+        mag_partial = self.root / "mag_col_1"
+        st1 = tlumaczenie.Magazyn()
+        st1.ustaw(K("十步杀一人"), "Bezlitosne natarcie")
+        tlumaczenie.zapisz(mag_partial, st1)
+        out1 = self.root / "latka_col_1"
+        self.assertEqual(zbuduj_latke.main(["--indeks", str(ix_dir), "--magazyn", str(mag_partial), "--zh", str(zh_p), "--cel", str(en_p), "--wyj", str(out1)]), 0)
+        got1, _ = mapa_tekstow.wczytaj_warstwe(out1 / "en")
+        self.assertEqual(got1[t_skill_1], "Bezlitosne natarcie")
+        self.assertEqual(got1[t_cut], "Cut them down, left and right")
+
+        # 2. Gdy przetłumaczone są oba warianty, każdy idzie na swoje właściwe miejsce.
+        mag_full = self.root / "mag_col_2"
+        st1.ustaw(mapa_tekstow.klucz_wariantu("十步杀一人", "Cut them down, left and right"), "Ścinam ich na lewo i prawo")
+        tlumaczenie.zapisz(mag_full, st1)
+        out2 = self.root / "latka_col_2"
+        self.assertEqual(zbuduj_latke.main(["--indeks", str(ix_dir), "--magazyn", str(mag_full), "--zh", str(zh_p), "--cel", str(en_p), "--wyj", str(out2)]), 0)
+        got2, _ = mapa_tekstow.wczytaj_warstwe(out2 / "en")
+        self.assertEqual(got2[t_skill_1], "Bezlitosne natarcie")
+        self.assertEqual(got2[t_cut], "Ścinam ich na lewo i prawo")
+
 
 if __name__ == "__main__":
     unittest.main()

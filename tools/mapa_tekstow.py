@@ -25,6 +25,7 @@ gra doda w przyszłych aktualizacjach.
 from __future__ import annotations
 
 import hashlib
+import re
 from pathlib import Path
 from typing import Iterable
 
@@ -39,6 +40,8 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import locale_records as records
 
 DLUGOSC_KLUCZA = 16
+_SLOWO_EN = re.compile(r"[a-z0-9']+")
+_STOP_EN = frozenset({"a", "an", "the", "to", "of", "in", "on", "at", "for", "and", "or", "is", "are", "be", "with", "by", "from", "as", "that", "this", "it"})
 
 
 class MapaError(Exception):
@@ -48,6 +51,27 @@ class MapaError(Exception):
 def klucz(tekst: str) -> str:
     """Stały klucz tekstu źródłowego."""
     return hashlib.sha256(tekst.encode("utf-8")).hexdigest()[:DLUGOSC_KLUCZA]
+
+
+def klucz_wariantu(tekst: str, angielski: str) -> str:
+    """Klucz rozróżniający kontekstowe warianty tego samego tekstu źródłowego."""
+    return hashlib.sha256(f"{tekst}\0{angielski}".encode("utf-8")).hexdigest()[:DLUGOSC_KLUCZA]
+
+
+def podobienstwo_en(a: str, b: str) -> float:
+    """Podobieństwo dwóch wersji angielskich tego samego napisu (0.0..1.0)."""
+    def sygnatura(text: str) -> frozenset[str]:
+        norm = text.replace("‘", "'").replace("’", "'").replace("“", '"').replace("”", '"').casefold()
+        words = _SLOWO_EN.findall(norm)
+        core = frozenset(w for w in words if w not in _STOP_EN)
+        return core if core else frozenset(words)
+
+    sa, sb = sygnatura(a), sygnatura(b)
+    if sa == sb:
+        return 1.0
+    if not sa or not sb:
+        return 0.0
+    return len(sa & sb) / len(sa | sb)
 
 
 def wczytaj_warstwe(path) -> tuple[dict[int, str], set[int]]:

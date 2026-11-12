@@ -95,12 +95,28 @@ def rodzenstwo_wariantow(warianty: dict[str, dict]) -> dict[str, list[str]]:
     return groups
 
 
+def _dopasuj_kolizje(warianty_zh: list[list[str]], current: str, magazyn: magazyn_mod.Magazyn) -> str | None:
+    """Dobierz wariant tłumaczenia dla tekstu `zh`, który ma rozbieżne znaczenia w EN."""
+    for key, rep_en in warianty_zh:
+        if rep_en == current:
+            return magazyn.po_kluczu.get(key)
+    best_key, best_sim = None, 0.0
+    for key, rep_en in warianty_zh:
+        score = mapa_tekstow.podobienstwo_en(current, rep_en)
+        if score > best_sim:
+            best_key, best_sim = key, score
+    if best_key is not None and best_sim >= 0.5:
+        return magazyn.po_kluczu.get(best_key)
+    return None
+
+
 def przeklady_pliku(
     teksty: dict[int, str],
     zh: dict[int, str],
     magazyn: magazyn_mod.Magazyn,
     warianty: dict[str, dict],
     rodzenstwo: dict[str, list[str]],
+    kolizje: dict[str, list[list[str]]] | None = None,
 ) -> dict[int, str]:
     """`id -> przekład` dla wpisów jednego pliku; tylko wpisy, które się zmienią."""
     wanted: dict[int, str] = {}
@@ -114,7 +130,10 @@ def przeklady_pliku(
                     break
         if text is None:
             source = zh.get(ident, current)
-            text = magazyn.po_kluczu.get(mapa_tekstow.klucz(source))
+            if kolizje and source in kolizje:
+                text = _dopasuj_kolizje(kolizje[source], current, magazyn)
+            else:
+                text = magazyn.po_kluczu.get(mapa_tekstow.klucz(source))
         if text and text != current:
             wanted[ident] = text
     return wanted
@@ -131,12 +150,13 @@ def przepisz(
     *,
     plik_latki: str | None = None,
     sciezka_w_grze: str | None = None,
+    kolizje: dict[str, list[list[str]]] | None = None,
 ) -> dict:
     """Przepisz jeden plik mapy do `cel` i zwróć raport; rzuca `LatkaError` przy niezgodności."""
     try:
         data = path.read_bytes()
         teksty, _removed = mapa_tekstow.wczytaj_warstwe(path)
-        wanted = przeklady_pliku(teksty, zh, magazyn, warianty, rodzenstwo)
+        wanted = przeklady_pliku(teksty, zh, magazyn, warianty, rodzenstwo, kolizje=kolizje)
         patched, stats = patcher.apply_translations(data, wanted, level=poziom, text_map={})
         check = patcher.verify(data, patched, wanted, text_map={})
     except (OSError, mapa_tekstow.MapaError, patcher.PatchError, records.LayoutError) as error:
@@ -230,6 +250,7 @@ def main(argv=None) -> int:
                 arguments.poziom,
                 plik_latki=patch_rel,
                 sciezka_w_grze=game_rel,
+                kolizje=ix.kolizje,
             )
             for path, patch_rel, game_rel in planned
         ]

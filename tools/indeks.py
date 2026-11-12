@@ -80,6 +80,8 @@ class Indeks:
     zamiany: list = field(default_factory=list)
     warianty: dict[str, dict] = field(default_factory=dict)  # id tekstu (hex) -> {k, w, en}
     przerywniki: dict = field(default_factory=dict)  # numer przerywnika -> {tekst, streszczenie}
+    kolizje: dict[str, list[list[str]]] = field(default_factory=dict)  # zh -> [[klucz, en], ...]
+    cutsceny_kontekst: dict[str, list[dict]] = field(default_factory=dict)  # typ -> wiersze kontekstu cutscen
 
     def zrodlo(self, tekst: Tekst) -> tuple[str, str, str] | None:
         """Główne źródło tekstu: (rodzaj tabeli, ścieżka pola, klucz wiersza)."""
@@ -134,7 +136,8 @@ def wczytaj(katalog, *, teksty: bool = True, sceny: bool = True) -> Indeks:
                 z_en = row.get("zr") == "en"
                 source = row["en"] if z_en else row["zh"]
                 where = row.get("w")
-                indeks.teksty[mapa_tekstow.klucz(source)] = Tekst(
+                key = row.get("k") or mapa_tekstow.klucz(source)
+                indeks.teksty[key] = Tekst(
                     source, None if z_en else row.get("en"), row.get("n", 1), tuple(where) if where else None, z_en
                 )
         if sceny:
@@ -162,6 +165,11 @@ def wczytaj(katalog, *, teksty: bool = True, sceny: bool = True) -> Indeks:
             indeks.warianty[row["id"]] = row
         for row in tabela("przerywniki"):
             indeks.przerywniki[row["no"]] = row
+        for row in tabela("kolizje"):
+            indeks.kolizje[row["zh"]] = row["w"]
+        if teksty:
+            for row in tabela("cutsceny_kontekst"):
+                indeks.cutsceny_kontekst.setdefault(row["typ"], []).append(row)
     except (OSError, KeyError, json.JSONDecodeError) as error:
         raise IndeksError(f"{root}: niepełny wyciąg ({error!r})") from error
     return indeks

@@ -68,6 +68,24 @@ PROG_UDZIALU = 0.5
 _SLOWA_DIALOGU = re.compile(r"dialog|talk|say|popo|speech|bubble")
 _PRZESTRZEN = re.compile(r"^spaces\.s(\d+)\.")
 RODZAJ_KOD = {"kwestia": "k", "plansza": "p", "wizytowka_imie": "wi", "wizytowka_tytul": "wt", "inne": "i"}
+_KOPIE_KWESTII = frozenset({"debate_guider_dialog_data"})
+_ZAKRES_CUTSCEN_TM = (590000, 592694)
+_ZAKRES_BOTOW_TM = (3220000, 3269999)
+_INTERPUNKCJA_NORM = re.compile(r"[\s，。？！、：；“”‘’（）()\[\]…—\-,.?!:;'\"]+")
+
+
+def _norm_zh(text: str) -> str:
+    return _INTERPUNKCJA_NORM.sub("", text)
+
+
+def _mowca_z_en(en_text: str) -> str | None:
+    if ":" not in en_text[:40]:
+        return None
+    prefix, _rest = en_text.split(":", 1)
+    prefix = prefix.strip()
+    if 1 <= len(prefix) <= 35 and not re.search(r"[{}\[\]#\d]", prefix):
+        return prefix
+    return None
 
 
 def _liczby(value) -> list[int]:
@@ -106,6 +124,12 @@ class Obserwator:
         self.tozsamosci: list[dict] = []
         self.zamiany: list[dict] = []
         self.przerywniki: dict[int, dict] = {}
+        self.sound_data_po_tekscie: dict[str, list[str]] = defaultdict(list)
+        self.text_msg_cutsceny: dict[int, tuple[int, bool]] = {}  # wiersz -> (text_id, czy_grey)
+        self.bot_nick_cids: set[int] = set()
+        self.intro_cutsceny: list[dict] = []
+        self.filmy_napisy: list[dict] = []
+        self.powtorki_cutscen: list[dict] = []
         # odwołania do dialogów
         self.pola: list[tuple[str, str]] = []
         self._numer_pola: dict[tuple[str, str], int] = {}
@@ -338,6 +362,76 @@ class Obserwator:
         if isinstance(row, dict):
             self.zamiany.append({"dialog": row.get("no", key), "na": _liczby(row.get("en")), "typ": "jezyk_en"})
 
+    def _t_sound_data(self, _name, _key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        text, audio = row.get("text"), row.get("audio_name")
+        if isinstance(text, str) and isinstance(audio, str) and audio:
+            norm = _norm_zh(text)
+            if len(norm) >= 4 and audio not in self.sound_data_po_tekscie[norm]:
+                self.sound_data_po_tekscie[norm].append(audio)
+
+    def _zbierz_text_msg(self, key, row, *, grey: bool) -> None:
+        if not isinstance(key, int) or not isinstance(row, dict):
+            return
+        cid = row.get("content")
+        if not isinstance(cid, int) or isinstance(cid, bool):
+            return
+        if _ZAKRES_CUTSCEN_TM[0] <= key <= _ZAKRES_CUTSCEN_TM[1]:
+            prev = self.text_msg_cutsceny.get(key)
+            if prev is None or (prev[1] and not grey):
+                self.text_msg_cutsceny[key] = (cid, grey)
+        elif _ZAKRES_BOTOW_TM[0] <= key <= _ZAKRES_BOTOW_TM[1]:
+            self.bot_nick_cids.add(cid)
+
+    def _t_text_msg(self, _name, key, row) -> None:
+        self._zbierz_text_msg(key, row, grey=False)
+
+    def _t_text_msg__grey(self, _name, key, row) -> None:
+        self._zbierz_text_msg(key, row, grey=True)
+
+    def _t_wds_oneday_intro_cutscene_data(self, _name, key, row) -> None:
+        if isinstance(row, dict) and isinstance(row.get("text"), int):
+            self.intro_cutsceny.append(
+                {
+                    "id": row.get("id", key),
+                    "czas": row.get("time", 0.0),
+                    "trwanie": row.get("duration", 0.0),
+                    "mowca": row.get("speaker"),
+                    "text_id": row["text"],
+                }
+            )
+
+    def _t_entry_collect_movie_subtitle_data(self, _name, key, row) -> None:
+        if not isinstance(row, list):
+            return
+        for item in row:
+            if isinstance(item, dict) and isinstance(item.get("text"), int):
+                self.filmy_napisy.append(
+                    {
+                        "film": item.get("dialog_no", key),
+                        "id": item.get("id"),
+                        "czas": item.get("time", 0.0),
+                        "trwanie": item.get("duration", 0.0),
+                        "text_id": item["text"],
+                    }
+                )
+
+    def _t_task_cutscene_replay(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.powtorki_cutscen.append(
+                {
+                    "no": row.get("no", key),
+                    "task_no": row.get("task_no"),
+                    "finish_task": row.get("finish_task"),
+                    "grupa": row.get("group"),
+                    "przestrzen": row.get("space_no"),
+                    "nazwa_id": row.get("name"),
+                    "rozdzial_id": row.get("chapter_name"),
+                    "streszczenie_id": row.get("synopsis_text") or row.get("synopsis_text_mobile"),
+                }
+            )
+
 
 class Podzial:
     """Zapis JSONL w plikach o stałej regule podziału (`nazwa_<część>.jsonl`).
@@ -402,38 +496,124 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
     zrodla = zrodla_tekstow.zbierz(baza, czy_tekst, pomin_rodziny=("dialog_timelines",), obserwator=obserwator)
     log(f"tabele: {sum(zrodla.wiersze.values())} wierszy, {len(zrodla.wystapienia)} id z tabel ({time.time() - start:.0f} s)")
 
-    # 3. zakres tekstów i klucze
+    # 3. zakres tekstów i klucze (deterministycznie, z priorytetem źródeł i rozdzieleniem kolizji fabularnych)
     wskazane: set[int] = set(zrodla.wystapienia)
+    scene_cids: set[int] = set()
     for scena in sceny.values():
         for element in scena["elementy"]:
             wskazane.add(element["text_id"])
+            scene_cids.add(element["text_id"])
             if element["nazwa"]:
                 wskazane.add(element["nazwa"])
         for osoba in scena["obsada"]:
             if osoba["nazwa"]:
                 wskazane.add(osoba["nazwa"])
-    w_zakresie = set(en) | wskazane
+
+    cut_cids: set[int] = {cid for cid, _grey in obserwator.text_msg_cutsceny.values()}
+    cut_cids |= {item["text_id"] for item in obserwator.intro_cutsceny}
+    cut_cids |= {item["text_id"] for item in obserwator.filmy_napisy}
+    story_cids = scene_cids | cut_cids
+    bot_cids = obserwator.bot_nick_cids - story_cids
+
+    w_zakresie = sorted(set(en) | wskazane)
+
+    def _priorytet_w(pochodzenie: int, wiersz: str, text_id: int) -> tuple:
+        kind = zrodla.pochodzenia[pochodzenie][0]
+        is_grey = kind.endswith("__grey")
+        base = kind.removesuffix("__grey")
+        is_copy = base in _KOPIE_KWESTII
+        _tbl, _, row_key = wiersz.rpartition("#")
+        is_cut_tm = base == "text_msg" and row_key.isdigit() and _ZAKRES_CUTSCEN_TM[0] <= int(row_key) <= _ZAKRES_CUTSCEN_TM[1]
+        nat = (0, int(row_key), "") if row_key.lstrip("-").isdigit() else (1, 0, row_key)
+        return (is_grey, is_copy, not is_cut_tm, pochodzenie, nat, text_id)
+
+    # Grupuj identyfikatory po tekście źródłowym, żeby wykryć kolizje znaczeniowe
+    # między strefą fabuły (dialogi/cutsceny) a pozostałymi tabelami gry.
+    grupy_zh: dict[str, list[int]] = defaultdict(list)
     klucz_id: dict[int, str] = {}
-    teksty: dict[str, dict] = {}
+    z_en_by_key: dict[str, str] = {}
     for text_id in w_zakresie:
         zrodlowy = zh.get(text_id)
-        z_en = zrodlowy is None
-        if z_en:
-            zrodlowy = en[text_id]
-        key = mapa_tekstow.klucz(zrodlowy)
-        klucz_id[text_id] = key
-        entry = teksty.get(key)
-        if entry is None:
-            entry = teksty[key] = {"zr": zrodlowy, "z_en": z_en, "n": 0, "en": Counter(), "w": []}
+        if zrodlowy is None:
+            source_en = en[text_id]
+            key = mapa_tekstow.klucz(source_en)
+            klucz_id[text_id] = key
+            z_en_by_key[key] = source_en
+        else:
+            grupy_zh[zrodlowy].append(text_id)
+
+    kolizje: list[dict] = []
+    teksty: dict[str, dict] = {}
+    for key, zr_en in z_en_by_key.items():
+        teksty[key] = {"zr": zr_en, "z_en": True, "n": 0, "en": Counter(), "w": None, "_tids": []}
+
+    for zrodlowy, tids in grupy_zh.items():
+        base_key = mapa_tekstow.klucz(zrodlowy)
+        story_en = Counter(en[tid] for tid in tids if tid in story_cids and tid in en)
+        other_en = Counter(en[tid] for tid in tids if tid not in story_cids and tid not in bot_cids and tid in en)
+        podzial_kluczy = False
+        if story_en and other_en:
+            top_story = story_en.most_common(1)[0][0]
+            top_other = other_en.most_common(1)[0][0]
+            if mapa_tekstow.podobienstwo_en(top_story, top_other) < 0.5:
+                podzial_kluczy = True
+                # Liczniejszy kontekst zachowuje główny klucz `klucz(zh)`, rzadszy dostaje
+                # osobny klucz wariantu. Przy remisie fabuła dostaje wariant, a reszta główny.
+                story_total = sum(1 for tid in tids if tid in story_cids)
+                other_total = sum(1 for tid in tids if tid not in story_cids and tid not in bot_cids)
+                if story_total > other_total:
+                    story_key = base_key
+                    other_key = mapa_tekstow.klucz_wariantu(zrodlowy, top_other)
+                else:
+                    other_key = base_key
+                    story_key = mapa_tekstow.klucz_wariantu(zrodlowy, top_story)
+                if story_key == other_key:
+                    podzial_kluczy = False
+                else:
+                    kolizje.append({"zh": zrodlowy, "w": [[other_key, top_other], [story_key, top_story]]})
+                    for tid in tids:
+                        if tid in story_cids:
+                            tid_en = en.get(tid)
+                            if tid_en and mapa_tekstow.podobienstwo_en(tid_en, top_other) > mapa_tekstow.podobienstwo_en(tid_en, top_story):
+                                tid_key = other_key
+                            else:
+                                tid_key = story_key
+                        else:
+                            tid_en = en.get(tid)
+                            if tid_en and mapa_tekstow.podobienstwo_en(tid_en, top_story) > mapa_tekstow.podobienstwo_en(tid_en, top_other):
+                                tid_key = story_key
+                            else:
+                                tid_key = other_key
+                        klucz_id[tid] = tid_key
+                        if tid_key not in teksty:
+                            teksty[tid_key] = {"zr": zrodlowy, "z_en": False, "n": 0, "en": Counter(), "w": None, "_tids": []}
+                        teksty[tid_key]["_tids"].append(tid)
+        if not podzial_kluczy:
+            teksty[base_key] = {"zr": zrodlowy, "z_en": False, "n": 0, "en": Counter(), "w": None, "_tids": tids}
+            for tid in tids:
+                klucz_id[tid] = base_key
+
+    for text_id in w_zakresie:
+        key = klucz_id[text_id]
+        entry = teksty[key]
         entry["n"] += 1
         angielski = en.get(text_id)
-        if angielski is not None and not z_en:
+        if angielski is not None and not entry["z_en"]:
             entry["en"][angielski] += 1
-        if not entry["w"]:
-            for pochodzenie, wiersz, etykieta in zrodla.wystapienia.get(text_id, ()):
-                # [numer źródła, klucz wiersza, id tekstu-nazwy tego wiersza (jeśli inny niż ten tekst)]
-                entry["w"] = [pochodzenie, wiersz, etykieta if etykieta != text_id else 0]
-                break
+
+    for key, entry in teksty.items():
+        if entry["z_en"]:
+            tids_for_w = [tid for tid in w_zakresie if klucz_id[tid] == key]
+        else:
+            tids_for_w = entry["_tids"]
+        best_choice = None
+        for tid in tids_for_w:
+            for pochodzenie, wiersz, etykieta in zrodla.wystapienia.get(tid, ()):
+                prio = _priorytet_w(pochodzenie, wiersz, tid)
+                if best_choice is None or prio < best_choice[0]:
+                    best_choice = (prio, [pochodzenie, wiersz, etykieta if etykieta != tid else 0])
+        if best_choice is not None:
+            entry["w"] = best_choice[1]
 
     def k(text_id) -> str | None:
         return klucz_id.get(text_id) if isinstance(text_id, int) and not isinstance(text_id, bool) else None
@@ -449,6 +629,8 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             row = {"zh": entry["zr"]}
             if entry["en"]:
                 row["en"] = entry["en"].most_common(1)[0][0]
+            if key != mapa_tekstow.klucz(entry["zr"]):
+                row["k"] = key
         if entry["n"] > 1:
             row["n"] = entry["n"]
         if entry["w"]:
@@ -456,6 +638,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             row["w"] = entry["w"][:2] + ([etykieta] if etykieta and etykieta != key else [])
         podzial.dodaj(key[0], row)
     pliki["teksty"] = podzial.koniec()
+    pliki["kolizje"] = zapisz_jsonl(wyj / "kolizje.jsonl", sorted(kolizje, key=lambda item: item["zh"]))
     (wyj / "zrodla.json").write_text(
         json.dumps(
             [[kind, path, zrodla.liczba[index]] for index, (kind, path) in enumerate(zrodla.pochodzenia)],
@@ -671,6 +854,71 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         wyj / "zamiany_dialogow.jsonl",
         sorted(obserwator.zamiany, key=lambda row: (str(row["typ"]), str(row["dialog"]))),
     )
+
+    # Kontekst dla osobnej sekcji cutscen: napisy text_msg 590000..592694 z audio sound_data
+    # i podpowiedzią mówcy, plus intro/filmy z czasami oraz replay z powiązaniem do zadań.
+    def _cut_audio(text_id: int) -> str | None:
+        zs = zh.get(text_id)
+        if not zs:
+            return None
+        hits = obserwator.sound_data_po_tekscie.get(_norm_zh(zs))
+        if not hits and " " in zs.strip():
+            hits = obserwator.sound_data_po_tekscie.get(_norm_zh(zs.strip().split(" ", 1)[1]))
+        return hits[0] if hits else None
+
+    def _cut_mowca_en(text_id: int) -> str | None:
+        zs = zh.get(text_id)
+        if not zs:
+            return None
+        own_en = en.get(text_id) or ""
+        if _mowca_z_en(own_en):
+            return None
+        for other_tid in grupy_zh.get(zs, ()):
+            if other_tid == text_id:
+                continue
+            sp = _mowca_z_en(en.get(other_tid) or "")
+            if sp:
+                return sp
+        return None
+
+    cut_rows: list[dict] = []
+    for row_no in sorted(obserwator.text_msg_cutsceny):
+        cid, _grey = obserwator.text_msg_cutsceny[row_no]
+        key = k(cid)
+        if not key:
+            continue
+        item = {"typ": "napis", "wiersz": row_no, "k": key}
+        audio = _cut_audio(cid)
+        if audio:
+            item["audio"] = audio
+        mowca_en = _cut_mowca_en(cid)
+        if mowca_en:
+            item["mowca_en"] = mowca_en
+        cut_rows.append(item)
+    for item in sorted(obserwator.intro_cutsceny, key=lambda r: (r["czas"], r["id"])):
+        key = k(item["text_id"])
+        if key:
+            cut_rows.append(
+                {"typ": "intro", "id": item["id"], "czas": item["czas"], "trwanie": item["trwanie"], "mowca": item["mowca"], "k": key}
+            )
+    for item in sorted(obserwator.filmy_napisy, key=lambda r: (r["film"], r["czas"], r["id"])):
+        key = k(item["text_id"])
+        if key:
+            cut_rows.append(
+                {"typ": "film", "film": item["film"], "id": item["id"], "czas": item["czas"], "trwanie": item["trwanie"], "k": key}
+            )
+    for item in sorted(obserwator.powtorki_cutscen, key=lambda r: r["no"]):
+        row = {"typ": "powtorka", "no": item["no"]}
+        for field in ("task_no", "finish_task", "grupa", "przestrzen"):
+            if item[field] not in (None, 0):
+                row[field] = item[field]
+        for src_field, dst_field in (("nazwa_id", "nazwa"), ("rozdzial_id", "rozdzial"), ("streszczenie_id", "streszczenie")):
+            key = k(item[src_field])
+            if key:
+                row[dst_field] = key
+        if any(f in row for f in ("nazwa", "rozdzial", "streszczenie")):
+            cut_rows.append(row)
+    pliki["cutsceny_kontekst"] = zapisz_jsonl(wyj / "cutsceny_kontekst.jsonl", cut_rows)
 
     # 7. manifest z liczbami i pokryciem
     elementy_scen = sum(len(scena["elementy"]) for scena in sceny.values())
