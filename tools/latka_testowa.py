@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Buduje małą, odwracalną łatkę testową UI + polskich znaków (ZIP z instalatorem Windows).
+"""Buduje małą, odwracalną łatkę testową UI i/lub prologu z polskimi znakami (ZIP z instalatorem Windows).
 
     python3 tools/latka_testowa.py \
       --indeks index \
@@ -8,14 +8,17 @@
       --mapa Package/HD/oversea/locale/translate_words_map_en_diff path/pkg_en_diff \
       --mapa LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff path/patch_en_diff \
       --build-gry 25906190 \
+      --zakres ui+prolog \
       --wyj-zip dist/WWM_LATKA_TEST_PL.zip
 
 Nie dotyka katalogu `tlumaczenie/`. W osobnym folderze tymczasowym tworzy
-tymczasowy magazyn wyłącznie dla kilku etykiet menu głównego i ustawień
-zawierających wszystkie polskie znaki diakrytyczne (ą ć ę ł ń ó ś ź ż
-Ą Ć Ę Ł Ń Ó Ś Ź Ż), przepuszcza go przez `tools/zbuduj_latke.py` i pakuje
-razem ze skryptami `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`,
-`SPRAWDZ_STAN.bat`). Szczegóły próby: docs/TEST_W_GRZE.md.
+tymczasowy magazyn wyłącznie dla wybranych etykiet menu głównego/ustawień oraz
+pierwszych napisów w prologu gry (tabele `text_msg` / `text_msg__grey`,
+wiersze 590336–590351) zawierających wszystkie polskie znaki diakrytyczne
+(ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż), przepuszcza go przez
+`tools/zbuduj_latke.py` i pakuje razem ze skryptami `instalator/`
+(`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`). Szczegóły próby:
+docs/TEST_W_GRZE.md.
 """
 
 from __future__ import annotations
@@ -54,6 +57,21 @@ TEST_LABELS: dict[str, str] = {
     "Exit": "Wyjście [PL]",
 }
 
+# Pierwsze napisy w cutscence prologu gry (tabele `text_msg` i `text_msg__grey`,
+# wiersze 590336–590351). Dopasowywane parą (EN, ZH.strip()), żeby nie podmienić
+# krótkich zwrotów w innych dialogach.
+PROLOG_LINES: tuple[tuple[str, str, str], ...] = (
+    ("It's you.", "是你", "To ty [PL: ą ć ę ł ń ó ś ź ż]."),
+    ("Yes. Coming to catch you.", "是啊 来抓你", "Tak. Przyszliśmy cię pojmać [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
+    ("Even at the end of the road,", "穷途末路", "Nawet u kresu drogi [ą ć ę ł ń ó ś ź ż],"),
+    ("a drink to wet your throat.", "尚有一饮入喉", "łyk trunku zwilży gardło [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
+    ("Well? How is it?", "如何", "I jak? Smakuje [ą ć ę ł ń ó ś ź ż]?"),
+    ("Bland.", "淡", "Mdłe [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
+    ("Retrieve the Zhenguan Jade!", "夺下镇冠珏", "Odbierzcie Nefryt Zhenguan [ąęółńśźż]!"),
+)
+
+ZAKRESY = ("ui", "prolog", "ui+prolog")
+
 
 def zbuduj_paczke_testowa(
     *,
@@ -64,29 +82,44 @@ def zbuduj_paczke_testowa(
     wyj_zip: str | Path,
     build_gry: str = "",
     poziom: int = 9,
+    zakres: str = "ui+prolog",
 ) -> dict:
-    """Zbuduj testowy ZIP instalacyjny dla wybranych napisów UI; nie modyfikuje oryginałów."""
+    """Zbuduj testowy ZIP instalacyjny dla wybranych napisów UI i/lub prologu; nie modyfikuje oryginałów."""
     if not cel_paths and not mapa_pairs:
         raise ValueError("podaj co najmniej jedno --cel albo --mapa")
+    if zakres not in ZAKRESY:
+        raise ValueError(f"nieznany zakres testu: {zakres!r} (dozwolone: {', '.join(ZAKRESY)})")
+
+    use_ui = zakres in ("ui", "ui+prolog")
+    use_prolog = zakres in ("prolog", "ui+prolog")
+    prolog_by_pair = {(en, zh_key): pl for en, zh_key, pl in PROLOG_LINES}
 
     zh = mapa_tekstow.zloz(zh_paths)
     store = magazyn_mod.Magazyn()
-    matched_labels: dict[str, int] = {}
+    matched_ui: dict[str, int] = {}
+    matched_prolog: dict[str, int] = {}
 
     target_files = [Path(p) for p in cel_paths] + [Path(p) for _, p in mapa_pairs]
     for path in target_files:
         teksty, _removed = mapa_tekstow.wczytaj_warstwe(path)
         for ident, current in teksty.items():
-            pl_text = TEST_LABELS.get(current)
-            if not pl_text:
-                continue
-            source = zh.get(ident, current)
-            slot = mapa_tekstow.klucz(source)
-            store.ustaw(slot, pl_text)
-            matched_labels[current] = matched_labels.get(current, 0) + 1
+            zh_raw = zh.get(ident)
+            if use_ui and current in TEST_LABELS:
+                source = zh_raw if zh_raw is not None else current
+                store.ustaw(mapa_tekstow.klucz(source), TEST_LABELS[current])
+                matched_ui[current] = matched_ui.get(current, 0) + 1
+            if use_prolog and zh_raw is not None:
+                prolog_pl = prolog_by_pair.get((current, zh_raw.strip()))
+                if prolog_pl:
+                    store.ustaw(mapa_tekstow.klucz(zh_raw), prolog_pl)
+                    matched_prolog[current] = matched_prolog.get(current, 0) + 1
 
     if not len(store):
-        raise ValueError("nie znaleziono żadnej z testowych etykiet UI w podanych plikach mapy")
+        raise ValueError(f"nie znaleziono żadnej z testowych etykiet dla zakresu {zakres!r} w podanych plikach mapy")
+
+    matched_labels = dict(matched_ui)
+    for label, count in matched_prolog.items():
+        matched_labels[label] = matched_labels.get(label, 0) + count
 
     with tempfile.TemporaryDirectory(prefix="wwm-test-latka-") as tmp:
         tmp_dir = Path(tmp)
@@ -118,11 +151,14 @@ def zbuduj_paczke_testowa(
 
     return {
         "ok": True,
+        "zakres": zakres,
         "zip": str(out_zip),
         "bajtow": size,
         "sha256": digest,
         "plikow_w_zip": len(zip_members),
         "dopasowane_etykiety": dict(sorted(matched_labels.items())),
+        "dopasowane_ui": dict(sorted(matched_ui.items())),
+        "dopasowane_prolog": dict(sorted(matched_prolog.items())),
         "slotow_testowych": len(store),
         "pliki_gry": latka_manifest["pliki"],
         "build_gry": latka_manifest.get("build_gry", ""),
@@ -131,12 +167,13 @@ def zbuduj_paczke_testowa(
 
 def main(argv: list[str] | None = None) -> int:
     wypisz.utf8()
-    parser = argparse.ArgumentParser(description="Zbuduj małą łatkę testową UI i polskich znaków z instalatorem Windows.")
+    parser = argparse.ArgumentParser(description="Zbuduj małą łatkę testową UI i/lub prologu dla polskich znaków z instalatorem Windows.")
     parser.add_argument("--indeks", default="index")
     parser.add_argument("--zh", nargs="+", required=True, help="mapa zh_cn i jej warstwy _diff")
     parser.add_argument("--cel", action="append", default=[], help="plik mapy docelowej")
     parser.add_argument("--mapa", nargs=2, action="append", default=[], metavar=("SCIEZKA_W_GRZE", "PLIK"))
     parser.add_argument("--build-gry", default="")
+    parser.add_argument("--zakres", choices=ZAKRESY, default="ui+prolog", help="co podmienić: ui, prolog, czy ui+prolog (domyślnie)")
     parser.add_argument("--wyj-zip", required=True, help="ścieżka wynikowego archiwum ZIP do przetestowania w Windows")
     parser.add_argument("--poziom", type=int, default=9)
     args = parser.parse_args(argv)
@@ -150,6 +187,7 @@ def main(argv: list[str] | None = None) -> int:
             wyj_zip=args.wyj_zip,
             build_gry=args.build_gry,
             poziom=args.poziom,
+            zakres=args.zakres,
         )
     except (OSError, ValueError, RuntimeError, mapa_tekstow.MapaError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))

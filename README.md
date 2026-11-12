@@ -12,7 +12,7 @@ pakietu, import zwrotki, łatka bazy i warstw `_diff`, audyt aktualizacji
 i pakiet uzupełniający) działa na prawdziwych plikach buildu `25906190` w
 piaskownicy, ale **nie był jeszcze sprawdzony w uruchomionej grze**. Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`),
 bezpieczny instalator/przywracacz łatki dla Windows (`instalator/`) oraz plan
-pierwszej próby UI i polskich znaków ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Brakuje
+pierwszej próby UI, napisów prologu i polskich znaków ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Brakuje
 jeszcze pierwszej zwrotki przekładu oraz samego testu na uruchomionej grze. Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
 grze, bez wstrzykiwania i obchodzenia zabezpieczeń; warunków wydawcy nie
 potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.

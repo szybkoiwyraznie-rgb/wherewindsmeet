@@ -161,6 +161,29 @@ class PackageTests(unittest.TestCase):
         self.assertNotIn("[stuff_items · name · wiersz 1] Miecz", files["03_przedmioty_01.md"])
         self.assertIn("pakiet uzupełniający", readme)
 
+    def test_only_with_en_skips_zh_only_entries_and_keeps_zh_source_with_en_only_fallback(self):
+        with tempfile.TemporaryDirectory(prefix="wwm-paczka-en-") as temp:
+            manifest = buduj_paczke.zbuduj(self.ix, Path(temp), wersja="2", data="2026-01-03", tylko_z_en=True, zip_=False)
+            files = {path.name: path.read_text(encoding="utf-8") for folder in ("sceny", "widoki") for path in (Path(temp) / folder).glob("*.md")}
+            readme = (Path(temp) / "README.md").read_text(encoding="utf-8")
+        self.assertTrue(manifest["tylko_z_en"])
+        self.assertEqual(manifest["rodzaj"], "pełny")
+        self.assertTrue(manifest["kontrola"]["zgodne"])
+        slots = {entry.klucz for entry in self.entries(files)}
+        expected = {
+            key for key, text in self.ix.teksty.items()
+            if text.zrodlo.strip() and (text.en is not None or text.z_en)
+        } | {"@" + ident for ident in self.ix.warianty}
+        self.assertEqual(slots, expected)
+        self.assertNotIn(K("druga pogawędka"), slots)
+        self.assertNotIn(K("dialog z innego projektu"), slots)
+        self.assertIn(K("scena obok numerem"), slots)
+        self.assertIn("--tylko-z-en", readme)
+        # scena tła z samymi tekstami bez EN (501, 502) została pominięta, a ta z EN (500) została
+        bg = files["90_rozmowy-tla_01.md"]
+        self.assertIn("dialog 500", bg)
+        self.assertNotIn("dialog 501", bg)
+
 
 class WriterTests(unittest.TestCase):
     def test_series_is_split_below_the_limit_and_headings_continue(self):

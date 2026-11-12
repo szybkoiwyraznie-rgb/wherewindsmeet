@@ -288,14 +288,81 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(json.loads((out / "audyt.json").read_text(encoding="utf-8"))["do_tlumacza"], 0)
 
 
+    def test_audit_only_with_en_surfaces_newly_localized_zh_only_entries(self):
+        zh1 = dict(ZH_ALL)
+        en1 = dict(EN_ALL)
+        zh1[T + 900] = "niewydany dotąd wpis"
+        tables = world()
+        tables["stuff_items"] = [*tables["stuff_items"], (9, {"name": T + 900})]
+        wyciag.zbuduj(FakeBaza(tables), zh1, en1, self.root / "ix_zh_only_old", {"opis": "przed en"}, log=lambda _text: None)
+        old_ix = indeks.wczytaj(self.root / "ix_zh_only_old")
+
+        en2 = dict(en1)
+        en2[T + 900] = "Released globally"
+        wyciag.zbuduj(FakeBaza(tables), zh1, en2, self.root / "ix_zh_only_new", {"opis": "po en"}, log=lambda _text: None)
+        new_ix = indeks.wczytaj(self.root / "ix_zh_only_new")
+
+        # Bez flagi --tylko-z-en wpis był już znany w indeksie
+        _, raw_slots = audyt_aktualizacji.porownaj(old_ix, new_ix, tylko_z_en=False)
+        self.assertEqual(raw_slots, [])
+        # Z flagą --tylko-z-en staje się nowym tekstem do patcha tłumaczenia
+        report, en_slots = audyt_aktualizacji.porownaj(old_ix, new_ix, tylko_z_en=True)
+        self.assertEqual(en_slots, [K("niewydany dotąd wpis")])
+        self.assertTrue(report["tylko_z_en"])
+        self.assertIn("--tylko-z-en", audyt_aktualizacji.opis(report))
+
+        manifest = buduj_paczke.zbuduj(
+            new_ix,
+            self.root / "paczka_patch_en",
+            wersja="2",
+            data="2026-01-10",
+            tylko_sloty=set(en_slots),
+            tylko_z_en=True,
+            zip_=False,
+        )
+        self.assertEqual(manifest["liczby"]["do_wpisania"], 1)
+        self.assertTrue(manifest["kontrola"]["zgodne"])
+
     def test_latka_testowa_builds_complete_windows_zip_for_ui_and_diacritics(self):
         maps = self.root / "mapy_ui"
         pkg_en = maps / "pkg_en"
         patch_diff = maps / "patch_diff"
         zh = maps / "zh"
         maps.mkdir()
-        zh.write_bytes(container([table([(T + 1, "设置".encode()), (T + 2, "音频".encode()), (T + 3, "退出".encode())])], with_metadata=True))
-        pkg_en.write_bytes(container([table([(T + 1, b"Settings"), (T + 2, b"Audio"), (T + 99, b"Unchanged")])], with_metadata=True))
+        zh.write_bytes(
+            container(
+                [
+                    table([
+                        (T + 1, "设置".encode()),
+                        (T + 2, "音频".encode()),
+                        (T + 3, "退出".encode()),
+                        (T + 10, "穷途末路".encode()),
+                        (T + 11, "尚有一饮入喉".encode()),
+                        (T + 12, "如何 ".encode()),  # spacja końcowa jak w grze
+                        (T + 13, "淡".encode()),
+                        (T + 14, "平淡无奇".encode()),  # inne ZH z takim samym EN "Bland." — nie powinno się zmienić
+                    ])
+                ],
+                with_metadata=True,
+            )
+        )
+        pkg_en.write_bytes(
+            container(
+                [
+                    table([
+                        (T + 1, b"Settings"),
+                        (T + 2, b"Audio"),
+                        (T + 10, b"Even at the end of the road,"),
+                        (T + 11, b"a drink to wet your throat."),
+                        (T + 12, b"Well? How is it?"),
+                        (T + 13, b"Bland."),
+                        (T + 14, b"Bland."),
+                        (T + 99, b"Unchanged"),
+                    ])
+                ],
+                with_metadata=True,
+            )
+        )
         patch_diff.write_bytes(container([table([(T + 3, b"Exit")])], with_metadata=True))
 
         out_zip = self.root / "WWM_LATKA_TEST_PL.zip"
@@ -318,13 +385,38 @@ class PipelineTests(unittest.TestCase):
             manifest = json.loads(z.read("latka.json").decode("utf-8"))
             self.assertEqual(manifest["build_gry"], "25906190")
             self.assertEqual(len(manifest["pliki"]), 2)
-            # Check repacked maps kept Unchanged and inserted Polish diacritics
+            # Check repacked maps kept Unchanged, non-prologue Bland., and inserted Polish diacritics in UI + prologue
             patched_pkg = self.root / "out_pkg_en"
             patched_pkg.write_bytes(z.read("pliki/Package/HD/oversea/locale/translate_words_map_en"))
             got, _ = mapa_tekstow.wczytaj_warstwe(patched_pkg)
             self.assertIn("ą ć ę ł ń ó ś ź ż", got[T + 1])
             self.assertIn("Ą Ć Ę Ł Ń Ó Ś Ź Ż", got[T + 2])
+            self.assertIn("Nawet u kresu drogi", got[T + 10])
+            self.assertIn("łyk trunku zwilży gardło", got[T + 11])
+            self.assertIn("I jak? Smakuje", got[T + 12])
+            self.assertIn("Mdłe", got[T + 13])
+            self.assertEqual(got[T + 14], "Bland.")
             self.assertEqual(got[T + 99], "Unchanged")
+
+        # Tryb --zakres prolog zmienia tylko kwestie prologu i zostawia UI nietknięte
+        prolog_zip = self.root / "WWM_LATKA_TEST_PROLOG.zip"
+        report_prolog = latka_testowa.zbuduj_paczke_testowa(
+            indeks_dir=self.root / "index",
+            zh_paths=[zh],
+            cel_paths=[],
+            mapa_pairs=[("Package/HD/oversea/locale/translate_words_map_en", pkg_en)],
+            wyj_zip=prolog_zip,
+            zakres="prolog",
+        )
+        self.assertEqual(report_prolog["zakres"], "prolog")
+        self.assertEqual(report_prolog["dopasowane_ui"], {})
+        self.assertIn("Even at the end of the road,", report_prolog["dopasowane_prolog"])
+        with ZipFile(prolog_zip) as z:
+            p = self.root / "out_prolog_only"
+            p.write_bytes(z.read("pliki/Package/HD/oversea/locale/translate_words_map_en"))
+            got_p, _ = mapa_tekstow.wczytaj_warstwe(p)
+            self.assertEqual(got_p[T + 1], "Settings")
+            self.assertIn("Nawet u kresu drogi", got_p[T + 10])
 
 
 if __name__ == "__main__":

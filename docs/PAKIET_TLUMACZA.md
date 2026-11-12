@@ -102,11 +102,29 @@ Wynik jest deterministyczny: te same wejścia dają bajt w bajt te same pliki.
 | zadań / grup zadań / pytań z wyborami | 24 733 / 1 077 / 15 027 |
 | identyfikatorów angielskich ze wskazanym źródłem (tabela lub scena) | 1 052 649 (93,59%) |
 
-**Zakres.** Identyfikator jest „w grze”, jeśli ma wersję angielską albo
-wskazuje go odczytana tabela lub dialog. 700 766 identyfikatorów istnieje tylko
-w mapie chińskiej i nie wskazuje ich nic — klient zachodni nie ma dla nich
-żadnego tekstu. To **hipoteza robocza** (teksty chińskiego wydania), nie
-sprawdzona w grze; liczba jest w manifeście, żeby dało się do niej wrócić.
+**Zakres i zasada źródeł.** W danych buildu `25906190` mapa `zh_cn` ma
+`1 818 900` identyfikatorów, a `en` — `1 124 787` (czyli **38,16%**
+identyfikatorów z `zh_cn` nie ma w mapie angielskiej).
+
+- `700 766` identyfikatorów wyłącznie chińskich bez wskazania z tabel ani
+  scen zostało już pominiętych przy budowie `index/`.
+- Z pozostałych `1 128 714` identyfikatorów w `index/` (`483 190` unikalnych
+  tekstów):
+  - `476 071` ma i `ZH`, i `EN` (`1 114 265` ID),
+  - `5 824` ma tylko `EN` (`10 577` ID — źródłem jest angielski),
+  - `1 295` ma tylko `ZH` (`3 872` ID — w `paczka v1` weszły do pakietu, ale
+    **935 z nich, czyli 72,2%**, to etykiety testowe, zaślepki i wpisy wycofane
+    typu `测试`, `废弃`, `占坑`, `活动说明活动说明…`, `数据加载中…`, a reszta to
+    treści niewydane w wersji globalnej).
+- **Przyjęta zasada zakresu:** tłumaczeniu w wersji polskiej podlegają wyłącznie
+  wpisy mające odpowiednik angielski w kliencie globalnym (`EN` wyznacza
+  zakres „co jest wydane w grze”, a `ZH` pozostaje głównym tekstem źródłowym,
+  z `EN` jako odniesieniem; dla `5 824` wpisów wyłącznie EN źródłem jest `EN`).
+  Wiersze wyłącznie chińskie czekają, aż trafią do globalnego wydania — wtedy
+  kolejny audyt wyłapie je jako aktualizację („patch tłumaczenia”). Od strony
+  narzędzi obsługuje to flaga `--tylko-z-en` w `tools/buduj_paczke.py` (na
+  bieżącym `index/` ogranicza pakiet z `485 047` do `483 752` miejsc `PL:`)
+  oraz w `tools/audyt_aktualizacji.py`.
 
 **Mówcy.** Kwestia leży w torze `EntityTextTrack` wewnątrz grupy
 `EntityTrackGroup`, więc mówca wynika z budowy danych. Nazwa mówcy:
@@ -194,6 +212,16 @@ Tabela `debate_guider_dialog_data` powtarza kwestie scen (66 357 z 66 372 jej
 wierszy to teksty obecne w dialogach), więc w widokach ma tylko teksty,
 których w scenach nie ma.
 
+**Gdzie jest otwierający prolog vs Rozdział 1.** Pierwsza cutscenka z początku
+gry (m.in. kwestie Jiang Yana i Chen Zixiego: `Even at the end of the road,` /
+`a drink to wet your throat.`, pościg o Nefryt Zhenguan) nie leży w tabelach
+`dialog_timelines`, lecz w napisach przerywnikowych `text_msg` i `text_msg__grey`
+(wiersze `590291–590390`). W pakiecie `v1` te dwie tabele są w `widoki.zip`
+w plikach **`07_komunikaty_04.md`** i **`07_komunikaty_12.md`**. Bezpośrednio
+po obudzeniu bohatera fabuła przechodzi już do **`sceny.zip`** →
+**`01_watek-glowny_rozdzial-1_01.md`** (zadania `220001`–`220003`, scena
+`1/73373`, dialog `4700001`).
+
 ## Zwrotka → magazyn przekładów
 
 ```sh
@@ -248,11 +276,12 @@ tekstu mieszczą pola. Nie obiecujemy bezpieczeństwa konta.
    <= 85 MiB) i wrzuca archiwum na Dysk.
 2. **Agent** pobiera pliki do `google_drive/`, wypakowuje do `local/`
    i przebudowuje wyciąg w katalogu roboczym (`tools/wyciag.py`, jak wyżej).
-3. Audyt względem ostatniego commita:
+3. Audyt względem ostatniego commita (flaga `--tylko-z-en` wyłapuje również
+   wcześniejsze wpisy wyłącznie chińskie, które właśnie dostały wydanie EN):
 
    ```sh
    python3 tools/audyt_aktualizacji.py --stary-git HEAD --nowy index \
-     --wyj dist/audyt --tlumaczenie tlumaczenie
+     --wyj dist/audyt --tlumaczenie tlumaczenie --tylko-z-en
    ```
 
    `AUDYT.md` mówi, ile jest nowych i usuniętych tekstów, które sceny są nowe
@@ -261,7 +290,7 @@ tekstu mieszczą pola. Nie obiecujemy bezpieczeństwa konta.
 
    ```sh
    python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v2 --wersja 2 \
-     --data RRRR-MM-DD --tylko-sloty dist/audyt/nowe_sloty.txt --tlumaczenie tlumaczenie
+     --data RRRR-MM-DD --tylko-sloty dist/audyt/nowe_sloty.txt --tlumaczenie tlumaczenie --tylko-z-en
    ```
 
    Sceny z nową kwestią są pokazane w całości; stare kwestie mają

@@ -999,7 +999,26 @@ cudzego kodu ani nie wymagają tej procedury.
     SHA-256 i buildu Steam przed zmianą, transakcyjnym zapisem z cofnięciem
     błędu i ochroną przed nadpisaniem nowszego patcha Steam przy przywracaniu.
     Zweryfikowano na fikcyjnej instalacji w Windows CI (`tests/test_installer_windows.py`).
-  - **Mała łatka testowa UI i polskich znaków (`tools/latka_testowa.py`, `docs/TEST_W_GRZE.md`):**
-    przygotowano izolowany generator paczki testowej dla etykiet menu i ustawień
+  - **Mała łatka testowa UI, prologu i polskich znaków (`tools/latka_testowa.py`, `docs/TEST_W_GRZE.md`):**
+    przygotowano izolowany generator paczki testowej dla etykiet menu/ustawień
+    oraz otwierających napisów prologu (`text_msg` / `text_msg__grey`, wiersze
+    `590336–590351`, m.in. *Even at the end of the road, / a drink to wet your throat.*)
     z kompletem znaków `ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`; **sam test w
     uruchomionej grze nadal pozostaje po stronie właściciela na Windows**.
+- **Weryfikacja prologu i zakresu `ZH` vs `EN` w `index/` (build `25906190`):**
+  - **Lokalizacja prologu:** kwestie otwierającej cutscenki (*Jiang Yan*, *Chen Zixi*)
+    leżą w `text_msg` / `text_msg__grey` (w `paczka_dla_tlumacza_wwm_v1.zip`:
+    `widoki/07_komunikaty_04.md` i `07_komunikaty_12.md`); grywalny wątek
+    główny po obudzeniu zaczyna się w `sceny/01_watek-glowny_rozdzial-1_01.md`
+    (zadania `220001`–`220003`, dialog `4700001`).
+  - **Różnica `ZH` vs `EN`:** `zh_cn` zawiera `1 818 900` ID, a `en` — `1 124 787`
+    ID (`38,16%` różnicy); poza `700 766` niewskazanymi ID pominiętymi już przy
+    ekstrakcji, wśród `1 295` tekstów wyłącznie chińskich w `index/` aż `935`
+    (**72,2%**) to komunikaty testowe, zaślepki i wpisy wycofane (`测试`, `废弃`,
+    `占坑`), a z `483 190` tekstów indeksu `476 071` ma parę `ZH + EN`,
+    `5 824` ma tylko `EN` (`z_en=True`), `690` tekstów `EN` zawiera resztki CJK,
+    a `48` wykazuje różnice w argumentach formatowania `{}` / `%s`.
+  - **Narzędzia zakresu (`--tylko-z-en`):** w `tools/buduj_paczke.py`
+    (przetestowane na `index/`: `483 752` miejsc `PL:`, `kontrola()` 100%
+    zgodna) oraz `tools/audyt_aktualizacji.py` (wykrywa jako nowość wpisy,
+    które w kolejnym patchu globalnym uzyskały wersję `EN`).

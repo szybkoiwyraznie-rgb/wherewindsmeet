@@ -163,6 +163,8 @@ def readme(generator, manifest: dict) -> str:
     add("")
     add(f"Dane gry: {manifest['indeks']['opis'] or 'brak opisu wersji'}. Pakiet zbudowano {manifest['data']}.")
     add("Źródłem przekładu jest **tekst chiński**; angielska wersja gry stoi obok jako pomoc (nazwy, terminy).")
+    if manifest.get("tylko_z_en"):
+        add("Zakres pakietu (`--tylko-z-en`): obejmuje wyłącznie pozycje mające wersję angielską w kliencie globalnym (wpisy wyłącznie chińskie bez odpowiednika EN pominięto do czasu ich ewentualnego wydania).")
     add("")
     add("## 0. W skrócie")
     add("")

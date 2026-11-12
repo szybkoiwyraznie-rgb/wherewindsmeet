@@ -51,22 +51,26 @@ instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
 - **Aktualizacja przyrostowa sprawdzona na danych**: różnica między paczką gry
   a stanem po `LocalData/Patch` to 387 nowych tekstów, 64 usunięte, 0 zmienionych
   scen; pakiet uzupełniający ma 387 miejsc `PL:`.
-- Decyzje właściciela (bez zmian): język źródłowy chiński, angielski pomocniczo;
-  własny przekład, bez cudzych polonizacji; tylko zmiany tekstu przy wyłączonej
-  grze, bez wstrzykiwania i obchodzenia zabezpieczeń; teksty i indeksy w Git,
-  poza Git tylko binarne pliki gry ([DATA_POLICY.md](DATA_POLICY.md)).
-  Instalacja odniesienia: Steam, Windows, App ID `3564740`, build `25906190`
-  ([STEAM_REFERENCE.md](STEAM_REFERENCE.md)). Warunków wydawcy nie
-  potwierdziliśmy niezależnie; nie obiecujemy bezpieczeństwa konta.
+- Decyzje właściciela: język źródłowy chiński, angielski pomocniczo;
+  **zakres tłumaczenia wyznacza obecność wersji angielskiej (`EN`)** — wpisy
+  wyłącznie chińskie czekają do momentu wydania w wersji globalnej jako
+  „patch tłumaczenia” (`--tylko-z-en` w `buduj_paczke.py` i
+  `audyt_aktualizacji.py`); własny przekład, bez cudzych polonizacji; tylko
+  zmiany tekstu przy wyłączonej grze, bez wstrzykiwania i obchodzenia
+  zabezpieczeń; teksty i indeksy w Git, poza Git tylko binarne pliki gry
+  ([DATA_POLICY.md](DATA_POLICY.md)). Instalacja odniesienia: Steam, Windows,
+  App ID `3564740`, build `25906190` ([STEAM_REFERENCE.md](STEAM_REFERENCE.md)).
+  Warunków wydawcy nie potwierdziliśmy niezależnie; nie obiecujemy bezpieczeństwa
+  konta.
 
 | Obszar | Stan |
 |---|---|
 | Repozytorium i workflow | Ponad 325 testów (Linux + Windows PS 5.1); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami — odczytane i sprawdzone na całości danych. |
 | Wyciąg i powiązania | `index/` w Git, deterministyczny, ze stałym podziałem plików. |
-| Pakiet tłumacza | Wersja 1 zbudowana i przekazana. Generator, README, spisy, kontrola własna. |
+| Pakiet tłumacza | Wersja 1 zbudowana i przekazana (485 047 miejsc `PL:`). Generator wspiera też `--tylko-z-en` (483 752 miejsc `PL:` po odcięciu 1 295 wpisów bez `EN`). |
 | Import zwrotki | Gotowy i przetestowany; czeka na pierwszą zwrotkę. |
-| Łatka i instalator Windows | `tools/zbuduj_latke.py` (`--mapa`, `--build-gry`) + `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) + `tools/latka_testowa.py` i [TEST_W_GRZE.md](TEST_W_GRZE.md). Sprawdzone w Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
+| Łatka i instalator Windows | `tools/zbuduj_latke.py` (`--mapa`, `--build-gry`) + `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) + `tools/latka_testowa.py` (UI i napisy prologu) i [TEST_W_GRZE.md](TEST_W_GRZE.md). Sprawdzone w Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
@@ -84,8 +88,11 @@ instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
 4. **18 157 tekstów bez źródła** — są w mapie, nie wskazuje ich żadna odczytana
    tabela (prawdopodobnie interfejs zaszyty w skryptach klienta).
 5. **Limity pól** — nieznane; pakiet podaje długości wersji angielskiej.
-6. 700 766 identyfikatorów tylko chińskich pominięto jako niewyświetlane
-   w kliencie zachodnim — hipoteza.
+6. **Zakres `EN` vs `ZH`:** mapa chińska ma `1 818 900` ID wobec `1 124 787` ID
+   w angielskiej (`38,16%` różnicy); `700 766` niewskazanych ID odcięto w `index/`,
+   a wśród pozostałych `1 295` tekstów bez `EN` aż `935` (`72,2%`) to etykiety
+   testowe, zaślepki i wpisy wycofane (`测试`, `废弃`, `占坑`). Od kolejnego
+   wydania zakres wyznacza `--tylko-z-en` (patrz [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
 7. Dwie tabele rozmieszczenia obiektów (`spaces.s66027.spawn.*`) nie czytają
    się do końca; bez tekstów.
 8. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.

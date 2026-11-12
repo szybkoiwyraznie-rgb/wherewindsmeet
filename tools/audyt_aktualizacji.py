@@ -53,10 +53,25 @@ def _sloty_sceny(scena: dict) -> list[str]:
     return ["@" + element[4] if len(element) > 4 and element[3] else element[2] for element in scena["e"]]
 
 
-def porownaj(stary, nowy, magazyn=None) -> tuple[dict, list[str]]:
+def _ma_en_tekst(text) -> bool:
+    return text is not None and (text.en is not None or text.z_en)
+
+
+def _ma_en_wariant(ix, ident: str) -> bool:
+    var = ix.warianty.get(ident, {})
+    return bool(var.get("en") or _ma_en_tekst(ix.teksty.get(var.get("k", ""))))
+
+
+def porownaj(stary, nowy, magazyn=None, *, tylko_z_en: bool = False) -> tuple[dict, list[str]]:
     """Porównaj dwa wczytane wyciągi; zwraca (raport, lista nowych slotów)."""
-    old_keys, new_keys = set(stary.teksty), set(nowy.teksty)
-    old_variants, new_variants = set(stary.warianty), set(nowy.warianty)
+    if tylko_z_en:
+        old_keys = {key for key, text in stary.teksty.items() if _ma_en_tekst(text)}
+        new_keys = {key for key, text in nowy.teksty.items() if _ma_en_tekst(text)}
+        old_variants = {ident for ident in stary.warianty if _ma_en_wariant(stary, ident)}
+        new_variants = {ident for ident in nowy.warianty if _ma_en_wariant(nowy, ident)}
+    else:
+        old_keys, new_keys = set(stary.teksty), set(nowy.teksty)
+        old_variants, new_variants = set(stary.warianty), set(nowy.warianty)
     added = new_keys - old_keys
     added_variants = new_variants - old_variants
     removed = old_keys - new_keys
@@ -86,6 +101,7 @@ def porownaj(stary, nowy, magazyn=None) -> tuple[dict, list[str]]:
     slots = sorted(added) + sorted("@" + ident for ident in added_variants)
     report = {
         "format": "wwm-audyt-v1",
+        "tylko_z_en": tylko_z_en,
         "stary": {"opis": stary.manifest.get("wejscia", {}).get("opis", ""), "tekstow": len(old_keys), "scen": len(stary.sceny)},
         "nowy": {"opis": nowy.manifest.get("wejscia", {}).get("opis", ""), "tekstow": len(new_keys), "scen": len(nowy.sceny)},
         "teksty": {
@@ -126,11 +142,13 @@ def porownaj(stary, nowy, magazyn=None) -> tuple[dict, list[str]]:
 
 def opis(report: dict) -> str:
     texts, scenes = report["teksty"], report["sceny"]
+    suffix = " --tylko-z-en" if report.get("tylko_z_en") else ""
     lines = [
         "# Audyt aktualizacji gry",
         "",
         f"- poprzedni wyciąg: {report['stary']['opis'] or '(bez opisu)'} — {report['stary']['tekstow']} tekstów, {report['stary']['scen']} scen",
         f"- nowy wyciąg: {report['nowy']['opis'] or '(bez opisu)'} — {report['nowy']['tekstow']} tekstów, {report['nowy']['scen']} scen",
+        *(["- zakres: wyłącznie wpisy z wersją angielską (`--tylko-z-en`)"] if report.get("tylko_z_en") else []),
         "",
         "## Teksty",
         "",
@@ -145,7 +163,7 @@ def opis(report: dict) -> str:
         "",
         f"## Do tłumacza: {report['do_tlumacza']} miejsc `PL:`",
         "",
-        "Lista kluczy: `nowe_sloty.txt` → `python3 tools/buduj_paczke.py --tylko-sloty nowe_sloty.txt …`.",
+        f"Lista kluczy: `nowe_sloty.txt` → `python3 tools/buduj_paczke.py --tylko-sloty nowe_sloty.txt{suffix} …`.",
     ]
     if texts["nowe_wg_tabeli"]:
         lines += ["", "## Nowe teksty według tabeli", "", "| tabela | nowych tekstów |", "|---|---:|"]
@@ -185,6 +203,7 @@ def main(argv=None) -> int:
     parser.add_argument("--nowy", default="index")
     parser.add_argument("--wyj", required=True)
     parser.add_argument("--tlumaczenie", help="magazyn przekładów: policz, ile po aktualizacji brakuje")
+    parser.add_argument("--tylko-z-en", action="store_true", help="porównuj wyłącznie wpisy z wersją angielską (pomija wyłącznie chińskie)")
     arguments = parser.parse_args(argv)
     try:
         with tempfile.TemporaryDirectory(prefix="wwm-audyt-") as temp:
@@ -192,7 +211,7 @@ def main(argv=None) -> int:
             stary = indeks_mod.wczytaj(old_dir)
         nowy = indeks_mod.wczytaj(arguments.nowy)
         magazyn = magazyn_mod.wczytaj(arguments.tlumaczenie) if arguments.tlumaczenie else None
-        report, slots = porownaj(stary, nowy, magazyn)
+        report, slots = porownaj(stary, nowy, magazyn, tylko_z_en=arguments.tylko_z_en)
     except (indeks_mod.IndeksError, magazyn_mod.MagazynError, AudytError, OSError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
@@ -201,7 +220,7 @@ def main(argv=None) -> int:
     (out / "audyt.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     (out / "nowe_sloty.txt").write_text("".join(slot + "\n" for slot in slots), encoding="utf-8", newline="\n")
     (out / "AUDYT.md").write_text(opis(report), encoding="utf-8", newline="\n")
-    print(json.dumps({"ok": True, "teksty": {k: v for k, v in report["teksty"].items() if k != "nowe_wg_tabeli"}, "sceny": {k: v for k, v in report["sceny"].items() if not k.startswith("lista")}, "do_tlumacza": report["do_tlumacza"]}, ensure_ascii=False, indent=1))
+    print(json.dumps({"ok": True, "tylko_z_en": report["tylko_z_en"], "teksty": {k: v for k, v in report["teksty"].items() if k != "nowe_wg_tabeli"}, "sceny": {k: v for k, v in report["sceny"].items() if not k.startswith("lista")}, "do_tlumacza": report["do_tlumacza"]}, ensure_ascii=False, indent=1))
     return 0
 
 

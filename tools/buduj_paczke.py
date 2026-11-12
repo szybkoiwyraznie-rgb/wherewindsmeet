@@ -245,10 +245,11 @@ class Pisarz:
 
 
 class Generator:
-    def __init__(self, ix, magazyn=None, tylko_sloty: set[str] | None = None):
+    def __init__(self, ix, magazyn=None, tylko_sloty: set[str] | None = None, *, tylko_z_en: bool = False):
         self.ix = ix
         self.magazyn = magazyn or magazyn_mod.Magazyn()
         self.tylko = tylko_sloty  # None = pakiet pełny; zbiór = pakiet uzupełniający
+        self.tylko_z_en = tylko_z_en
         self.sloty: dict[str, tuple[str, str]] = {}  # slot -> (plik, opis miejsca)
         self.liczby = Counter()
         self.uklad = uklad_scen.uloz(ix)
@@ -283,8 +284,22 @@ class Generator:
     def _slot_sceny(self, element: list) -> str:
         return "@" + element[4] if len(element) > 4 and element[3] else element[2]
 
+    def _ma_en(self, slot: str) -> bool:
+        if slot.startswith("@"):
+            var = self.ix.warianty.get(slot[1:], {})
+            text = self.ix.teksty.get(var.get("k", ""))
+            return bool(var.get("en") or (text is not None and (text.en is not None or text.z_en)))
+        text = self.ix.teksty.get(slot)
+        return text is not None and (text.en is not None or text.z_en)
+
     def _zawiera_nowe(self, sloty) -> bool:
-        return self.tylko is None or any(slot in self.tylko for slot in sloty)
+        for slot in sloty:
+            if self.tylko is not None and slot not in self.tylko:
+                continue
+            if self.tylko_z_en and not self._ma_en(slot):
+                continue
+            return True
+        return False
 
     def _element(self, nr: int, etykieta: str, slot: str, w_bloku: dict, dodatkowe=(), en: str | None = None, miejsce: str = "") -> tuple[list[str], bool]:
         """Linie jednego elementu i informacja, czy otwiera miejsce na `PL:`."""
@@ -325,6 +340,10 @@ class Generator:
         if done is not None:
             lines.append(f"{WCIECIE}PL (już jest): {fmt.zakoduj(done)}")
             self.liczby["juz_przetlumaczone"] += 1
+            return lines, False
+        if self.tylko_z_en and not self._ma_en(slot):
+            lines.append(f"{WCIECIE}(pominięty — brak wersji angielskiej w grze)")
+            self.liczby["pominietych_bez_en"] += 1
             return lines, False
         if self.tylko is not None and slot not in self.tylko:
             lines.append(f"{WCIECIE}(tekst z wcześniejszego pakietu — tu nic nie wpisuj)")
@@ -650,6 +669,8 @@ class Generator:
             rows = sorted(groups.get(view, ()))
             if self.tylko is not None:
                 rows = [row for row in rows if row[3] in self.tylko]
+            if self.tylko_z_en:
+                rows = [row for row in rows if self._ma_en(row[3])]
             if not rows:
                 continue
             wstep = [
@@ -750,7 +771,13 @@ def kontrola(generator: "Generator", wyj: Path) -> dict:
         for path in sorted((wyj / folder).glob("*.md")):
             for entry in fmt.czytaj_wpisy(path.read_text(encoding="utf-8")):
                 seen[entry.klucz] += 1
-    wanted = {key for key, text in ix.teksty.items() if text.zrodlo.strip()} | {"@" + ident for ident in ix.warianty}
+    wanted = {
+        key for key, text in ix.teksty.items()
+        if text.zrodlo.strip() and (not generator.tylko_z_en or text.en is not None or text.z_en)
+    } | {
+        "@" + ident for ident in ix.warianty
+        if not generator.tylko_z_en or generator._ma_en("@" + ident)
+    }
     if generator.tylko is not None:
         wanted &= generator.tylko
     wanted = {slot for slot in wanted if not generator.magazyn.ma(slot)}
@@ -763,7 +790,7 @@ def kontrola(generator: "Generator", wyj: Path) -> dict:
     }
 
 
-def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: set[str] | None = None, zip_: bool = True) -> dict:
+def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: set[str] | None = None, tylko_z_en: bool = False, zip_: bool = True) -> dict:
     """Zbuduj pakiet w katalogu `wyj`; zwraca manifest pakietu."""
     try:
         from tools import opis_paczki
@@ -778,7 +805,7 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
                 old.unlink()
     for old in wyj.glob("paczka_dla_tlumacza_wwm_v*.zip"):
         old.unlink()
-    generator = Generator(ix, magazyn, tylko_sloty)
+    generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en)
     generator.sceny(wyj / "sceny")
     sceny_serie = list(generator.serie)
     generator.serie = []
@@ -799,6 +826,7 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         "wersja": wersja,
         "data": data,
         "rodzaj": "pełny" if tylko_sloty is None else "uzupełniający",
+        "tylko_z_en": tylko_z_en,
         "indeks": {
             "format": ix.manifest["format"],
             "opis": ix.manifest.get("wejscia", {}).get("opis", ""),
@@ -846,6 +874,7 @@ def main(argv=None) -> int:
     parser.add_argument("--data", required=True, help="data pakietu do README, np. 2026-11-12")
     parser.add_argument("--tlumaczenie", help="katalog magazynu przekładów; gotowe przekłady nie dostają `PL:`")
     parser.add_argument("--tylko-sloty", help="plik z listą kluczy (jeden na linię): pakiet uzupełniający")
+    parser.add_argument("--tylko-z-en", action="store_true", help="pomiń wpisy bez wersji angielskiej w grze (tylko chińskie)")
     parser.add_argument("--bez-zip", action="store_true")
     arguments = parser.parse_args(argv)
     try:
@@ -857,9 +886,9 @@ def main(argv=None) -> int:
     except (indeks_mod.IndeksError, magazyn_mod.MagazynError, OSError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
-    manifest = zbuduj(ix, Path(arguments.wyj), wersja=arguments.wersja, data=arguments.data, magazyn=magazyn, tylko_sloty=only, zip_=not arguments.bez_zip)
+    manifest = zbuduj(ix, Path(arguments.wyj), wersja=arguments.wersja, data=arguments.data, magazyn=magazyn, tylko_sloty=only, tylko_z_en=arguments.tylko_z_en, zip_=not arguments.bez_zip)
     ok = manifest["kontrola"]["zgodne"]
-    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "liczby": manifest["liczby"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
+    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "tylko_z_en": manifest["tylko_z_en"], "liczby": manifest["liczby"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
     return 0 if ok else 1
 
 

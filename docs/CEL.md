@@ -21,7 +21,7 @@ Zbudować **paczkę ZIP dla Tłumacza** w układzie paczki SRW Y
 
 | wymaganie | miara |
 |---|---|
-| pełność | 100% tekstów gry, scen i postaci |
+| pełność | 100% tekstów wydanych w kliencie globalnym (obecność wersji `EN` wyznacza zakres; tłumaczenie z `ZH` z `EN` jako pomocą — wpisy wyłącznie chińskie bez `EN` pomijane do czasu wydania w Global jako „patch tłumaczenia”), plus sceny i postacie |
 | mówcy | 100% kwestii przypisanych do mówcy |
 | sceny | 100% scen z granicami |
 | chronologia | zweryfikowana przynajmniej dla wątku głównego; jeśli się nie da, kolejność według numeracji z danych gry, która ją zastępuje |
