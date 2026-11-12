@@ -64,16 +64,35 @@ samego źródła plik nie przechowuje, dlatego mapy są per-język.
 
 Wpis, którego tekst zaczyna się od bajtu `0xFF`, jest zaślepką, nie tekstem.
 
+## Warstwa `_diff`
+
+Warstwy poprawek (`*_diff`) używają tego samego kontenera i układu tabel:
+
+- **Chunk 0** ma strukturę `u64 suma_wpisów_po_zmianie, u64 liczba_kubełków_bazy,
+  u32[liczba_kubełków_bazy]`. Każdy wpis tablicy daje numer chunku w pliku
+  `_diff`, który modyfikuje dany kubełek bazy, albo `0xFFFFFFFF`, jeśli ten
+  kubełek nie ma zmian. Uwaga: w chunku 0 `liczba_kubełków_bazy` to rozmiar
+  indeksu pliku **bazowego**, nie liczba chunków samego pliku `_diff` — dlatego
+  `apply_translation.is_metadata_chunk` rozpoznaje chunk 0 warunkiem
+  `len(payload) == 16 + 4 * count`.
+- **Pozostałe chunki** to tabele tekstów o tym samym układzie co warstwa 3
+  powyżej; zawierają wpisy dopisane, zmienione i usunięte (tekst o wartości
+  zaczynającej się od `0xFF`).
+- Klient czyta warstwy po kolei: najpierw mapa bazowa z `Package/HD/oversea/locale/`,
+  potem `_diff` z `Package`, na końcu `_diff` z `LocalData/Patch/HD/oversea/locale/`.
+  Czytnik warstwowy: `tools/mapa_tekstow.py`.
+
 ## Zapisywanie (patche)
 
 Przepakowanie tabeli: zachowujemy nagłówek i `buckets`, wpisy wypisujemy w tej
 samej kolejności, teksty sklejamy od nowa zaraz za tablicą wpisów, a offsety
 przeliczamy wzorem `(entry_count - index) * 16 - 8 + suma_poprzednich`. Dziury
 dostają `offset = 0xFFFFFFFF`. Potem zstd i nowa tabela przesunięć kontenera.
+W pliku `_diff` wpisy usunięte (`0xFF`) pozostają usunięte (nie są przekładane).
 
 **Sprawdzone na wszystkich chunkach:** przepakowanie bez zmiany tekstów odtwarza
 zbiór `id → tekst` w 4386/4386 chunkach mapy głównej i 4163/4163 chunkach
-`_diff`. Bajty nie są identyczne (wariante tekstów są współdzielone, więc
+`_diff`. Bajty nie są identyczne (warianty tekstów są współdzielone, więc
 kompaktowanie skraca tabelę), ale zawartość tak.
 
 ## Co jest odczytane
@@ -81,9 +100,9 @@ kompaktowanie skraca tabelę), ale zawartość tak.
 | Element | Stan |
 |---|---|
 | kontener, chunki, zstd | odczytane, testy w `tests/test_locale_container.py` |
-| tabela wpisów, offsety, teksty | odczytane, testy w `tests/test_locale_records.py` |
+| tabela wpisów, offsety, teksty i warstwy `_diff` | odczytane, testy w `tests/test_locale_records.py` i `test_mapa_tekstow.py` |
 | zapis zwrotny (przepakowanie) | odczytany i sprawdzony na 8549 chunkach |
-| 1 122 784 wpisów mapy EN | wyciągnięte, 0 błędów (4386 tabel + chunk indeksu) |
-| zapis zwrotny przez patcher | `tools/apply_translation.py`, sprawdzony na całej mapie EN (200 podmian, 11 s) |
-| mówcy, kolejność scen | **nieodczytane** |
-| limity pól interfejsu | **nieznane** (używamy długości oryginału) |
+| 1 124 787 wpisów mapy EN (baza + 2 warstwy `_diff`) | wyciągnięte, 0 błędów |
+| zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py` i `tools/apply_translation.py`; próba na realnych 3 plikach EN w piaskownicy |
+| mówcy, powiązania tabel, kolejność scen | odczytane z bazy gry ([BAZA_GRY.md](BAZA_GRY.md), [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) |
+| limity pól interfejsu i przyjęcie w grze | **nieznane / nie sprawdzone w grze** (widoki podają długość EN) |

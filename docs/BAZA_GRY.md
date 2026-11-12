@@ -152,11 +152,12 @@ W chunku danych leżą w tej kolejności: `dialog_config`, `project_info`,
 
 ### Wyjaśnienie „5 859 brakujących dialogów”
 
-`tools/timeline.py` wycina scenę od znacznika `TimelinePObject` do następnego
-i bierze pierwsze `dialog_no` z tego wycinka. Ponieważ `dialog_config` leży
-**przed** własnym `timeline`, wycinek zawiera `dialog_config` **następnego**
-dialogu. Skutek: w `index/` numer i projekt każdej sceny należą do sceny
-następnej w pliku. Potwierdzenie na samym indeksie:
+Pierwszy parser (`tools/timeline.py`, usunięty) wycinał scenę od znacznika
+`TimelinePObject` do następnego i brał pierwsze `dialog_no` z tego wycinka.
+Ponieważ `dialog_config` leży **przed** własnym `timeline`, wycinek zawierał
+`dialog_config` **następnego** dialogu. Skutek: w pierwszym indeksie
+(`wwm-indeks-v1`) numer i projekt każdej sceny należały do sceny następnej
+w pliku. Potwierdzenie na tamtym indeksie:
 
 | pomiar | wynik |
 |---|---|
@@ -166,7 +167,30 @@ następnej w pliku. Potwierdzenie na samym indeksie:
 | „brakujące” numery, które są numerem sceny już obecnej w indeksie | 5 506 z 5 859 |
 | plik poprawki (numery skaczą o miliony): zgodność z następną sceną | 14 z 14 |
 
-Wnioski z `docs/SCENY_WWM.md` i `docs/ANALIZA_KORPUSU.md` oparte na tym numerze
-(„5 871 scen bez `dialog_no`”, „`dialog_no` to grupa”, przypisanie scen do
-projektów, 5 859 braków) są **artefaktem parsera**, nie cechą danych. Poprawne
-odczytanie: numer dialogu = nazwa tabeli `dialog_timelines.<numer>`.
+Wnioski oparte na tym numerze („5 871 scen bez `dialog_no`”, „`dialog_no` to
+grupa”, przypisanie scen do projektów, 5 859 braków) były **artefaktem
+parsera**, nie cechą danych. Dokumenty, które je opisywały (`SCENY_WWM.md`,
+`ANALIZA_KORPUSU.md`), parser `tools/timeline.py` i zbudowany nim indeks zostały
+usunięte 2026-11-12. Poprawne odczytanie: numer dialogu = nazwa tabeli
+`dialog_timelines.<numer>`; czyta go `tools/sceny_z_bazy.py`.
+
+## Tabele wiążące i warianty w grze
+
+Wyciąg (`tools/wyciag.py`) łączy dialogi z resztą bazy przez następujące
+tabele (szczegóły w kodzie oraz [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)):
+
+| tabela / pole | rola |
+|---|---|
+| `tasks` (`pre_task`, `post_task`, `pian_id`, `group_id`, `fetch_play_dialogs`, `finish_play_dialogs`, `finish_dialogs`, `fetch_dialogs_id`, `process_interact_param`, `finish_choice`, `get_task_choice`) | zadania, ich kolejność łańcuchowa oraz powiązania z dialogami |
+| `task_group_info`, `task_types` | rozdziały (typ `1` = wątek główny, grupy `1`, `4`, `6`, `7` = rozdziały 1–4) i kolejność typów zadań; uwaga: `group_tasks` sortuje po numerze, nie po fabule (59 naruszeń kolejności w rozdz. 1) |
+| `branch_data` (`ques_argue_no`), `npc_talk_options` | pytania z wyborami gracza, opcje rozmowy z NPC i następstwa dialogów |
+| `spaces.*.entity` → `entity_init_data.billboard_data` → `entity_attr` | tłumaczenie `entity_no` mówcy na `npc_no`, imię/tytuł z tabliczki oraz opis postaci (`introduction` przez `attr_id`) |
+| `world_view_person_info` (i powiązane `world_view_*`) | postacie w encyklopedii gry i ich historie |
+| `space_info` / `spaces.*`, `cutscenes`, `plot_recap_data`, `dialog_replace*` | nazwy miejsc, plansze przerywników, streszczenia i podmiany dialogów |
+| `EntityTextTrack`: `valid_for_specific_type` + `entity_type` (`1` / `2`) | kwestie zależne od płci bohatera (bohater / bohaterka) o osobnych identyfikatorach tekstu nawet przy wspólnym źródle chińskim |
+| `debate_guider_dialog_data` | powtarza niemal wyłącznie kwestie scen (66 357 z 66 372 linii) — w pakiecie nie dubluje scen |
+
+Skrypty wywołujące dialogi poza tabelami (`*.ets`, nazwy `storyline.*` bez
+rekordu w bazie) nie leżą w tych tabelach; dlatego część scen fabularnych nie ma
+bezpośredniego wskazania w `tasks`, a `oversea_src_dialog_no` (22 348 wpisów,
+tylko 186 istniejących celów) nie nadaje się do wiązania kolejności.

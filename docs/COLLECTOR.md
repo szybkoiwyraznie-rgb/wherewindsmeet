@@ -141,8 +141,7 @@ Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
 
 `zbierz.ps1` ma z założenia limit payloadu 90 MB, więc nie uniesie całego korpusu:
 same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
-`MANIFEST` pokazuje **74 951** dialogów, z których `data205` daje tylko 7 571
-(patrz [SCENY_WWM.md](SCENY_WWM.md)).
+`MANIFEST` wymienia 74 950 tabel dialogów (budowa bazy: [BAZA_GRY.md](BAZA_GRY.md)).
 
 Do jednorazowego uzupełnienia służy osobny skrypt, który **tylko czyta** katalog gry:
 kopiuje wskazany zestaw plików do folderu tymczasowego, liczy SHA-256, zapisuje

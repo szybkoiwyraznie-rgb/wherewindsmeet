@@ -1,9 +1,44 @@
 # Patcher — jak działa i jak go używać
 
-Patcher podmienia teksty w mapie locale gry. Uruchamiasz go **lokalnie**, na
-kopii pliku z gry; narzędzie nigdy nie modyfikuje pliku wejściowego.
+Głównym narzędziem budującym zmienione mapy tekstów z magazynu tłumaczeń
+(`tlumaczenie/`) jest `tools/zbuduj_latke.py`. Wykorzystuje ono niższy poziom
+(`tools/apply_translation.py`), przepisując osobno mapę główną **oraz** jej
+warstwy `_diff`. Narzędzie działa lokalnie na kopii plików z gry i nigdy nie
+modyfikuje oryginałów.
 
-## Użycie
+Pełny opis obiegu, ról plików i procedury przy aktualizacjach jest w
+[PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
+
+## Zbudowanie łatki z magazynu (`tools/zbuduj_latke.py`)
+
+```bash
+python3 tools/zbuduj_latke.py \
+  --indeks index \
+  --magazyn tlumaczenie \
+  --zh "pliki/translate_words_map_zh_cn" "pliki/000007_translate_words_map_zh_cn_diff" \
+  --cel "pliki/000001_translate_words_map_en" \
+  --cel "pliki/000003_translate_words_map_en_diff" \
+  --cel "pliki/000002_translate_words_map_en_diff" \
+  --wyj dist/latka
+```
+
+- `--indeks` — wyciąg `index/` (do mapowania kwestii zależnych od płci i wariantów),
+- `--magazyn` — katalog `tlumaczenie/` (`pl_*.jsonl`, `pl_warianty.jsonl`),
+- `--zh` — chińska mapa źródłowa i jej warstwy `_diff` (służy do wyliczenia klucza SHA-256 każdego identyfikatora),
+- `--cel` — docelowe pliki wybranego języka klienta (baza + warstwy `_diff`, np. angielskie); każdy jest przepisywany osobno pod swoją nazwą do `--wyj`,
+- `--wyj` — osobny katalog wyjściowy (nie może być katalogiem plików wejściowych).
+
+Kolejność dobierania przekładu dla identyfikatora:
+1. wprost po identyfikatorze (`pl_warianty.jsonl` — kwestie zależne od płci bohatera; nieprzetłumaczony wariant dziedziczy po drugim wariancie tego samego tekstu),
+2. po kluczu SHA-256 tekstu chińskiego z `--zh`, a jeśli nie ma wersji chińskiej — tekstu z pliku celu.
+
+Po zapisie każdego pliku łatka czyta własne wyjście z powrotem i porównuje
+każdy wpis: zmienić się mogą wyłącznie wpisy z przekładem i tylko na ten przekład;
+wpisy usunięte (`0xFF` w `_diff`) pozostają usunięte.
+
+## Narzędzie niskopoziomowe (`tools/apply_translation.py`)
+
+Do pojedynczego pliku mapy i jawnego JSONL `{"id": "…", "text": "…"}`:
 
 ```bash
 python3 tools/apply_translation.py \
@@ -12,51 +47,22 @@ python3 tools/apply_translation.py \
   --wyjscie "pliki/000001_translate_words_map_en.new"
 ```
 
-- `--map` — oryginalna mapa z gry (nie jest zmieniana),
-- `--tlumaczenia` — JSONL, po jednym `{"id": "…", "text": "…"}` na linię
-  (`id` to identyfikator z paczki dla Tłumacza, 16 znaków hex),
-- `--wyjscie` — nowy plik mapy; musi być inny niż `--map`,
-- `--poziom` — poziom zstd (domyślnie 9),
-- `--bez-weryfikacji` — pomija kontrolę po zapisie (nie zalecane).
+Wymaga `zstandard` (`pip install -r requirements-dev.txt`). Czyta kontener
+([LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)), przepisuje chunk 0 bez zmian,
+przepakowuje tabele z nowymi offsetami i weryfikuje wynik przed zapisem.
 
-Wymaga pakietu `zstandard` (`python3 -m venv .venv && .venv/bin/pip install zstandard`).
+## Czego jeszcze nie ma i co nie zostało sprawdzone
 
-## Co robi
+- **Nie przetestowano łatki w rzeczywistej grze** (klient może sprawdzać sumy kontrolne plików przy starcie lub aktualizacji, czcionki mogą nie mieć wszystkich polskich znaków, a pola interfejsu mają nieznane limity szerokości).
+- **Nie wybrano docelowo zastępowanego języka klienta** (dotychczasowe próby na mapie EN w piaskownicy).
+- **Brak jeszcze skryptu instalującego łatkę u właściciela** (kopia bezpieczeństwa oryginałów, podmiana, sprawdzone przywracanie) — nie wolno podmieniać plików instalacji gry bez osobnego planu i działającego cofania.
 
-1. Czyta kontener, chunki i tabele (format w [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)).
-2. Chunek 0 (indeks mapy) przepisuje bez zmian.
-3. W każdej tabeli podmienia teksty: najpierw po `id`, a potem — dla wpisów,
-   których tekst jest identyczny z przetłumaczonym — przez dziedziczenie.
-   Dzięki temu jedno tłumaczenie trafia we wszystkie powtórzenia w grze.
-4. Przepakowuje tabelę: te same id, nowe offsety i długości, teksty sklejone od
-   nowa. Dzięki temu tłumaczenie może być dłuższe lub krótsze od oryginału.
-5. Kompresuje chunki, składa nowy kontener z nową tabelą przesunięć.
-6. **Weryfikuje wynik przed zapisem:** czyta własne wyjście i porównuje każdy
-   wpis — jeśli cokolwiek się nie zgadza, plik nie powstaje.
+## Wynik na realnych mapach w piaskownicy
 
-## Co wypisuje
-
-```json
-{"chunks": 4387, "entries": 1122784, "applied": 200, "ids_not_in_map": 0,
- "bytes_before": 50550179, "bytes_after": 51904280,
- "verified": {"ids": 1122784, "changed": 200}, "ok": true, "output": "…"}
-```
-
-- `applied` — ile wpisów podmieniono,
-- `ids_not_in_map` — ile id z pliku tłumaczeń nie istnieje w mapie (np. teksty
-  z innej wersji gry); takie pozycje są pomijane, nie zgadywane,
-- `verified.changed` — ile wpisów różni się od oryginału w zapisanym pliku.
-
-## Czego patcher jeszcze nie robi
-
-- nie kopiuje pliku do instalacji gry ani nie robi backupu — to robi skrypt
-  uruchamiany przez użytkownika,
-- nie obsługuje map `_diff` (nakładka LDP) — tylko mapę główną EN,
-- nie sprawdza, czy gra przyjmie plik (test u użytkownika).
-
-## Wynik na realnej mapie
-
-Mapa EN 50 550 179 B, 4386 tabel tekstów, 1 122 784 wpisy: **200 przetłumaczonych
-tekstów → 41 962 zmienione wpisy** (dziedziczenie), 13 s, wynik 49 560 183 B,
-weryfikacja 1 122 784 id bez rozjazdów. Struktura wyniku przechodzi
+Próba na 3 prawdziwych mapach EN z buildu `25906190` i sztucznym magazynie
+19 630 przekładów (23 s): przepisano 95 471 wpisów mapy bazowej oraz 847 i 1 060
+w dwóch warstwach `_diff`; po złożeniu warstw zmienionych 96 019 z 1 124 787
+wpisów, zbiór identyfikatorów niezmieniony, read-back przeszedł bez rozjazdów.
+Wcześniejsza próba jednostkowa `apply_translation.py` (200 tekstów → 41 962
+podmiany przez dziedziczenie, 11–13 s) również przeszła read-back i
 `tools/locale_container.py`.
