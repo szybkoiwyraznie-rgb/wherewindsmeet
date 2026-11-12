@@ -43,7 +43,7 @@ class Tekst(NamedTuple):
     zrodlo: str  # tekst źródłowy: chiński, a gdy go nie ma — angielski
     en: str | None  # wersja angielska gry (pomocnicza); None, gdy brak
     n: int  # ile identyfikatorów gry ma ten tekst
-    w: tuple | None  # (numer źródła w `zrodla`, klucz wiersza) albo None
+    w: tuple | None  # (numer źródła w `zrodla`, klucz wiersza[, klucz nazwy wiersza]) albo None
     z_en: bool  # True: tekst nie ma wersji chińskiej, źródłem jest angielski
 
 
@@ -66,7 +66,6 @@ class Indeks:
     zrodla: list = field(default_factory=list)
     sceny: dict[int, dict] = field(default_factory=dict)
     pola_dialogow: list = field(default_factory=list)
-    dymki: dict[str, list] = field(default_factory=dict)
     zadania: dict[int, dict] = field(default_factory=dict)
     grupy: dict[int, dict] = field(default_factory=dict)
     typy_zadan: dict[int, dict] = field(default_factory=dict)
@@ -78,6 +77,7 @@ class Indeks:
     miejsca: dict = field(default_factory=dict)
     zamiany: list = field(default_factory=list)
     warianty: dict[str, dict] = field(default_factory=dict)  # id tekstu (hex) -> {k, w, en}
+    przerywniki: dict = field(default_factory=dict)  # numer przerywnika -> {tekst, streszczenie}
 
     def zrodlo(self, tekst: Tekst) -> tuple[str, str, str] | None:
         """Główne źródło tekstu: (rodzaj tabeli, ścieżka pola, klucz wiersza)."""
@@ -85,6 +85,10 @@ class Indeks:
             return None
         kind, path = self.zrodla[tekst.w[0]][:2]
         return kind, path, tekst.w[1]
+
+    def nazwa_wiersza(self, tekst: Tekst) -> str | None:
+        """Klucz tekstu-nazwy wiersza, z którego pochodzi tekst (np. nazwa przedmiotu przy opisie)."""
+        return tekst.w[2] if tekst.w and len(tekst.w) > 2 else None
 
     def zh(self, klucz: str | None) -> str:
         """Tekst źródłowy po kluczu albo pusty napis."""
@@ -134,8 +138,6 @@ def wczytaj(katalog, *, teksty: bool = True, sceny: bool = True) -> Indeks:
         if sceny:
             for row in tabela("sceny"):
                 indeks.sceny[row["d"]] = row
-            for row in tabela("dymki"):
-                indeks.dymki[row["d"]] = row["e"]
         for row in tabela("zadania"):
             indeks.zadania[row["no"]] = row
         for row in tabela("grupy_zadan"):
@@ -156,6 +158,8 @@ def wczytaj(katalog, *, teksty: bool = True, sceny: bool = True) -> Indeks:
         indeks.zamiany = list(tabela("zamiany_dialogow"))
         for row in tabela("warianty"):
             indeks.warianty[row["id"]] = row
+        for row in tabela("przerywniki"):
+            indeks.przerywniki[row["no"]] = row
     except (OSError, KeyError, json.JSONDecodeError) as error:
         raise IndeksError(f"{root}: niepełny wyciąg ({error!r})") from error
     return indeks

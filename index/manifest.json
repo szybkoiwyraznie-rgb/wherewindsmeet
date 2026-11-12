@@ -1,153 +1,306 @@
 {
-  "format": "wwm-indeks-v1",
-  "utworzono": "2026-11-11",
-  "liczby": {
-    "scen": 74979,
-    "kwestii": 178572,
-    "unikalnych_tekstow": 176146,
-    "mowcow": 17492,
-    "tekstow_z_dluzsza_wersja_mapy": 25258
+ "format": "wwm-indeks-v2",
+ "wejscia": {
+  "opis": "Steam 3564740, build 25906190, pliki z 2026-11-11",
+  "mapa_zh": [
+   {
+    "plik": "translate_words_map_zh_cn",
+    "bajtow": 69470988,
+    "sha256": "74505cecc0a7ca6f85ff9b31ea04cf7e6c5a0407b61f046469ff1158abaf7c71"
+   },
+   {
+    "plik": "000007_translate_words_map_zh_cn_diff",
+    "bajtow": 233290,
+    "sha256": "02bcbf07898c8b779da0cca3b624a1e55413e9b43fe7881c5a4fc36ebc8817a1"
+   }
+  ],
+  "mapa_en": [
+   {
+    "plik": "000001_translate_words_map_en",
+    "bajtow": 50550179,
+    "sha256": "d8f227bb851b76f849620c57ef924f21157019f2113a5e264df40c95a20bfa17"
+   },
+   {
+    "plik": "000003_translate_words_map_en_diff",
+    "bajtow": 751922,
+    "sha256": "377bdd2b71b05ae6664ef2f273329e16c5b494315d9a938d9bfefd3fe1bc4e34"
+   },
+   {
+    "plik": "000002_translate_words_map_en_diff",
+    "bajtow": 1122346,
+    "sha256": "ae22e2785bc85c172df9c5477aa722faa7e7e9468ef7c38425d1cb17edcb1633"
+   }
+  ],
+  "manifest_bazy": {
+   "plik": "MANIFEST",
+   "bajtow": 1415521,
+   "sha256": "48ce04bade699fdbea157e4b5bb1b197ba14e421c31595ccb412d0ff029f23e9"
   },
-  "pokrycie": {
-    "dialog_timelines": 74951,
-    "scen_z_dialog_no": 69092,
-    "scen_poza_rejestrem": 0,
-    "pokrycie_procent": 92.2,
-    "brakuje_dialogow": 5859
+  "pliki_bazy": 42,
+  "tabel": 114171
+ },
+ "liczby": {
+  "id_w_mapie_zh": 1818900,
+  "id_w_mapie_en": 1124787,
+  "id_w_zakresie": 1128714,
+  "unikalnych_tekstow_w_zakresie": 483190,
+  "tekstow_bez_wersji_zh": 5824,
+  "id_tylko_zh_niewskazane_pominiete": 700766,
+  "id_tylko_zh_wskazane": 3927,
+  "scen": 74950,
+  "scen_bez_tekstu": 1577,
+  "elementow_scen": 187330,
+  "kwestii": 186025,
+  "kwestii_zaleznych_od_plci_bohatera": 1860,
+  "zadan": 24733,
+  "grup_zadan": 1077,
+  "pytan_z_wyborami": 15027,
+  "postaci_z_tabliczka": 42236,
+  "postaci_w_encyklopedii": 172,
+  "miejsc": 2330
+ },
+ "pokrycie": {
+  "id_en_wskazane_przez_tabele_lub_sceny": 1052649,
+  "id_en_bez_zrodla": 72138,
+  "procent_id_en_ze_zrodlem": 93.59,
+  "id_w_scenach": 185045,
+  "kwestii_bez_grupy_mowcy": 0,
+  "kwestie_wg_nazwy_mowcy": {
+   "gracz": 37407,
+   "nazwa_z_gry": 111398,
+   "etykieta_robocza": 37168,
+   "bez_nazwy": 52
   },
-  "zrodla": {
-    "mapa": {
-      "plik": "translate_words_map_zh_cn",
-      "bajtow": 69470988,
-      "sha256": "74505cecc0a7ca6f85ff9b31ea04cf7e6c5a0407b61f046469ff1158abaf7c71"
-    },
-    "rejestr": {
-      "plik": "MANIFEST",
-      "bajtow": 1415521,
-      "sha256": "48ce04bade699fdbea157e4b5bb1b197ba14e421c31595ccb412d0ff029f23e9"
-    },
-    "sceny": [
-      {
-        "plik": "sceny_data201.jsonl",
-        "bajtow": 5432577,
-        "sha256": "1e0b35a291a2d0dd93eeef48d97af9dd6d80517050080ec074b75612b032f1cf",
-        "scen": 6926,
-        "kwestii": 15805
-      },
-      {
-        "plik": "sceny_data202.jsonl",
-        "bajtow": 9238665,
-        "sha256": "07305810e87271d99cec4dcd41fac63dd30eaed5620e26cc69e5365a70ffbefc",
-        "scen": 10600,
-        "kwestii": 27488
-      },
-      {
-        "plik": "sceny_data203.jsonl",
-        "bajtow": 8232136,
-        "sha256": "cf946b8495e4d732f8af0a38ee9d26c355a2a48f29496e9e503b4156d3816074",
-        "scen": 8939,
-        "kwestii": 25004
-      },
-      {
-        "plik": "sceny_data204.jsonl",
-        "bajtow": 7803187,
-        "sha256": "7021472e9d01a4633588c13543093ca9cebc46a932c52f6d3e795b51d1b7a2e7",
-        "scen": 8811,
-        "kwestii": 22934
-      },
-      {
-        "plik": "sceny_data206.jsonl",
-        "bajtow": 8221926,
-        "sha256": "6ef9356aa7ef3c5588e0489e87a41640bce9bb71401e8b4cb2464cf4c4121325",
-        "scen": 12272,
-        "kwestii": 23361
-      },
-      {
-        "plik": "sceny_data3.jsonl",
-        "bajtow": 14810,
-        "sha256": "4f51958f133dd87d4175e88430181f07a49cf8e75dab461e8d476c120dabcbed",
-        "scen": 25,
-        "kwestii": 43
-      },
-      {
-        "plik": "sceny_data1200_patch.jsonl",
-        "bajtow": 55576,
-        "sha256": "7b77dab8a6ba1b2de083ba6d20c2cc9c3d118b918ac3ecfa9ecffd14c7d8641d",
-        "scen": 33,
-        "kwestii": 183
-      },
-      {
-        "plik": "sceny_data205.jsonl",
-        "bajtow": 5794924,
-        "sha256": "7fb471bc1213397e4686f8aadb52afc944815c9484ed99c6345e62ec70357884",
-        "scen": 8484,
-        "kwestii": 17268
-      },
-      {
-        "plik": "sceny_data207.jsonl",
-        "bajtow": 10366753,
-        "sha256": "ed54983959913a1d31b6b8624edf6e4f2cb89d8f8f06c3bce6624e89d42ff02d",
-        "scen": 11847,
-        "kwestii": 32015
-      },
-      {
-        "plik": "sceny_data208.jsonl",
-        "bajtow": 5092619,
-        "sha256": "8777d0f87c5fbb7c9371e79a4c934c7b7b991557e426cb14784f3e8a669a3897",
-        "scen": 7042,
-        "kwestii": 14471
-      }
-    ]
+  "scen_z_odwolaniem": 58464,
+  "pol_wskazujacych_dialogi": 546
+ },
+ "bledy": {
+  "tabele": {
+   "spaces.s66027.spawn.spawn_sw_default_0": "wartość: nieznany typ 0x00 przy pozycji 10809",
+   "spaces.s66027.spawn.spawn_sw_hg_usual_0": "wartość: nieznany typ 0x00 przy pozycji 10881"
   },
-  "shardy": {
-    "sceny": [
-      {
-        "plik": "sceny_000.jsonl",
-        "linie": 16227,
-        "bajtow": 9436514
-      },
-      {
-        "plik": "sceny_001.jsonl",
-        "linie": 15323,
-        "bajtow": 9436943
-      },
-      {
-        "plik": "sceny_002.jsonl",
-        "linie": 18040,
-        "bajtow": 9436877
-      },
-      {
-        "plik": "sceny_003.jsonl",
-        "linie": 17113,
-        "bajtow": 9436782
-      },
-      {
-        "plik": "sceny_004.jsonl",
-        "linie": 8276,
-        "bajtow": 4858865
-      }
-    ],
-    "teksty": [
-      {
-        "plik": "teksty_000.jsonl",
-        "linie": 74793,
-        "bajtow": 9437146
-      },
-      {
-        "plik": "teksty_001.jsonl",
-        "linie": 75033,
-        "bajtow": 9437116
-      },
-      {
-        "plik": "teksty_002.jsonl",
-        "linie": 26320,
-        "bajtow": 3319027
-      }
-    ]
+  "sceny": {}
+ },
+ "pliki": {
+  "teksty": [
+   {
+    "plik": "teksty_0.jsonl",
+    "wierszy": 30155,
+    "bajtow": 4698715,
+    "sha256": "24c709dbbf85c8d567c81f6a3c944c9e68a1d0f50f17a8de57e6e6eb61495ef0"
+   },
+   {
+    "plik": "teksty_1.jsonl",
+    "wierszy": 30067,
+    "bajtow": 4813332,
+    "sha256": "2087e6095c9961f20f5c98a1e12d0c1b5c16f74437f3ac87df26e9c46d75290e"
+   },
+   {
+    "plik": "teksty_2.jsonl",
+    "wierszy": 30249,
+    "bajtow": 4719312,
+    "sha256": "e8f86b79cd4c2ead368dc03ad976da602944d2a94cd89376250ccf5f17abaff4"
+   },
+   {
+    "plik": "teksty_3.jsonl",
+    "wierszy": 30072,
+    "bajtow": 4836612,
+    "sha256": "7316a5009823f300850b142137c62678be2eeb0808363d827d8eadaa5234d6fd"
+   },
+   {
+    "plik": "teksty_4.jsonl",
+    "wierszy": 30046,
+    "bajtow": 4722892,
+    "sha256": "61b4774171a849fa7af40deb4fe9b7f49ef97a4aaa9a8d120204bdf29fb81313"
+   },
+   {
+    "plik": "teksty_5.jsonl",
+    "wierszy": 30334,
+    "bajtow": 4716358,
+    "sha256": "0afadb97042eeaf5448923e9adc354ed93a284d6876eb4f863b0f35b036b3f3e"
+   },
+   {
+    "plik": "teksty_6.jsonl",
+    "wierszy": 30475,
+    "bajtow": 4833435,
+    "sha256": "bae8cde86316eddf40e38603873eb07cf19df911c23c1fc1f30f2190dd5c645c"
+   },
+   {
+    "plik": "teksty_7.jsonl",
+    "wierszy": 30129,
+    "bajtow": 4760650,
+    "sha256": "cb3e0724f0b308dbf2733c80401a82bfe0adb4a3c95e97df39999a2266628e98"
+   },
+   {
+    "plik": "teksty_8.jsonl",
+    "wierszy": 30287,
+    "bajtow": 4787049,
+    "sha256": "d127da4620b224411e2342b3d4d741773e97ff403a38c417e6858e5b59010a75"
+   },
+   {
+    "plik": "teksty_9.jsonl",
+    "wierszy": 30225,
+    "bajtow": 4727327,
+    "sha256": "d341e89e3f7d6db2ce8046bebb20c4fc9888823f102c226fc53545c748de7813"
+   },
+   {
+    "plik": "teksty_a.jsonl",
+    "wierszy": 30170,
+    "bajtow": 4727452,
+    "sha256": "d532b9d3570b7e7c41cdf71568f5b50b7895a14cdc5ca98f0a9d9242825d9fc8"
+   },
+   {
+    "plik": "teksty_b.jsonl",
+    "wierszy": 30243,
+    "bajtow": 4720823,
+    "sha256": "88182c8a3f0647af6bd16953f3cb475c5ee3ac88648867866929519cc44ef7b9"
+   },
+   {
+    "plik": "teksty_c.jsonl",
+    "wierszy": 29943,
+    "bajtow": 4801428,
+    "sha256": "cd95cdfdecfb8d63ddfac0e4f01e7569a957163bbe32bde10945216edabfb2fa"
+   },
+   {
+    "plik": "teksty_d.jsonl",
+    "wierszy": 30595,
+    "bajtow": 4835817,
+    "sha256": "5212fa7f37b001ae0b360129b324af13299f25c62834e728f7db43c15768c10f"
+   },
+   {
+    "plik": "teksty_e.jsonl",
+    "wierszy": 30265,
+    "bajtow": 4740914,
+    "sha256": "40c7da1a91d46c3c2930a0f683828040d50041e8ca719be20aa1c22a73b24767"
+   },
+   {
+    "plik": "teksty_f.jsonl",
+    "wierszy": 29935,
+    "bajtow": 4683592,
+    "sha256": "8919f55a4a69995aa80c5ccecf0fab1a7dd237c58ceaa75cbb1804dd604970ce"
+   }
+  ],
+  "sceny": [
+   {
+    "plik": "sceny_0.jsonl",
+    "wierszy": 9468,
+    "bajtow": 2994813,
+    "sha256": "c7a7633a9ceed7273f014213216ac76eae42e03838440b36aca488e44f2fd4e4"
+   },
+   {
+    "plik": "sceny_1.jsonl",
+    "wierszy": 9446,
+    "bajtow": 2996295,
+    "sha256": "4dc5b73d30f64c72d3a5e42f301005cc4ac9ae4dc0f90b7cc6e9f4700f1f6f7e"
+   },
+   {
+    "plik": "sceny_2.jsonl",
+    "wierszy": 9383,
+    "bajtow": 2969431,
+    "sha256": "a6c7c8fd8f2702d07be41040b1034f2062780170296aa6ae8793e42054a2ea5e"
+   },
+   {
+    "plik": "sceny_3.jsonl",
+    "wierszy": 9344,
+    "bajtow": 2974022,
+    "sha256": "8aaf8722eccb5bbe62cd83dbfa617cd4d9350a52aab2c2141d9a2c6e886a8370"
+   },
+   {
+    "plik": "sceny_4.jsonl",
+    "wierszy": 9422,
+    "bajtow": 2989832,
+    "sha256": "ac1a61bb16d3f9a0cf4679c1546074fb3f43a54e7a201e80e00628ff9d1a154e"
+   },
+   {
+    "plik": "sceny_5.jsonl",
+    "wierszy": 9330,
+    "bajtow": 2968477,
+    "sha256": "cec41f7522a6a3d04e7d4431969a539f5880d9d25bba558359c8b63d94c3b22d"
+   },
+   {
+    "plik": "sceny_6.jsonl",
+    "wierszy": 9322,
+    "bajtow": 2972362,
+    "sha256": "a302408384ab4942e6a3727f1c81dac6f695e0bedd248087ee333631541d6771"
+   },
+   {
+    "plik": "sceny_7.jsonl",
+    "wierszy": 9235,
+    "bajtow": 2934380,
+    "sha256": "e764d6f481f73d47eab8adcdefa267cdfb6d0b3b29de33340952b4e305059d13"
+   }
+  ],
+  "warianty": {
+   "plik": "warianty.jsonl",
+   "wierszy": 1860,
+   "bajtow": 247768,
+   "sha256": "aa9f94f619b0df25a3f039df53c8fb996a96d994b391377e9ec0d3b3146dff11"
   },
-  "pominiete": [
-    "formatted_text (jest w shardach tekstow)",
-    "skeleton (identyfikacja mowcy: mowca + speaker_no)",
-    "chunk, chunk_index (szczegoly ekstrakcji)"
-  ]
+  "zadania": {
+   "plik": "zadania.jsonl",
+   "wierszy": 24733,
+   "bajtow": 4429519,
+   "sha256": "c936671e8fee6e17ae21faefdbe701fcb4f02bb1016e4f69716cac0794762184"
+  },
+  "grupy_zadan": {
+   "plik": "grupy_zadan.jsonl",
+   "wierszy": 1077,
+   "bajtow": 205355,
+   "sha256": "886d75907d387736aa0c2d71bbb7b6c55b264971f8ea44a04daf74d07c998782"
+  },
+  "typy_zadan": {
+   "plik": "typy_zadan.jsonl",
+   "wierszy": 15,
+   "bajtow": 761,
+   "sha256": "f972842598b7bd3bd91bc99f6144f2de8d3f29455d00a0637d31c0045cc3315a"
+  },
+  "streszczenia": {
+   "plik": "streszczenia.jsonl",
+   "wierszy": 150,
+   "bajtow": 11665,
+   "sha256": "ce485b0492316ec70c5d1d42e3132d0754720a613865b9488f52be42e7ffb727"
+  },
+  "wybory": {
+   "plik": "wybory.jsonl",
+   "wierszy": 15027,
+   "bajtow": 2536355,
+   "sha256": "031ba0c4f8dea32e1008c214892994e0d2aea73da788aa54518cbac97ea46e5a"
+  },
+  "opcje_npc": {
+   "plik": "opcje_npc.jsonl",
+   "wierszy": 648,
+   "bajtow": 61847,
+   "sha256": "42e0737ff575ee8a587836b5b8a2300ef3cdd35b9a0c7a566900204fcc1181cd"
+  },
+  "postacie": {
+   "plik": "postacie.jsonl",
+   "wierszy": 42236,
+   "bajtow": 1912911,
+   "sha256": "000c783942df6630528ab1163d23ea3085ca24eebbb6a59dd1a842f256bbc07a"
+  },
+  "encyklopedia": {
+   "plik": "encyklopedia.jsonl",
+   "wierszy": 172,
+   "bajtow": 29598,
+   "sha256": "fe3c69c5189b2df3e8971660f6f76b06525a51787f2f6fee3889346e97e7cd64"
+  },
+  "miejsca": {
+   "plik": "miejsca.jsonl",
+   "wierszy": 2330,
+   "bajtow": 157161,
+   "sha256": "604524c53f129563c23b674377b244a45061f977d7e60020b1a48ff7c018b908"
+  },
+  "przerywniki": {
+   "plik": "przerywniki.jsonl",
+   "wierszy": 2267,
+   "bajtow": 101029,
+   "sha256": "23e47332a1dc2d4109729863cb03ff2a0a2b9b654d056425a23267a52adcb227"
+  },
+  "zamiany_dialogow": {
+   "plik": "zamiany_dialogow.jsonl",
+   "wierszy": 1117,
+   "bajtow": 78182,
+   "sha256": "25fe72178416812df284d09b7452c54209807c21e4762a71df6ce9c104fb9c2f"
+  }
+ }
 }

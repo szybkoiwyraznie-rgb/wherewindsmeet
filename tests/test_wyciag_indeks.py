@@ -26,7 +26,7 @@ ZH = {
     T + 31: "Idź do kowala",
     T + 32: "Rozdział pierwszy",
     T + 40: "Kuźnia",
-    T + 50: "dymek pierwszy",
+    T + 50: "Kowal z Kuźni, mrukliwy",
     T + 60: "Tak",
     T + 61: "Nie",
     T + 62: "Rozmowa",
@@ -34,6 +34,7 @@ ZH = {
     T + 80: "Stary kowal",
     T + 81: "Historia",
     T + 82: "Dawno temu…",
+    T + 90: "Plansza przerywnika",
 }
 EN = {
     T + 1: "smith line",
@@ -72,7 +73,7 @@ def tables() -> dict:
         "dialog_timelines.101": list(empty.items()),
         "dialog_timelines.102": list(empty.items()),
         "tasks": [
-            (1, {"no": 1, "group": 5, "task_type": 1, "post_task": [2], "task_name": T + 30, "task_target_str": T + 31, "finish_dialogs": 100, "task_space": 7}),
+            (1, {"no": 1, "group": 5, "task_type": 1, "post_task": [2], "task_name": T + 30, "task_target_str": T + 31, "finish_dialogs": 100, "task_space": 7, "fetch_play_cutscene": 300}),
             (2, {"no": 2, "group": 5, "task_type": 1, "pre_task": [1], "finish_dialogs": 101, "process_interact_param": ["102", "55"]}),
             (3, {"no": 3, "group": 5, "task_type": 1, "pre_task": [2], "finish_dialogs": 102}),
         ],
@@ -80,13 +81,14 @@ def tables() -> dict:
         "group_tasks": [(5, [1, 2, 3])],
         "branch_data": [("9_1", {"ques_argue_no": 9, "ques_each_no": 1, "main_title": T + 62, "choice_1": T + 60, "choice_2": T + 61, "choice_dialogs_1": 101, "ques_stop_dialogs": [[100]]})],
         "branch_dialog_subsequent": [(100, [101])],
-        "entity_init_data": [(700, {"id": 700, "billboard_data": {"name": T + 9, "title": T + 10}})],
+        "entity_init_data": [(700, {"id": 700, "attr_id": 55, "billboard_data": {"name": T + 9, "title": T + 10}})],
         "spaces.s7.entity": [(9001, {"npc_no": 700, "serial_id": 9001})],
         "space_info": [(7, {"name": T + 40, "fb_name": "kuznia_robocza"})],
         "stuff_items": [(1, {"name": T + 20, "describe_str": T + 21}), (2, {"name": T + 22})],
-        "debate_guider_dialog_data": [(31, {"data": [{"text": T + 50, "entity_no": 9001, "time": 0}]})],
+        "entity_attr": [(55, {"id": 55, "introduction": T + 50})],
         "world_view_person_info": [(4, {"id": 4, "name": T + 80, "story": [41]})],
         "world_view_person_event": [(41, {"id": 41, "title": T + 81, "description": T + 82})],
+        "cutscenes": [(300, {"no": 300, "content": T + 90}), (301, {"no": 301, "movie_path": "film.mp4"})],
     }
 
 
@@ -119,6 +121,10 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(sword.n, 2)
         self.assertIn(sword.en, ("Sword", "Blade"))
         self.assertEqual(self.indeks.zrodlo(sword), ("stuff_items", "name", "1"))
+        description = self.indeks.teksty[K("Opis miecza")]
+        self.assertEqual(self.indeks.zrodlo(description), ("stuff_items", "describe_str", "1"))
+        self.assertEqual(self.indeks.nazwa_wiersza(description), K("Miecz"))
+        self.assertIsNone(self.indeks.nazwa_wiersza(sword))
         self.assertNotIn(K("tylko chiński, nikt nie wskazuje"), self.indeks.teksty)
         english_only = self.indeks.teksty[K("english only text")]
         self.assertTrue(english_only.z_en)
@@ -132,7 +138,8 @@ class ExtractTests(unittest.TestCase):
     def test_scene_has_cast_lines_place_and_links(self):
         scene = self.indeks.sceny[100]
         # nazwa mówcy: numer seryjny -> byt -> tabliczka
-        self.assertEqual(scene["o"][0], ["kowal_roboczy", 3, 9001, K("Kowal"), K("Mistrz kuźni")])
+        self.assertEqual(scene["o"][0], ["kowal_roboczy", 3, 9001, K("Kowal"), K("Mistrz kuźni"), K("Kowal z Kuźni, mrukliwy")])
+        self.assertEqual(scene["o"][1], ["ja", 1, 0])
         self.assertEqual(scene["e"][0], ["k", 0, K("kwestia kowala")])
         self.assertEqual(scene["e"][1], ["k", 1, K("kwestia gracza")])
         variants = sorted(tuple(element[2:]) for element in scene["e"][2:])
@@ -158,9 +165,13 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual([item["tekst"] for item in choice["wybory"]], [K("Tak"), K("Nie")])
         self.assertEqual(choice["wybory"][0]["dialogi"], [101])
         self.assertEqual(self.indeks.encyklopedia[4]["historie"], [[K("Historia"), K("Dawno temu…")]])
-        self.assertEqual(self.indeks.postacie[700], {"no": 700, "n": K("Kowal"), "t": K("Mistrz kuźni")})
+        self.assertEqual(
+            self.indeks.postacie[700],
+            {"no": 700, "n": K("Kowal"), "t": K("Mistrz kuźni"), "o": K("Kowal z Kuźni, mrukliwy")},
+        )
         self.assertEqual(self.indeks.miejsca[7]["nazwa"], K("Kuźnia"))
-        self.assertEqual(self.indeks.dymki["31"], [[9001, K("dymek pierwszy"), K("Kowal"), 7]])
+        self.assertEqual(self.indeks.zadania[1]["przerywniki"], {"przyjecie": [300]})
+        self.assertEqual(self.indeks.przerywniki, {300: {"no": 300, "tekst": K("Plansza przerywnika")}})
 
     def test_every_key_used_by_scenes_exists_in_texts(self):
         for scene in self.indeks.sceny.values():

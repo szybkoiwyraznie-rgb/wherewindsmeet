@@ -8,18 +8,19 @@ musiały już czytać plików gry**:
 
     index/manifest.json          liczby, pokrycie, SHA-256 wejść, lista plików
     index/teksty_X.jsonl         unikalny tekst źródłowy: zh, en, liczba id, główne źródło
+                                 `w` = [numer źródła, klucz wiersza, klucz nazwy wiersza]
     index/zrodla.json            lista „tabela :: pole” (numer = pierwsza liczba w `w`)
     index/sceny_N.jsonl          dialog: obsada, elementy, odwołania, miejsca
     index/warianty.jsonl         kwestie zależne od płci bohatera: id tekstu, klucz, wersja en
     index/pola_dialogow.json     lista pól wskazujących dialogi (numer = pierwsza liczba w `r`)
-    index/dymki_N.jsonl          rozmowy w dymkach (`debate_guider_dialog_data`)
     index/zadania.jsonl          zadania: łańcuch pre/post, grupa, dialogi, teksty
     index/grupy_zadan.jsonl      grupy zadań (rozdziały wątku głównego, historie poboczne)
     index/wybory.jsonl           pytania i wybory gracza (`branch_data`) z dialogami
     index/opcje_npc.jsonl        opcje rozmowy z NPC (`npc_talk_options`)
-    index/postacie.jsonl         byt -> nazwa i tytuł z tabliczki nad głową
+    index/postacie.jsonl         byt -> nazwa i tytuł z tabliczki nad głową, opis postaci
     index/encyklopedia.jsonl     postacie z encyklopedii gry (`world_view_person_*`)
     index/miejsca.jsonl          przestrzeń -> nazwa
+    index/przerywniki.jsonl      przerywnik filmowy -> tekst planszy i streszczenie
     index/zamiany_dialogow.jsonl podmiany dialogów (w tym wersje językowe)
 
 Tekst jest zapisany raz, w `teksty_X.jsonl`; wszystkie inne pliki wskazują go
@@ -56,7 +57,6 @@ except ImportError:  # uruchomienie jako skrypt
 FORMAT = "wwm-indeks-v2"
 LIMIT_PLIKU = 10 * 1024 * 1024  # limit repozytorium na jeden plik
 CZESCI_SCEN = 8  # sceny_N.jsonl: N = numer dialogu modulo 8
-CZESCI_DYMKOW = 2
 MAKS_ODWOLAN_SCENY = 4
 PROG_TRAFIEN = 3
 PROG_UDZIALU = 0.5
@@ -95,13 +95,15 @@ class Obserwator:
         self.nastepstwa: dict[int, list[int]] = {}
         self.opcje_npc: dict[int, dict] = {}
         self.tabliczki: dict[int, tuple[int, int]] = {}  # byt -> (id nazwy, id tytułu)
+        self.atrybut_bytu: dict[int, int] = {}  # byt -> wiersz `entity_attr`
+        self.opisy: dict[int, int] = {}  # wiersz `entity_attr` -> id tekstu opisu postaci
         self.seryjne: dict[int, tuple[int, int]] = {}  # numer seryjny -> (przestrzeń, byt)
         self.miejsca: dict[int, dict] = {}
         self.osoby: dict[int, dict] = {}
         self.wydarzenia_osob: dict[int, dict] = {}
         self.tozsamosci: list[dict] = []
-        self.dymki: dict[str, list] = {}
         self.zamiany: list[dict] = []
+        self.przerywniki: dict[int, dict] = {}
         # odwołania do dialogów
         self.pola: list[tuple[str, str]] = []
         self._numer_pola: dict[tuple[str, str], int] = {}
@@ -188,6 +190,10 @@ class Obserwator:
                 "zakonczenie": _liczby(row.get("finish_play_dialogs")) + _liczby(row.get("finish_dialogs")),
             },
             "wybory": _liczby(row.get("finish_choice")) + _liczby(row.get("get_task_choice")),
+            "przerywniki": {
+                "przyjecie": _liczby(row.get("fetch_play_cutscene")),
+                "zakonczenie": _liczby(row.get("finish_play_cutscene")),
+            },
         }
 
     def _t_task_group_info(self, _name, key, row) -> None:
@@ -270,9 +276,21 @@ class Obserwator:
         }
 
     def _t_entity_init_data(self, _name, key, row) -> None:
-        board = row.get("billboard_data") if isinstance(row, dict) else None
+        if not isinstance(row, dict):
+            return
+        board = row.get("billboard_data")
         if isinstance(board, dict) and (board.get("name") or board.get("title")):
             self.tabliczki[row.get("id", key)] = (board.get("name") or 0, board.get("title") or 0)
+        if isinstance(row.get("attr_id"), int):
+            self.atrybut_bytu[row.get("id", key)] = row["attr_id"]
+
+    def _t_entity_attr(self, _name, key, row) -> None:
+        if isinstance(row, dict) and row.get("introduction"):
+            self.opisy[row.get("id", key)] = row["introduction"]
+
+    def opis_bytu(self, byt: int) -> int:
+        """Id tekstu opisu postaci (`entity_attr.introduction`) albo 0."""
+        return self.opisy.get(self.atrybut_bytu.get(byt, byt), 0)
 
     def _t_spaces_x_entity(self, name, key, row) -> None:
         space = _PRZESTRZEN.match(name)
@@ -301,18 +319,12 @@ class Obserwator:
         if isinstance(row, dict):
             self.tozsamosci.append({"osoba": row.get("people_link"), "tekst": row.get("people_identity")})
 
-    def _t_debate_guider_dialog_data(self, _name, key, row) -> None:
-        data = row.get("data") if isinstance(row, dict) else None
-        if isinstance(data, list):
-            self.dymki[str(key)] = [
-                (
-                    item.get("time") if isinstance(item.get("time"), (int, float)) else 0,
-                    item.get("entity_no") if isinstance(item.get("entity_no"), int) else 0,
-                    item.get("text"),
-                )
-                for item in data
-                if isinstance(item, dict)
-            ]
+    def _t_cutscenes(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.przerywniki[row.get("no", key)] = {
+                "tekst": row.get("content"),
+                "streszczenie": row.get("synopsis_text_pc") or row.get("synopsis_text_mobile"),
+            }
 
     def _t_dialog_replace(self, _name, key, row) -> None:
         if isinstance(row, dict):
@@ -416,8 +428,9 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         if angielski is not None and not z_en:
             entry["en"][angielski] += 1
         if not entry["w"]:
-            for pochodzenie, wiersz, _etykieta in zrodla.wystapienia.get(text_id, ()):
-                entry["w"] = [pochodzenie, wiersz]
+            for pochodzenie, wiersz, etykieta in zrodla.wystapienia.get(text_id, ()):
+                # [numer źródła, klucz wiersza, id tekstu-nazwy tego wiersza (jeśli inny niż ten tekst)]
+                entry["w"] = [pochodzenie, wiersz, etykieta if etykieta != text_id else 0]
                 break
 
     def k(text_id) -> str | None:
@@ -437,7 +450,8 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         if entry["n"] > 1:
             row["n"] = entry["n"]
         if entry["w"]:
-            row["w"] = entry["w"]
+            etykieta = k(entry["w"][2])
+            row["w"] = entry["w"][:2] + ([etykieta] if etykieta and etykieta != key else [])
         podzial.dodaj(key[0], row)
     pliki["teksty"] = podzial.koniec()
     (wyj / "zrodla.json").write_text(
@@ -483,7 +497,11 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             if tabliczka is not None:
                 nazwa = nazwa or tabliczka[0]
                 tytul = tabliczka[1]
-            obsada.append([osoba["tag"], osoba["typ"], osoba["entity_no"], k(nazwa), k(tytul)])
+            # [etykieta robocza, typ, numer bytu, klucz nazwy, klucz tytułu, klucz opisu postaci]
+            wpis = [osoba["tag"], osoba["typ"], osoba["entity_no"], k(nazwa), k(tytul), k(obserwator.opis_bytu(byt)) if byt else None]
+            while wpis[-1] is None and len(wpis) > 3:
+                wpis.pop()
+            obsada.append(wpis)
             if osoba["kwestii"]:
                 if osoba["typ"] == sceny_z_bazy.TYP_GRACZ:
                     mowcy["gracz"] += osoba["kwestii"]
@@ -546,23 +564,6 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         ),
     )
 
-    # 5. rozmowy w dymkach
-    podzial = Podzial(wyj, "dymki", [str(part) for part in range(CZESCI_DYMKOW)])
-    kwestii_dymkow = rozmow_dymkow = 0
-    for key in sorted(obserwator.dymki, key=lambda value: (len(value), value)):
-        kwestie = []
-        for _czas, byt, text_id in sorted(obserwator.dymki[key], key=lambda item: item[0]):
-            if k(text_id) is None:
-                continue
-            seryjny = obserwator.seryjne.get(byt)
-            tabliczka = obserwator.tabliczki.get(seryjny[1] if seryjny else byt)
-            kwestie.append([byt, k(text_id), k(tabliczka[0]) if tabliczka else None, seryjny[0] if seryjny else None])
-        if kwestie:
-            kwestii_dymkow += len(kwestie)
-            rozmow_dymkow += 1
-            podzial.dodaj(str(int(key) % CZESCI_DYMKOW) if key.isdigit() else "0", {"d": key, "e": kwestie})
-    pliki["dymki"] = podzial.koniec()
-
     # 6. tabele powiązań
     def klucze(row: dict, pola: tuple[str, ...]) -> dict:
         """Wiersz bez pustych pól; pola tekstowe zamienione z id na klucz tekstu."""
@@ -617,12 +618,17 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             for no, row in sorted(obserwator.opcje_npc.items())
         ),
     )
+    def postac(no: int) -> dict:
+        nazwa, tytul = obserwator.tabliczki.get(no, (0, 0))
+        row = {"no": no, "n": k(nazwa), "t": k(tytul), "o": k(obserwator.opis_bytu(no))}
+        return {name: value for name, value in row.items() if value is not None}
+
     pliki["postacie"] = zapisz_jsonl(
         wyj / "postacie.jsonl",
         (
-            {"no": no, "n": k(nazwa), "t": k(tytul)}
-            for no, (nazwa, tytul) in sorted(obserwator.tabliczki.items())
-            if k(nazwa) or k(tytul)
+            row
+            for row in (postac(no) for no in sorted(set(obserwator.tabliczki) | set(obserwator.atrybut_bytu)))
+            if len(row) > 1
         ),
     )
     tozsamosci = defaultdict(list)
@@ -648,6 +654,14 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
     pliki["miejsca"] = zapisz_jsonl(
         wyj / "miejsca.jsonl",
         ({"no": no, **klucze(row, ("nazwa",))} for no, row in sorted(obserwator.miejsca.items(), key=lambda item: str(item[0]))),
+    )
+    pliki["przerywniki"] = zapisz_jsonl(
+        wyj / "przerywniki.jsonl",
+        (
+            {"no": no, **klucze(row, ("tekst", "streszczenie"))}
+            for no, row in sorted(obserwator.przerywniki.items(), key=lambda item: str(item[0]))
+            if k(row["tekst"]) or k(row["streszczenie"])
+        ),
     )
     pliki["zamiany_dialogow"] = zapisz_jsonl(
         wyj / "zamiany_dialogow.jsonl",
@@ -678,8 +692,6 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             "elementow_scen": elementy_scen,
             "kwestii": kwestii,
             "kwestii_zaleznych_od_plci_bohatera": len(warianty),
-            "rozmow_w_dymkach": rozmow_dymkow,
-            "kwestii_w_dymkach": kwestii_dymkow,
             "zadan": len(obserwator.zadania),
             "grup_zadan": len(obserwator.grupy),
             "pytan_z_wyborami": len(obserwator.wybory),
@@ -708,7 +720,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
     return manifest
 
 
-def opis_wejsc(katalogi: list[str], zh: list[str], en: list[str], baza: baza_gry.Baza) -> dict:
+def opis_wejsc(katalogi: list[str], zh: list[str], en: list[str], baza: baza_gry.Baza, opis: str = "") -> dict:
     """Inwentarz plików wejściowych: nazwy bez ścieżek, rozmiary i SHA-256."""
 
     def plik(path) -> dict:
@@ -716,6 +728,7 @@ def opis_wejsc(katalogi: list[str], zh: list[str], en: list[str], baza: baza_gry
         return {"plik": path.name, "bajtow": path.stat().st_size, "sha256": mapa_tekstow.sha256_pliku(path)}
 
     return {
+        "opis": opis,
         "mapa_zh": [plik(path) for path in zh],
         "mapa_en": [plik(path) for path in en],
         "manifest_bazy": plik(baza.sciezka_manifestu),
@@ -731,6 +744,7 @@ def main(argv=None) -> int:
     parser.add_argument("--zh", nargs="+", required=True, help="mapa zh_cn i jej warstwy _diff, w kolejności nakładania")
     parser.add_argument("--en", nargs="+", required=True, help="mapa en i jej warstwy _diff, w kolejności nakładania")
     parser.add_argument("--wyj", default="index")
+    parser.add_argument("--opis", default="", help="opis wersji gry do manifestu, np. numer buildu i data")
     arguments = parser.parse_args(argv)
 
     try:
@@ -741,7 +755,7 @@ def main(argv=None) -> int:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
     manifest = zbuduj(
-        baza, zh, en, Path(arguments.wyj), opis_wejsc(arguments.baza, arguments.zh, arguments.en, baza),
+        baza, zh, en, Path(arguments.wyj), opis_wejsc(arguments.baza, arguments.zh, arguments.en, baza, arguments.opis),
         log=lambda text: print(text, file=sys.stderr),
     )
     print(json.dumps({"ok": True, "liczby": manifest["liczby"], "pokrycie": manifest["pokrycie"]}, ensure_ascii=False, indent=1))
