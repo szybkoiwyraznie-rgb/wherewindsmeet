@@ -1,6 +1,35 @@
 # Patcher — jak działa i jak go używać
 
-Głównym narzędziem budującym zmienione mapy tekstów z magazynu tłumaczeń
+## Jedno polecenie z dowolnej zwrotki (`tools/one_click_patch.py`)
+
+Gdy spłynie od tłumacza częściowa albo pełna zwrotka (kilka plików `.md`,
+katalog albo archiwum `.zip` z częściowo wypełnionymi polami `PL:`) oraz zrzut
+z gry (`WWM_DANE_*.zip` ze zbieracza `collector/` lub rozpakowany katalog
+map), jedno polecenie buduje gotowy one-clickowy instalator `WWM_LATKA_PL.zip`
+dla Windows:
+
+```bash
+python3 tools/one_click_patch.py \
+  --zwrotka zwrotka_czesc1.zip [plik2.md ...] \
+  --dane-gry WWM_DANE_20261111_181913_13ff7ac1.zip \
+  --wyj-zip dist/WWM_LATKA_PL.zip
+```
+
+Skrypt w jednym przebiegu:
+1. importuje wyłącznie wypełnione linie `PL:` (puste `PL:` pomija bezpiecznie — obsługuje częściowe zwrotki),
+2. łączy zwrotkę z bazowym magazynem `--magazyn tlumaczenie` (o ile istnieje i nie podano `--tylko-zwrotka`; opcjonalnie utrwala go przez `--zapisz-magazyn`),
+3. odczytuje `RAPORT.json` i automatycznie wykrywa mapy `zh_cn`, docelowe mapy języka (`Package/...` i `LocalData/Patch/...`) oraz `steam_build_id`,
+4. przepisuje binarne mapy gry z obsługą wariantów płci i kolizji fabularnych oraz weryfikuje każdy wpis,
+5. pakuje wynik razem z `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) do jednego gotowego `WWM_LATKA_PL.zip`.
+
+W przypadku błędów w zwrotce (np. zgubione tokeny lub złamana linia) domyślnie
+przerywa z listą błędów w JSON (`exit code 2`); flaga `--pomin-bledne` pozwala
+zbudować łatkę wyłącznie z poprawnych wpisów. Zamiast `--dane-gry` można też
+podać jawnie `--zh`, `--mapa` i `--build-gry`.
+
+## Budowa łatki krok po kroku (`tools/zbuduj_latke.py`)
+
+Głównym narzędziem niskopoziomowym budującym zmienione mapy tekstów z magazynu tłumaczeń
 (`tlumaczenie/`) jest `tools/zbuduj_latke.py`. Wykorzystuje ono niższy poziom
 (`tools/apply_translation.py`), przepisując osobno mapę główną **oraz** jej
 warstwy `_diff`. Narzędzie działa lokalnie na kopii plików z gry i nigdy nie

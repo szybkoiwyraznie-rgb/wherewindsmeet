@@ -17,6 +17,7 @@ GUIDES = (
     "docs/BAZA_GRY.md",
     "docs/LOCALE_CONTAINER.md",
     "docs/PATCHER_WWM.md",
+    "docs/CZYTANKI_WWM.md",
     "docs/TEST_W_GRZE.md",
     "docs/OVERSEA_INWENTARZ.md",
     "paczki/v1/README.md",

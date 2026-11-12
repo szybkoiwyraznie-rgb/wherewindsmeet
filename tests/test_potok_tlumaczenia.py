@@ -17,7 +17,7 @@ from tests.test_zrodla_tekstow import FakeBaza
 from tools import audyt_aktualizacji, buduj_paczke, import_zwrotki, indeks, latka_testowa, mapa_tekstow, tlumaczenie, wyciag, zbuduj_latke
 
 ROOT = Path(__file__).resolve().parent.parent
-CLI_TOOLS = ("baza_gry", "wyciag", "indeks", "uklad_scen", "buduj_paczke", "import_zwrotki", "zbuduj_latke", "latka_testowa", "audyt_aktualizacji")
+CLI_TOOLS = ("baza_gry", "wyciag", "indeks", "uklad_scen", "buduj_paczke", "import_zwrotki", "zbuduj_latke", "latka_testowa", "audyt_aktualizacji", "one_click_patch", "buduj_czytanki")
 ZH_ALL = {**ZH, **ZH_EXTRA}
 EN_ALL = {**EN, **EN_EXTRA}
 

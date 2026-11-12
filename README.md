@@ -22,7 +22,7 @@ potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 - [Stan projektu](docs/STATUS.md) oraz [cel i kryteria akceptacji](docs/CEL.md)
 - [Pakiet dla tłumacza i potok aktualizacji](docs/PAKIET_TLUMACZA.md) — pełna instrukcja obsługi obiegu
 - [Baza danych gry (`MANIFEST` → `indexN` → `dataN`)](docs/BAZA_GRY.md)
-- [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher](docs/PATCHER_WWM.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
+- [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher i one-click ze zwrotki](docs/PATCHER_WWM.md), [czytanki `.md` z fabuły i encyklopedii](docs/CZYTANKI_WWM.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
 - [Dziennik eksperymentów](docs/EXPERIMENT_LOG.md) i [zestawienie dostaw z gry](docs/OVERSEA_INWENTARZ.md)
 - [Plan etapów](docs/ROADMAP.md), [wykonalność i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows](docs/WINDOWS_OPTIONS.md), [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
