@@ -397,6 +397,61 @@ class CzytankiTests(unittest.TestCase):
         self.assertEqual(rc4, 0)
         self.assertIn("Cześć z samej zwrotki!", (out_zwr / "01_watek_glowny.md").read_text(encoding="utf-8"))
 
+    def test_podglad_en_and_merges_identical_gender_variants(self):
+        # W trybie --podglad-en angielskie warianty T+3 i T+4 są różne (testuje rozdział),
+        # ale jeśli w magazynie PL przypiszemy identyczny tekst dla @T+3 i @T+4, tryb `oba` scali je w jedną linię.
+        mag_same = tlumaczenie.Magazyn()
+        mag_same.ustaw(f"@{T + 3:016x}", "To samo zdanie dla obu płci.")
+        mag_same.ustaw(f"@{T + 4:016x}", "To samo zdanie dla obu płci.")
+        mag_same_dir = self.root / "mag_same"
+        tlumaczenie.zapisz(mag_same_dir, mag_same)
+
+        out_same = self.root / "czytanki_same"
+        rc_same = buduj_czytanki.main(
+            [
+                "--indeks",
+                str(self.root / "index"),
+                "--magazyn",
+                str(mag_same_dir),
+                "--wyj-katalog",
+                str(out_same),
+            ]
+        )
+        self.assertEqual(rc_same, 0)
+        main_same = (out_same / "01_watek_glowny.md").read_text(encoding="utf-8")
+        self.assertEqual(main_same.count("To samo zdanie dla obu płci."), 1)
+        self.assertNotIn("[♂ Bohater]", main_same)
+
+        # Jawny tryb --podglad-en pokazuje angielskie teksty do oceny układu
+        out_en = self.root / "czytanki_en"
+        rc_en = buduj_czytanki.main(
+            [
+                "--indeks",
+                str(self.root / "index"),
+                "--podglad-en",
+                "--wyj-katalog",
+                str(out_en),
+            ]
+        )
+        self.assertEqual(rc_en, 0)
+        self.assertIn("Podgląd formy czytanek (EN", (out_en / "README.md").read_text(encoding="utf-8"))
+        self.assertIn("Chapter Two EN", (out_en / "01_watek_glowny.md").read_text(encoding="utf-8"))
+
+    def test_table_preserves_hex_ids_and_keeps_filenames_intact(self):
+        lines = buduj_czytanki.formatuj_tabele(
+            ["Nazwa", "Opis", "Pochodzenie"],
+            [
+                ["Przedmiot #102020", "A common fish lure.", ""],
+                ["#102022", "Grain or dough bait.", "Made using flour."],
+                ["02_zadania_poboczne_i_swiat.md", "Bardzo długi opis księgi zadań pobocznych pogrupowanych według kategorii gry.", "100/100"],
+            ],
+        )
+        rendered = "\n".join(lines)
+        self.assertIn("Przedmiot #102020", rendered)
+        self.assertIn("#102022", rendered)
+        self.assertIn("02_zadania_poboczne_i_swiat.md", rendered)
+        self.assertTrue(all(len(line) <= 120 for line in lines if line.startswith("|")))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -87,6 +87,7 @@ _RE_TAG_XML = re.compile(r"</?(?:LINK|IMAGE|COLOR|FONT|SIZE|STYLE|OUTLINE)(?:\s[
 _RE_KOLOR = re.compile(r"#(?:[0-9a-fA-F]{6}|[A-Z])")
 _RE_WIELE_SPACJI = re.compile(r"[ \t]{2,}")
 _RE_PUSTE_LINIE = re.compile(r"\n{3,}")
+_RE_SLOWA = re.compile(r"\w+")
 
 
 class CzytankiError(Exception):
@@ -114,8 +115,15 @@ def oczysc_tekst(text: str, *, jedna_linia: bool = False) -> str:
     return joined.strip()
 
 
-def _escapuj_komorke(text: str) -> str:
-    return text.replace("|", "\\|").strip()
+def _escapuj_komorke(text: str, *, jedna_linia: bool = False) -> str:
+    cleaned = text.replace("\r\n", "\n").replace("\r", "\n").replace("\t", " ")
+    lines = [_RE_WIELE_SPACJI.sub(" ", line).strip() for line in cleaned.split("\n")]
+    if jedna_linia:
+        joined = " ".join(part for part in lines if part)
+    else:
+        joined = "\n".join(lines)
+        joined = _RE_PUSTE_LINIE.sub("\n\n", joined)
+    return joined.replace("|", "\\|").strip()
 
 
 def formatuj_tabele(
@@ -131,12 +139,12 @@ def formatuj_tabele(
     if not wiersze:
         return []
 
-    # Najpierw normalizacja i wstępne obliczenie rozsądnych szerokości kolumn.
-    norm_headers = [_escapuj_komorke(oczysc_tekst(h, jedna_linia=True)) for h in naglowki]
+    # Najpierw normalizacja i wstępne obliczenie rozsądnych szerokości kolumn (bez ponownego cięcia #rrggbb na gotowych etykietach).
+    norm_headers = [_escapuj_komorke(h, jedna_linia=True) for h in naglowki]
     norm_rows: list[list[str]] = []
     for row in wiersze:
         padded = list(row[:cols]) + [""] * max(0, cols - len(row))
-        norm_rows.append([_escapuj_komorke(oczysc_tekst(str(cell))) for cell in padded])
+        norm_rows.append([_escapuj_komorke(str(cell)) for cell in padded])
 
     # Ile miejsca zostaje na treść kolumn poza separatorami `| ` + ` | ` + ` |`
     overhead = 3 * cols + 1
@@ -155,7 +163,7 @@ def formatuj_tabele(
     total = sum(widths)
     if total > budget:
         # Najpierw zachowujemy pełną szerokość bez rozcinania pojedynczych długich wyrazów (np. nazw plików),
-        # oraz krótkich kolumn do 34 znaków, o ile mieści się to w budżecie wiersza.
+        # oraz krótkich kolumn do 42 znaków, o ile mieści się to w budżecie wiersza.
         longest_tokens = [
             max(
                 [len(norm_headers[i])]
@@ -164,7 +172,7 @@ def formatuj_tabele(
             for i in range(cols)
         ]
         soft_floor = [
-            min(natural_widths[i], max(len(norm_headers[i]), min(34, max(longest_tokens[i], 24))))
+            min(natural_widths[i], max(len(norm_headers[i]), min(42, max(longest_tokens[i], 24))))
             for i in range(cols)
         ]
         if sum(soft_floor) <= budget:
@@ -249,6 +257,38 @@ class ZrodloPL:
         if done is None:
             return None
         cleaned = oczysc_tekst(done, jedna_linia=jedna_linia)
+        return cleaned if cleaned else None
+
+    def klucz_bazowy(self, slot: str) -> str:
+        if slot.startswith("@"):
+            var = self.ix.warianty.get(slot[1:])
+            if var and var.get("k"):
+                return var["k"]
+        return slot
+
+
+class ZrodloPodgladuEN:
+    """Jawny tryb podglądu formy czytanek w języku angielskim (wyłącznie z flagą `--podglad-en`)."""
+
+    jest_podgladem_en = True
+
+    def __init__(self, ix: indeks_mod.Indeks):
+        self.ix = ix
+
+    def ma(self, slot: str | None) -> bool:
+        return self.tekst(slot) is not None
+
+    def tekst(self, slot: str | None, *, jedna_linia: bool = False) -> str | None:
+        if not slot:
+            return None
+        val = self.ix.en(slot)
+        if not val and slot.startswith("@"):
+            var = self.ix.warianty.get(slot[1:])
+            if var and var.get("k"):
+                val = self.ix.en(var["k"])
+        if not val:
+            return None
+        cleaned = oczysc_tekst(val, jedna_linia=jedna_linia)
         return cleaned if cleaned else None
 
     def klucz_bazowy(self, slot: str) -> str:
@@ -376,6 +416,7 @@ class BudowniczyCzytanek:
         for task in ix.zadania.values():
             for lst in (task.get("przerywniki") or {}).values():
                 self.przerywniki_w_zadaniu_add(lst)
+        self._kandydaci_wzmianek: list[tuple[str, str, str, tuple[str, ...]]] | None = None
 
     def przerywniki_w_zadaniu_add(self, lst) -> None:
         self.przerywniki_w_zadaniach.update(lst)
@@ -492,7 +533,7 @@ class BudowniczyCzytanek:
 
     # -------------------------------------------------------- renderowanie sceny
 
-    def _renderuj_scene(self, numer_sceny: int, miejsce) -> tuple[list[str], int, int, set[int]]:
+    def _renderuj_scene(self, numer_sceny: int, miejsce, *, poziom_naglowka: int = 4) -> tuple[list[str], int, int, set[int]]:
         """Renderuje pojedynczą scenę. Zwraca (linie, przetłumaczonych, wszystkich, zbiór_id_postaci)."""
         scena = self.ix.sceny[numer_sceny]
         slots: list[str] = []
@@ -521,11 +562,11 @@ class BudowniczyCzytanek:
                 postacie_w_scenie.add(self.encyklopedia_po_kluczu[person[3]]["id"])
 
         lines: list[str] = []
-        nagl = f"#### Scena — dialog {numer_sceny}"
+        nagl = f"{'#' * poziom_naglowka} Scena — dialog {numer_sceny}"
         miejsca_txt = [self._miejsce(m) for m in (scena.get("m") or [])[:3]]
         miejsca_txt = [m for m in miejsca_txt if m]
         if miejsce.moment == "numeracja":
-            nagl += " *(kolejność przybliżona według numeracji gry)*"
+            nagl += " *(kolejność przybliżona)*"
         lines.append(nagl)
         if miejsca_txt:
             lines.append(f"*Miejsce: {', '.join(miejsca_txt)}*")
@@ -533,14 +574,36 @@ class BudowniczyCzytanek:
             lines.append(f"*Uwaga: przetłumaczono {done} z {total} wypowiedzi w tej scenie.*")
         lines.append("")
 
-        blok_wiersze: list[str] = []
+        surowe_wpisy: list[tuple[str, int, str, str, str, str]] = []
         for el, slot, prefix in active_elements:
             kind = el[0]
             txt = self._tekst(slot, fallback_label="kwestii")
             if txt is None:
                 continue
+            wariant = el[3] if len(el) > 3 and el[3] else 0
+            bazowy = el[2]
+            mowca = self._mowca(scena, el[1], el[5] if len(el) > 5 else None) if kind == "k" else ""
+            surowe_wpisy.append((kind, wariant, bazowy, mowca, txt, prefix))
+
+        blok_wiersze: list[str] = []
+        idx = 0
+        while idx < len(surowe_wpisy):
+            kind, wariant, bazowy, mowca, txt, prefix = surowe_wpisy[idx]
+            if (
+                self.plec == "oba"
+                and idx + 1 < len(surowe_wpisy)
+                and {wariant, surowe_wpisy[idx + 1][1]} == {1, 2}
+                and surowe_wpisy[idx + 1][0] == kind
+                and surowe_wpisy[idx + 1][2] == bazowy
+                and surowe_wpisy[idx + 1][3] == mowca
+                and surowe_wpisy[idx + 1][4] == txt
+            ):
+                prefix = ""
+                idx += 2
+            else:
+                idx += 1
+
             if kind == "k":
-                mowca = self._mowca(scena, el[1], el[5] if len(el) > 5 else None)
                 akapit = txt.replace("\n", " ")
                 blok_wiersze.append(f"**{prefix}{mowca}:** {akapit}")
             elif kind in ("p", "o", "i"):
@@ -640,33 +703,48 @@ class BudowniczyCzytanek:
                 lines.append(f"- *Ponowne wystąpienia znanych postaci:* {', '.join(powrotne_postacie)}")
             lines.append("")
 
-        # Wzmiankowane w polskim tekście rozdziału przedmioty lub techniki (dopasowanie ostrożne >= 5 znaków).
-        znalezione_rzeczy: list[tuple[str, str, str]] = []
-        low_text = teksty_rozdzialu.lower()
-        for tbl_name, kategoria in (
-            ("equip_items", "Wyposażenie"),
-            ("stuff_items", "Przedmiot"),
-            ("kongfu", "Styl walki"),
-            ("xinfa", "Sztuka wewnętrzna"),
-            ("jianghu_skills", "Umiejętność Jianghu"),
-        ):
-            for rid, cols in sorted(self.tabele.get(tbl_name, {}).items(), key=lambda x: _naturalny(x[0])):
-                n_kl = cols.get("name") or cols.get("jianghu_skill_name")
-                if not n_kl:
-                    continue
-                pl_n = self.pl.tekst(n_kl, jedna_linia=True)
-                if not pl_n or len(pl_n) < 5 or pl_n in wzmiankowane_przedmioty:
-                    continue
-                if re.search(rf"(?<!\w){re.escape(pl_n.lower())}(?!\w)", low_text):
+        # Wzmiankowane w tekście rozdziału przedmioty lub techniki (dopasowanie z zachowaniem wielkości liter,
+        # bez jednosłownych nazw pospolitych z tabeli stuff_items, z jednorazowym cache dla szybkości).
+        if self._kandydaci_wzmianek is None:
+            kandydaci: list[tuple[str, str, str, tuple[str, ...]]] = []
+            for tbl_name, kategoria in (
+                ("equip_items", "Wyposażenie"),
+                ("stuff_items", "Przedmiot"),
+                ("kongfu", "Styl walki"),
+                ("xinfa", "Sztuka wewnętrzna"),
+                ("jianghu_skills", "Umiejętność Jianghu"),
+            ):
+                for _rid, cols in sorted(self.tabele.get(tbl_name, {}).items(), key=lambda x: _naturalny(x[0])):
+                    n_kl = cols.get("name") or cols.get("jianghu_skill_name")
+                    if not n_kl:
+                        continue
+                    pl_n = self.pl.tekst(n_kl, jedna_linia=True)
+                    if not pl_n or len(pl_n) < 5:
+                        continue
+                    toks = tuple(_RE_SLOWA.findall(pl_n))
+                    if not toks:
+                        continue
+                    if tbl_name == "stuff_items" and len(toks) < 2:
+                        continue
                     d_kl = cols.get("brief_describe_str") or cols.get("describe_str") or cols.get("description") or cols.get("jianghu_brief_description")
                     pl_d = self.pl.tekst(d_kl, jedna_linia=True) if d_kl else None
-                    if pl_d:
-                        znalezione_rzeczy.append((pl_n, kategoria, pl_d))
-                        wzmiankowane_przedmioty.add(pl_n)
+                    if not pl_d:
+                        continue
+                    kandydaci.append((pl_n, kategoria, pl_d, toks))
+            self._kandydaci_wzmianek = kandydaci
+
+        znalezione_rzeczy: list[tuple[str, str, str]] = []
+        word_set = set(_RE_SLOWA.findall(teksty_rozdzialu))
+        for pl_n, kategoria, pl_d, toks in self._kandydaci_wzmianek:
+            if pl_n in wzmiankowane_przedmioty:
+                continue
+            if not all(tok in word_set for tok in toks):
+                continue
+            if re.search(rf"(?<!\w){re.escape(pl_n)}(?!\w)", teksty_rozdzialu):
+                znalezione_rzeczy.append((pl_n, kategoria, pl_d))
+                wzmiankowane_przedmioty.add(pl_n)
                 if len(znalezione_rzeczy) >= 8:
                     break
-            if len(znalezione_rzeczy) >= 8:
-                break
 
         if znalezione_rzeczy:
             lines.append("#### Wzmiankowane przedmioty i techniki")
@@ -739,7 +817,7 @@ class BudowniczyCzytanek:
 
         def dodaj_ciag(tytul_h2: str, ciag: list[dict]) -> None:
             nonlocal done_total, all_total
-            filtrowane: list[tuple[dict, str]] = []
+            filtrowane: list[tuple[dict, str, str]] = []
             for row in ciag:
                 p = plec_wiersza.get(row["wiersz"], "")
                 if p == "bohaterka" and self.plec == "bohater":
@@ -747,8 +825,8 @@ class BudowniczyCzytanek:
                 if p == "bohater" and self.plec == "bohaterka":
                     continue
                 pref = "[♂ Bohater] " if (p == "bohater" and self.plec == "oba") else ("[♀ Bohaterka] " if (p == "bohaterka" and self.plec == "oba") else "")
-                filtrowane.append((row, pref))
-            d_c, t_c = self._stat_slotow([r["k"] for r, _ in filtrowane])
+                filtrowane.append((row, p, pref))
+            d_c, t_c = self._stat_slotow([r["k"] for r, _, _ in filtrowane])
             done_total += d_c
             all_total += t_c
             if not self._ma_dopuszczalne_pokrycie(d_c, t_c):
@@ -756,16 +834,32 @@ class BudowniczyCzytanek:
             lines.append(f"## {tytul_h2} ({d_c}/{t_c} napisów)")
             lines.append("")
             last_vo = ""
-            for row, pref in filtrowane:
+            i = 0
+            while i < len(filtrowane):
+                row, p, pref = filtrowane[i]
                 txt = self._tekst(row["k"], fallback_label="napisu", jedna_linia=True)
                 if not txt:
+                    i += 1
                     continue
+                # Jeśli kolejne dwa wiersze to para płci z identycznym tekstem, scal w jedną linię.
+                merged_pair = False
+                if self.plec == "oba" and p and i + 1 < len(filtrowane):
+                    row2, p2, _ = filtrowane[i + 1]
+                    if {p, p2} == {"bohater", "bohaterka"}:
+                        txt2 = self._tekst(row2["k"], fallback_label="napisu", jedna_linia=True)
+                        if txt2 == txt:
+                            merged_pair = True
+                            pref = ""
+                i += 2 if merged_pair else 1
+
                 aud = row.get("audio") or ""
-                vo = "_".join([p for p in aud.split("_") if not p.isdigit()][:3]) if aud else ""
+                vo = "_".join([part for part in aud.split("_") if not part.isdigit()][:3]) if aud else ""
                 if vo and vo != last_vo and last_vo:
                     lines.append("")
                 last_vo = vo
-                if "_player_m_" in aud or "_pma_" in aud:
+                if merged_pair:
+                    mowca = "Gracz" if ("_player_" in aud or "_pma_" in aud or "_pfa_" in aud or "_zhujue_" in aud) else ""
+                elif "_player_m_" in aud or "_pma_" in aud:
                     mowca = "Gracz (bohater)"
                 elif "_player_f_" in aud or "_pfa_" in aud:
                     mowca = "Gracz (bohaterka)"
@@ -922,7 +1016,11 @@ class BudowniczyCzytanek:
                         zad_sceny_lines.append("")
 
                 for m in miejsca_sceny:
-                    s_lines, sd, st, s_chars = self._renderuj_scene(m.dialog, m)
+                    s_lines, sd, st, s_chars = self._renderuj_scene(
+                        m.dialog,
+                        m,
+                        poziom_naglowka=4 if tylko_watek_glowny else 5,
+                    )
                     zad_done += sd
                     zad_all += st
                     postacie_rozdzialu.update(s_chars)
@@ -1009,19 +1107,28 @@ class BudowniczyCzytanek:
                 rozdzial_zadan += 1
 
                 if last_meta and last_meta[0] == tyt and nazwa_z is not None:
+                    nowe_etapy = False
+                    if (
+                        len(rozdzial_body) >= 2
+                        and rozdzial_body[-1] == ""
+                        and rozdzial_body[-2].startswith(("- **Kolejny etap / cel:**", "- **Dalszy opis:**"))
+                    ):
+                        rozdzial_body.pop()
                     if cel_z and cel_z != last_meta[1]:
                         rozdzial_body.append(f"- **Kolejny etap / cel:** {cel_z}")
+                        nowe_etapy = True
                     if opis_z and opis_z != last_meta[2]:
                         rozdzial_body.append(f"- **Dalszy opis:** {opis_z}")
+                        nowe_etapy = True
                     if zad_sceny_lines:
-                        rozdzial_body.append("")
+                        if rozdzial_body and rozdzial_body[-1] != "":
+                            rozdzial_body.append("")
                         rozdzial_body.extend(zad_sceny_lines)
-                    elif not (cel_z and cel_z != last_meta[1]) and not (opis_z and opis_z != last_meta[2]):
-                        pass
-                    else:
+                    elif nowe_etapy:
                         rozdzial_body.append("")
                 else:
-                    rozdzial_body.append(f"### {tyt}")
+                    nagl_zad = "### " if tylko_watek_glowny else "#### "
+                    rozdzial_body.append(f"{nagl_zad}{tyt}")
                     miejsce_z = self._miejsce(trow["przestrzen"]) if trow.get("przestrzen") is not None else None
                     if miejsce_z:
                         rozdzial_body.append(f"- **Miejsce:** {miejsce_z}")
@@ -1099,7 +1206,14 @@ class BudowniczyCzytanek:
         done_total = 0
         all_total = 0
 
-        def sekcja_tabelowa(tytul: str, tbl: str, map_col: list[tuple[str, str]], *, jak_lista: bool = False) -> None:
+        def sekcja_tabelowa(
+            tytul: str,
+            tbl: str,
+            map_col: list[tuple[str, str]],
+            *,
+            jak_lista: bool = False,
+            domyslny_prefiks: str = "Wpis",
+        ) -> None:
             nonlocal done_total, all_total
             rows = self._zbierz_wiersze_tabeli(tbl)
             if not rows:
@@ -1116,7 +1230,7 @@ class BudowniczyCzytanek:
                 if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
                     continue
                 if jak_lista:
-                    nazwa = self._tekst(cols.get(map_col[0][0]), fallback_label="tytułu", jedna_linia=True) or f"Wpis #{rid}"
+                    nazwa = self._tekst(cols.get(map_col[0][0]), fallback_label="tytułu", jedna_linia=True) or f"{domyslny_prefiks} #{rid}"
                     sekcja_linie.append(f"### {nazwa}")
                     for col_key, label in map_col[1:]:
                         val = self._tekst(cols.get(col_key), fallback_label=label.lower())
@@ -1152,6 +1266,7 @@ class BudowniczyCzytanek:
             "world_view_region_info",
             [("name", "Region"), ("introduction", "Opis regionu")],
             jak_lista=True,
+            domyslny_prefiks="Region",
         )
         sekcja_tabelowa(
             "Frakcje i ugrupowania (Shili)",
@@ -1163,17 +1278,17 @@ class BudowniczyCzytanek:
                 ("introduction_long", "Historia i charakterystyka"),
             ],
             jak_lista=True,
+            domyslny_prefiks="Frakcja",
         )
         sekcja_tabelowa(
             "Linie dziedzictwa sekt",
             "school_sect_chuancheng_data",
             [
                 ("school_name", "Sekta"),
-                ("generation_description_1", "Pokolenie I"),
-                ("generation_description_2", "Pokolenie II"),
-                ("generation_description_3", "Pokolenie III"),
+                *[(f"generation_description_{i}", f"Pokolenie {i}") for i in range(1, 11)],
             ],
             jak_lista=True,
+            domyslny_prefiks="Sekta",
         )
 
         # Postacie z encyklopedii (`ix.encyklopedia` + `world_view_person_info`)
@@ -1321,7 +1436,7 @@ class BudowniczyCzytanek:
                 t_s += t_r
                 if not self._ma_dopuszczalne_pokrycie(d_r, t_r):
                     continue
-                nazwa = self._tekst(cols.get("name"), fallback_label="nazwy", jedna_linia=True) or f"#{rid}"
+                nazwa = self._tekst(cols.get("name"), fallback_label="nazwy", jedna_linia=True) or f"Przedmiot #{rid}"
                 opis_kr = self._tekst(cols.get("brief_describe_str"), jedna_linia=True)
                 opis_dl = self._tekst(cols.get("describe_str"), jedna_linia=True)
                 historia = self._tekst(cols.get("story_describe_str"), jedna_linia=True)
@@ -1395,7 +1510,7 @@ class BudowniczyCzytanek:
                 if not wiersz[0] and not any(wiersz[1:]):
                     continue
                 if not wiersz[0]:
-                    wiersz[0] = f"#{rid}"
+                    wiersz[0] = f"{kolumny[0][1]} #{rid}"
                 wiersze_tab.append(wiersz)
             done_total += d_s
             all_total += t_s
@@ -1476,6 +1591,7 @@ class BudowniczyCzytanek:
                 opis="Główna linia fabularna w kolejności rozdziałów, łańcuchów zadań, scen i wyborów.",
                 wstep=[
                     "Główna linia fabularna ułożona według rozdziałów oraz łańcuchów zależności zadań z gry.",
+                    "Sceny bez pewnego zaczepienia zdarzeniem oznaczono `*(kolejność przybliżona)*` (według numeracji dialogów gry).",
                     "Przy każdym rozdziale znajdziesz również pierwsze pojawienia bohaterów z encyklopedii oraz wzmiankowane pojęcia.",
                 ],
                 tylko_watek_glowny=True,
@@ -1487,7 +1603,7 @@ class BudowniczyCzytanek:
                 wstep=[
                     "> **Uwaga dla czytelnika:** Zadania w tej księdze (Spotkania, Kampanie, Dziedzictwo Jianghu, Sprawy świata itp.)",
                     "> są uporządkowane według kategorii i wewnętrznych łańcuchów zależności, lecz w otwartym świecie gry można je",
-                    "> podejmować w dowolnej kolejności.",
+                    "> podejmować w dowolnej kolejności. Sceny bez pewnego punktu zaczepienia oznaczono `*(kolejność przybliżona)*`.",
                 ],
                 tylko_watek_glowny=False,
             ),
@@ -1564,6 +1680,7 @@ def zapisz_czytanki(
     plec: str = "oba",
     wersja: str = "v1",
     zrodlo_przekladow: str = "",
+    podglad_en: bool = False,
 ) -> dict:
     """Zapisz pliki czytanek, `README.md` oraz opcjonalny deterministyczny ZIP."""
     if wyj_katalog.exists():
@@ -1598,23 +1715,35 @@ def zapisz_czytanki(
         "bohaterka": "ścieżka bohaterki (wariant żeński)",
     }[plec]
 
+    zasada_jezyka = (
+        "- **Tryb techniczny (`--podglad-en`):** **podgląd angielski** z bazy gry wyłącznie do oceny formy i układu."
+        if podglad_en
+        else "- **Zasady tekstu:** wyłącznie język polski — brak automatycznego cofania do angielskiego ani chińskiego."
+    )
+    tytul_glowny = (
+        f"# Where Winds Meet — Podgląd formy czytanek (EN, {wersja})"
+        if podglad_en
+        else f"# Where Winds Meet — Czytanki polskie ({wersja})"
+    )
+    kol_pokrycia = "Pokrycie EN" if podglad_en else "Pokrycie PL"
+
     readme: list[str] = [
-        f"# Where Winds Meet — Czytanki polskie ({wersja})",
+        tytul_glowny,
         "",
         "Zestaw plików `.md` do czytania fabuły i encyklopedii świata gry poza grą",
         "(w edytorze tekstu lub przeglądarce Markdown). Wygenerowano automatycznie z wyciągu",
-        "`index/` oraz polskich przekładów gry.",
+        "`index/` oraz polskich przekładów gry." if not podglad_en else "`index/` w trybie podglądu angielskiego.",
         "",
         f"- **Data wygenerowania:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
         f"- **Zakres wydania:** {zakres} ({zakres_opis})",
         f"- **Wariant płci bohatera:** {plec} ({plec_opis})",
         *([f"- **Źródło przekładów:** {zrodlo_przekladow}"] if zrodlo_przekladow else []),
-        "- **Zasady tekstu:** wyłącznie język polski — brak automatycznego cofania do angielskiego ani chińskiego.",
+        zasada_jezyka,
         "",
         "## Spis plików",
         "",
         *formatuj_tabele(
-            ["Plik", "Zawartość", "Pokrycie PL", "Rozmiar"],
+            ["Plik", "Zawartość", kol_pokrycia, "Rozmiar"],
             [
                 [
                     row["plik"],
@@ -1723,6 +1852,7 @@ def main(argv: list[str] | None = None) -> int:
         help="wariant płci w dialogach zależnych od płci gracza",
     )
     parser.add_argument("--z-otoczeniem", action="store_true", help="dołącz dodatkowy plik rozmów poza zadaniami")
+    parser.add_argument("--podglad-en", action="store_true", help="tryb podglądu formy z angielskim tekstem z index/ (bez tłumaczenia PL)")
     parser.add_argument("--podziel-powyzej", type=int, default=DOMYSLNY_LIMIT_BAJTOW, help="limit bajtów pliku przed podziałem na części (0 = nie dziel)")
     parser.add_argument("--wersja", default="v1", help="etykieta wersji w README (domyślnie: v1)")
     parser.add_argument("--wyj-katalog", default="dist/czytanki", help="katalog docelowy plików .md")
@@ -1732,14 +1862,20 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         ix = indeks_mod.wczytaj(args.indeks)
-        magazyn, tylko_klucze, zrodlo_opis = _wczytaj_przeklady(
-            ix,
-            magazyn_dir=args.magazyn,
-            zwrotki=args.zwrotka,
-            tylko_zwrotka=args.tylko_zwrotka,
-            pomin_bledne=args.pomin_bledne,
-        )
-        pl = ZrodloPL(ix, magazyn, tylko_klucze=tylko_klucze)
+        if args.podglad_en:
+            if args.zwrotka or args.tylko_zwrotka:
+                raise CzytankiError("--podglad-en nie łączy się z --zwrotka ani --tylko-zwrotka")
+            pl = ZrodloPodgladuEN(ix)
+            zrodlo_opis = "podgląd angielski (index/)"
+        else:
+            magazyn, tylko_klucze, zrodlo_opis = _wczytaj_przeklady(
+                ix,
+                magazyn_dir=args.magazyn,
+                zwrotki=args.zwrotka,
+                tylko_zwrotka=args.tylko_zwrotka,
+                pomin_bledne=args.pomin_bledne,
+            )
+            pl = ZrodloPL(ix, magazyn, tylko_klucze=tylko_klucze)
         builder = BudowniczyCzytanek(
             ix,
             pl,
@@ -1758,6 +1894,7 @@ def main(argv: list[str] | None = None) -> int:
             plec=args.plec,
             wersja=args.wersja,
             zrodlo_przekladow=zrodlo_opis,
+            podglad_en=args.podglad_en,
         )
     except (CzytankiError, import_zwrotki.ZwrotkaError, indeks_mod.IndeksError, magazyn_mod.MagazynError, OSError, ValueError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False, indent=1))

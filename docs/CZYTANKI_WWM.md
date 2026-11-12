@@ -33,10 +33,14 @@ Najważniejsze przełączniki:
   tylko w 100% ukończone sekcje; `wszystko` buduje pełny szkielet z jawnymi
   markerami `[Brak polskiego tekstu (...)]`.
 - `--plec oba | bohater | bohaterka` — obsługa kwestii zależnych od płci postaci
-  gracza (`@id` w dialogach i pary w napisach cutscen).
+  gracza (`@id` w dialogach i pary w napisach cutscen; w trybie `oba` identyczne
+  kwestie obojga wariantów są scalane w jedną linię).
 - `--z-otoczeniem` — dołącza katalog dialogów poza zadaniami (`06_rozmowy_otoczenia.md`).
 - `--podziel-powyzej 1500000` — automatycznie dzieli księgi większe niż limit bajtów
   na części (`*_czesc_01.md`, ...) w granicach sekcji.
+- `--podglad-en` — jawny tryb podglądu samej formy i układu czytanek na tekstach
+  angielskich z `index/` (do oceny przed rozpoczęciem tłumaczenia; domyślnie
+  narzędzie działa wyłącznie po polsku).
 
 ## Struktura wyjściowych czytanek
 
