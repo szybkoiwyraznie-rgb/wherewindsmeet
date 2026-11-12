@@ -35,10 +35,12 @@ from pathlib import Path
 try:
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 
 MAKS_NA_LISCIE = 500
 
@@ -175,6 +177,7 @@ def indeks_z_gita(ref: str, katalog: Path, repo: Path) -> Path:
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Porównaj dwa wyciągi index/ po aktualizacji gry.")
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--stary", help="katalog poprzedniego wyciągu")
@@ -195,9 +198,9 @@ def main(argv=None) -> int:
         return 1
     out = Path(arguments.wyj)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "audyt.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    (out / "nowe_sloty.txt").write_text("".join(slot + "\n" for slot in slots), encoding="utf-8")
-    (out / "AUDYT.md").write_text(opis(report), encoding="utf-8")
+    (out / "audyt.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    (out / "nowe_sloty.txt").write_text("".join(slot + "\n" for slot in slots), encoding="utf-8", newline="\n")
+    (out / "AUDYT.md").write_text(opis(report), encoding="utf-8", newline="\n")
     print(json.dumps({"ok": True, "teksty": {k: v for k, v in report["teksty"].items() if k != "nowe_wg_tabeli"}, "sceny": {k: v for k, v in report["sceny"].items() if not k.startswith("lista")}, "do_tlumacza": report["do_tlumacza"]}, ensure_ascii=False, indent=1))
     return 0
 

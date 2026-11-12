@@ -40,9 +40,11 @@ from typing import Iterator
 
 try:  # import jako moduł
     from tools import apply_translation as patcher
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import apply_translation as patcher
+    from tools import wypisz
 
 
 class BazaError(Exception):
@@ -521,6 +523,7 @@ def sprawdz(baza: Baza, postep=None) -> dict:
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Czytnik bazy danych gry (MANIFEST/index/data).")
     parser.add_argument("katalogi", nargs="+", help="katalogi z plikami gry; późniejszy przykrywa")
     parser.add_argument("--manifest", help="plik MANIFEST (domyślnie z ostatniego katalogu)")

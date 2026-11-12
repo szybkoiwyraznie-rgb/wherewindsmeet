@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -14,6 +16,8 @@ from tests.test_wyciag_indeks import EN, ZH, K, T
 from tests.test_zrodla_tekstow import FakeBaza
 from tools import audyt_aktualizacji, buduj_paczke, import_zwrotki, indeks, mapa_tekstow, tlumaczenie, wyciag, zbuduj_latke
 
+ROOT = Path(__file__).resolve().parent.parent
+CLI_TOOLS = ("baza_gry", "wyciag", "indeks", "uklad_scen", "buduj_paczke", "import_zwrotki", "zbuduj_latke", "audyt_aktualizacji")
 ZH_ALL = {**ZH, **ZH_EXTRA}
 EN_ALL = {**EN, **EN_EXTRA}
 
@@ -51,6 +55,22 @@ class PipelineTests(unittest.TestCase):
             for path in (self.root / "paczka" / part).glob("*.md"):
                 (folder / part / path.name).write_text(fill(path.read_text(encoding="utf-8"), translations), encoding="utf-8")
         return folder
+
+    def test_command_line_tools_write_utf8_when_the_pipe_has_a_legacy_code_page(self):
+        """Windows daje przekierowanemu wyjściu stronę kodową bez polskich znaków."""
+        env = {**os.environ, "PYTHONIOENCODING": "cp1252", "PYTHONUTF8": "0"}
+        for name in CLI_TOOLS:
+            with self.subTest(tool=name):
+                result = subprocess.run([sys.executable, str(ROOT / "tools" / f"{name}.py"), "--help"], capture_output=True, env=env)
+                self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+                self.assertIn("usage:", result.stdout.decode("utf-8"))
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "buduj_paczke.py"), "--indeks", str(self.root / "index"), "--wyj", str(self.root / "paczka_cli"),
+             "--wersja", "1", "--data", "2026-01-01", "--bez-zip"],
+            capture_output=True, env=env,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+        self.assertEqual(json.loads(result.stdout.decode("utf-8"))["rodzaj"], "pełny")
 
     def test_import_accepts_good_entries_and_reports_bad_ones(self):
         folder = self.returned(

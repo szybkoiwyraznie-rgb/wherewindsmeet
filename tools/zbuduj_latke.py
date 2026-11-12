@@ -39,6 +39,7 @@ try:
     from tools import locale_records as records
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import apply_translation as patcher
@@ -46,6 +47,7 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import locale_records as records
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 
 
 class LatkaError(Exception):
@@ -111,6 +113,7 @@ def przepisz(path: Path, cel: Path, zh: dict[int, str], magazyn, warianty, rodze
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Zbuduj łatkę: mapy tekstów z polskimi przekładami.")
     parser.add_argument("--indeks", default="index")
     parser.add_argument("--magazyn", default="tlumaczenie")
@@ -147,7 +150,7 @@ def main(argv=None) -> int:
         "pliki": files,
         "uwaga": "łatka nie była sprawdzona w grze; przed podmianą plików zrób kopię oryginałów",
     }
-    (out / "latka.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (out / "latka.json").write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps({"ok": True, **report}, ensure_ascii=False, indent=1))
     return 0
 

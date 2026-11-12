@@ -28,9 +28,11 @@ from typing import Iterator, NamedTuple
 
 try:
     from tools import mapa_tekstow
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import mapa_tekstow
+    from tools import wypisz
 
 FORMAT = "wwm-indeks-v2"
 
@@ -181,6 +183,7 @@ def sprawdz_pliki(katalog) -> list[str]:
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Opis wyciągu index/ albo jeden tekst po kluczu.")
     parser.add_argument("katalog", nargs="?", default="index")
     parser.add_argument("--klucz", help="pokaż tekst o tym kluczu")

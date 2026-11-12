@@ -39,12 +39,14 @@ try:
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
+    from tools import wypisz
 
 LIMIT_PLIKU = 1_500_000  # bajtów na jeden plik .md
 WCIECIE = "   "
@@ -836,6 +838,7 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Pakiet dla tłumacza z wyciągu index/.")
     parser.add_argument("--indeks", default="index")
     parser.add_argument("--wyj", required=True)

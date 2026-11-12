@@ -50,9 +50,11 @@ from pathlib import Path
 
 try:
     from tools import baza_gry, mapa_tekstow, sceny_z_bazy, zrodla_tekstow
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import baza_gry, mapa_tekstow, sceny_z_bazy, zrodla_tekstow
+    from tools import wypisz
 
 FORMAT = "wwm-indeks-v2"
 LIMIT_PLIKU = 10 * 1024 * 1024  # limit repozytorium na jeden plik
@@ -462,6 +464,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     log(f"teksty: {len(teksty)} unikalnych, {len(w_zakresie)} id w zakresie ({time.time() - start:.0f} s)")
 
@@ -479,6 +482,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     podzial = Podzial(wyj, "sceny", [str(part) for part in range(CZESCI_SCEN)])
     mowcy = Counter()
@@ -695,7 +699,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             "zadan": len(obserwator.zadania),
             "grup_zadan": len(obserwator.grupy),
             "pytan_z_wyborami": len(obserwator.wybory),
-            "postaci_z_tabliczka": pliki["postacie"]["wierszy"],
+            "bytow_z_nazwa_tytulem_lub_opisem": pliki["postacie"]["wierszy"],
             "postaci_w_encyklopedii": len(obserwator.osoby),
             "miejsc": len(obserwator.miejsca),
         },
@@ -715,7 +719,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         },
         "pliki": pliki,
     }
-    (wyj / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (wyj / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     log(f"gotowe ({time.time() - start:.0f} s)")
     return manifest
 
@@ -738,6 +742,7 @@ def opis_wejsc(katalogi: list[str], zh: list[str], en: list[str], baza: baza_gry
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Wyciąg z bazy gry do katalogu index/ (wwm-indeks-v2).")
     parser.add_argument("--baza", nargs="+", required=True, help="katalogi z MANIFEST, indexN, dataN (późniejszy przykrywa)")
     parser.add_argument("--manifest", help="plik MANIFEST, jeśli nie ten z ostatniego katalogu")

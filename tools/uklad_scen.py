@@ -28,12 +28,14 @@ from dataclasses import dataclass, field
 
 try:
     from tools import indeks as indeks_mod
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     import sys
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import indeks as indeks_mod
+    from tools import wypisz
 
 ODSTEP = 5
 TYP_WATKU_GLOWNEGO = 1
@@ -312,6 +314,7 @@ def uloz(ix) -> Uklad:
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     import argparse
     import json
 

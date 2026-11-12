@@ -37,11 +37,13 @@ try:
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import tlumaczenie as magazyn_mod
+    from tools import wypisz
 
 MAKS_PROBLEMOW_W_RAPORCIE = 2000
 
@@ -164,6 +166,7 @@ def importuj(ix, pliki, magazyn: magazyn_mod.Magazyn, *, mimo_tokenow: bool = Fa
 
 
 def main(argv=None) -> int:
+    wypisz.utf8()
     parser = argparse.ArgumentParser(description="Import zwrotki tłumacza do magazynu przekładów.")
     parser.add_argument("zwrotka", nargs="+", help="katalog, plik .md albo zip ze zwrotką")
     parser.add_argument("--indeks", default="index")
@@ -183,7 +186,7 @@ def main(argv=None) -> int:
         return 1
     if arguments.raport:
         Path(arguments.raport).parent.mkdir(parents=True, exist_ok=True)
-        Path(arguments.raport).write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        Path(arguments.raport).write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     summary = {name: report[name] for name in ("plikow", "liczby", "odrzucone", "problemy_wg_rodzaju", "magazyn")}
     print(json.dumps({"ok": not report["odrzucone"], **summary}, ensure_ascii=False, indent=1))
     return 2 if report["odrzucone"] else 0
