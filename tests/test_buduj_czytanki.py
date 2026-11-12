@@ -209,6 +209,10 @@ class CzytankiTests(unittest.TestCase):
             buduj_czytanki.oczysc_tekst("#8C5823175#E pkt za <Silkbind Penetration|780|#C|154> i #Y10#E <LINK id='1'>kliknij</LINK>"),
             "175 pkt za Silkbind Penetration i 10 kliknij",
         )
+        self.assertEqual(
+            buduj_czytanki.oczysc_tekst("Naciśnij #ccac18{}#E, aby skoczyć."),
+            "Naciśnij {}, aby skoczyć.",
+        )
 
     def test_wraps_markdown_tables_to_120_chars_without_br(self):
         lines = buduj_czytanki.formatuj_tabele(
@@ -451,6 +455,205 @@ class CzytankiTests(unittest.TestCase):
         self.assertIn("#102022", rendered)
         self.assertIn("02_zadania_poboczne_i_swiat.md", rendered)
         self.assertTrue(all(len(line) <= 120 for line in lines if line.startswith("|")))
+
+    def test_cutscene_context_you_xia_and_replay_linking(self):
+        V = T + 5000
+        zh = {
+            **ZH_CZYTANKI,
+            V + 1: "主角",
+            V + 2: "曹静观音",
+            V + 3: "Kwestia gracza pod przebraniem",
+            V + 4: "Stoisz tu?",
+            V + 5: "Ja?",
+            V + 6: "寒香寻",
+            V + 7: "我们终究还是走到了这一步",
+            V + 8: "天音之誓绝不可忘",
+            V + 9: "这是天泉的规矩",
+            V + 10: "解释一下为何如此",
+            V + 11: "莫要再多言了",
+            V + 12: "记住今天的教训",
+            V + 13: "且看我这一剑",
+            V + 14: "寒姨 你是去竹林小屋了吗",
+            V + 15: "我 还是先回去吧",
+            V + 16: "你可真有本事啊",
+            V + 17: "Powtórka zadania kluczowego",
+            V + 18: "Streszczenie kluczowej cutsceny zadania",
+            V + 19: "Kluczowy rozdział",
+            V + 20: "Luźna plansza przejściowa",
+            V + 21: "我们终究还是走到了这一步。",
+        }
+        en = {
+            **EN_CZYTANKI,
+            V + 1: "Main Character",
+            V + 2: "Cao Jing Guanyin",
+            V + 3: "Disguised player line",
+            V + 4: "Why standing here?",
+            V + 5: "Me?",
+            V + 6: "Han Xiangxun",
+            V + 7: "We reached this point at last",
+            V + 8: "Never forget the oath of Heaven",
+            V + 9: "These are the rules of Heaven",
+            V + 10: "Explain why it happened",
+            V + 11: "Say no more words",
+            V + 12: "Remember today's lesson",
+            V + 13: "Watch this blade strike",
+            V + 14: "Aunt Han, did you go to the hut?",
+            V + 15: "Me: I should head back first.",
+            V + 16: "You really have some nerve",
+            V + 17: "Key Replay Title",
+            V + 18: "Key replay synopsis EN",
+            V + 19: "Key chapter EN",
+            V + 20: "Loose black screen EN",
+            V + 21: "We reached this point at last.",
+        }
+        data = rich_world()
+        # Dialog z generyczną nazwą gracza (主角 -> You Xia) oraz prawdziwym przebraniem (曹静观音 -> You Xia (Przebrana Cao))
+        data["dialog_timelines.300"] = list(
+            rows([
+                group("ja_gen", 1, 0, V + 1, [text_track([span(T + 2, 0.0, 1)])]),
+                group("ja_przebr", 1, 0, V + 2, [text_track([span(V + 3, 1.0, 1)])]),
+            ]).items()
+        )
+        data["tasks"] = [
+            *data["tasks"],
+            (11, {"no": 11, "group": 5, "task_type": 1, "pre_task": [10], "task_name": V + 19, "finish_dialogs": 300}),
+        ]
+        data["group_tasks"] = [(5, [1, 2, 3, 11]), (6, [10]), (20, [20])]
+        # Encyklopedia z WVPV dla Han Xiangxun (w bazie gry description ma kropkę/interpunkcję i osobny klucz od text_msg)
+        data["world_view_person_info"] = [
+            *data["world_view_person_info"],
+            (12, {"id": 12, "name": V + 6, "people_identity": [T + 10], "story": []}),
+        ]
+        data["world_view_person_voice"] = [
+            ("12001", {"id": "12001", "person_id": 12, "description": V + 21}),
+        ]
+        data["wds_oneday_intro_cutscene_data"] = [
+            (1, {"id": 1, "time": 1.0, "duration": 2.0, "speaker": 2, "text": V + 4}),
+            (2, {"id": 2, "time": 3.0, "duration": 2.0, "speaker": 1, "text": V + 5}),
+        ]
+        # 10 ciągłych napisów text_msg + tabela sound_data mapująca te zdania na audio_name
+        # (poligon Tian Yinga `vo_sm_xsm9p4` z 1-wierszową kolizją `vo_sm_kfm8_pma_53`,
+        # linią z WVPV (V+7), wołaczem 寒姨 (V+14) oraz prefiksem `我 ` (V+15)).
+        data["text_msg"] = [
+            (591342, {"id": 591342, "content": V + 8}),
+            (591343, {"id": 591343, "content": V + 9}),
+            (591344, {"id": 591344, "content": V + 10}),
+            (591345, {"id": 591345, "content": V + 11}),
+            (591346, {"id": 591346, "content": V + 12}),
+            (591347, {"id": 591347, "content": V + 13}),
+            (591348, {"id": 591348, "content": V + 7}),
+            (591349, {"id": 591349, "content": V + 14}),
+            (591350, {"id": 591350, "content": V + 15}),
+            (591351, {"id": 591351, "content": V + 16}),
+        ]
+        data["sound_data"] = [
+            (1, {"text": zh[V + 8], "audio_name": "vo_sm_xsm9p4_ty_01"}),
+            (2, {"text": zh[V + 9], "audio_name": "vo_sm_xsm9p4_ty_02"}),
+            (3, {"text": zh[V + 10], "audio_name": "vo_sm_kfm8_pma_53"}),
+            (4, {"text": zh[V + 11], "audio_name": "vo_sm_xsm9p4_ty_03"}),
+            (5, {"text": zh[V + 12], "audio_name": "vo_sm_xsm9p4_ty_04"}),
+            (6, {"text": zh[V + 13], "audio_name": "vo_sm_xsm9p4_pma_05"}),
+            (7, {"text": zh[V + 16], "audio_name": "vo_sm_xsm9p4_npc_pma_06"}),
+        ]
+        data["cutscenes"] = [
+            *data["cutscenes"],
+            (30999, {"no": 30999, "synopsis_text_pc": V + 18}),
+            (30888, {"no": 30888, "content": V + 20}),
+            (10030888, {"no": 10030888, "content": V + 20}),
+        ]
+        data["task_cutscene_replay"] = [
+            (30999, {"no": 30999, "task_no": 11, "group": 5, "name": V + 17, "synopsis_text": V + 18}),
+        ]
+
+        root_c = self.root / "cutscene_ctx"
+        wyciag.zbuduj(FakeBaza(data), zh, en, root_c / "index", {"opis": "cutscene ctx"}, log=lambda _t: None)
+        mag = tlumaczenie.Magazyn()
+        k = mapa_tekstow.klucz
+        base_mag = tlumaczenie.wczytaj(self.magazyn_dir)
+        for slot, val in base_mag.po_kluczu.items():
+            mag.ustaw(slot, val)
+        for vid, val in base_mag.po_id.items():
+            mag.ustaw(f"@{vid}", val)
+        for src_id, pl_val in (
+            (V + 1, "Bohater"),
+            (V + 2, "Przebrana Cao"),
+            (V + 3, "Wypowiedź w przebraniu."),
+            (V + 4, "Dlaczego tu stoisz?"),
+            (V + 5, "Ja?"),
+            (V + 6, "Ciocia Han"),
+            (V + 7, "W końcu doszliśmy do tego miejsca."),
+            (V + 8, "Nigdy nie zapomnij przysięgi."),
+            (V + 9, "Takie są zasady sekty."),
+            (V + 10, "Wyjaśnij, dlaczego tak się stało."),
+            (V + 11, "Nie mów już ani słowa."),
+            (V + 12, "Zapamiętaj dzisiejszą lekcję."),
+            (V + 13, "Spójrz na to cięcie miecza!"),
+            (V + 14, "Ciociu Han, byłaś w chatce w gaju?"),
+            (V + 15, "Ja: Wrócę lepiej pierwszy."),
+            (V + 16, "Masz odwagę."),
+            (V + 17, "Powtórka finału aktu"),
+            (V + 18, "Streszczenie przypisane bezpośrednio do zadania jedenastego."),
+            (V + 19, "Zadanie jedenaste"),
+            (V + 20, "Krótka plansza czarnego ekranu."),
+        ):
+            mag.ustaw(k(zh[src_id]), pl_val)
+        tlumaczenie.zapisz(root_c / "magazyn", mag)
+
+        out_c = root_c / "czytanki"
+        rc = buduj_czytanki.main(
+            [
+                "--indeks",
+                str(root_c / "index"),
+                "--magazyn",
+                str(root_c / "magazyn"),
+                "--wyj-katalog",
+                str(out_c),
+            ]
+        )
+        self.assertEqual(rc, 0)
+        prolog = (out_c / "00_prolog_i_przerywniki.md").read_text(encoding="utf-8")
+        main_md = (out_c / "01_watek_glowny.md").read_text(encoding="utf-8")
+
+        # 1. Zero generycznego "Gracz" / "You Xia (Bohater)"; poprawne "You Xia" i "You Xia (Przebrana Cao)"
+        self.assertNotIn("**Gracz:**", main_md)
+        self.assertNotIn("You Xia (Bohater)", main_md)
+        self.assertIn("**You Xia:** Kuję od rana!", main_md)
+        self.assertIn("**You Xia (Przebrana Cao):** Wypowiedź w przebraniu.", main_md)
+
+        # 2. Intro ma You Xia i Gwardię Cesarską
+        self.assertIn("Mówca 2 (Gwardia Cesarska):", prolog)
+        self.assertIn("**You Xia:** Ja?", prolog)
+
+        # 3. `vo_sm_xsm9p4` trafia do Poligonu Tian Yinga (nie Prologu!)
+        self.assertIn("Qinghe — poligon Tian Yinga", prolog)
+        self.assertNotIn("Prolog — zasadzka w ulewie", prolog)
+
+        # 4. Wygładzona 1-wierszowa kolizja V+10 nie przypisała błędnie `You Xia`,
+        # a cała scena 591342–591351 pozostała jednym spójnym blokiem
+        self.assertEqual(prolog.count("591342–591351"), 1)
+        self.assertNotIn("**You Xia:** Wyjaśnij, dlaczego tak się stało.", prolog)
+        self.assertIn("Wyjaśnij, dlaczego tak się stało.", prolog)
+
+        # 5. WVPV przypisało polską nazwę "Ciocia Han" (bez wycieku EN "Han Xiangxun")
+        self.assertIn("**Ciocia Han:** W końcu doszliśmy do tego miejsca.", prolog)
+        self.assertNotIn("Han Xiangxun", prolog)
+
+        # 6. Wołacz V+14 NIE przypisał Cioci Han, prefiks V+15 dał You Xia bez podwójnego "Ja:",
+        # a wzorzec NPC pod płeć gracza (`_npc_pma_`) na V+16 NIE daje fałszywego You Xia
+        self.assertNotIn("**Ciocia Han:** Ciociu Han, byłaś w chatce w gaju?", prolog)
+        self.assertIn("Ciociu Han, byłaś w chatce w gaju?", prolog)
+        self.assertIn("**You Xia:** Wrócę lepiej pierwszy.", prolog)
+        self.assertNotIn("**You Xia:** Masz odwagę.", prolog)
+        self.assertIn("Masz odwagę.", prolog)
+        self.assertNotIn("**You Xia:** Ja: Wrócę lepiej pierwszy.", prolog)
+
+        # 7. Powtórka #30999 z `task_cutscene_replay` weszła do zadania #11 w 01_watek_glowny,
+        # nie powtórzyła się w 00_prolog_i_przerywniki, a klon #10030888 został pominięty
+        self.assertIn("Przerywnik fabularny w dzienniku (#30999):", main_md)
+        self.assertIn("Streszczenie przypisane bezpośrednio do zadania jedenastego.", main_md)
+        self.assertNotIn("#30999", prolog)
+        self.assertIn("- **#30888:** Krótka plansza czarnego ekranu.", prolog)
+        self.assertNotIn("#10030888", prolog)
 
 
 if __name__ == "__main__":
