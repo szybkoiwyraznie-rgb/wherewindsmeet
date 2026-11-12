@@ -232,19 +232,20 @@ nie zapisane w repozytorium): 19 630 przekładów → 95 471 zmienionych wpisów
 mapy angielskiej, 847 i 1 060 w dwóch warstwach `_diff`; po złożeniu warstw
 zmienionych 96 019 z 1 124 787, zbiór identyfikatorów bez zmian; 23 s.
 
+Gotowy katalog łatki można spakować ze skryptami z `instalator/` (`tools/build_installer_kit.py --latka dist/latka --output dist/WWM_LATKA_PL.zip`), a przed pełną łatką przeprowadzić małą próbę UI i polskich znaków opisaną w [TEST_W_GRZE.md](TEST_W_GRZE.md) (`tools/latka_testowa.py`).
+
 **Nie sprawdzono w grze:** czy klient przyjmie zmienione mapy (możliwa kontrola
 plików przy starcie albo aktualizacji), czy czcionki mają polskie znaki, ile
-tekstu mieszczą pola. Podmiana plików w instalacji wymaga osobnego planu, kopii
-oryginałów i sprawdzonego przywracania ([AGENTS.md](../AGENTS.md)); nie ma
-jeszcze skryptu instalacyjnego. Nie obiecujemy bezpieczeństwa konta.
+tekstu mieszczą pola. Nie obiecujemy bezpieczeństwa konta.
 
 ## Aktualizacja gry — co robić krok po kroku
 
-1. **Właściciel** po patchu gry wrzuca na Dysk katalog
-   `LocalData/Patch/HD/oversea` (tak jak `patch.zip`: `MANIFEST`, `data1001`,
-   `data1200`, `index1001`, `index1200`, `locale/*_diff`). Po dużej aktualizacji
-   klienta także zmienione pliki z `Package/HD/oversea` (`MANIFEST`, `data*`,
-   `index*`, `locale/translate_words_map_{zh_cn,en}` i ich `_diff`).
+1. **Właściciel** po patchu gry uruchamia `URUCHOM_AKTUALIZACJE.bat`
+   z zestawu `collector/` (jednym kliknięciem pakuje `LocalData/Patch/HD/oversea/*`,
+   `Package/HD/oversea/{MANIFEST,data1001,data1200,index1001,index1200}`,
+   wszystkie warstwy `*_diff` oraz `translate_words_map_zh_cn` do ZIP-a < 90 MiB;
+   przy większej aktualizacji klienta `spakuj_dane.ps1` dzieli wynik na części
+   <= 85 MiB) i wrzuca archiwum na Dysk.
 2. **Agent** pobiera pliki do `google_drive/`, wypakowuje do `local/`
    i przebudowuje wyciąg w katalogu roboczym (`tools/wyciag.py`, jak wyżej).
 3. Audyt względem ostatniego commita:

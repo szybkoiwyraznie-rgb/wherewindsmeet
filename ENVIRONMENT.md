@@ -52,7 +52,7 @@ wybrane.
 
 Dokumenty i kod tekstowy są domyślnie wersjonowane z LF. Zgodnie z praktyką SRW
 pliki `.bat`, `.cmd` i `.ps1` są oznaczone `-text`: Git ma zachować zapisane
-bajty. Źródła zbieracza mają CRLF, PowerShell ma UTF-8 BOM, a BAT jest ASCII;
-builder i testy sprawdzają bajty w ZIP-ie. Windows CI uruchamia rozpakowane
+bajty. Źródła `collector/` i `instalator/` mają CRLF, PowerShell ma UTF-8 BOM, a BAT jest ASCII;
+buildery (`tools/build_collector_kit.py`, `tools/build_installer_kit.py`) i testy sprawdzają bajty w ZIP-ach. Windows CI uruchamia rozpakowane
 skrypty na sztucznej instalacji; sama konfiguracja atrybutów nie jest testem
 rzeczywistej gry.

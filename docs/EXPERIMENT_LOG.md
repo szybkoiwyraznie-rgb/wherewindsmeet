@@ -982,3 +982,24 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Ograniczenia:** żadnych testów w uruchomionej grze ani na instalacji
   właściciela; nie sprawdzono przyjmowania przepisanych map przez klienta,
   polskich glifów, limitów szerokości pól ani kolejności fabularnej.
+
+- **Zbieracz aktualizacji, instalator Windows z kopią/przywracaniem i plan testu UI (po `9f04ed6`):**
+  - **Zbieracz v2 (`collector/URUCHOM_AKTUALIZACJE.bat`, `zbierz.ps1 -Tryb aktualizacja`, `spakuj_dane.ps1`, `validate_collector_return.py`):**
+    dodano tryb jednego kliknięcia zbierający `LocalData/Patch/HD/oversea/*`,
+    `Package/HD/oversea/{MANIFEST,data1001,data1200,index1001,index1200}`,
+    wszystkie mapy `*_diff` oraz `translate_words_map_zh_cn` w jednym archiwum
+    < 90 MiB (format `wwm-collection-v2`); przepisano `spakuj_dane.ps1`
+    na `.NET SHA256`/`ZipArchive` z dzieleniem dużych paczek <= 85 MiB i
+    zachowaniem pełnych ścieżek względnych. Zweryfikowano w Windows PowerShell 5.1 CI.
+  - **Instalator Windows i wsparcie identycznych nazw w łatce (`tools/zbuduj_latke.py`, `instalator/`, `tools/build_installer_kit.py`):**
+    dodano `--mapa SCIEZKA_W_GRZE PLIK` i `--build-gry` w `tools/zbuduj_latke.py`
+    (rozróżnianie identycznych nazw bazowych między `Package/` i `LocalData/Patch/`);
+    utworzono zestaw `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`,
+    `instaluj_latke.ps1`) z kopią oryginałów poza folderem gry, weryfikacją
+    SHA-256 i buildu Steam przed zmianą, transakcyjnym zapisem z cofnięciem
+    błędu i ochroną przed nadpisaniem nowszego patcha Steam przy przywracaniu.
+    Zweryfikowano na fikcyjnej instalacji w Windows CI (`tests/test_installer_windows.py`).
+  - **Mała łatka testowa UI i polskich znaków (`tools/latka_testowa.py`, `docs/TEST_W_GRZE.md`):**
+    przygotowano izolowany generator paczki testowej dla etykiet menu i ustawień
+    z kompletem znaków `ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`; **sam test w
+    uruchomionej grze nadal pozostaje po stronie właściciela na Windows**.

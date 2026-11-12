@@ -10,9 +10,10 @@ i przekazany właścicielowi** (`485 047` miejsc `PL:` na `73 373` sceny i `62`
 pliki widoków). Cały obieg po stronie narzędzi (ekstrakcja bazy, budowa
 pakietu, import zwrotki, łatka bazy i warstw `_diff`, audyt aktualizacji
 i pakiet uzupełniający) działa na prawdziwych plikach buildu `25906190` w
-piaskownicy, ale **nie był jeszcze sprawdzony w uruchomionej grze**. Brakuje
-jeszcze pierwszej zwrotki przekładu oraz skryptu instalującego łatkę z kopią
-i przywracaniem. Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
+piaskownicy, ale **nie był jeszcze sprawdzony w uruchomionej grze**. Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`),
+bezpieczny instalator/przywracacz łatki dla Windows (`instalator/`) oraz plan
+pierwszej próby UI i polskich znaków ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Brakuje
+jeszcze pierwszej zwrotki przekładu oraz samego testu na uruchomionej grze. Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
 grze, bez wstrzykiwania i obchodzenia zabezpieczeń; warunków wydawcy nie
 potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 
@@ -21,7 +22,7 @@ potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 - [Stan projektu](docs/STATUS.md) oraz [cel i kryteria akceptacji](docs/CEL.md)
 - [Pakiet dla tłumacza i potok aktualizacji](docs/PAKIET_TLUMACZA.md) — pełna instrukcja obsługi obiegu
 - [Baza danych gry (`MANIFEST` → `indexN` → `dataN`)](docs/BAZA_GRY.md)
-- [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md) oraz [patcher](docs/PATCHER_WWM.md)
+- [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher](docs/PATCHER_WWM.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
 - [Dziennik eksperymentów](docs/EXPERIMENT_LOG.md) i [zestawienie dostaw z gry](docs/OVERSEA_INWENTARZ.md)
 - [Plan etapów](docs/ROADMAP.md), [wykonalność i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows](docs/WINDOWS_OPTIONS.md), [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
@@ -43,8 +44,9 @@ python tools/run_tests.py
 
 ```text
 .github/       CI (Ubuntu i Windows × Python 3.11/3.12) i szablony współpracy
-collector/     źródła zbieracza Windows (BAT + PowerShell)
-docs/          status, dokumentacja formatów, potoku i dziennik eksperymentów
+collector/     źródła zbieracza Windows (rozpoznanie + cotygodniowe aktualizacje)
+instalator/    bezpieczny instalator Windows z kopią zapasową i przywracaniem
+docs/          status, dokumentacja formatów, potoku, plan testu i dziennik
 index/         wersjonowany wyciąg bazy i tekstów (wwm-indeks-v2)
 paczki/        archiwalne README i manifesty kolejnych wysłanych pakietów
 tools/         czytnik bazy, wyciąg, generator pakietu, importer, łatka, audyt i kontrole

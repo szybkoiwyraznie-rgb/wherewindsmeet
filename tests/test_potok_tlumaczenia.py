@@ -14,10 +14,10 @@ from tests.test_buduj_paczke import EN_EXTRA, ZH_EXTRA, world
 from tests.test_mapa_tekstow import diff_container
 from tests.test_wyciag_indeks import EN, ZH, K, T
 from tests.test_zrodla_tekstow import FakeBaza
-from tools import audyt_aktualizacji, buduj_paczke, import_zwrotki, indeks, mapa_tekstow, tlumaczenie, wyciag, zbuduj_latke
+from tools import audyt_aktualizacji, buduj_paczke, import_zwrotki, indeks, latka_testowa, mapa_tekstow, tlumaczenie, wyciag, zbuduj_latke
 
 ROOT = Path(__file__).resolve().parent.parent
-CLI_TOOLS = ("baza_gry", "wyciag", "indeks", "uklad_scen", "buduj_paczke", "import_zwrotki", "zbuduj_latke", "audyt_aktualizacji")
+CLI_TOOLS = ("baza_gry", "wyciag", "indeks", "uklad_scen", "buduj_paczke", "import_zwrotki", "zbuduj_latke", "latka_testowa", "audyt_aktualizacji")
 ZH_ALL = {**ZH, **ZH_EXTRA}
 EN_ALL = {**EN, **EN_EXTRA}
 
@@ -286,6 +286,45 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual((out / "nowe_sloty.txt").read_text(encoding="utf-8"), "")
         self.assertEqual(json.loads((out / "audyt.json").read_text(encoding="utf-8"))["do_tlumacza"], 0)
+
+
+    def test_latka_testowa_builds_complete_windows_zip_for_ui_and_diacritics(self):
+        maps = self.root / "mapy_ui"
+        pkg_en = maps / "pkg_en"
+        patch_diff = maps / "patch_diff"
+        zh = maps / "zh"
+        maps.mkdir()
+        zh.write_bytes(container([table([(T + 1, "设置".encode()), (T + 2, "音频".encode()), (T + 3, "退出".encode())])], with_metadata=True))
+        pkg_en.write_bytes(container([table([(T + 1, b"Settings"), (T + 2, b"Audio"), (T + 99, b"Unchanged")])], with_metadata=True))
+        patch_diff.write_bytes(container([table([(T + 3, b"Exit")])], with_metadata=True))
+
+        out_zip = self.root / "WWM_LATKA_TEST_PL.zip"
+        rc = latka_testowa.main([
+            "--indeks", str(self.root / "index"),
+            "--zh", str(zh),
+            "--mapa", "Package/HD/oversea/locale/translate_words_map_en", str(pkg_en),
+            "--mapa", "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", str(patch_diff),
+            "--build-gry", "25906190",
+            "--wyj-zip", str(out_zip),
+        ])
+        self.assertEqual(rc, 0)
+        self.assertTrue(out_zip.is_file())
+        self.assertFalse((self.root / "tlumaczenie").exists())
+        from zipfile import ZipFile
+        with ZipFile(out_zip) as z:
+            names = set(z.namelist())
+            for req in ("CZYTAJ_TO.txt", "ZAINSTALUJ.bat", "PRZYWROC.bat", "SPRAWDZ_STAN.bat", "instaluj_latke.ps1", "latka.json"):
+                self.assertIn(req, names)
+            manifest = json.loads(z.read("latka.json").decode("utf-8"))
+            self.assertEqual(manifest["build_gry"], "25906190")
+            self.assertEqual(len(manifest["pliki"]), 2)
+            # Check repacked maps kept Unchanged and inserted Polish diacritics
+            patched_pkg = self.root / "out_pkg_en"
+            patched_pkg.write_bytes(z.read("pliki/Package/HD/oversea/locale/translate_words_map_en"))
+            got, _ = mapa_tekstow.wczytaj_warstwe(patched_pkg)
+            self.assertIn("ą ć ę ł ń ó ś ź ż", got[T + 1])
+            self.assertIn("Ą Ć Ę Ł Ń Ó Ś Ź Ż", got[T + 2])
+            self.assertEqual(got[T + 99], "Unchanged")
 
 
 if __name__ == "__main__":

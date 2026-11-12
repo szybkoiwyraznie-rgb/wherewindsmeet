@@ -15,18 +15,32 @@ Pełny opis obiegu, ról plików i procedury przy aktualizacjach jest w
 python3 tools/zbuduj_latke.py \
   --indeks index \
   --magazyn tlumaczenie \
-  --zh "pliki/translate_words_map_zh_cn" "pliki/000007_translate_words_map_zh_cn_diff" \
-  --cel "pliki/000001_translate_words_map_en" \
-  --cel "pliki/000003_translate_words_map_en_diff" \
-  --cel "pliki/000002_translate_words_map_en_diff" \
+  --zh "pliki/translate_words_map_zh_cn" "pliki/translate_words_map_zh_cn_diff" \
+  --mapa Package/HD/oversea/locale/translate_words_map_en "pliki/Package/HD/oversea/locale/translate_words_map_en" \
+  --mapa Package/HD/oversea/locale/translate_words_map_en_diff "pliki/Package/HD/oversea/locale/translate_words_map_en_diff" \
+  --mapa LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff "pliki/LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff" \
+  --build-gry 25906190 \
   --wyj dist/latka
 ```
 
 - `--indeks` — wyciąg `index/` (do mapowania kwestii zależnych od płci i wariantów),
 - `--magazyn` — katalog `tlumaczenie/` (`pl_*.jsonl`, `pl_warianty.jsonl`),
 - `--zh` — chińska mapa źródłowa i jej warstwy `_diff` (służy do wyliczenia klucza SHA-256 każdego identyfikatora),
-- `--cel` — docelowe pliki wybranego języka klienta (baza + warstwy `_diff`, np. angielskie); każdy jest przepisywany osobno pod swoją nazwą do `--wyj`,
+- `--mapa SCIEZKA_W_GRZE PLIK` — jawna para docelowej ścieżki w instalacji gry i lokalnego pliku wejściowego (rozróżnia identyczne nazwy między `Package/...` i `LocalData/Patch/...` i zapisuje `sciezka_w_grze` oraz `plik_latki` w `latka.json`),
+- `--cel` — alternatywny zapis dla pojedynczych plików o unikalnych nazwach (lub ze ścieżką zawierającą `Package/` albo `LocalData/Patch/`),
+- `--build-gry` — opcjonalny `buildid` ze Steam zapisywany w `latka.json` (sprawdzany przy instalacji),
 - `--wyj` — osobny katalog wyjściowy (nie może być katalogiem plików wejściowych).
+
+Gotową łatkę z `--wyj` można spakować razem ze skryptami Windows (`instalator/`:
+`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`, `instaluj_latke.ps1`,
+`CZYTAJ_TO.txt`) do jednego archiwum:
+
+```bash
+python3 tools/build_installer_kit.py --latka dist/latka --output dist/WWM_LATKA_PL.zip
+```
+
+Do pierwszego bezpiecznego sprawdzenia czcionek i przyjmowania map w grze służy
+osobny generator małej łatki UI (`tools/latka_testowa.py` oraz plan w [TEST_W_GRZE.md](TEST_W_GRZE.md)).
 
 Kolejność dobierania przekładu dla identyfikatora:
 1. wprost po identyfikatorze (`pl_warianty.jsonl` — kwestie zależne od płci bohatera; nieprzetłumaczony wariant dziedziczy po drugim wariancie tego samego tekstu),
@@ -55,7 +69,7 @@ przepakowuje tabele z nowymi offsetami i weryfikuje wynik przed zapisem.
 
 - **Nie przetestowano łatki w rzeczywistej grze** (klient może sprawdzać sumy kontrolne plików przy starcie lub aktualizacji, czcionki mogą nie mieć wszystkich polskich znaków, a pola interfejsu mają nieznane limity szerokości).
 - **Nie wybrano docelowo zastępowanego języka klienta** (dotychczasowe próby na mapie EN w piaskownicy).
-- **Brak jeszcze skryptu instalującego łatkę u właściciela** (kopia bezpieczeństwa oryginałów, podmiana, sprawdzone przywracanie) — nie wolno podmieniać plików instalacji gry bez osobnego planu i działającego cofania.
+- **Skrypty instalatora i przywracania (`instalator/`)** przeszły automatyczne testy Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie), ale **nie były jeszcze uruchamiane na rzeczywistej instalacji gry właściciela** ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
 
 ## Wynik na realnych mapach w piaskownicy
 

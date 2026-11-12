@@ -13,9 +13,15 @@ import zwrotki, łatka map tekstów, audyt aktualizacji i pakiet uzupełniający
 działa na prawdziwych plikach gry **w piaskownicy**. Opis i polecenia:
 [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
 
-**W grze nie sprawdzono niczego**: ani łatki, ani polskich znaków, ani
-kolejności scen. Nie ma jeszcze żadnego przekładu (`tlumaczenie/` powstanie
-przy pierwszej zwrotce).
+Przygotowano również **tryb cotygodniowej aktualizacji w zbieraczu**
+(`collector/URUCHOM_AKTUALIZACJE.bat` + dzielenie dużych paczek w `spakuj_dane.ps1`),
+**bezpieczny instalator Windows z kopią zapasową i przywracaniem** (`instalator/`,
+`tools/build_installer_kit.py`) oraz **plan małej próby UI i polskich znaków**
+([TEST_W_GRZE.md](TEST_W_GRZE.md), `tools/latka_testowa.py`).
+
+**W grze nie sprawdzono niczego**: ani łatki, ani instalatora na prawdziwej
+instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
+żadnego przekładu (`tlumaczenie/` powstanie przy pierwszej zwrotce).
 
 ## Co wiadomo
 
@@ -55,13 +61,13 @@ przy pierwszej zwrotce).
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 317 testów; `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
+| Repozytorium i workflow | Ponad 325 testów (Linux + Windows PS 5.1); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami — odczytane i sprawdzone na całości danych. |
 | Wyciąg i powiązania | `index/` w Git, deterministyczny, ze stałym podziałem plików. |
 | Pakiet tłumacza | Wersja 1 zbudowana i przekazana. Generator, README, spisy, kontrola własna. |
 | Import zwrotki | Gotowy i przetestowany; czeka na pierwszą zwrotkę. |
-| Łatka | `tools/zbuduj_latke.py` przepisuje mapę i warstwy `_diff` z kontrolą wpis po wpisie. **Nie sprawdzona w grze**; brak skryptu instalacyjnego i przywracania. |
-| Aktualizacje gry | Audyt dwóch wyciągów i pakiet uzupełniający działają. Zbieracz nie ma jeszcze trybu „tylko patch” — właściciel wrzuca katalog `LocalData/Patch/HD/oversea` ręcznie. |
+| Łatka i instalator Windows | `tools/zbuduj_latke.py` (`--mapa`, `--build-gry`) + `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`) + `tools/latka_testowa.py` i [TEST_W_GRZE.md](TEST_W_GRZE.md). Sprawdzone w Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
+| Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
 ## Otwarte ustalenia
@@ -86,10 +92,9 @@ przy pierwszej zwrotce).
 
 ## Następny krok
 
-1. Czekać na zwrotkę tłumacza → `tools/import_zwrotki.py` → commit `tlumaczenie/`.
-2. Równolegle: plan i skrypt małej łatki testowej dla właściciela (kopia,
-   podmiana, przywracanie) i pierwszy test w grze.
-3. Tryb aktualizacji w zbieraczu: jeden klik pakuje `LocalData/Patch/HD/oversea`
-   i zmienione mapy tekstów.
-4. Po każdym patchu gry: kroki z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md),
-   rozdział „Aktualizacja gry”.
+1. Wykonać pierwszy mały test UI i polskich znaków w grze według
+   [TEST_W_GRZE.md](TEST_W_GRZE.md) (przy użyciu `tools/latka_testowa.py`
+   i `instalator/ZAINSTALUJ.bat` / `PRZYWROC.bat`).
+2. Czekać na zwrotkę tłumacza → `tools/import_zwrotki.py` → commit `tlumaczenie/`.
+3. Po każdym cotygodniowym patchu gry: właściciel klika
+   `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
