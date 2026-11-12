@@ -5,7 +5,7 @@ param(
     [ValidateSet('instaluj', 'przywroc', 'stan')] [string] $Akcja = 'instaluj',
     [Parameter(Position = 0)] [string] $GameRoot = '',
     [string] $SteamRoot = '',
-    [string] $LatkaDir = $PSScriptRoot,
+    [string] $LatkaDir = '',
     [string] $BackupDirectory = '',
     [switch] $PominWersje,
     [switch] $Wymus,
@@ -279,6 +279,8 @@ function Save-InstallState([string] $StatePath, $StateObj) {
 
 try {
     if ($PSVersionTable.PSVersion.Major -lt 5) { throw 'Potrzebny Windows PowerShell 5.1 lub nowszy.' }
+    if ([string]::IsNullOrWhiteSpace($LatkaDir)) { $LatkaDir = $PSScriptRoot }
+    if ([string]::IsNullOrWhiteSpace($LatkaDir)) { $LatkaDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
     if ($Akcja -ne 'stan') {
         $running = @(Get-Process -Name @('WhereWindsMeet', 'WWM', 'WWM_Game', 'yysls') -ErrorAction SilentlyContinue)
         if ($running.Count -gt 0) { throw 'Wyglada na to, ze gra dziala. Zamknij ja przed instalacja lub przywracaniem.' }
