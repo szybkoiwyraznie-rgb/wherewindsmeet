@@ -458,6 +458,65 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(got2[t_skill_1], "Bezlitosne natarcie")
         self.assertEqual(got2[t_cut], "Ścinam ich na lewo i prawo")
 
+    def test_latka_testowa_handles_rebuilt_prologue_and_collision_variants(self):
+        t_cut = T + 850
+        t_skill_1 = T + 851
+        t_skill_2 = T + 852
+        t_prolog = T + 853
+        zh_dict = {
+            **ZH_ALL,
+            t_cut: "十步杀一人",
+            t_skill_1: "十步杀一人",
+            t_skill_2: "十步杀一人",
+            t_prolog: "是啊 来抓你",
+        }
+        en_dict = {
+            **EN_ALL,
+            t_cut: "Cut them down, left and right",
+            t_skill_1: "Relentless Advance",
+            t_skill_2: "Relentless Advance",
+            t_prolog: "That's right, here to take you in.",
+        }
+        custom = world()
+        custom["text_msg"] = [(590438, {"content": t_cut}), (590337, {"content": t_prolog})]
+        custom["buff"] = [*custom["buff"], (10, {"buff_name": t_skill_1}), (11, {"buff_name": t_skill_2})]
+        ix_dir = self.root / "ix_latka_v2"
+        wyciag.zbuduj(FakeBaza(custom), zh_dict, en_dict, ix_dir, {}, log=lambda _text: None)
+
+        maps = self.root / "mapy_latka_v2"
+        maps.mkdir(exist_ok=True)
+        zh_p = maps / "zh"
+        en_p = maps / "en"
+        zh_p.write_bytes(
+            container(
+                [table([(t_cut, "十步杀一人".encode()), (t_skill_1, "十步杀一人".encode()), (t_prolog, "是啊 来抓你".encode())])],
+                with_metadata=True,
+            )
+        )
+        en_p.write_bytes(
+            container(
+                [table([(t_cut, b"Cut them down, left and right"), (t_skill_1, b"Relentless Advance"), (t_prolog, b"That's right, here to take you in.")])],
+                with_metadata=True,
+            )
+        )
+        out_zip = self.root / "WWM_LATKA_TEST_V2.zip"
+        rep = latka_testowa.zbuduj_paczke_testowa(
+            indeks_dir=ix_dir,
+            zh_paths=[zh_p],
+            cel_paths=[],
+            mapa_pairs=[("Package/HD/oversea/locale/translate_words_map_en", en_p)],
+            wyj_zip=out_zip,
+            zakres="prolog",
+        )
+        self.assertTrue(rep["ok"])
+        with zipfile.ZipFile(out_zip) as z:
+            p = self.root / "out_latka_en"
+            p.write_bytes(z.read("pliki/Package/HD/oversea/locale/translate_words_map_en"))
+            got, _ = mapa_tekstow.wczytaj_warstwe(p)
+        self.assertIn("Ścinam ich na lewo i prawo", got[t_cut])
+        self.assertIn("Zgadza się — przyszliśmy cię pojmać", got[t_prolog])
+        self.assertEqual(got[t_skill_1], "Relentless Advance")
+
 
 if __name__ == "__main__":
     unittest.main()

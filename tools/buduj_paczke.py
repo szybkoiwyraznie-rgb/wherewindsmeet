@@ -68,7 +68,7 @@ WIDOKI = [
     ("03_przedmioty", "Przedmioty, wyposażenie, stroje, budowle"),
     ("04_walka_i_umiejetnosci", "Walka: umiejętności, efekty, talenty, przeciwnicy"),
     ("05_swiat_i_miejsca", "Świat: miejsca, regiony, mapy, obiekty"),
-    ("06_encyklopedia_i_ksiegi", "Encyklopedia, księgi, zapiski, listy, przerywniki"),
+    ("06_encyklopedia_i_ksiegi", "Encyklopedia, księgi, zapiski, listy"),
     ("07_komunikaty", "Komunikaty i dymki (text_msg i pokrewne)"),
     ("08_interfejs_i_systemy", "Interfejs i systemy gry"),
     ("09_pozostale", "Pozostałe tabele"),
@@ -79,6 +79,64 @@ POZOSTALE = "09_pozostale"
 # Tabele, które powtarzają kwestie scen (te same teksty co w `dialog_timelines`):
 # ich powtórzeń nie wypisujemy w widokach, bo każda taka kwestia ma `PL:` w scenie.
 KOPIE_KWESTII = {"debate_guider_dialog_data"}
+CUTSCENY_TABELE = {
+    "cutscenes",
+    "task_cutscene_replay",
+    "entry_collect_movie_subtitle_data",
+    "wds_oneday_intro_cutscene_data",
+}
+ZAKRES_BOTY_TM = (3_220_000, 3_269_999)
+ZAKRES_CUTSCEN_TM = (590_000, 592_694)
+ZAKRES_PROLOG_TM = (590_291, 590_459)
+
+# Tabele czysto techniczne/meta (samouczki, sterowanie, QTE, ustawienia, rankingi, komunikaty błędów programisty):
+# w trybie v2 zostają po angielsku w kliencie gry i nie trafiają do paczki dla tłumacza.
+_WYKLUCZONE_TABELE_RE = re.compile(
+    r"^(?:"
+    r"programmer_text_msg|"
+    r"guider_|battle_guide_|homeland_guide|growth_guide_wanfa_data|activity_season_guide_|sprite_new_system_guide|"
+    r"gameplay_info|social_game_config|social_game_pop_tips_data|"
+    r"setting_|building_setting_|chat_setting_|photo_setting_|homeland_mate_settings|"
+    r"input_|key_|keymap_|console_joystick_func|console_keymap_|windows_key|xbox|pc_slot_tip|dungeon_joystick_data|hud_edit_config|"
+    r"cutscene_qte_config|toushi_qte_action_config|qte_btn_group_data|qixi_qte_hint_data|"
+    r"datetime_format_config|multi_language_|right_side_page_comps|click_target_info_config|ui_corner_btn_config|ui_toolbar_config|"
+    r"common_tip_|common_share_config|share_content_config|share_password_config|"
+    r"pvp_room_grey_gonggao|version_exposure_config|homeland_meteor_shower_pre_danmu_config|school_ly_dance_danmu|"
+    r"rank_|dynamic_rank_data|feedback_menu_|tip_off_|pre_download_data|IOS_push_reviews_config"
+    r")"
+)
+_RE_PLACEHOLDER = re.compile(
+    r"^(?:test|testing|temp|tmp|todo|tbd|placeholder|dummy|debug|xxx+|111+|aaa+|待补充|测试|占位|预留|暂无|敬请期待)$|"
+    r"(?:^\[?test[\s_\-:0-9\]]|测试文本|测试用|占位符|等待配置|待配置|待填写|待替换|暂未配置|测试标题|测试图片|我在lock\d|我在普攻\d)",
+    re.I,
+)
+_RE_PROMO_BETA = re.compile(
+    r"(?:企业微信|微信公众号|微信扫码|关注公众号|扫码加入|网易大神|大神号|大神app|测试服|内测群|删档测试|保密协议|健康游戏忠告|适龄提示|先锋测试|"
+    r"wechat|wecom|netease god|confidentiality agreement)",
+    re.I,
+)
+_RE_BLAD_SIECIOWY = re.compile(
+    r"(?:网络异常|网络连接|网络波动|网络繁忙|连接失败|连接超时|服务器内部错误|服务器繁忙|服务器维护|请求超时|请求过于频繁|错误码|实名认证未通过|断线重连|"
+    r"network error|network fluctuation|network busy|connection (?:failed|lost|timed out|timeout|error)|"
+    r"server (?:error|busy|unavailable|maintenance)|internal server error|request timed out|rate limit|socket error|"
+    r"authentication failed|real-name authentication failed)",
+    re.I,
+)
+_MOWCY_CUTSCEN_ZH = {
+    "伊刀": "伊刀 (Yi Dao)",
+    "我": "gracz (我)",
+    "寒香寻": "寒香寻 (Han Xiangxun)",
+    "江无浪": "江无浪 (Jiang Wulang)",
+    "江晏": "江晏 (Jiang Yan)",
+    "千夜": "千夜 (Qianye)",
+    "寒姨": "寒姨 (Ciotka Han)",
+    "陈子奚": "陈子奚 (Chen Zixi)",
+    "师父": "师父 (Mistrz)",
+    "老板娘": "老板娘 (Właścicielka gospody)",
+    "行当管理员": "行当管理员 (Zarządca fachu)",
+    "赵大哥": "赵大哥 (Brat Zhao)",
+    "东阙公子": "东阙公子 (Panicz Dongque)",
+}
 # (wzorzec nazwy tabeli, widok) — wygrywa pierwsza pasująca reguła
 REGULY = [
     (r"(text_msg|ccs_text_msg|programmer_text_msg)", "07_komunikaty"),
@@ -245,13 +303,23 @@ class Pisarz:
 
 
 class Generator:
-    def __init__(self, ix, magazyn=None, tylko_sloty: set[str] | None = None, *, tylko_z_en: bool = False):
+    def __init__(
+        self,
+        ix,
+        magazyn=None,
+        tylko_sloty: set[str] | None = None,
+        *,
+        tylko_z_en: bool = False,
+        wszystko: bool = False,
+    ):
         self.ix = ix
         self.magazyn = magazyn or magazyn_mod.Magazyn()
         self.tylko = tylko_sloty  # None = pakiet pełny; zbiór = pakiet uzupełniający
         self.tylko_z_en = tylko_z_en
+        self.wszystko = wszystko
         self.sloty: dict[str, tuple[str, str]] = {}  # slot -> (plik, opis miejsca)
         self.liczby = Counter()
+        self.wykluczenia = Counter()
         self.uklad = uklad_scen.uloz(ix)
         self._nazwa_po_tekscie: dict[str, str] = {}
         for row in ix.postacie.values():
@@ -268,6 +336,74 @@ class Generator:
         self.spis_scen: list[tuple] = []  # (numer sceny, dialog, plik, część, zadanie, elementów)
         self.spis_zadan: list[dict] = []
         self.serie: list[dict] = []
+        self._zadanie_przerywnika: dict[int, int] = {}
+        for task_no, task in sorted(ix.zadania.items()):
+            for lst in (task.get("przerywniki") or {}).values():
+                for cut_no in lst:
+                    self._zadanie_przerywnika.setdefault(cut_no, task_no)
+        self._chronione_klucze = self._zbuduj_chronione_klucze()
+        self._cutsceny_klucze = self._zbuduj_cutsceny_klucze()
+
+    def _zbuduj_cutsceny_klucze(self) -> set[str]:
+        ix = self.ix
+        keys: set[str] = set()
+        for typ in ("napis", "intro", "film"):
+            for row in ix.cutsceny_kontekst.get(typ, ()):
+                if row.get("k"):
+                    keys.add(row["k"])
+        for row in ix.cutsceny_kontekst.get("powtorka", ()):
+            for field in ("nazwa", "rozdzial"):
+                if row.get(field):
+                    keys.add(row[field])
+        for row in ix.przerywniki.values():
+            for field in ("tekst", "streszczenie"):
+                if row.get(field):
+                    keys.add(row[field])
+        return keys
+
+    def _zbuduj_chronione_klucze(self) -> set[str]:
+        ix = self.ix
+        keys = self._zbuduj_cutsceny_klucze()
+        for scene in ix.sceny.values():
+            for element in scene["e"]:
+                keys.add(element[2])
+        for row in ix.wybory.values():
+            for choice in row["wybory"]:
+                keys.add(choice["tekst"])
+        return keys
+
+    def powod_wykluczenia(self, key: str) -> str | None:
+        """Powód pominięcia wpisu w pakiecie v2 albo `None`, gdy zostaje dla tłumacza."""
+        if self.wszystko or key in self._chronione_klucze:
+            return None
+        text = self.ix.teksty.get(key)
+        if text is None or not text.zrodlo.strip():
+            return None
+        source = self.ix.zrodlo(text)
+        if source is None:
+            return None
+        kind, _col, row = source
+        base = kind.removesuffix("__grey")
+        row_key = row.rpartition("#")[2]
+        if base == "text_msg" and row_key.isdigit():
+            ri = int(row_key)
+            if ZAKRES_BOTY_TM[0] <= ri <= ZAKRES_BOTY_TM[1]:
+                return "boty_nicki"
+            if kind == "text_msg__grey" and ZAKRES_CUTSCEN_TM[0] <= ri <= ZAKRES_CUTSCEN_TM[1]:
+                return "stare_grey_cutsceny"
+        if _WYKLUCZONE_TABELE_RE.match(base):
+            return "tabele_meta"
+        if base in ("text_msg", "ccs_text_msg"):
+            zh = text.zrodlo.strip()
+            en = (text.en or "").strip()
+            combined = f"{zh}\n{en}"
+            if _RE_PLACEHOLDER.search(zh) or (en and _RE_PLACEHOLDER.search(en)):
+                return "placeholdery_testy"
+            if _RE_PROMO_BETA.search(combined):
+                return "promo_beta_cn"
+            if _RE_BLAD_SIECIOWY.search(combined):
+                return "bledy_sieciowe"
+        return None
 
     # ----------------------------------------------------------- teksty
 
@@ -638,6 +774,238 @@ class Generator:
                 self._scena(pisarz, numer, uklad.miejsca[numer])
         seria(pisarz, "rozmowy tła według miejsca")
 
+    # ----------------------------------------------------------- cutsceny
+
+    @staticmethod
+    def _vo_scena(audio: str | None) -> str:
+        if not audio:
+            return ""
+        parts = audio.split("_")
+        out = []
+        for part in parts:
+            if part in ("npc", "player", "m", "f", "pma", "pfa", "zhujue", "boss", "yl") or part.isdigit():
+                break
+            out.append(part)
+        return "_".join(out)
+
+    def _mowca_cutsceny(self, row: dict, text) -> str:
+        audio = row.get("audio") or ""
+        if "_player_m_" in audio or "_pma_" in audio:
+            return "gracz (bohater)"
+        if "_player_f_" in audio or "_pfa_" in audio:
+            return "gracz (bohaterka)"
+        if "_zhujue_" in audio:
+            return "gracz"
+        zh = text.zrodlo.strip()
+        if " " in zh:
+            prefix = zh.split(" ", 1)[0]
+            if prefix in _MOWCY_CUTSCEN_ZH:
+                return _MOWCY_CUTSCEN_ZH[prefix]
+        mowca_en = (row.get("mowca_en") or "").strip()
+        if mowca_en and not mowca_en.startswith("(") and len(mowca_en.split()) <= 3:
+            return mowca_en
+        return ""
+
+    def cutsceny(self, katalog: Path) -> None:
+        ix = self.ix
+        self._nowe_w_bloku = []
+        wstep = ["Polski tekst wpisujesz w jednej linii po `PL:`. Zasady i podział na sekcje: `README.md`."]
+
+        # 1. 01_napisy_cutscen — text_msg 590000..592694 pogrupowane po lukach ID i segmentach audio
+        napisy = sorted(
+            (r for r in ix.cutsceny_kontekst.get("napis", ()) if r.get("k") in ix.teksty),
+            key=lambda r: r["wiersz"],
+        )
+        plec_wiersza: dict[int, str] = {}
+        for idx in range(len(napisy) - 1):
+            a, b = napisy[idx], napisy[idx + 1]
+            if b["wiersz"] != a["wiersz"] + 1:
+                continue
+            ta, tb = ix.teksty[a["k"]], ix.teksty[b["k"]]
+            aud_a, aud_b = a.get("audio") or "", b.get("audio") or ""
+            is_mf_zh = (
+                ("小子" in ta.zrodlo and "小妮子" in tb.zrodlo)
+                or ("少侠" in ta.zrodlo and "女侠" in tb.zrodlo)
+                or ("小妮子" in ta.zrodlo and "小子" in tb.zrodlo)
+                or ("女侠" in ta.zrodlo and "少侠" in tb.zrodlo)
+            )
+            is_mf_aud = ("_m_" in aud_a and "_f_" in aud_b) or ("_pma_" in aud_a and "_pfa_" in aud_b)
+            if is_mf_zh or is_mf_aud:
+                if "小妮子" in ta.zrodlo or "女侠" in ta.zrodlo or "_f_" in aud_a or "_pfa_" in aud_a:
+                    plec_wiersza[a["wiersz"]] = "bohaterka (żeński)"
+                    plec_wiersza[b["wiersz"]] = "bohater (męski)"
+                else:
+                    plec_wiersza[a["wiersz"]] = "bohater (męski)"
+                    plec_wiersza[b["wiersz"]] = "bohaterka (żeński)"
+
+        # Najpierw dzielimy po lukach ID (>1), wyodrębniając m.in. PROLOG (590291..590459),
+        # a w ramach dużych ciągów tniemy łagodnie po zmianie rodziny `vo_*` lub co 100 linii.
+        ciagi: list[list[dict]] = []
+        for row in napisy:
+            if not ciagi or row["wiersz"] - ciagi[-1][-1]["wiersz"] > 1:
+                ciagi.append([row])
+            else:
+                ciagi[-1].append(row)
+
+        if napisy:
+            katalog.mkdir(parents=True, exist_ok=True)
+            pisarz = Pisarz(katalog, "01_napisy_cutscen", "Napisy cutscen (`text_msg` 590000–592694) — Where Winds Meet", wstep)
+            nr_ciagu = 0
+            for ciag in ciagi:
+                if not self._zawiera_nowe([r["k"] for r in ciag]):
+                    continue
+                nr_ciagu += 1
+                start_w, stop_w = ciag[0]["wiersz"], ciag[-1]["wiersz"]
+                is_prolog = not (stop_w < ZAKRES_PROLOG_TM[0] or start_w > ZAKRES_PROLOG_TM[1])
+                if is_prolog:
+                    nagl = f"## Cutscena {nr_ciagu} — PROLOG (wiersze {start_w}–{stop_w}, {len(ciag)} linii)"
+                else:
+                    nagl = f"## Cutscena {nr_ciagu} (wiersze {start_w}–{stop_w}, {len(ciag)} linii)"
+                pisarz.naglowek(2, [nagl])
+
+                subblocks: list[list[dict]] = []
+                cur_sub: list[dict] = []
+                cur_vo = ""
+                for row in ciag:
+                    vo = self._vo_scena(row.get("audio"))
+                    if cur_sub and ((vo and cur_vo and vo != cur_vo and len(cur_sub) >= 12) or len(cur_sub) >= 100):
+                        subblocks.append(cur_sub)
+                        cur_sub = []
+                        cur_vo = vo
+                    elif vo and not cur_vo:
+                        cur_vo = vo
+                    cur_sub.append(row)
+                if cur_sub:
+                    subblocks.append(cur_sub)
+
+                for sub in subblocks:
+                    if not self._zawiera_nowe([r["k"] for r in sub]):
+                        continue
+                    lines: list[str] = []
+                    w_bloku: dict[str, int] = {}
+                    nr = opened = 0
+                    for row in sub:
+                        nr += 1
+                        key = row["k"]
+                        text = ix.teksty[key]
+                        speaker = self._mowca_cutsceny(row, text)
+                        audio = row.get("audio") or ""
+                        parts = [f"text_msg · {row['wiersz']}"]
+                        if audio:
+                            parts.append(audio)
+                        if speaker:
+                            parts.append(f"mówca: {speaker}")
+                        label = " · ".join(parts)
+                        extra: list[str] = []
+                        if row["wiersz"] in plec_wiersza:
+                            extra.append(f"wariant płci: {plec_wiersza[row['wiersz']]}")
+                        part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce=f"cutscena {row['wiersz']}, element {{nr}}")
+                        lines += part
+                        opened += is_open
+                    self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+            files = pisarz.koniec()
+            if files:
+                self.serie.append({"baza": "01_napisy_cutscen", "tytul": "Napisy cutscen (`text_msg` 590000–592694)", "opis": "cutsceny", "pliki": files})
+
+        # 2. 02_intro_i_filmy — wds_oneday_intro_cutscene_data + entry_collect_movie_subtitle_data
+        intro = sorted((r for r in ix.cutsceny_kontekst.get("intro", ()) if r.get("k") in ix.teksty), key=lambda r: r["id"])
+        filmy = sorted((r for r in ix.cutsceny_kontekst.get("film", ()) if r.get("k") in ix.teksty), key=lambda r: (r["film"], r["czas"], r["id"]))
+        has_intro = self._zawiera_nowe([r["k"] for r in intro])
+        has_filmy = self._zawiera_nowe([r["k"] for r in filmy])
+        if has_intro or has_filmy:
+            katalog.mkdir(parents=True, exist_ok=True)
+            pisarz = Pisarz(katalog, "02_intro_i_filmy", "Intro i napisy filmowe — Where Winds Meet", wstep)
+            if has_intro:
+                pisarz.naglowek(2, [f"## Intro — wds_oneday_intro_cutscene_data ({len(intro)} linii)"])
+                lines, w_bloku, nr, opened = [], {}, 0, 0
+                for row in intro:
+                    nr += 1
+                    t0 = row["czas"]
+                    t1 = t0 + row["trwanie"]
+                    label = f"intro · id {row['id']} · {t0:.1f}s–{t1:.1f}s · mówca {row['mowca']}"
+                    part, is_open = self._element(nr, label, row["k"], w_bloku, miejsce=f"intro id {row['id']}")
+                    lines += part
+                    opened += is_open
+                self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+            by_film: dict[int, list[dict]] = defaultdict(list)
+            for row in filmy:
+                by_film[row["film"]].append(row)
+            for film_id, rows in sorted(by_film.items()):
+                if not self._zawiera_nowe([r["k"] for r in rows]):
+                    continue
+                pisarz.naglowek(2, [f"## Film {film_id} — entry_collect_movie_subtitle_data ({len(rows)} napisów)"])
+                lines, w_bloku, nr, opened = [], {}, 0, 0
+                for row in rows:
+                    nr += 1
+                    t0 = row["czas"]
+                    t1 = t0 + row["trwanie"]
+                    label = f"film {film_id} · id {row['id']} · {t0:.1f}s–{t1:.1f}s"
+                    part, is_open = self._element(nr, label, row["k"], w_bloku, miejsce=f"film {film_id}, id {row['id']}")
+                    lines += part
+                    opened += is_open
+                self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+            files = pisarz.koniec()
+            if files:
+                self.serie.append({"baza": "02_intro_i_filmy", "tytul": "Intro i napisy filmowe", "opis": "cutsceny", "pliki": files})
+
+        # 3. 03_plansze_i_streszczenia — task_cutscene_replay + cutscenes poza zadaniami
+        powtorki = sorted(
+            ix.cutsceny_kontekst.get("powtorka", ()),
+            key=lambda r: (r.get("grupa") or 0, r.get("task_no") or 0, r["no"]),
+        )
+        powtorki_nowe = [
+            r for r in powtorki
+            if any((r.get(f) in ix.teksty and r.get(f) not in self.sloty) for f in ("nazwa", "rozdzial"))
+            and self._zawiera_nowe([r[f] for f in ("nazwa", "rozdzial") if r.get(f) and r.get(f) in ix.teksty])
+        ]
+        przerywniki_nowe = [
+            row for _no, row in sorted(ix.przerywniki.items())
+            if any((row.get(f) and row.get(f) in ix.teksty and row.get(f) not in self.sloty) for f in ("tekst", "streszczenie"))
+            and self._zawiera_nowe([row[f] for f in ("tekst", "streszczenie") if row.get(f) and row.get(f) in ix.teksty])
+        ]
+        if powtorki_nowe or przerywniki_nowe:
+            katalog.mkdir(parents=True, exist_ok=True)
+            pisarz = Pisarz(katalog, "03_plansze_i_streszczenia", "Plansze przerywników i powtórki w dzienniku — Where Winds Meet", wstep)
+            if powtorki_nowe:
+                pisarz.naglowek(2, [f"## Powtórki cutscen w dzienniku — task_cutscene_replay ({len(powtorki_nowe)} wpisów)"])
+                for row in powtorki_nowe:
+                    lines, w_bloku, nr, opened = [], {}, 0, 0
+                    task_no = row.get("task_no")
+                    task_info = ""
+                    if task_no and task_no in ix.zadania:
+                        task_info = f"zadanie {task_no} ({self.para(ix.zadania[task_no].get('nazwa'))})"
+                    for field, label in (("nazwa", "Nazwa powtórki"), ("rozdzial", "Rozdział powtórki")):
+                        key = row.get(field)
+                        if not key or key not in ix.teksty:
+                            continue
+                        nr += 1
+                        extra = [task_info] if task_info else []
+                        part, is_open = self._element(nr, f"task_cutscene_replay · {row['no']} · {label}", key, w_bloku, dodatkowe=extra, miejsce=f"powtórka {row['no']}, element {{nr}}")
+                        lines += part
+                        opened += is_open
+                    if lines:
+                        self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+            if przerywniki_nowe:
+                pisarz.naglowek(2, [f"## Plansze i streszczenia przerywników — cutscenes ({len(przerywniki_nowe)} wpisów)"])
+                for row in przerywniki_nowe:
+                    lines, w_bloku, nr, opened = [], {}, 0, 0
+                    cut_no = row["no"]
+                    task_no = self._zadanie_przerywnika.get(cut_no)
+                    extra = [f"zadanie: {task_no} — {self.para(ix.zadania[task_no].get('nazwa'))}"] if task_no and task_no in ix.zadania else []
+                    for field, label in (("tekst", "Plansza przerywnika"), ("streszczenie", "Streszczenie przerywnika")):
+                        key = row.get(field)
+                        if not key or key not in ix.teksty:
+                            continue
+                        nr += 1
+                        part, is_open = self._element(nr, f"cutscenes · {cut_no} · {label}", key, w_bloku, dodatkowe=extra, miejsce=f"cutscene {cut_no}, element {{nr}}")
+                        lines += part
+                        opened += is_open
+                    if lines:
+                        self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+            files = pisarz.koniec()
+            if files:
+                self.serie.append({"baza": "03_plansze_i_streszczenia", "tytul": "Plansze przerywników i powtórki w dzienniku", "opis": "cutsceny", "pliki": files})
+
     # ----------------------------------------------------------- widoki
 
     def widoki(self, katalog: Path) -> None:
@@ -652,10 +1020,16 @@ class Generator:
 
         groups: dict[str, list[tuple]] = defaultdict(list)
         for key, text in ix.teksty.items():
+            reason = self.powod_wykluczenia(key)
+            if reason is not None:
+                self.wykluczenia[reason] += 1
+                continue
+            if not self.wszystko and key in self._cutsceny_klucze:
+                continue
             source = ix.zrodlo(text)
             if source is None:
                 if key in self.sloty:
-                    continue  # tekst tylko ze scen
+                    continue  # tekst tylko ze scen albo cutscen
                 groups[BEZ_ZRODLA].append((("", 0, ""), (1, 0, text.zrodlo), 0, key))
                 continue
             kind, _path, row = source
@@ -762,18 +1136,23 @@ def kontrola(generator: "Generator", wyj: Path) -> dict:
     """Przeczytaj gotowe pliki tak, jak zrobi to import, i porównaj z wyciągiem.
 
     Każde miejsce `PL:` ma klucz znany wyciągowi i występuje dokładnie raz;
-    w pakiecie pełnym miejsca pokrywają wszystkie niepuste teksty i wszystkie
-    kwestie zależne od płci, w uzupełniającym — dokładnie zamówione klucze.
+    w pakiecie pełnym miejsca pokrywają wszystkie niewykluczone niepuste teksty
+    oraz wszystkie kwestie zależne od płci, w uzupełniającym — dokładnie zamówione klucze.
     """
     ix = generator.ix
     seen = Counter()
-    for folder in ("sceny", "widoki"):
-        for path in sorted((wyj / folder).glob("*.md")):
+    for folder in ("sceny", "cutsceny", "widoki"):
+        folder_path = wyj / folder
+        if not folder_path.is_dir():
+            continue
+        for path in sorted(folder_path.glob("*.md")):
             for entry in fmt.czytaj_wpisy(path.read_text(encoding="utf-8")):
                 seen[entry.klucz] += 1
     wanted = {
         key for key, text in ix.teksty.items()
-        if text.zrodlo.strip() and (not generator.tylko_z_en or text.en is not None or text.z_en)
+        if text.zrodlo.strip()
+        and (not generator.tylko_z_en or text.en is not None or text.z_en)
+        and generator.powod_wykluczenia(key) is None
     } | {
         "@" + ident for ident in ix.warianty
         if not generator.tylko_z_en or generator._ma_en("@" + ident)
@@ -790,7 +1169,18 @@ def kontrola(generator: "Generator", wyj: Path) -> dict:
     }
 
 
-def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: set[str] | None = None, tylko_z_en: bool = False, zip_: bool = True) -> dict:
+def zbuduj(
+    ix,
+    wyj: Path,
+    *,
+    wersja: str,
+    data: str,
+    magazyn=None,
+    tylko_sloty: set[str] | None = None,
+    tylko_z_en: bool = False,
+    wszystko: bool = False,
+    zip_: bool = True,
+) -> dict:
     """Zbuduj pakiet w katalogu `wyj`; zwraca manifest pakietu."""
     try:
         from tools import opis_paczki
@@ -798,22 +1188,34 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         import opis_paczki  # type: ignore[no-redef]
 
     wyj.mkdir(parents=True, exist_ok=True)
-    for name in ("sceny", "widoki"):
+    for name in ("sceny", "cutsceny", "widoki"):
         folder = wyj / name
         if folder.is_dir():
             for old in folder.glob("*"):
                 old.unlink()
     for old in wyj.glob("paczka_dla_tlumacza_wwm_v*.zip"):
         old.unlink()
-    generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en)
+    for old in ("cutsceny.zip", "sceny.zip", "widoki.zip"):
+        old_zip = wyj / old
+        if old_zip.exists():
+            old_zip.unlink()
+
+    generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en, wszystko=wszystko)
     generator.sceny(wyj / "sceny")
     sceny_serie = list(generator.serie)
     generator.serie = []
     liczby_scen = Counter(generator.liczby)
+
+    generator.cutsceny(wyj / "cutsceny")
+    cutsceny_serie = list(generator.serie)
+    generator.serie = []
+    liczby_po_cut = Counter(generator.liczby)
+    liczby_cutsceny = liczby_po_cut - liczby_scen
+
     generator.widoki(wyj / "widoki")
     widoki_serie = list(generator.serie)
     liczby = Counter(generator.liczby)
-    liczby_widokow = liczby - liczby_scen
+    liczby_widokow = liczby - liczby_po_cut
 
     (wyj / "sceny" / "spis-scen.md").write_text(opis_paczki.spis_scen(generator, sceny_serie), encoding="utf-8", newline="\n")
     (wyj / "sceny" / "spis-misji.md").write_text(opis_paczki.spis_misji(generator), encoding="utf-8", newline="\n")
@@ -827,6 +1229,7 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         "data": data,
         "rodzaj": "pełny" if tylko_sloty is None else "uzupełniający",
         "tylko_z_en": tylko_z_en,
+        "wszystko": wszystko,
         "indeks": {
             "format": ix.manifest["format"],
             "opis": ix.manifest.get("wejscia", {}).get("opis", ""),
@@ -834,7 +1237,9 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         },
         "liczby": dict(liczby),
         "liczby_sceny": dict(liczby_scen),
+        "liczby_cutsceny": dict(liczby_cutsceny),
         "liczby_widoki": dict(liczby_widokow),
+        "wykluczenia": dict(generator.wykluczenia),
         "uklad": {
             "scen_w_zadaniach": sum(1 for row in generator.spis_scen if row[3] == "zadania"),
             "w_tym_wg_numeracji": sum(1 for row in generator.spis_scen if row[5] == "numeracja"),
@@ -843,23 +1248,28 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
             "przerwanych_cykli_lancucha_zadan": generator.uklad.cykle,
         },
         "sceny": sceny_serie,
+        "cutsceny": cutsceny_serie,
         "widoki": widoki_serie,
     }
     (wyj / "README.md").write_text(opis_paczki.readme(generator, manifest), encoding="utf-8", newline="\n")
     manifest["kontrola"] = kontrola(generator, wyj)
     if zip_:
-        for name in ("sceny", "widoki"):
-            spakuj(wyj / name, wyj / f"{name}.zip")
-        # jeden plik do przekazania tłumaczowi: README.md + sceny.zip + widoki.zip
+        arch_parts = []
+        for name in ("sceny", "cutsceny", "widoki"):
+            folder = wyj / name
+            if folder.is_dir() and any(folder.iterdir()):
+                spakuj(folder, wyj / f"{name}.zip")
+                arch_parts.append(f"{name}.zip")
+        # jeden plik do przekazania tłumaczowi: README.md + istniejące archiwa działów
         whole = wyj / f"paczka_dla_tlumacza_wwm_v{wersja}.zip"
         with zipfile.ZipFile(whole, "w", zipfile.ZIP_STORED) as archive:
-            for name in ("README.md", "sceny.zip", "widoki.zip"):
+            for name in ["README.md", *arch_parts]:
                 info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, (wyj / name).read_bytes())
         manifest["archiwa"] = {
             name: {"bajtow": (wyj / name).stat().st_size, "sha256": sha256(wyj / name)}
-            for name in ("sceny.zip", "widoki.zip", whole.name)
+            for name in [*arch_parts, whole.name]
         }
     (wyj / "paczka.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     return manifest
@@ -875,6 +1285,7 @@ def main(argv=None) -> int:
     parser.add_argument("--tlumaczenie", help="katalog magazynu przekładów; gotowe przekłady nie dostają `PL:`")
     parser.add_argument("--tylko-sloty", help="plik z listą kluczy (jeden na linię): pakiet uzupełniający")
     parser.add_argument("--tylko-z-en", action="store_true", help="pomiń wpisy bez wersji angielskiej w grze (tylko chińskie)")
+    parser.add_argument("--wszystko", action="store_true", help="nie stosuj wykluczeń v2 (uwzględnij też boty, programmer i tabele meta)")
     parser.add_argument("--bez-zip", action="store_true")
     arguments = parser.parse_args(argv)
     try:
@@ -886,9 +1297,19 @@ def main(argv=None) -> int:
     except (indeks_mod.IndeksError, magazyn_mod.MagazynError, OSError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
-    manifest = zbuduj(ix, Path(arguments.wyj), wersja=arguments.wersja, data=arguments.data, magazyn=magazyn, tylko_sloty=only, tylko_z_en=arguments.tylko_z_en, zip_=not arguments.bez_zip)
+    manifest = zbuduj(
+        ix,
+        Path(arguments.wyj),
+        wersja=arguments.wersja,
+        data=arguments.data,
+        magazyn=magazyn,
+        tylko_sloty=only,
+        tylko_z_en=arguments.tylko_z_en,
+        wszystko=arguments.wszystko,
+        zip_=not arguments.bez_zip,
+    )
     ok = manifest["kontrola"]["zgodne"]
-    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "tylko_z_en": manifest["tylko_z_en"], "liczby": manifest["liczby"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
+    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "tylko_z_en": manifest["tylko_z_en"], "wszystko": manifest["wszystko"], "liczby": manifest["liczby"], "wykluczenia": manifest["wykluczenia"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
     return 0 if ok else 1
 
 

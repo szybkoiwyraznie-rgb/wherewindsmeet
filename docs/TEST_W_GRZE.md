@@ -8,10 +8,11 @@ To najkrótsza i bezpieczna próba sprawdzenia w prawdziwym kliencie Steam:
    polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`)
    bez pustych ramek (`□`) i ucięć.
 
-Test zmienia wyłącznie kilkanaście etykiet menu głównego / ustawień oraz 7
-początkowych kwestii otwierającej cutscenki prologu (wiersze `590336–590351`
-tabel `text_msg` i `text_msg__grey`, m.in. `Even at the end of the road,` /
-`a drink to wet your throat.`), bez modyfikacji plików `.exe`, `.dll` ani
+Test zmienia wyłącznie kilkanaście etykiet menu głównego / ustawień oraz
+początkowe kwestie otwierającej cutscenki prologu (wiersze `590291–590459`
+z sekcji `cutsceny/01_napisy_cutscen_*.md`, m.in. `Even at the end of the road,`,
+`there's still time for one last drink.`, `Cut them down, left and right` z obsługą
+rozdzielania kolizji z Wariantu A), bez modyfikacji plików `.exe`, `.dll` ani
 pamięci procesu.
 
 **Zastrzeżenie:** test nie był jeszcze uruchomiony w prawdziwej grze.
@@ -53,14 +54,17 @@ Testowane napisy UI obejmują komplet polskich znaków:
 - `New Game` → `Nowa gra [PL]`
 - `Exit` → `Wyjście [PL]`
 
-Testowane kwestie prologu (dopasowanie `(EN, ZH)` z `text_msg` / `text_msg__grey`):
+Testowane kwestie prologu (dopasowanie `(EN, ZH)` z `text_msg 590291–590459` z dopasowaniem wariantów w `index/kolizje.jsonl`):
+- `Whoa, what brings you here,` (`呦 这是哪来的风`) → `Oho, co za wiatr cię tu przywiał [PL: ą ć ę ł ń ó ś ź ż],`
+- `My, would you look at who the wind finally blew back home...` (`把我们家贵客吹回来了`) → `No proszę, kogo też wiatr wreszcie przywiał do domu [Ą Ć Ę Ł Ń Ó Ś Ź Ż]...`
 - `It's you.` (`是你`) → `To ty [PL: ą ć ę ł ń ó ś ź ż].`
-- `Yes. Coming to catch you.` (`是啊 来抓你`) → `Tak. Przyszliśmy cię pojmać [Ą Ć Ę Ł Ń Ó Ś Ź Ż].`
+- `That's right, here to take you in.` (`是啊 来抓你`) → `Zgadza się — przyszliśmy cię pojmać [Ą Ć Ę Ł Ń Ó Ś Ź Ż].`
 - `Even at the end of the road,` (`穷途末路`) → `Nawet u kresu drogi [ą ć ę ł ń ó ś ź ż],`
-- `a drink to wet your throat.` (`尚有一饮入喉`) → `łyk trunku zwilży gardło [Ą Ć Ę Ł Ń Ó Ś Ź Ż].`
-- `Well? How is it?` (`如何`) → `I jak? Smakuje [ą ć ę ł ń ó ś ź ż]?`
+- `there's still time for one last drink.` (`尚有一饮入喉`) → `został jeszcze łyk trunku przed końcem [Ą Ć Ę Ł Ń Ó Ś Ź Ż].`
+- `So?` (`如何`) → `I jak [ą ć ę ł ń ó ś ź ż]?`
 - `Bland.` (`淡`) → `Mdłe [Ą Ć Ę Ł Ń Ó Ś Ź Ż].`
 - `Retrieve the Zhenguan Jade!` (`夺下镇冠珏`) → `Odbierzcie Nefryt Zhenguan [ąęółńśźż]!`
+- `Cut them down, left and right` (`十步杀一人`) → `Ścinam ich na lewo i prawo [ą ć ę ł ń ó ś ź ż]` (z pozostawieniem umiejętności `Relentless Advance` po angielsku)
 
 ---
 

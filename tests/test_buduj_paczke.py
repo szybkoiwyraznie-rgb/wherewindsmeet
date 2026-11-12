@@ -210,5 +210,120 @@ class WriterTests(unittest.TestCase):
         self.assertEqual(buduj_paczke.kategoria("zupelnie_nieznana"), "09_pozostale")
 
 
+class V2CutscenesAndExclusionsTests(unittest.TestCase):
+    def _build_v2_world(self):
+        base = world()
+        zh = {**ZH, **ZH_EXTRA}
+        en = {**EN, **EN_EXTRA}
+        extra_zh = {
+            T + 700: "伊刀 别动",  # 590291 PROLOG
+            T + 701: "小子 快醒来啊",  # 590453 M
+            T + 702: "小妮子 快醒来啊",  # 590454 F
+            T + 703: "新来的！",  # intro
+            T + 704: "花果山上来了那一批灯",  # film
+            T + 705: "劫后重逢",  # replay name
+            T + 706: "未配 zadań przerywnik",  # cutscenes bez zadania
+            T + 707: "bot nick 3220001",  # bot nick -> wykluczony
+            T + 708: "测试文本123",  # placeholder -> wykluczony
+            T + 709: "关注“燕云十六声”官方公众号",  # promo WeChat -> wykluczone
+            T + 710: "网络连接失败，请稍后重试",  # blad sieci -> wykluczony
+            T + 711: "klucz z programmer",  # programmer_text_msg -> wykluczony
+            T + 712: "Press {} for tutorial",  # guider_task -> wykluczony
+            T + 713: "Auto-Skip Setting",  # setting_items -> wykluczony
+            T + 714: "Osiągnięcie gracza",  # ac_raw -> zostaje
+            T + 715: "Tekst 3D fabularny",  # gameplay_space_3d_ui_config -> zostaje
+            T + 716: "stary grey 590291",  # text_msg__grey 590291 rozny od text_msg -> wykluczony
+        }
+        extra_en = {
+            T + 700: "Stay put.",
+            T + 701: "Kid, wake up!",
+            T + 702: "Girlie, wake up!",
+            T + 703: "You there, the newcomer!",
+            T + 704: "To Huaguo Mountain...",
+            T + 705: "Reunion After the Storm",
+            T + 706: "Standalone cutscene board",
+            T + 707: "ShadowBot",
+            T + 708: "Test Text 123",
+            T + 709: "Follow Official WeChat Account",
+            T + 710: "Network error, connection failed",
+            T + 711: "Debug programmer text",
+            T + 712: "Press {} for tutorial",
+            T + 713: "Auto-Skip Setting",
+            T + 714: "Player Achievement",
+            T + 715: "Story 3D Text",
+            T + 716: "Old grey subtitle",
+        }
+        zh.update(extra_zh)
+        en.update(extra_en)
+        base["text_msg"] = [
+            (590291, {"content": T + 700}),
+            (590453, {"content": T + 701}),
+            (590454, {"content": T + 702}),
+            (3220001, {"content": T + 707}),
+            (100, {"content": T + 708}),
+            (101, {"content": T + 709}),
+            (102, {"content": T + 710}),
+        ]
+        base["text_msg__grey"] = [(590291, {"content": T + 716})]
+        base["sound_data"] = [(1, {"audio_name": "vo_shenxiandu_npc_105", "text": "伊刀 别动"})]
+        base["wds_oneday_intro_cutscene_data"] = [(10001, {"id": 10001, "time": 1.0, "duration": 3.0, "speaker": 2, "text": T + 703})]
+        base["entry_collect_movie_subtitle_data"] = [(1, [{"dialog_no": 1, "id": 101, "time": 1.0, "duration": 3.0, "text": T + 704}])]
+        base["task_cutscene_replay"] = [(32208, {"no": 32208, "task_no": 1, "group": 5, "name": T + 705})]
+        base["cutscenes"] = [*base["cutscenes"], (302, {"no": 302, "content": T + 706})]
+        base["programmer_text_msg"] = [(1, {"content": T + 711})]
+        base["guider_task"] = [(1, {"guide_desc": T + 712}), (2, {"guide_desc": T + 30})]  # T+30 chronione przez zadania/sceny
+        base["setting_items"] = [(1, {"name": T + 713})]
+        base["ac_raw"] = [(1, {"name": T + 714})]
+        base["gameplay_space_3d_ui_config"] = [(1, {"text": T + 715})]
+        return base, zh, en
+
+    def test_cutscenes_section_and_v2_exclusions_pass_control_and_preserve_story(self):
+        data, zh, en = self._build_v2_world()
+        with tempfile.TemporaryDirectory(prefix="wwm-v2-paczka-") as temp:
+            root = Path(temp)
+            wyciag.zbuduj(FakeBaza(data), zh, en, root / "index", {"opis": "test v2"}, log=lambda _text: None)
+            ix = indeks.wczytaj(root / "index")
+
+            # Domyślny tryb v2: cutsceny/ + wykluczenia śmieci
+            manifest = buduj_paczke.zbuduj(ix, root / "out_v2", wersja="2", data="2026-11-11", tylko_z_en=True)
+            self.assertTrue(manifest["kontrola"]["zgodne"])
+            self.assertEqual(
+                manifest["wykluczenia"],
+                {"boty_nicki": 1, "stare_grey_cutsceny": 1, "tabele_meta": 3, "placeholdery_testy": 1, "promo_beta_cn": 1, "bledy_sieciowe": 1},
+            )
+            with zipfile.ZipFile(root / "out_v2" / "paczka_dla_tlumacza_wwm_v2.zip") as z:
+                self.assertEqual(z.namelist(), ["README.md", "sceny.zip", "cutsceny.zip", "widoki.zip"])
+
+            cut_files = {p.name: p.read_text(encoding="utf-8") for p in (root / "out_v2" / "cutsceny").glob("*.md")}
+            self.assertIn("01_napisy_cutscen_01.md", cut_files)
+            self.assertIn("02_intro_i_filmy_01.md", cut_files)
+            self.assertIn("03_plansze_i_streszczenia_01.md", cut_files)
+
+            napisy_md = cut_files["01_napisy_cutscen_01.md"]
+            self.assertIn("PROLOG (wiersze 590291–590291", napisy_md)
+            self.assertIn("vo_shenxiandu_npc_105 · mówca: 伊刀 (Yi Dao)", napisy_md)
+            self.assertIn("wariant płci: bohater (męski)", napisy_md)
+            self.assertIn("wariant płci: bohaterka (żeński)", napisy_md)
+            self.assertIn("intro · id 10001 · 1.0s–4.0s · mówca 2", cut_files["02_intro_i_filmy_01.md"])
+            self.assertIn("film 1 · id 101 · 1.0s–4.0s", cut_files["02_intro_i_filmy_01.md"])
+            self.assertIn("task_cutscene_replay · 32208 · Nazwa powtórki", cut_files["03_plansze_i_streszczenia_01.md"])
+            self.assertIn("cutscenes · 302 · Plansza przerywnika", cut_files["03_plansze_i_streszczenia_01.md"])
+
+            widoki_md = "\n".join(p.read_text(encoding="utf-8") for p in (root / "out_v2" / "widoki").glob("*.md"))
+            self.assertIn("Osiągnięcie gracza", widoki_md)
+            self.assertIn("Tekst 3D fabularny", widoki_md)
+            for excluded in ("ShadowBot", "Test Text 123", "Follow Official WeChat Account", "Network error", "Debug programmer text", "Press {} for tutorial", "Auto-Skip Setting", "Old grey subtitle"):
+                self.assertNotIn(excluded, widoki_md)
+
+            readme = (root / "out_v2" / "README.md").read_text(encoding="utf-8")
+            self.assertIn("cutsceny.zip", readme)
+            self.assertIn("losowych nicków botów/graczy", readme)
+
+            # Tryb --wszystko zachowuje też pozycje wykluczone
+            manifest_all = buduj_paczke.zbuduj(ix, root / "out_all", wersja="2", data="2026-11-11", wszystko=True, zip_=False)
+            self.assertTrue(manifest_all["kontrola"]["zgodne"])
+            self.assertEqual(manifest_all["wykluczenia"], {})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -123,7 +123,11 @@ def spis_misji(generator) -> str:
 def readme(generator, manifest: dict) -> str:
     ix = generator.ix
     liczby = manifest["liczby"]
-    sceny, widoki = manifest["liczby_sceny"], manifest["liczby_widoki"]
+    sceny = manifest["liczby_sceny"]
+    cutsceny = manifest.get("liczby_cutsceny") or {}
+    widoki = manifest["liczby_widoki"]
+    cut_serie = manifest.get("cutsceny") or []
+    wykl = manifest.get("wykluczenia") or {}
     uklad = manifest["uklad"]
     numery = ix.manifest["liczby"]
     pokrycie = ix.manifest["pokrycie"]
@@ -174,13 +178,20 @@ def readme(generator, manifest: dict) -> str:
         "Każda scena ma w nagłówku zadanie, miejsce i uczestników; `spis-misji.md` i `spis-scen.md` w tym samym zipie "
         "pokazują układ całości."
     )
+    next_step = 2
+    if cut_serie:
+        add(
+            f"{next_step}. Rozpakowujesz **`cutsceny.zip`** — wydzielone napisy cutscen (w tym PROLOG), intro, napisy filmowe oraz "
+            f"plansze/powtórki przerywników: {_l(cutsceny.get('elementow', 0))} elementów, **{_l(cutsceny.get('do_wpisania', 0))} linii `PL:`**."
+        )
+        next_step += 1
     add(
-        f"2. Rozpakowujesz **`widoki.zip`** — teksty spoza scen w grupach: postacie, zadania, przedmioty, walka, świat, "
+        f"{next_step}. Rozpakowujesz **`widoki.zip`** — teksty spoza scen w grupach: postacie, zadania, przedmioty, walka, świat, "
         f"encyklopedia, komunikaty, interfejs. Do wpisania: **{_l(widoki.get('do_wpisania', 0))} linii `PL:`** "
         f"(razem w pakiecie **{_l(liczby.get('do_wpisania', 0))}**)."
     )
-    add("3. Pod każdym tekstem chińskim są linie `EN:` (angielska wersja gry jako odniesienie) i `PL:` — **polski wpisujesz po `PL:`**.")
-    add("4. Odsyłasz pliki **tak jak są** (może być zip). Nie zmieniasz nazw plików, linii `klucz:` ani tekstu chińskiego.")
+    add(f"{next_step + 1}. Pod każdym tekstem chińskim są linie `EN:` (angielska wersja gry jako odniesienie) i `PL:` — **polski wpisujesz po `PL:`**.")
+    add(f"{next_step + 2}. Odsyłasz pliki **tak jak są** (może być zip). Nie zmieniasz nazw plików, linii `klucz:` ani tekstu chińskiego.")
     add("")
     add("## 1. Jak wygląda jeden element")
     add("")
@@ -312,6 +323,20 @@ def readme(generator, manifest: dict) -> str:
         "i został przerwany), ale część scen fabularnych wywołują skrypty, których w plikach tabel nie ma — te sceny trafiły do punktu 2 albo 3."
     )
     add("")
+    if cut_serie:
+        add("## 8a. Sekcja cutscen (`cutsceny.zip`)")
+        add("")
+        add("Napisy cutscen, filmy i plansze przerywników zostały zebrane w osobnym archiwum z zachowaniem kolejności ciągów i kontekstu:")
+        add("")
+        out.extend(_tabela_serii(cut_serie, sceny=False))
+        add("")
+        add(
+            "- `01_napisy_cutscen_NN.md` — napisy z zakresu `text_msg 590000–592694` pogrupowane według ciągów ID i nagrań audio (`vo_*`), "
+            "z wyraźnie oznaczonym **PROLOGIEM** (`590291–590459`), podpowiedzią mówcy, identyfikatorem nagrania i parami bohater/bohaterka."
+        )
+        add("- `02_intro_i_filmy_*.md` — intro gry (`wds_oneday_intro_cutscene_data`) oraz napisy filmowe ze znacznikami czasu.")
+        add("- `03_plansze_i_streszczenia_*.md` — powtórki cutscen w dzienniku (`task_cutscene_replay`) z powiązaniem do zadania i pozostałe plansze `cutscenes`.")
+        add("")
     add("## 9. Widoki")
     add("")
     add("Każdy tekst spoza scen stoi przy tabeli i polu gry, z którego pochodzi (`[tabela · pole · wiersz]`). Podział na pliki:")
@@ -335,6 +360,17 @@ def readme(generator, manifest: dict) -> str:
         f"- {_l(numery['id_tylko_zh_niewskazane_pominiete'])} identyfikatorów tekstu, które istnieją tylko w chińskiej mapie i których nie wskazuje "
         "żadna tabela ani scena — klient zachodni nie ma dla nich żadnej wersji językowej, więc ich nie wyświetla."
     )
+    if wykl:
+        opis_wykl = {
+            "boty_nicki": "losowych nicków botów/graczy (`text_msg` 3220000–3269999)",
+            "tabele_meta": "wpisów z tabel meta/UI/samouczków/sterowania/klawiszy/QTE/ustawień/komunikatów programisty (zostają po angielsku)",
+            "stare_grey_cutsceny": "przestarzałych wariantów `__grey` z zakresu cutscen 590000–592694",
+            "placeholdery_testy": "placeholderów i napisów testowych",
+            "promo_beta_cn": "chińskich komunikatów beta, NDA i promocji WeChat/WeCom",
+            "bledy_sieciowe": "komunikatów błędów sieciowych, serwera i logowania",
+        }
+        for key, count in sorted(wykl.items(), key=lambda item: -item[1]):
+            add(f"- {_l(count)} {opis_wykl.get(key, key)}.")
     add(f"- {_l(numery['scen_bez_tekstu'])} dialogów bez żadnego tekstu (same animacje i dźwięk).")
     add("- Tekstów zaszytych w grafikach, filmach i w samym programie gry.")
     add("")

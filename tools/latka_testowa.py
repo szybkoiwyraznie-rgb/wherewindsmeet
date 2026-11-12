@@ -31,6 +31,7 @@ import tempfile
 
 try:
     from tools import build_installer_kit
+    from tools import indeks as indeks_mod
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
     from tools import wypisz
@@ -38,6 +39,7 @@ try:
 except ImportError:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import build_installer_kit
+    from tools import indeks as indeks_mod
     from tools import mapa_tekstow
     from tools import tlumaczenie as magazyn_mod
     from tools import wypisz
@@ -57,20 +59,41 @@ TEST_LABELS: dict[str, str] = {
     "Exit": "Wyjście [PL]",
 }
 
-# Pierwsze napisy w cutscence prologu gry (tabele `text_msg` i `text_msg__grey`,
-# wiersze 590336–590351). Dopasowywane parą (EN, ZH.strip()), żeby nie podmienić
-# krótkich zwrotów w innych dialogach.
+# Pierwsze napisy w cutscenach prologu gry (`text_msg`, wiersze 590291–590459).
+# Dopasowywane parą (EN.strip(), ZH.strip()) i — w razie kolizji w `index/kolizje.jsonl` —
+# dokładnym kluczem wariantu, żeby nie podmienić obcych etykiet w grze.
 PROLOG_LINES: tuple[tuple[str, str, str], ...] = (
+    ("Whoa, what brings you here,", "呦 这是哪来的风", "Oho, co za wiatr cię tu przywiał [PL: ą ć ę ł ń ó ś ź ż],"),
+    ("My, would you look at who the wind finally blew back home...", "把我们家贵客吹回来了", "No proszę, kogo też wiatr wreszcie przywiał do domu [Ą Ć Ę Ł Ń Ó Ś Ź Ż]..."),
     ("It's you.", "是你", "To ty [PL: ą ć ę ł ń ó ś ź ż]."),
+    ("That's right, here to take you in.", "是啊 来抓你", "Zgadza się — przyszliśmy cię pojmać [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
     ("Yes. Coming to catch you.", "是啊 来抓你", "Tak. Przyszliśmy cię pojmać [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
     ("Even at the end of the road,", "穷途末路", "Nawet u kresu drogi [ą ć ę ł ń ó ś ź ż],"),
+    ("there's still time for one last drink.", "尚有一饮入喉", "został jeszcze łyk trunku przed końcem [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
     ("a drink to wet your throat.", "尚有一饮入喉", "łyk trunku zwilży gardło [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
+    ("So?", "如何", "I jak [ą ć ę ł ń ó ś ź ż]?"),
     ("Well? How is it?", "如何", "I jak? Smakuje [ą ć ę ł ń ó ś ź ż]?"),
     ("Bland.", "淡", "Mdłe [Ą Ć Ę Ł Ń Ó Ś Ź Ż]."),
     ("Retrieve the Zhenguan Jade!", "夺下镇冠珏", "Odbierzcie Nefryt Zhenguan [ąęółńśźż]!"),
+    ("Cut them down, left and right", "十步杀一人", "Ścinam ich na lewo i prawo [ą ć ę ł ń ó ś ź ż]"),
 )
 
 ZAKRESY = ("ui", "prolog", "ui+prolog")
+
+
+def _klucz_dla_wpisu(ix: indeks_mod.Indeks, zh_raw: str, current: str) -> str | None:
+    warianty_zh = ix.kolizje.get(zh_raw)
+    if not warianty_zh:
+        return mapa_tekstow.klucz(zh_raw)
+    for key, rep_en in warianty_zh:
+        if rep_en == current:
+            return key
+    best_key, best_sim = None, 0.0
+    for key, rep_en in warianty_zh:
+        score = mapa_tekstow.podobienstwo_en(current, rep_en)
+        if score > best_sim:
+            best_key, best_sim = key, score
+    return best_key if best_sim >= 0.5 else None
 
 
 def zbuduj_paczke_testowa(
@@ -94,6 +117,7 @@ def zbuduj_paczke_testowa(
     use_prolog = zakres in ("prolog", "ui+prolog")
     prolog_by_pair = {(en, zh_key): pl for en, zh_key, pl in PROLOG_LINES}
 
+    ix = indeks_mod.wczytaj(indeks_dir, teksty=False)
     zh = mapa_tekstow.zloz(zh_paths)
     store = magazyn_mod.Magazyn()
     matched_ui: dict[str, int] = {}
@@ -106,13 +130,17 @@ def zbuduj_paczke_testowa(
             zh_raw = zh.get(ident)
             if use_ui and current in TEST_LABELS:
                 source = zh_raw if zh_raw is not None else current
-                store.ustaw(mapa_tekstow.klucz(source), TEST_LABELS[current])
-                matched_ui[current] = matched_ui.get(current, 0) + 1
+                slot_key = _klucz_dla_wpisu(ix, source, current) if zh_raw is not None else mapa_tekstow.klucz(current)
+                if slot_key:
+                    store.ustaw(slot_key, TEST_LABELS[current])
+                    matched_ui[current] = matched_ui.get(current, 0) + 1
             if use_prolog and zh_raw is not None:
-                prolog_pl = prolog_by_pair.get((current, zh_raw.strip()))
+                prolog_pl = prolog_by_pair.get((current.strip(), zh_raw.strip()))
                 if prolog_pl:
-                    store.ustaw(mapa_tekstow.klucz(zh_raw), prolog_pl)
-                    matched_prolog[current] = matched_prolog.get(current, 0) + 1
+                    slot_key = _klucz_dla_wpisu(ix, zh_raw, current)
+                    if slot_key:
+                        store.ustaw(slot_key, prolog_pl)
+                        matched_prolog[current.strip()] = matched_prolog.get(current.strip(), 0) + 1
 
     if not len(store):
         raise ValueError(f"nie znaleziono żadnej z testowych etykiet dla zakresu {zakres!r} w podanych plikach mapy")
