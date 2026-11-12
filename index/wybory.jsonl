@@ -325,7 +325,7 @@
 {"q":"10303_1","pytanie":10303,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400021],"wybory":[{"nr":1,"tekst":"cc478ef45631af75","dialogi":[3400022]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10304_1","pytanie":10304,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400023],"wybory":[{"nr":1,"tekst":"4db443f4ca4fe291","dialogi":[3400024]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10305_1","pytanie":10305,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400025],"wybory":[{"nr":1,"tekst":"6eb4a4854a1ea353","dialogi":[3400026]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
-{"q":"10306_1","pytanie":10306,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400027],"wybory":[{"nr":1,"tekst":"5ed44a1f9b821447","dialogi":[3400028]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
+{"q":"10306_1","pytanie":10306,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400027],"wybory":[{"nr":1,"tekst":"1f948874d1a82cc4","dialogi":[3400028]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10307_1","pytanie":10307,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400029],"wybory":[{"nr":1,"tekst":"f2f58fc91f26aff6","dialogi":[3400030]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10308_1","pytanie":10308,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400031],"wybory":[{"nr":1,"tekst":"8efd8111d2e3f876","dialogi":[3400032]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10309_1","pytanie":10309,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400033],"wybory":[{"nr":1,"tekst":"17ed58bf874183f4","dialogi":[3400034]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
@@ -367,7 +367,7 @@
 {"q":"1033_2","pytanie":1033,"krok":2,"tytul":"911c49b3c8b347b9","po_dialogach":[1040169],"wybory":[{"nr":1,"tekst":"6d8a47b52bb52050","dialogi":[1040167]},{"nr":2,"tekst":"00f46bdc9441e3b4","dialogi":[1040168]},{"nr":3,"tekst":"7c68cea6158a7f4b"}]}
 {"q":"10340_1","pytanie":10340,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400059],"wybory":[{"nr":1,"tekst":"0254d038c8b1dfc7","dialogi":[3400060]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10341_1","pytanie":10341,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400061],"wybory":[{"nr":1,"tekst":"8856af0e5ce98cd6","dialogi":[3400062]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
-{"q":"10342_1","pytanie":10342,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400063],"wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[3400064]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
+{"q":"10342_1","pytanie":10342,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400063],"wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[3400064]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10343_1","pytanie":10343,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400065],"wybory":[]}
 {"q":"10344_1","pytanie":10344,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400066],"wybory":[{"nr":1,"tekst":"2e05d3ba0d3bd34a","dialogi":[3400067]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10345_1","pytanie":10345,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400068],"wybory":[{"nr":1,"tekst":"ce1246f602cfbbfc","dialogi":[3400069]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
@@ -429,7 +429,7 @@
 {"q":"10393_1","pytanie":10393,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400244],"wybory":[{"nr":1,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":2,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":3,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10394_1","pytanie":10394,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400245],"wybory":[{"nr":1,"tekst":"65cd70731018c7ac","dialogi":[3400246]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10395_1","pytanie":10395,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400247],"wybory":[{"nr":1,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":2,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":3,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
-{"q":"10396_1","pytanie":10396,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400248],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[3400806]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
+{"q":"10396_1","pytanie":10396,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400248],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[3400806]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10397_1","pytanie":10397,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400249],"wybory":[{"nr":1,"tekst":"8eaada7fefa6beb3","dialogi":[3400250]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10398_1","pytanie":10398,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400251],"wybory":[{"nr":1,"tekst":"01dc2e75f0297a97","dialogi":[3400252]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
 {"q":"10399_1","pytanie":10399,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400253],"wybory":[{"nr":1,"tekst":"73ad0504f1f26fe5","dialogi":[3400254]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
@@ -454,7 +454,7 @@
 {"q":"104017_1","pytanie":104017,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[1790000049],"wybory":[]}
 {"q":"104018_1","pytanie":104018,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[1790000068],"wybory":[{"nr":1,"tekst":"296aa047061e7c00"},{"nr":2,"tekst":"681dff1f0c143cbb"}]}
 {"q":"104019_1","pytanie":104019,"krok":1,"tytul":"f8308b0b2728de23","po_dialogach":[1790000069],"wybory":[]}
-{"q":"10401_1","pytanie":10401,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400256],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[3400257]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"},{"nr":7,"tekst":"746b2d5f59c221c1"}]}
+{"q":"10401_1","pytanie":10401,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[3400256],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[3400257]},{"nr":2,"tekst":"660ff5a6d5f35f2e","typ":8,"parametry":["10323"]},{"nr":3,"tekst":"5439a952ea590aa4","typ":8,"parametry":["10326"]},{"nr":4,"tekst":"15b60566ac022951","typ":8,"parametry":["10323"]},{"nr":5,"tekst":"746b2d5f59c221c1"},{"nr":7,"tekst":"746b2d5f59c221c1"}]}
 {"q":"104020_1","pytanie":104020,"krok":1,"tytul":"f8308b0b2728de23","po_dialogach":[1790000070],"wybory":[]}
 {"q":"104021_1","pytanie":104021,"krok":1,"tytul":"f8308b0b2728de23","po_dialogach":[1790000071],"wybory":[]}
 {"q":"104022_1","pytanie":104022,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[1790000175],"wybory":[{"nr":1,"tekst":"6967ebc5b2d53b61","typ":8,"parametry":["470"]},{"nr":2,"tekst":"727b8011f14c805f","typ":8,"parametry":["492"]},{"nr":3,"tekst":"59fe4ce487877047"}]}
@@ -1348,7 +1348,7 @@
 {"q":"115000_1","pytanie":115000,"krok":1,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"545441c8b3292255","typ":9,"parametry":["client/store/store_interact"]},{"nr":2,"tekst":"49031a2516be706b","dialogi":[11800006]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
 {"q":"115001_1","pytanie":115001,"krok":1,"tytul":"c10444eec9b982a8","wybory":[{"nr":1,"tekst":"6e11434e1c51b0fa","typ":8,"parametry":["810023"]},{"nr":2,"tekst":"61f96c6aac6a0745","typ":9,"parametry":["client/store/store_interact"]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
 {"q":"115002_1","pytanie":115002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8500009],"wybory":[{"nr":1,"tekst":"de60aee425ac4440","dialogi":[8500020],"typ":8,"parametry":["810272"]},{"nr":2,"tekst":"e16eb1f487c85cfd","dialogi":[8500020],"typ":8,"parametry":["810276"]},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
-{"q":"115003_1","pytanie":115003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13001476],"wybory":[{"nr":1,"tekst":"81bb5b707a41e844","typ":8,"parametry":["810273"]},{"nr":2,"tekst":"e16eb1f487c85cfd","typ":8,"parametry":["810277"]},{"nr":4,"tekst":"0e6ea84be3571b7b"}]}
+{"q":"115003_1","pytanie":115003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13001476],"wybory":[{"nr":1,"tekst":"650d9b81a9a138e7","typ":8,"parametry":["810273"]},{"nr":2,"tekst":"e16eb1f487c85cfd","typ":8,"parametry":["810277"]},{"nr":4,"tekst":"0e6ea84be3571b7b"}]}
 {"q":"115004_1","pytanie":115004,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13001479],"wybory":[{"nr":1,"tekst":"7b650d5d3272b6b5","typ":8,"parametry":["810274"]},{"nr":2,"tekst":"e16eb1f487c85cfd","typ":8,"parametry":["810278"]},{"nr":4,"tekst":"5aed98460d01a6e0"}]}
 {"q":"115005_1","pytanie":115005,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13001482],"wybory":[{"nr":1,"tekst":"c6d6b3d222a453ec","typ":8,"parametry":["810275"]},{"nr":2,"tekst":"e16eb1f487c85cfd","typ":8,"parametry":["810279"]},{"nr":4,"tekst":"93b705ff419a0c28"}]}
 {"q":"115_1","pytanie":115,"krok":1,"po_dialogach":[140160],"wybory":[{"nr":1,"tekst":"3b0813bb5c765ccf","dialogi":[140161],"typ":5,"parametry":["200108"]},{"nr":2,"tekst":"198851dbaba152fb"},{"nr":3,"tekst":"a6520de37baa1d96"}]}
@@ -1369,7 +1369,7 @@
 {"q":"118000_1","pytanie":118000,"krok":1,"tytul":"5be7c73e54a3e9d4","po_dialogach":[10900030],"wybory":[{"nr":1,"tekst":"0f6d8a9f25b70d67","typ":9,"parametry":["client/store/store_interact"]},{"nr":2,"tekst":"2319f1d7109e4141"},{"nr":5,"tekst":"746b2d5f59c221c1","dialogi":[10900036]}]}
 {"q":"118000_2","pytanie":118000,"krok":2,"tytul":"5be7c73e54a3e9d4","wybory":[{"nr":1,"tekst":"71077172d8934f58","dialogi":[10900031]},{"nr":2,"tekst":"67bbbde8b7f0e3ba","dialogi":[10900032]},{"nr":3,"tekst":"9a81dab3abf093b3","dialogi":[10900033]},{"nr":4,"tekst":"40ebdf78fe912277","dialogi":[10900034]},{"nr":5,"tekst":"746b2d5f59c221c1","dialogi":[10900036]}]}
 {"q":"118000_3","pytanie":118000,"krok":3,"tytul":"5be7c73e54a3e9d4","wybory":[{"nr":1,"tekst":"345d9df490d1abb8","dialogi":[10900035]}]}
-{"q":"118001_1","pytanie":118001,"krok":1,"tytul":"5be7c73e54a3e9d4","po_dialogach":[10900027],"wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[10900028]},{"nr":2,"tekst":"6b5d26c4c82744fd","dialogi":[10900029]}]}
+{"q":"118001_1","pytanie":118001,"krok":1,"tytul":"5be7c73e54a3e9d4","po_dialogach":[10900027],"wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[10900028]},{"nr":2,"tekst":"6b5d26c4c82744fd","dialogi":[10900029]}]}
 {"q":"118001_2","pytanie":118001,"krok":2,"tytul":"5be7c73e54a3e9d4","wybory":[{"nr":1,"tekst":"0f6d8a9f25b70d67","typ":9,"parametry":["client/store/store_interact"]},{"nr":2,"tekst":"2319f1d7109e4141"},{"nr":5,"tekst":"746b2d5f59c221c1","dialogi":[10900036]}]}
 {"q":"118001_3","pytanie":118001,"krok":3,"tytul":"5be7c73e54a3e9d4","wybory":[{"nr":1,"tekst":"71077172d8934f58","dialogi":[10900031]},{"nr":2,"tekst":"67bbbde8b7f0e3ba"},{"nr":3,"tekst":"9a81dab3abf093b3","dialogi":[10900033]},{"nr":4,"tekst":"40ebdf78fe912277","dialogi":[10900034]},{"nr":5,"tekst":"746b2d5f59c221c1","dialogi":[10900036]}]}
 {"q":"118001_4","pytanie":118001,"krok":4,"tytul":"5be7c73e54a3e9d4","wybory":[{"nr":1,"tekst":"345d9df490d1abb8","dialogi":[10900035]}]}
@@ -1564,7 +1564,7 @@
 {"q":"121016_1","pytanie":121016,"krok":1,"tytul":"f03e71bd177a4b79","po_dialogach":[14400012],"wybory":[{"nr":1,"tekst":"013bd394ca5f33b3","dialogi":[14400013]},{"nr":2,"tekst":"8129ef2a9bfcfa57","dialogi":[14400014]},{"nr":3,"tekst":"66058087bff766ab","dialogi":[14400015]},{"nr":4,"tekst":"e999f9b4db1cec49","dialogi":[14400016]},{"nr":5,"tekst":"746b2d5f59c221c1"}]}
 {"q":"121016_2","pytanie":121016,"krok":2,"tytul":"4ddc040c7257cb48","po_dialogach":[14400038],"wybory":[]}
 {"q":"121017_1","pytanie":121017,"krok":1,"tytul":"272fbdceb60555db","po_dialogach":[14400092],"wybory":[{"nr":1,"tekst":"deb264fd6ee48b56"},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"121017_2","pytanie":121017,"krok":2,"tytul":"272fbdceb60555db","po_dialogach":[14400093],"wybory":[{"nr":1,"tekst":"5ed44a1f9b821447","dialogi":[14400094],"typ":1},{"nr":2,"tekst":"b72c8462fbb070c8","dialogi":[14400094],"typ":1},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
+{"q":"121017_2","pytanie":121017,"krok":2,"tytul":"272fbdceb60555db","po_dialogach":[14400093],"wybory":[{"nr":1,"tekst":"1f948874d1a82cc4","dialogi":[14400094],"typ":1},{"nr":2,"tekst":"b72c8462fbb070c8","dialogi":[14400094],"typ":1},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"121018_1","pytanie":121018,"krok":1,"tytul":"8f2af761ac1bc6f5","po_dialogach":[14400108],"wybory":[{"nr":1,"tekst":"8b5c853ed7b8ab74","dialogi":[14400109],"typ":1},{"nr":2,"tekst":"0e4ba154e4cd6fd1","dialogi":[14400110],"typ":1},{"nr":3,"tekst":"50c575c899df139e","dialogi":[14400109],"typ":1},{"nr":4,"tekst":"746b2d5f59c221c1"}]}
 {"q":"121019_1","pytanie":121019,"krok":1,"tytul":"a0cb0a1728df32e4","po_dialogach":[14400116],"wybory":[{"nr":1,"tekst":"a0cb0a1728df32e4","dialogi":[14400117],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"121020_1","pytanie":121020,"krok":1,"tytul":"e2793bd0553ec6fa","po_dialogach":[14400119],"wybory":[{"nr":1,"tekst":"b5141d3d19e9a048","dialogi":[14400120],"typ":1},{"nr":2,"tekst":"584cd0fcf368adcc","dialogi":[14400121],"typ":1},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
@@ -2422,7 +2422,7 @@
 {"q":"129095_1","pytanie":129095,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200513],"wybory":[{"nr":1,"tekst":"f15b0b8eb2eba132","dialogi":[13200514]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"129096_1","pytanie":129096,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200515],"wybory":[{"nr":1,"tekst":"268c79b87915d7d0","dialogi":[13200516]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"129097_1","pytanie":129097,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200524],"wybory":[{"nr":1,"tekst":"2d7a3779e5689200","typ":1},{"nr":2,"tekst":"8475d4f2112f5c8b","typ":1}]}
-{"q":"129098_1","pytanie":129098,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200555],"wybory":[{"nr":1,"tekst":"dfc1e7fd9601c25c","dialogi":[13200556],"typ":1}]}
+{"q":"129098_1","pytanie":129098,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200555],"wybory":[{"nr":1,"tekst":"066b4904b41d148a","dialogi":[13200556],"typ":1}]}
 {"q":"129099_1","pytanie":129099,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200529],"wybory":[{"nr":1,"tekst":"df0d25193874aa17","typ":5,"parametry":["910165"]},{"nr":2,"tekst":"6b7589029582f8f7","typ":5,"parametry":["910167"]}]}
 {"q":"1290_1","pytanie":1290,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[100621],"wybory":[{"nr":1,"tekst":"07d2c4e33dc93ba5","dialogi":[100623],"typ":1}]}
 {"q":"129100_1","pytanie":129100,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[13200534],"wybory":[{"nr":1,"tekst":"980e32990d6bcc3c"}]}
@@ -3936,7 +3936,7 @@
 {"q":"159078_1","pytanie":159078,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800474],"wybory":[]}
 {"q":"159079_1","pytanie":159079,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800476],"wybory":[]}
 {"q":"159080_1","pytanie":159080,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800478],"wybory":[]}
-{"q":"159081_1","pytanie":159081,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800479],"wybory":[{"nr":1,"tekst":"7776e9f5239ae307","typ":1},{"nr":2,"tekst":"7776e9f5239ae307","typ":1}]}
+{"q":"159081_1","pytanie":159081,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800479],"wybory":[{"nr":1,"tekst":"32d130c128413266","typ":1},{"nr":2,"tekst":"32d130c128413266","typ":1}]}
 {"q":"159081_2","pytanie":159081,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800480],"wybory":[{"nr":1,"tekst":"4962cbf251a6e555"},{"nr":2,"tekst":"18a095e862d319d9"}]}
 {"q":"159081_3","pytanie":159081,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800481],"wybory":[{"nr":1,"tekst":"b74a9a1a61e84b41","dialogi":[19800482]}]}
 {"q":"159081_4","pytanie":159081,"krok":4,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19800483],"wybory":[{"nr":1,"tekst":"5867876511293b53","dialogi":[19800484]}]}
@@ -4029,7 +4029,7 @@
 {"q":"159210_1","pytanie":159210,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801010],"wybory":[]}
 {"q":"159211_1","pytanie":159211,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801011],"wybory":[]}
 {"q":"159212_1","pytanie":159212,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801014],"wybory":[{"nr":1,"tekst":"93bef26450c3b8c9","dialogi":[19801015]}]}
-{"q":"159213_1","pytanie":159213,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801016],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[19801017]}]}
+{"q":"159213_1","pytanie":159213,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801016],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[19801017]}]}
 {"q":"159214_1","pytanie":159214,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801027],"wybory":[{"nr":1,"tekst":"c103b6570e180df3","dialogi":[19801028]}]}
 {"q":"159215_1","pytanie":159215,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801029],"wybory":[{"nr":1,"tekst":"72b1233f9db02789","dialogi":[19801030]}]}
 {"q":"159216_1","pytanie":159216,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[19801031],"wybory":[{"nr":1,"tekst":"c103b6570e180df3","dialogi":[19801032]}]}
@@ -4365,7 +4365,7 @@
 {"q":"171002_1","pytanie":171002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[30700001],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"171003_1","pytanie":171003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[30700003],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[30700004]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[30700005]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"171003_2","pytanie":171003,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"1bf7ac688560d3b0"}]}
-{"q":"171003_3","pytanie":171003,"krok":3,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[30700006]}]}
+{"q":"171003_3","pytanie":171003,"krok":3,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[30700006]}]}
 {"q":"171004_1","pytanie":171004,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[30700007],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"171004_2","pytanie":171004,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[30700016],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
 {"q":"171004_3","pytanie":171004,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[30700017],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
@@ -4467,7 +4467,7 @@
 {"q":"17150_3","pytanie":17150,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890063],"wybory":[{"nr":1,"tekst":"25958465924ee1dc"}]}
 {"q":"17150_4","pytanie":17150,"krok":4,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890064],"wybory":[{"nr":1,"tekst":"884d728e17d3b96f"}]}
 {"q":"17150_5","pytanie":17150,"krok":5,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890065],"wybory":[{"nr":1,"tekst":"5c3950ce5d60e45a"}]}
-{"q":"17150_6","pytanie":17150,"krok":6,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890158],"wybory":[{"nr":1,"tekst":"86e37279b7566a3c"}]}
+{"q":"17150_6","pytanie":17150,"krok":6,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890158],"wybory":[{"nr":1,"tekst":"8768e61868fb94eb"}]}
 {"q":"17151_1","pytanie":17151,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890066],"wybory":[{"nr":1,"tekst":"99c0e7f06efa6714"},{"nr":2,"tekst":"f0b9ea9a3b5b1ede","dialogi":[6890067]}]}
 {"q":"17151_2","pytanie":17151,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890068],"wybory":[{"nr":1,"tekst":"f2eec0b623bbc90f"}]}
 {"q":"17151_3","pytanie":17151,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890069],"wybory":[{"nr":1,"tekst":"19ec81f2fb133466"}]}
@@ -4488,7 +4488,7 @@
 {"q":"17156_3","pytanie":17156,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890096],"wybory":[{"nr":1,"tekst":"d20c0754e47b7503"}]}
 {"q":"17156_4","pytanie":17156,"krok":4,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890097],"wybory":[{"nr":1,"tekst":"6be65405c5aa329e"}]}
 {"q":"17156_5","pytanie":17156,"krok":5,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890098],"wybory":[{"nr":1,"tekst":"f62affe26b2d846f","dialogi":[6890099],"typ":1},{"nr":2,"tekst":"152ec41b8da80452","dialogi":[6890100],"typ":1}]}
-{"q":"17157_1","pytanie":17157,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890109],"wybory":[{"nr":1,"tekst":"b1734670076e941e"},{"nr":2,"tekst":"52c1753ec8feec1a"}]}
+{"q":"17157_1","pytanie":17157,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890109],"wybory":[{"nr":1,"tekst":"58b8cb64b05fd803"},{"nr":2,"tekst":"52c1753ec8feec1a"}]}
 {"q":"17157_2","pytanie":17157,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890110],"wybory":[]}
 {"q":"17158_1","pytanie":17158,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890197],"wybory":[{"nr":1,"tekst":"01279b462ea8041d"}]}
 {"q":"17158_2","pytanie":17158,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6890196],"wybory":[{"nr":1,"tekst":"e0a1168db6ca4c91"}]}
@@ -5052,7 +5052,7 @@
 {"q":"178000_1","pytanie":178000,"krok":1,"tytul":"8cb12a5df279b33a","po_dialogach":[20100003],"wybory":[{"nr":1,"tekst":"f74571eb1c166d37","dialogi":[20100004],"typ":1},{"nr":2,"tekst":"8367af0d86b6304f","dialogi":[20100005],"typ":1}]}
 {"q":"178001_1","pytanie":178001,"krok":1,"tytul":"334fc46511806f2b","po_dialogach":[20100016],"wybory":[{"nr":1,"tekst":"370e6f0f7e956261","dialogi":[20100017],"typ":1}]}
 {"q":"178002_1","pytanie":178002,"krok":1,"tytul":"343774363944b9e9","po_dialogach":[20100012],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[20100013],"typ":1},{"nr":2,"tekst":"45b3f27e3a97e2c1"},{"nr":3,"tekst":"746b2d5f59c221c1","typ":1}]}
-{"q":"178002_2","pytanie":178002,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[20100014],"wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[20100015],"typ":1}]}
+{"q":"178002_2","pytanie":178002,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[20100014],"wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[20100015],"typ":1}]}
 {"q":"178003_1","pytanie":178003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[20100026],"wybory":[]}
 {"q":"178004_1","pytanie":178004,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[20100027],"wybory":[]}
 {"q":"178005_1","pytanie":178005,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[20100028],"wybory":[]}
@@ -5406,7 +5406,7 @@
 {"q":"18200_1","pytanie":18200,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[6900821],"wybory":[{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"182010_1","pytanie":182010,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[31600000],"wybory":[]}
 {"q":"182012_1","pytanie":182012,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[31600002],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[31600003]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[31600004]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"182012_2","pytanie":182012,"krok":2,"tytul":"5fc7ad3f2c3d86e0","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[31600005]}]}
+{"q":"182012_2","pytanie":182012,"krok":2,"tytul":"5fc7ad3f2c3d86e0","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[31600005]}]}
 {"q":"182013_1","pytanie":182013,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[31600007],"wybory":[{"nr":1,"tekst":"8786336813845ecf","dialogi":[31600008]},{"nr":2,"tekst":"b7fc9690da420b5e","dialogi":[31600009]}]}
 {"q":"182013_2","pytanie":182013,"krok":2,"tytul":"5fc7ad3f2c3d86e0","wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[31600010]}]}
 {"q":"182014_1","pytanie":182014,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[31600014],"wybory":[{"nr":1,"tekst":"a68c038123932d28","typ":1}]}
@@ -6045,7 +6045,7 @@
 {"q":"189005_2","pytanie":189005,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23800009],"wybory":[{"nr":1,"tekst":"e1f8be45f1ed4850","typ":1}]}
 {"q":"190000_1","pytanie":190000,"krok":1,"tytul":"a47e3fa13e2e591c","po_dialogach":[24800000],"wybory":[{"nr":1,"tekst":"7345ed45ce936fff"}]}
 {"q":"190001_1","pytanie":190001,"krok":1,"tytul":"6ff805a6cee3f493","po_dialogach":[24800002],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[24800003]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[24800004]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"190001_2","pytanie":190001,"krok":2,"tytul":"6ff805a6cee3f493","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[24800005]}]}
+{"q":"190001_2","pytanie":190001,"krok":2,"tytul":"6ff805a6cee3f493","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[24800005]}]}
 {"q":"190002_1","pytanie":190002,"krok":1,"tytul":"ebedd0bbe68494ca","po_dialogach":[24800007],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"190002_2","pytanie":190002,"krok":2,"tytul":"ebedd0bbe68494ca","po_dialogach":[24800008],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[24800010]}]}
 {"q":"190002_3","pytanie":190002,"krok":3,"tytul":"ebedd0bbe68494ca","po_dialogach":[24800009],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[24800010]}]}
@@ -6592,7 +6592,7 @@
 {"q":"194054_2","pytanie":194054,"krok":2,"tytul":"feae412b56447690","po_dialogach":[24700179],"wybory":[{"nr":1,"tekst":"fbcbbf95596d2fe1","dialogi":[24700180],"typ":1}]}
 {"q":"195000_1","pytanie":195000,"krok":1,"tytul":"f8308b0b2728de23","po_dialogach":[24400000],"wybory":[]}
 {"q":"195001_1","pytanie":195001,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[24400002],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[24400005]},{"nr":2,"tekst":"45b3f27e3a97e2c1"},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"195001_2","pytanie":195001,"krok":2,"tytul":"12a3d75820fc4414","po_dialogach":[24400003],"wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[24400004]}]}
+{"q":"195001_2","pytanie":195001,"krok":2,"tytul":"58a81fdce04c3fba","po_dialogach":[24400003],"wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[24400004]}]}
 {"q":"195002_1","pytanie":195002,"krok":1,"tytul":"5dcee64c705e200c","po_dialogach":[24400025],"wybory":[{"nr":1,"tekst":"74dd9eb0c9442585","typ":8,"parametry":["1590002"]},{"nr":2,"tekst":"f40aebcafaf2d1c6"}]}
 {"q":"195003_1","pytanie":195003,"krok":1,"tytul":"59ea3f252e381898","po_dialogach":[24400033],"wybory":[{"nr":1,"tekst":"69dee6601df01b87","typ":8,"parametry":["1590003"]},{"nr":2,"tekst":"4cd817bc617db6d8","typ":8,"parametry":["1590013"]},{"nr":3,"tekst":"e213b5acc22e8667","typ":8,"parametry":["1590014"]},{"nr":4,"tekst":"40c53ab9fd0f8834"}]}
 {"q":"195004_1","pytanie":195004,"krok":1,"tytul":"e4b01c258da5e160","po_dialogach":[34800064,34800062],"wybory":[{"nr":1,"tekst":"4e2f4d36fb43f92a","typ":8,"parametry":["1590004"]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
@@ -6945,7 +6945,7 @@
 {"q":"200_1","pytanie":200,"krok":1,"wybory":[{"nr":1,"tekst":"e79534d697dd595a","dialogi":[3500008],"typ":1},{"nr":2,"tekst":"f33ba6e0bf914cff","dialogi":[3500009],"typ":1}]}
 {"q":"201000_1","pytanie":201000,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23000000],"wybory":[{"nr":1,"tekst":"30bc8f50cfc02aec","dialogi":[23000001]}]}
 {"q":"201001_1","pytanie":201001,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23000003],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[23000004]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[23000005]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"201001_2","pytanie":201001,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[23000006]}]}
+{"q":"201001_2","pytanie":201001,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[23000006]}]}
 {"q":"201002_1","pytanie":201002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23000008],"wybory":[{"nr":1,"tekst":"8786336813845ecf","dialogi":[23000009]},{"nr":2,"tekst":"b7fc9690da420b5e","dialogi":[23000010]}]}
 {"q":"201002_2","pytanie":201002,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[23000011]}]}
 {"q":"201002_3","pytanie":201002,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23000012],"wybory":[]}
@@ -7417,7 +7417,7 @@
 {"q":"203_1","pytanie":203,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[1700484],"wybory":[{"nr":1,"tekst":"08cce32178fc7d5e","typ":1},{"nr":2,"tekst":"4bc48d979f5b32d0","dialogi":[1700482],"typ":1}]}
 {"q":"204000_1","pytanie":204000,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[31900001],"wybory":[{"nr":1,"tekst":"7cbb2aa48dd98364","dialogi":[31900002]},{"nr":2,"tekst":"8c5da2c64ae6c9c9","dialogi":[31900003]}]}
 {"q":"204001_1","pytanie":204001,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[31900005],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[31900006]},{"nr":2,"tekst":"45b3f27e3a97e2c1"},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"204001_2","pytanie":204001,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[31900007],"wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[31900008]}]}
+{"q":"204001_2","pytanie":204001,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[31900007],"wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[31900008]}]}
 {"q":"204002_1","pytanie":204002,"krok":1,"tytul":"f8308b0b2728de23","po_dialogach":[31900010],"wybory":[]}
 {"q":"204003_1","pytanie":204003,"krok":1,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"683d9df8a2e8505f","typ":8,"parametry":["1650067"]},{"nr":2,"tekst":"498e1d59b4d787ee"}]}
 {"q":"204004_1","pytanie":204004,"krok":1,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"0933c36a2be860a5","typ":8,"parametry":["1650069"]},{"nr":2,"tekst":"498e1d59b4d787ee"}]}
@@ -7569,7 +7569,7 @@
 {"q":"208000_1","pytanie":208000,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[2160000001],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"208001_1","pytanie":208001,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[2160000003],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[2160000004]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[2160000005]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"208001_2","pytanie":208001,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"1bf7ac688560d3b0"}]}
-{"q":"208001_3","pytanie":208001,"krok":3,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[2160000006]}]}
+{"q":"208001_3","pytanie":208001,"krok":3,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[2160000006]}]}
 {"q":"208002_1","pytanie":208002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[2160000005],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"208002_2","pytanie":208002,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[2160000014],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
 {"q":"208002_3","pytanie":208002,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[2160000015],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
@@ -8030,7 +8030,7 @@
 {"q":"210036_1","pytanie":210036,"krok":1,"tytul":"60f176ad1b3f5744","po_dialogach":[23900189],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"210037_1","pytanie":210037,"krok":1,"tytul":"de601554431de193","po_dialogach":[23900190],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"210038_1","pytanie":210038,"krok":1,"tytul":"0d94ffce5ca7d2b0","po_dialogach":[23900205],"wybory":[{"nr":1,"tekst":"86b5ac44adafa52a","dialogi":[23900206]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"210039_1","pytanie":210039,"krok":1,"tytul":"0d94ffce5ca7d2b0","po_dialogach":[23900207],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[23900208]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"210039_1","pytanie":210039,"krok":1,"tytul":"0d94ffce5ca7d2b0","po_dialogach":[23900207],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[23900208]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"21003_1","pytanie":21003,"krok":1,"tytul":"cede50255b0fec44","po_dialogach":[7200044],"wybory":[{"nr":1,"tekst":"ab34a084e599af16","dialogi":[7200045]},{"nr":2,"tekst":"c7d5119a60f61840"}]}
 {"q":"210040_1","pytanie":210040,"krok":1,"tytul":"06237c23e58b4628","po_dialogach":[23900214],"wybory":[{"nr":1,"tekst":"f88de681e0a5fa5b","dialogi":[23900215]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"210041_1","pytanie":210041,"krok":1,"tytul":"06237c23e58b4628","po_dialogach":[23900216],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
@@ -8541,7 +8541,7 @@
 {"q":"215000_1","pytanie":215000,"krok":1,"po_dialogach":[23300001],"wybory":[{"nr":1,"tekst":"89f4ddaef9c8fb35","dialogi":[23300002]},{"nr":2,"tekst":"2d30280eb00527b2","dialogi":[23300003]},{"nr":3,"tekst":"ade53cb4e183e8b9"}]}
 {"q":"215001_1","pytanie":215001,"krok":1,"po_dialogach":[23300004],"wybory":[{"nr":1,"tekst":"a48457422485d270","dialogi":[23300005]},{"nr":2,"tekst":"7345ed45ce936fff"}]}
 {"q":"215002_1","pytanie":215002,"krok":1,"po_dialogach":[23300007],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[23300008]},{"nr":2,"tekst":"45b3f27e3a97e2c1"},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"215002_2","pytanie":215002,"krok":2,"po_dialogach":[23300009],"wybory":[{"nr":2,"tekst":"12a3d75820fc4414","dialogi":[23300010]}]}
+{"q":"215002_2","pytanie":215002,"krok":2,"po_dialogach":[23300009],"wybory":[{"nr":2,"tekst":"58a81fdce04c3fba","dialogi":[23300010]}]}
 {"q":"215003_1","pytanie":215003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[23300012],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"215003_2","pytanie":215003,"krok":2,"po_dialogach":[23300013],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[23300015],"typ":1}]}
 {"q":"215003_3","pytanie":215003,"krok":3,"po_dialogach":[23300014],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[23300015],"typ":1}]}
@@ -8579,7 +8579,7 @@
 {"q":"219001_1","pytanie":219001,"krok":1,"tytul":"09891316b44281e4","wybory":[]}
 {"q":"219002_1","pytanie":219002,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[23600002],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[23600003]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[23600004]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"219002_2","pytanie":219002,"krok":2,"tytul":"3f5dc7fad0c06075","wybory":[{"nr":1,"tekst":"19a187a36d1dd155"}]}
-{"q":"219002_3","pytanie":219002,"krok":3,"tytul":"3f5dc7fad0c06075","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[23600005]}]}
+{"q":"219002_3","pytanie":219002,"krok":3,"tytul":"3f5dc7fad0c06075","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[23600005]}]}
 {"q":"219003_1","pytanie":219003,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[23600007],"wybory":[{"nr":1,"tekst":"8786336813845ecf","dialogi":[23600008]},{"nr":2,"tekst":"b7fc9690da420b5e","dialogi":[23600010]}]}
 {"q":"219003_2","pytanie":219003,"krok":2,"po_dialogach":[23600012],"wybory":[]}
 {"q":"219003_3","pytanie":219003,"krok":3,"po_dialogach":[23600013],"wybory":[]}
@@ -8732,8 +8732,8 @@
 {"q":"219143_1","pytanie":219143,"krok":1,"tytul":"d2b9dc913a39e5ac","po_dialogach":[23600565],"wybory":[]}
 {"q":"219144_1","pytanie":219144,"krok":1,"tytul":"d2b9dc913a39e5ac","po_dialogach":[23600566],"wybory":[]}
 {"q":"219145_1","pytanie":219145,"krok":1,"tytul":"a463ee19347df0a5","po_dialogach":[23600568],"wybory":[{"nr":1,"tekst":"f2d5efd1cd83e1b3","dialogi":[23600569]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"219146_1","pytanie":219146,"krok":1,"tytul":"a463ee19347df0a5","po_dialogach":[23600571],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[23600572]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"219147_1","pytanie":219147,"krok":1,"tytul":"a463ee19347df0a5","po_dialogach":[23600574],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[23600575]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"219146_1","pytanie":219146,"krok":1,"tytul":"a463ee19347df0a5","po_dialogach":[23600571],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[23600572]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"219147_1","pytanie":219147,"krok":1,"tytul":"a463ee19347df0a5","po_dialogach":[23600574],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[23600575]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"219148_1","pytanie":219148,"krok":1,"tytul":"48a2085c3f0e1b22","po_dialogach":[23600588],"wybory":[{"nr":1,"tekst":"fbd149e03dbb8839","dialogi":[23600589]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"219149_1","pytanie":219149,"krok":1,"tytul":"c65b9fc04911c1e6","po_dialogach":[23600590],"wybory":[{"nr":1,"tekst":"f8308b0b2728de23","dialogi":[23600591]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"219150_1","pytanie":219150,"krok":1,"tytul":"eb6a0f38e5da86e4","po_dialogach":[23600592],"wybory":[{"nr":1,"tekst":"8b931cbbc5ff834d","dialogi":[23600593]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
@@ -8753,7 +8753,7 @@
 {"q":"220000_3","pytanie":220000,"krok":3,"tytul":"7f63eff72934ce1e","po_dialogach":[242000003],"wybory":[]}
 {"q":"220001_1","pytanie":220001,"krok":1,"tytul":"a88af319b45d8ffe","po_dialogach":[242000005],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[242000006]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[242000007]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"220001_2","pytanie":220001,"krok":2,"tytul":"a88af319b45d8ffe","po_dialogach":[242000009],"wybory":[]}
-{"q":"220001_3","pytanie":220001,"krok":3,"tytul":"a88af319b45d8ffe","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[242000008]}]}
+{"q":"220001_3","pytanie":220001,"krok":3,"tytul":"a88af319b45d8ffe","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[242000008]}]}
 {"q":"220001_4","pytanie":220001,"krok":4,"tytul":"a88af319b45d8ffe","wybory":[]}
 {"q":"220002_1","pytanie":220002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[242000011],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"220002_2","pytanie":220002,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[242000012],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
@@ -9169,7 +9169,7 @@
 {"q":"240000_1","pytanie":240000,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[34100000],"wybory":[{"nr":1,"tekst":"670d9743542cae3e"}]}
 {"q":"240001_1","pytanie":240001,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[34100001],"wybory":[{"nr":1,"tekst":"670d9743542cae3e"}]}
 {"q":"240002_1","pytanie":240002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[34100003],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[34100004]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[34100005]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"240002_2","pytanie":240002,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[34100006]}]}
+{"q":"240002_2","pytanie":240002,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[34100006]}]}
 {"q":"240003_1","pytanie":240003,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[34100008],"wybory":[{"nr":1,"tekst":"8786336813845ecf","dialogi":[34100009]},{"nr":2,"tekst":"b7fc9690da420b5e","dialogi":[34100010]}]}
 {"q":"240003_2","pytanie":240003,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"214f4ab3832b540b","dialogi":[34100011]}]}
 {"q":"240004_1","pytanie":240004,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[34100014],"wybory":[]}
@@ -9626,7 +9626,7 @@
 {"q":"2589_1","pytanie":2589,"krok":1,"tytul":"b5c7edc4f4c70aa8","wybory":[{"nr":1,"tekst":"b5c7edc4f4c70aa8","dialogi":[4110092],"typ":1}]}
 {"q":"259000_1","pytanie":259000,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[45000000],"wybory":[]}
 {"q":"259001_1","pytanie":259001,"krok":1,"tytul":"b474bbc19522cd23","po_dialogach":[45000002],"wybory":[{"nr":1,"tekst":"802426bf39c2cfa1","dialogi":[45000003]},{"nr":2,"tekst":"45b3f27e3a97e2c1","dialogi":[45000004]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"259001_2","pytanie":259001,"krok":2,"tytul":"b474bbc19522cd23","wybory":[{"nr":1,"tekst":"12a3d75820fc4414","dialogi":[45000005]}]}
+{"q":"259001_2","pytanie":259001,"krok":2,"tytul":"b474bbc19522cd23","wybory":[{"nr":1,"tekst":"58a81fdce04c3fba","dialogi":[45000005]}]}
 {"q":"259002_1","pytanie":259002,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[45000019],"wybory":[{"nr":1,"tekst":"8786336813845ecf"},{"nr":2,"tekst":"b7fc9690da420b5e"}]}
 {"q":"259002_2","pytanie":259002,"krok":2,"tytul":"6bf6d3f3d6261b75","po_dialogach":[45000020],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
 {"q":"259002_3","pytanie":259002,"krok":3,"tytul":"6bf6d3f3d6261b75","po_dialogach":[45000021],"wybory":[{"nr":1,"tekst":"214f4ab3832b540b"}]}
@@ -9718,7 +9718,7 @@
 {"q":"27317_2","pytanie":27317,"krok":2,"tytul":"1d372a2daa6ac7bd","po_dialogach":[7530082],"wybory":[{"nr":1,"tekst":"f1a6bae8761826cc","dialogi":[7530083],"typ":1}]}
 {"q":"27318_1","pytanie":27318,"krok":1,"tytul":"c834615f9691f315","po_dialogach":[7530242],"wybory":[{"nr":1,"tekst":"c53b31cd2fffc058","dialogi":[7530243],"typ":1}]}
 {"q":"27319_1","pytanie":27319,"krok":1,"tytul":"b668d23bde31e5f3","po_dialogach":[7530089],"wybory":[{"nr":1,"tekst":"2a4c0eb75e57d651","dialogi":[7530090],"typ":1}]}
-{"q":"27320_1","pytanie":27320,"krok":1,"tytul":"51d77d9c4172bb29","po_dialogach":[7530248],"wybory":[{"nr":1,"tekst":"86e37279b7566a3c","dialogi":[7530249],"typ":1}]}
+{"q":"27320_1","pytanie":27320,"krok":1,"tytul":"51d77d9c4172bb29","po_dialogach":[7530248],"wybory":[{"nr":1,"tekst":"8768e61868fb94eb","dialogi":[7530249],"typ":1}]}
 {"q":"27321_1","pytanie":27321,"krok":1,"tytul":"ae3793cfb4aa792e","po_dialogach":[7530097],"wybory":[{"nr":1,"tekst":"58d9d4f88fbba2f0","dialogi":[7530098],"typ":1},{"nr":2,"tekst":"75cf5a849f8d70b4","dialogi":[7530099],"typ":1}]}
 {"q":"27322_1","pytanie":27322,"krok":1,"tytul":"b2463427b41378ca","po_dialogach":[7530100],"wybory":[{"nr":1,"tekst":"efc8eb61ab75abac","dialogi":[7530101],"typ":1},{"nr":2,"tekst":"890e600aefbc20ae","dialogi":[7530102],"typ":1}]}
 {"q":"27323_1","pytanie":27323,"krok":1,"tytul":"f3c19b18caa64b5a","po_dialogach":[7530106],"wybory":[{"nr":1,"tekst":"82fec3801d176574","dialogi":[7530107],"typ":1},{"nr":2,"tekst":"31aa37a60366a05d","dialogi":[7530107],"typ":1}]}
@@ -10603,7 +10603,7 @@
 {"q":"43419_1","pytanie":43419,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8001622],"wybory":[]}
 {"q":"43420_1","pytanie":43420,"krok":1,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"6bf6d3f3d6261b75","dialogi":[8001623]},{"nr":2,"tekst":"520ff6512856dee0","typ":2,"parametry":["1"]},{"nr":3,"tekst":"7345ed45ce936fff"}]}
 {"q":"43421_1","pytanie":43421,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8001624],"wybory":[{"nr":1,"tekst":"f0ece5f0cd211286"},{"nr":2,"tekst":"df8c00e4820253a2","dialogi":[8001625]}]}
-{"q":"43421_2","pytanie":43421,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"2539d3ab31f5a496","dialogi":[8001628]}]}
+{"q":"43421_2","pytanie":43421,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"935a26e2e966e6ac","dialogi":[8001628]}]}
 {"q":"43422_1","pytanie":43422,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8001627],"wybory":[]}
 {"q":"43423_1","pytanie":43423,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8001661],"wybory":[{"nr":1,"tekst":"b5141d3d19e9a048","dialogi":[8001662]},{"nr":2,"tekst":"584cd0fcf368adcc","dialogi":[8001662]}]}
 {"q":"43424_1","pytanie":43424,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[8000739],"wybory":[]}
@@ -11224,11 +11224,11 @@
 {"q":"5390_1","pytanie":5390,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402239],"wybory":[{"nr":1,"tekst":"4c54f1ebdc472664","dialogi":[3402240]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5391_1","pytanie":5391,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402241],"wybory":[{"nr":1,"tekst":"d6c7d7b1ce954e47","dialogi":[3402242]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5392_1","pytanie":5392,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402243],"wybory":[{"nr":1,"tekst":"020fbb987293f95b","dialogi":[3402244]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"5393_1","pytanie":5393,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402246],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[3402247]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"5393_1","pytanie":5393,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402246],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[3402247]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5394_1","pytanie":5394,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402248],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5395_1","pytanie":5395,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402249],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5396_1","pytanie":5396,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402250],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
-{"q":"5397_1","pytanie":5397,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402251],"wybory":[{"nr":1,"tekst":"058469c654ce67c9","dialogi":[3402252]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"5397_1","pytanie":5397,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402251],"wybory":[{"nr":1,"tekst":"7df41e18b5e0a3c7","dialogi":[3402252]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5398_1","pytanie":5398,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402253],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5399_1","pytanie":5399,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402254],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1"}]}
 {"q":"5400_1","pytanie":5400,"krok":1,"tytul":"3f5dc7fad0c06075","po_dialogach":[3402255],"wybory":[{"nr":1,"tekst":"219ead8c12525024","dialogi":[3402256]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
@@ -11466,8 +11466,8 @@
 {"q":"62026_1","pytanie":62026,"krok":1,"po_dialogach":[9000074,9000073],"wybory":[{"nr":1,"tekst":"0e660de6a2098276","dialogi":[9000025],"typ":8,"parametry":["660133"]},{"nr":2,"tekst":"e22f512d79d70cd5"}]}
 {"q":"62027_1","pytanie":62027,"krok":1,"po_dialogach":[9000076,9000075],"wybory":[{"nr":1,"tekst":"0e660de6a2098276","dialogi":[9000025],"typ":8,"parametry":["660133"]},{"nr":2,"tekst":"e22f512d79d70cd5"}]}
 {"q":"62028_1","pytanie":62028,"krok":1,"po_dialogach":[9000026],"wybory":[{"nr":1,"tekst":"c6d9bb95e3a01e0c","dialogi":[9000025],"typ":8,"parametry":["660135"]},{"nr":2,"tekst":"e22f512d79d70cd5"}]}
-{"q":"62029_1","pytanie":62029,"krok":1,"wybory":[{"nr":1,"tekst":"dfe8303906666505","dialogi":[9000078]},{"nr":2,"tekst":"b940a325d459b0a6"}]}
-{"q":"62030_1","pytanie":62030,"krok":1,"wybory":[{"nr":1,"tekst":"dfe8303906666505","dialogi":[9000078]},{"nr":2,"tekst":"b940a325d459b0a6"}]}
+{"q":"62029_1","pytanie":62029,"krok":1,"wybory":[{"nr":1,"tekst":"dfe8303906666505","dialogi":[9000078]},{"nr":2,"tekst":"e344c2f85b9caa53"}]}
+{"q":"62030_1","pytanie":62030,"krok":1,"wybory":[{"nr":1,"tekst":"dfe8303906666505","dialogi":[9000078]},{"nr":2,"tekst":"e344c2f85b9caa53"}]}
 {"q":"62031_1","pytanie":62031,"krok":1,"wybory":[{"nr":1,"tekst":"122f0b1025a07d5f"}]}
 {"q":"62032_1","pytanie":62032,"krok":1,"po_dialogach":[9000080],"wybory":[{"nr":1,"tekst":"136cb88ae1f5b852","dialogi":[9000083]},{"nr":2,"tekst":"6fa24d933977257e","dialogi":[9000084]},{"nr":3,"tekst":"8b44b53a429d4a4c","dialogi":[9000085]}]}
 {"q":"62033_1","pytanie":62033,"krok":1,"wybory":[{"nr":1,"tekst":"136cb88ae1f5b852","dialogi":[9000083]},{"nr":2,"tekst":"6fa24d933977257e","dialogi":[9000084]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
@@ -11919,7 +11919,7 @@
 {"q":"72077_1","pytanie":72077,"krok":1,"tytul":"0fa0d00fedbd5378","po_dialogach":[9200742],"wybory":[{"nr":1,"tekst":"b8e25fcdc67b3f5f","dialogi":[9200743]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"72078_1","pytanie":72078,"krok":1,"tytul":"aa3a7ddbf9575022","po_dialogach":[9200758],"wybory":[{"nr":1,"tekst":"bd2be3ef163f235f","dialogi":[9200759]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"72079_1","pytanie":72079,"krok":1,"tytul":"ba1bbb6aa34c674b","po_dialogach":[9200760],"wybory":[{"nr":1,"tekst":"82b2c1d17071ece1","dialogi":[9200761]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"72080_1","pytanie":72080,"krok":1,"tytul":"2d73795ecfff92e9","po_dialogach":[9200753],"wybory":[{"nr":1,"tekst":"4ddb2c5b90c995a8","dialogi":[9200754]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"72080_1","pytanie":72080,"krok":1,"tytul":"2d73795ecfff92e9","po_dialogach":[9200753],"wybory":[{"nr":1,"tekst":"3196b7d01a6f6d27","dialogi":[9200754]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"72081_1","pytanie":72081,"krok":1,"tytul":"b64b7a3a73794973","po_dialogach":[9200755],"wybory":[{"nr":1,"tekst":"3cc76867d3a06e58","dialogi":[9200756]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"72082_1","pytanie":72082,"krok":1,"tytul":"26c3c38f8e5b714e","po_dialogach":[9200745],"wybory":[{"nr":1,"tekst":"584cd0fcf368adcc","dialogi":[9200746]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"72083_1","pytanie":72083,"krok":1,"tytul":"05643d8dc62d0d28","po_dialogach":[9200747],"wybory":[{"nr":1,"tekst":"e097ed390fa31432","dialogi":[9200748]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
@@ -11952,7 +11952,7 @@
 {"q":"73011_1","pytanie":73011,"krok":1,"tytul":"1f6ab91cadaf1f7e","po_dialogach":[9700050],"wybory":[]}
 {"q":"73012_1","pytanie":73012,"krok":1,"tytul":"15c4dc2ed994b377","po_dialogach":[9700052],"wybory":[{"nr":1,"tekst":"ede98fc83e5ab863","dialogi":[9700053],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"73013_1","pytanie":73013,"krok":1,"tytul":"fc49c546482409a2","po_dialogach":[9700055],"wybory":[{"nr":1,"tekst":"266c6cb277cf2232","dialogi":[9700056],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"73014_1","pytanie":73014,"krok":1,"tytul":"fc49c546482409a2","po_dialogach":[9700058],"wybory":[{"nr":1,"tekst":"f0d98bde17a6a109","dialogi":[9700059],"typ":1},{"nr":2,"tekst":"b6249e6dcef55002","dialogi":[9700060]}]}
+{"q":"73014_1","pytanie":73014,"krok":1,"tytul":"fc49c546482409a2","po_dialogach":[9700058],"wybory":[{"nr":1,"tekst":"f0d98bde17a6a109","dialogi":[9700059],"typ":1},{"nr":2,"tekst":"36ad02cd92cf4cf0","dialogi":[9700060]}]}
 {"q":"73015_1","pytanie":73015,"krok":1,"tytul":"bb3f2a7047f26135","po_dialogach":[9700068],"wybory":[{"nr":1,"tekst":"7188ae2a69f8e39e"}]}
 {"q":"73015_2","pytanie":73015,"krok":2,"tytul":"bb3f2a7047f26135","po_dialogach":[9700076],"wybory":[{"nr":1,"tekst":"7b95a894d3dd212c"}]}
 {"q":"73015_3","pytanie":73015,"krok":3,"tytul":"bb3f2a7047f26135","po_dialogach":[9700075],"wybory":[{"nr":1,"tekst":"51f5e46352303ce3","dialogi":[9700069]}]}
@@ -11968,10 +11968,10 @@
 {"q":"73022_1","pytanie":73022,"krok":1,"tytul":"49fd5c967f8bd044","wybory":[{"nr":1,"tekst":"82ca991d3c98a847","typ":8,"parametry":["760004"]},{"nr":2,"tekst":"0942ff3e876caaf1","dialogi":[9700148],"typ":8,"parametry":["150008"]}]}
 {"q":"73023_1","pytanie":73023,"krok":1,"tytul":"02cfa3a654b294d5","po_dialogach":[9700149],"wybory":[]}
 {"q":"73024_1","pytanie":73024,"krok":1,"tytul":"ef28466a3593e725","wybory":[{"nr":1,"tekst":"7fac4f34b8b15292","dialogi":[9700574],"typ":8,"parametry":["760002"]},{"nr":2,"tekst":"5ca31c6e952c626f"}]}
-{"q":"73025_1","pytanie":73025,"krok":1,"tytul":"15c4dc2ed994b377","po_dialogach":[9700189],"wybory":[{"nr":1,"tekst":"2539d3ab31f5a496","dialogi":[9700190],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"73025_1","pytanie":73025,"krok":1,"tytul":"15c4dc2ed994b377","po_dialogach":[9700189],"wybory":[{"nr":1,"tekst":"935a26e2e966e6ac","dialogi":[9700190],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"73026_1","pytanie":73026,"krok":1,"tytul":"fc49c546482409a2","po_dialogach":[9700191],"wybory":[{"nr":1,"tekst":"746b2d5f59c221c1","typ":1}]}
 {"q":"73027_1","pytanie":73027,"krok":1,"tytul":"bb3f2a7047f26135","po_dialogach":[9700194],"wybory":[{"nr":1,"tekst":"aac19513b78c8df5","dialogi":[9700193],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"73028_1","pytanie":73028,"krok":1,"tytul":"ce87e791f698d586","po_dialogach":[9700085],"wybory":[{"nr":1,"tekst":"f867f34178594f89","dialogi":[9700209],"typ":1},{"nr":2,"tekst":"44120b197c77731b"}]}
+{"q":"73028_1","pytanie":73028,"krok":1,"tytul":"ce87e791f698d586","po_dialogach":[9700085],"wybory":[{"nr":1,"tekst":"84dd97c41191469b","dialogi":[9700209],"typ":1},{"nr":2,"tekst":"44120b197c77731b"}]}
 {"q":"73028_2","pytanie":73028,"krok":2,"tytul":"ce87e791f698d586","po_dialogach":[9700210],"wybory":[{"nr":1,"tekst":"ee3dd5c5654ab389","dialogi":[9700211],"typ":1}]}
 {"q":"73029_1","pytanie":73029,"krok":1,"tytul":"5a5d0e20525275a4","po_dialogach":[9700219],"wybory":[{"nr":1,"tekst":"78aab4804375dd0a","dialogi":[9700220]},{"nr":2,"tekst":"960aa0208aa54aa5","dialogi":[9700221]}]}
 {"q":"73029_2","pytanie":73029,"krok":2,"tytul":"5a5d0e20525275a4","wybory":[{"nr":1,"tekst":"2d7ecebe722e98c7","dialogi":[9700092],"typ":1}]}
@@ -12149,7 +12149,7 @@
 {"q":"73159_1","pytanie":73159,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700607],"wybory":[]}
 {"q":"73160_1","pytanie":73160,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700609],"wybory":[]}
 {"q":"73161_1","pytanie":73161,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700611],"wybory":[]}
-{"q":"73162_1","pytanie":73162,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700612],"wybory":[{"nr":1,"tekst":"b1734670076e941e","dialogi":[9700613],"typ":1},{"nr":2,"tekst":"ff6ea90a4338e4ee","dialogi":[9700614]}]}
+{"q":"73162_1","pytanie":73162,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700612],"wybory":[{"nr":1,"tekst":"58b8cb64b05fd803","dialogi":[9700613],"typ":1},{"nr":2,"tekst":"ff6ea90a4338e4ee","dialogi":[9700614]}]}
 {"q":"73163_1","pytanie":73163,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700616],"wybory":[]}
 {"q":"73164_1","pytanie":73164,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700617],"wybory":[]}
 {"q":"73165_1","pytanie":73165,"krok":1,"tytul":"2754c62bc6b0e615","po_dialogach":[9700618],"wybory":[{"nr":1,"tekst":"f28e4f4554e93c6f","dialogi":[9700619],"typ":1},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
@@ -12201,7 +12201,7 @@
 {"q":"75002_1","pytanie":75002,"krok":1,"tytul":"f7c59f4c8d73e6b2","po_dialogach":[9900016],"wybory":[{"nr":1,"tekst":"fcbf6ad864405524","typ":8,"parametry":["220019"]},{"nr":2,"tekst":"fcbf6ad864405524","dialogi":[9900017]},{"nr":3,"tekst":"7345ed45ce936fff"}]}
 {"q":"75003_1","pytanie":75003,"krok":1,"tytul":"f7c59f4c8d73e6b2","po_dialogach":[9900018],"wybory":[{"nr":1,"tekst":"fcbf6ad864405524","typ":8,"parametry":["220020"]},{"nr":2,"tekst":"fcbf6ad864405524","dialogi":[9900019]},{"nr":3,"tekst":"7345ed45ce936fff"}]}
 {"q":"75004_1","pytanie":75004,"krok":1,"tytul":"5fc7ad3f2c3d86e0","po_dialogach":[9900027],"wybory":[{"nr":1,"tekst":"6967ebc5b2d53b61","dialogi":[9900027]},{"nr":3,"tekst":"59fe4ce487877047"}]}
-{"q":"75005_1","pytanie":75005,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100303],"wybory":[{"nr":1,"tekst":"c8136812ff5e72a4","typ":9,"parametry":["client/store/store_interact"]},{"nr":2,"tekst":"5ed44a1f9b821447","dialogi":[10100304]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
+{"q":"75005_1","pytanie":75005,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100303],"wybory":[{"nr":1,"tekst":"c8136812ff5e72a4","typ":9,"parametry":["client/store/store_interact"]},{"nr":2,"tekst":"1f948874d1a82cc4","dialogi":[10100304]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"75006_1","pytanie":75006,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[9900040],"wybory":[{"nr":1,"tekst":"fd5fd3c4567938c7","dialogi":[9900041],"typ":8}]}
 {"q":"75007_1","pytanie":75007,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[9900071],"wybory":[{"nr":1,"tekst":"c472500ac8906741","dialogi":[9900072],"typ":8}]}
 {"q":"75007_2","pytanie":75007,"krok":2,"tytul":"6bf6d3f3d6261b75","wybory":[{"nr":1,"tekst":"ed3c9f77328bf684","dialogi":[9900073],"typ":8}]}
@@ -12342,7 +12342,7 @@
 {"q":"77085_1","pytanie":77085,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100295],"wybory":[{"nr":1,"tekst":"2d50838edfc74492","dialogi":[10100296],"typ":1},{"nr":2,"tekst":"9bb350e561861821","dialogi":[10100296],"typ":1}]}
 {"q":"77086_1","pytanie":77086,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100297],"wybory":[]}
 {"q":"77087_1","pytanie":77087,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100301,10100300],"wybory":[{"nr":1,"tekst":"ff62a130cbfab614","dialogi":[10100302]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
-{"q":"77088_1","pytanie":77088,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100303],"wybory":[{"nr":1,"tekst":"5ed44a1f9b821447","dialogi":[10100304],"typ":1}]}
+{"q":"77088_1","pytanie":77088,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100303],"wybory":[{"nr":1,"tekst":"1f948874d1a82cc4","dialogi":[10100304],"typ":1}]}
 {"q":"77089_1","pytanie":77089,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100305],"wybory":[{"nr":1,"tekst":"efe5df92c037bab9","dialogi":[10100306],"typ":1}]}
 {"q":"77090_1","pytanie":77090,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100307],"wybory":[{"nr":1,"tekst":"c41819feff4f8be1","dialogi":[10100308],"typ":1}]}
 {"q":"77091_1","pytanie":77091,"krok":1,"tytul":"6bf6d3f3d6261b75","po_dialogach":[10100309],"wybory":[{"nr":1,"tekst":"059d45c78c975734","dialogi":[10100310],"typ":1}]}
@@ -14946,7 +14946,7 @@
 {"q":"94554_1","pytanie":94554,"krok":1,"tytul":"5162eb46e66add6d","po_dialogach":[12202127],"wybory":[]}
 {"q":"94555_1","pytanie":94555,"krok":1,"tytul":"48587a43499a4f1c","wybory":[{"nr":1,"tekst":"0b950d2cfc5c86a3","dialogi":[12202129]},{"nr":2,"tekst":"2746f0e0b64193eb","dialogi":[12202130]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
 {"q":"94556_1","pytanie":94556,"krok":1,"tytul":"0bf58a50737e7010","wybory":[{"nr":1,"tekst":"a2bbafb74e617db6","dialogi":[12202134]},{"nr":2,"tekst":"76a0e8a699ffc5ab","dialogi":[12202135]},{"nr":3,"tekst":"746b2d5f59c221c1"}]}
-{"q":"94557_1","pytanie":94557,"krok":1,"tytul":"b754bc020df2297e","wybory":[{"nr":1,"tekst":"7776e9f5239ae307","dialogi":[12202139]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
+{"q":"94557_1","pytanie":94557,"krok":1,"tytul":"b754bc020df2297e","wybory":[{"nr":1,"tekst":"32d130c128413266","dialogi":[12202139]},{"nr":2,"tekst":"746b2d5f59c221c1"}]}
 {"q":"94558_1","pytanie":94558,"krok":1,"tytul":"2fcaa3507bf42fd7","po_dialogach":[12202148],"wybory":[]}
 {"q":"94559_1","pytanie":94559,"krok":1,"tytul":"2fcaa3507bf42fd7","po_dialogach":[12202150],"wybory":[]}
 {"q":"94560_1","pytanie":94560,"krok":1,"tytul":"8ea2744f4ddc618e","po_dialogach":[12202152],"wybory":[]}

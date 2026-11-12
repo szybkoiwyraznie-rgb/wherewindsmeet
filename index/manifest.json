@@ -36,15 +36,15 @@
    "bajtow": 1415521,
    "sha256": "48ce04bade699fdbea157e4b5bb1b197ba14e421c31595ccb412d0ff029f23e9"
   },
-  "pliki_bazy": 42,
+  "pliki_bazy": 47,
   "tabel": 114171
  },
  "liczby": {
   "id_w_mapie_zh": 1818900,
   "id_w_mapie_en": 1124787,
   "id_w_zakresie": 1128714,
-  "unikalnych_tekstow_w_zakresie": 483190,
-  "tekstow_bez_wersji_zh": 5824,
+  "unikalnych_tekstow_w_zakresie": 484080,
+  "tekstow_bez_wersji_zh": 5822,
   "id_tylko_zh_niewskazane_pominiete": 700766,
   "id_tylko_zh_wskazane": 3927,
   "scen": 74950,
@@ -52,6 +52,7 @@
   "elementow_scen": 187330,
   "kwestii": 186025,
   "kwestii_zaleznych_od_plci_bohatera": 1860,
+  "kolizji_znaczeniowych": 890,
   "zadan": 24733,
   "grup_zadan": 1077,
   "pytan_z_wyborami": 15027,
@@ -85,156 +86,162 @@
   "teksty": [
    {
     "plik": "teksty_0.jsonl",
-    "wierszy": 30155,
-    "bajtow": 4698715,
-    "sha256": "24c709dbbf85c8d567c81f6a3c944c9e68a1d0f50f17a8de57e6e6eb61495ef0"
+    "wierszy": 30221,
+    "bajtow": 4713241,
+    "sha256": "815df5be58b1bd2d268ad7c8c83c4d4e613b752d9be3503c58660b3a0eda7ec9"
    },
    {
     "plik": "teksty_1.jsonl",
-    "wierszy": 30067,
-    "bajtow": 4813332,
-    "sha256": "2087e6095c9961f20f5c98a1e12d0c1b5c16f74437f3ac87df26e9c46d75290e"
+    "wierszy": 30121,
+    "bajtow": 4827589,
+    "sha256": "0b4a13d04d3828c1986c2a51213bc0b904bddf8c706b836a980f73516cc0c23f"
    },
    {
     "plik": "teksty_2.jsonl",
-    "wierszy": 30249,
-    "bajtow": 4719312,
-    "sha256": "e8f86b79cd4c2ead368dc03ad976da602944d2a94cd89376250ccf5f17abaff4"
+    "wierszy": 30288,
+    "bajtow": 4729159,
+    "sha256": "31895b1d71ac6887135cf559b31358f56ae116a78612353a405cdd45a45295c5"
    },
    {
     "plik": "teksty_3.jsonl",
-    "wierszy": 30072,
-    "bajtow": 4836612,
-    "sha256": "7316a5009823f300850b142137c62678be2eeb0808363d827d8eadaa5234d6fd"
+    "wierszy": 30122,
+    "bajtow": 4849668,
+    "sha256": "cd73e57c5e7d79c63a5f2b256823e0947335dd8b479f0cb5e795f815090f4319"
    },
    {
     "plik": "teksty_4.jsonl",
-    "wierszy": 30046,
-    "bajtow": 4722892,
-    "sha256": "61b4774171a849fa7af40deb4fe9b7f49ef97a4aaa9a8d120204bdf29fb81313"
+    "wierszy": 30106,
+    "bajtow": 4731859,
+    "sha256": "330eb2b0a8d85d8a888f0106ef209f742876827d3c77284b72ad3c55742267d4"
    },
    {
     "plik": "teksty_5.jsonl",
-    "wierszy": 30334,
-    "bajtow": 4716358,
-    "sha256": "0afadb97042eeaf5448923e9adc354ed93a284d6876eb4f863b0f35b036b3f3e"
+    "wierszy": 30375,
+    "bajtow": 4722507,
+    "sha256": "b7771993425f901bb0e5929d4785b670dcc32de95667e878e3e5b6276394b80e"
    },
    {
     "plik": "teksty_6.jsonl",
-    "wierszy": 30475,
-    "bajtow": 4833435,
-    "sha256": "bae8cde86316eddf40e38603873eb07cf19df911c23c1fc1f30f2190dd5c645c"
+    "wierszy": 30530,
+    "bajtow": 4847058,
+    "sha256": "7f69e7b9f47d462c5359fc973bfe81cfb633573c1255bdadaa6bdb3d80055628"
    },
    {
     "plik": "teksty_7.jsonl",
-    "wierszy": 30129,
-    "bajtow": 4760650,
-    "sha256": "cb3e0724f0b308dbf2733c80401a82bfe0adb4a3c95e97df39999a2266628e98"
+    "wierszy": 30191,
+    "bajtow": 4771829,
+    "sha256": "ee4414143bedb2147476957d5946f672f09aaedb291267f9bfab2cbd57b02e8f"
    },
    {
     "plik": "teksty_8.jsonl",
-    "wierszy": 30287,
-    "bajtow": 4787049,
-    "sha256": "d127da4620b224411e2342b3d4d741773e97ff403a38c417e6858e5b59010a75"
+    "wierszy": 30341,
+    "bajtow": 4800581,
+    "sha256": "6e36de9c3128b35cf7778666f8590f00ebb8b36e4ae1e85e5b0ad26d75c2a6ab"
    },
    {
     "plik": "teksty_9.jsonl",
-    "wierszy": 30225,
-    "bajtow": 4727327,
-    "sha256": "d341e89e3f7d6db2ce8046bebb20c4fc9888823f102c226fc53545c748de7813"
+    "wierszy": 30278,
+    "bajtow": 4741529,
+    "sha256": "d901d1d219fed6c4b4281db5ec9aaa527282aebf192ff72854c0024a81b0bb0a"
    },
    {
     "plik": "teksty_a.jsonl",
-    "wierszy": 30170,
-    "bajtow": 4727452,
-    "sha256": "d532b9d3570b7e7c41cdf71568f5b50b7895a14cdc5ca98f0a9d9242825d9fc8"
+    "wierszy": 30232,
+    "bajtow": 4742375,
+    "sha256": "18d42dea7e21dbe5d6d925f4076f8657f50d82d10e3ad3eea2c9b36336773649"
    },
    {
     "plik": "teksty_b.jsonl",
-    "wierszy": 30243,
-    "bajtow": 4720823,
-    "sha256": "88182c8a3f0647af6bd16953f3cb475c5ee3ac88648867866929519cc44ef7b9"
+    "wierszy": 30315,
+    "bajtow": 4736813,
+    "sha256": "01260bc1967bfcd02ce51be8296360f32357c3edf8857109c608693ea585e438"
    },
    {
     "plik": "teksty_c.jsonl",
-    "wierszy": 29943,
-    "bajtow": 4801428,
-    "sha256": "cd95cdfdecfb8d63ddfac0e4f01e7569a957163bbe32bde10945216edabfb2fa"
+    "wierszy": 30014,
+    "bajtow": 4811346,
+    "sha256": "4185101b201eb93d1f739356ab8351e012314f5633c2b8d7e1d757380fb71c37"
    },
    {
     "plik": "teksty_d.jsonl",
-    "wierszy": 30595,
-    "bajtow": 4835817,
-    "sha256": "5212fa7f37b001ae0b360129b324af13299f25c62834e728f7db43c15768c10f"
+    "wierszy": 30646,
+    "bajtow": 4847477,
+    "sha256": "511cf15e03b8726f1760ff1157442ce39cd06e298cc1e16528fa2ef27115e78b"
    },
    {
     "plik": "teksty_e.jsonl",
-    "wierszy": 30265,
-    "bajtow": 4740914,
-    "sha256": "40c7da1a91d46c3c2930a0f683828040d50041e8ca719be20aa1c22a73b24767"
+    "wierszy": 30317,
+    "bajtow": 4753612,
+    "sha256": "662a62b3a74d211a99f7556d7a50383e1a7b0c943be8576e371f4718266b73bc"
    },
    {
     "plik": "teksty_f.jsonl",
-    "wierszy": 29935,
-    "bajtow": 4683592,
-    "sha256": "8919f55a4a69995aa80c5ccecf0fab1a7dd237c58ceaa75cbb1804dd604970ce"
+    "wierszy": 29983,
+    "bajtow": 4696127,
+    "sha256": "4d92d94f60d763975e3cbf5566a8bdf159d3b63a1a0afdcb3d1847f5ff774e08"
    }
   ],
+  "kolizje": {
+   "plik": "kolizje.jsonl",
+   "wierszy": 890,
+   "bajtow": 163692,
+   "sha256": "548e178af7c4c692ed7cbd13bf3ecf5cf3a4afa526b524182bb060fd82b562ea"
+  },
   "sceny": [
    {
     "plik": "sceny_0.jsonl",
     "wierszy": 9468,
     "bajtow": 2994813,
-    "sha256": "c7a7633a9ceed7273f014213216ac76eae42e03838440b36aca488e44f2fd4e4"
+    "sha256": "0960f5159b227ca3400cc012e51d88e9bbd5e5344a1d14e1f8230cf99f1ca47f"
    },
    {
     "plik": "sceny_1.jsonl",
     "wierszy": 9446,
     "bajtow": 2996295,
-    "sha256": "4dc5b73d30f64c72d3a5e42f301005cc4ac9ae4dc0f90b7cc6e9f4700f1f6f7e"
+    "sha256": "65a7a9ecf7875f9cc4cf3b12d1be511c87133d58b053c6dab7f121541fbd0089"
    },
    {
     "plik": "sceny_2.jsonl",
     "wierszy": 9383,
     "bajtow": 2969431,
-    "sha256": "a6c7c8fd8f2702d07be41040b1034f2062780170296aa6ae8793e42054a2ea5e"
+    "sha256": "ddcc3a527bf3aaf3f1cfc5466a57f9da1905b630eb2a5df0cea455325c361def"
    },
    {
     "plik": "sceny_3.jsonl",
     "wierszy": 9344,
     "bajtow": 2974022,
-    "sha256": "8aaf8722eccb5bbe62cd83dbfa617cd4d9350a52aab2c2141d9a2c6e886a8370"
+    "sha256": "fb86e7ed267a4b7a404b4966802756b63095858959e2d2f0aba0bdf23a103abc"
    },
    {
     "plik": "sceny_4.jsonl",
     "wierszy": 9422,
     "bajtow": 2989832,
-    "sha256": "ac1a61bb16d3f9a0cf4679c1546074fb3f43a54e7a201e80e00628ff9d1a154e"
+    "sha256": "c26e0a2087d330e10d474c8ef57d3159dac5fd943295d395f1113bb44e506a4b"
    },
    {
     "plik": "sceny_5.jsonl",
     "wierszy": 9330,
     "bajtow": 2968477,
-    "sha256": "cec41f7522a6a3d04e7d4431969a539f5880d9d25bba558359c8b63d94c3b22d"
+    "sha256": "a63525b4e7a904c83a7d4ae48d003bad7c5a66e1ae2c918f58bcb3472686b408"
    },
    {
     "plik": "sceny_6.jsonl",
     "wierszy": 9322,
     "bajtow": 2972362,
-    "sha256": "a302408384ab4942e6a3727f1c81dac6f695e0bedd248087ee333631541d6771"
+    "sha256": "2d1866c9015304fc4f754b21ecf72fb5f553d02b3e73cb6fc7863197130f33d8"
    },
    {
     "plik": "sceny_7.jsonl",
     "wierszy": 9235,
     "bajtow": 2934380,
-    "sha256": "e764d6f481f73d47eab8adcdefa267cdfb6d0b3b29de33340952b4e305059d13"
+    "sha256": "a8d293d2602d44eef912d344bdcba4221cdc1e88d9d2f591f8735ca74993eba5"
    }
   ],
   "warianty": {
    "plik": "warianty.jsonl",
    "wierszy": 1860,
    "bajtow": 247768,
-   "sha256": "aa9f94f619b0df25a3f039df53c8fb996a96d994b391377e9ec0d3b3146dff11"
+   "sha256": "4fc10d3ca016e88eadd949c3f3ee9fda41029b1e69324ebc0cda38601dabb2cd"
   },
   "zadania": {
    "plik": "zadania.jsonl",
@@ -264,19 +271,19 @@
    "plik": "wybory.jsonl",
    "wierszy": 15027,
    "bajtow": 2536355,
-   "sha256": "031ba0c4f8dea32e1008c214892994e0d2aea73da788aa54518cbac97ea46e5a"
+   "sha256": "8e671a2cefbc21b3f2b31b68f4bff6d0a6db80db19f7ea03058206b80b69da9b"
   },
   "opcje_npc": {
    "plik": "opcje_npc.jsonl",
    "wierszy": 648,
    "bajtow": 61847,
-   "sha256": "42e0737ff575ee8a587836b5b8a2300ef3cdd35b9a0c7a566900204fcc1181cd"
+   "sha256": "31e1f192797e3a45f1662e0945fd2e36c6596b4c363e9d91a8c96046d2ffba1e"
   },
   "postacie": {
    "plik": "postacie.jsonl",
    "wierszy": 42236,
    "bajtow": 1912911,
-   "sha256": "000c783942df6630528ab1163d23ea3085ca24eebbb6a59dd1a842f256bbc07a"
+   "sha256": "102fcc01a6817321fd46e998ed4ea1b71770409e27dd257d33daa42ffa9722ba"
   },
   "encyklopedia": {
    "plik": "encyklopedia.jsonl",
@@ -301,6 +308,12 @@
    "wierszy": 1117,
    "bajtow": 78182,
    "sha256": "25fe72178416812df284d09b7452c54209807c21e4762a71df6ce9c104fb9c2f"
+  },
+  "cutsceny_kontekst": {
+   "plik": "cutsceny_kontekst.jsonl",
+   "wierszy": 3099,
+   "bajtow": 222381,
+   "sha256": "b88c98f57d680066e5800912842ed8bebe9c1d78e9bb963d73b33009d27100dd"
   }
  }
 }

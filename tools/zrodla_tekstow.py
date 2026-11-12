@@ -74,6 +74,7 @@ class Zrodla:
     wiersze: Counter = field(default_factory=Counter)  # rodzaj tabeli -> liczba wierszy
     bledy: dict[str, str] = field(default_factory=dict)  # tabela -> komunikat
     _indeks: dict[tuple[str, str], int] = field(default_factory=dict)
+    _grey_wyst: dict[int, list[tuple[int, str, int]]] = field(default_factory=dict)
 
     def numer(self, rodzaj: str, sciezka: str) -> int:
         key = (rodzaj, sciezka)
@@ -85,9 +86,21 @@ class Zrodla:
 
     def dodaj(self, text_id: int, pochodzenie: int, klucz: str, etykieta: int) -> None:
         self.liczba[pochodzenie] += 1
+        if self.pochodzenia[pochodzenie][0].endswith("__grey"):
+            grey = self._grey_wyst.setdefault(text_id, [])
+            if len(grey) < MAKS_WYSTAPIEN:
+                grey.append((pochodzenie, klucz, etykieta))
+            return
         found = self.wystapienia.setdefault(text_id, [])
         if len(found) < MAKS_WYSTAPIEN:
             found.append((pochodzenie, klucz, etykieta))
+
+    def scal_grey(self) -> None:
+        for text_id, items in self._grey_wyst.items():
+            found = self.wystapienia.setdefault(text_id, [])
+            if len(found) < MAKS_WYSTAPIEN:
+                found.extend(items[: MAKS_WYSTAPIEN - len(found)])
+        self._grey_wyst.clear()
 
 
 def etykieta_wiersza(row, czy_tekst: Callable[[int], bool]) -> int:
@@ -141,11 +154,9 @@ def zbierz(
     drugi raz.
     """
     skip = set(pomin_rodziny)
-    # Tabele podstawowe zawsze przed bliźniakami `__grey`, z zachowaniem kolejności tabel.
-    names = sorted(
-        (name for name in baza.tabele if baza_gry.rodzina(name) not in skip),
-        key=lambda name: name.endswith("__grey"),
-    )
+    # Zachowujemy kolejność tabel z manifestu (liniowy odczyt chunków),
+    # a wystąpienia `__grey` odkładamy do uzupełnienia na końcu przez `scal_grey()`.
+    names = [name for name in baza.tabele if baza_gry.rodzina(name) not in skip]
     result = Zrodla()
     for number, name in enumerate(names, 1):
         kind = rodzaj_tabeli(name)
@@ -167,4 +178,5 @@ def zbierz(
             result.bledy[name] = str(error)[:200]
         if postep and number % 5000 == 0:
             postep(number, len(names))
+    result.scal_grey()
     return result

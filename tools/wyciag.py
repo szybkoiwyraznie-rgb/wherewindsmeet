@@ -531,21 +531,25 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
     # między strefą fabuły (dialogi/cutsceny) a pozostałymi tabelami gry.
     grupy_zh: dict[str, list[int]] = defaultdict(list)
     klucz_id: dict[int, str] = {}
-    z_en_by_key: dict[str, str] = {}
+    z_en_tids: dict[str, tuple[str, list[int]]] = {}
     for text_id in w_zakresie:
         zrodlowy = zh.get(text_id)
         if zrodlowy is None:
             source_en = en[text_id]
             key = mapa_tekstow.klucz(source_en)
             klucz_id[text_id] = key
-            z_en_by_key[key] = source_en
+            pair = z_en_tids.get(key)
+            if pair is None:
+                z_en_tids[key] = (source_en, [text_id])
+            else:
+                pair[1].append(text_id)
         else:
             grupy_zh[zrodlowy].append(text_id)
 
     kolizje: list[dict] = []
     teksty: dict[str, dict] = {}
-    for key, zr_en in z_en_by_key.items():
-        teksty[key] = {"zr": zr_en, "z_en": True, "n": 0, "en": Counter(), "w": None, "_tids": []}
+    for key, (zr_en, tids) in z_en_tids.items():
+        teksty[key] = {"zr": zr_en, "z_en": True, "n": 0, "en": Counter(), "w": None, "_tids": tids}
 
     for zrodlowy, tids in grupy_zh.items():
         base_key = mapa_tekstow.klucz(zrodlowy)
@@ -601,13 +605,9 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         if angielski is not None and not entry["z_en"]:
             entry["en"][angielski] += 1
 
-    for key, entry in teksty.items():
-        if entry["z_en"]:
-            tids_for_w = [tid for tid in w_zakresie if klucz_id[tid] == key]
-        else:
-            tids_for_w = entry["_tids"]
+    for entry in teksty.values():
         best_choice = None
-        for tid in tids_for_w:
+        for tid in entry["_tids"]:
             for pochodzenie, wiersz, etykieta in zrodla.wystapienia.get(tid, ()):
                 prio = _priorytet_w(pochodzenie, wiersz, tid)
                 if best_choice is None or prio < best_choice[0]:
@@ -944,6 +944,7 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
             "elementow_scen": elementy_scen,
             "kwestii": kwestii,
             "kwestii_zaleznych_od_plci_bohatera": len(warianty),
+            "kolizji_znaczeniowych": len(kolizje),
             "zadan": len(obserwator.zadania),
             "grup_zadan": len(obserwator.grupy),
             "pytan_z_wyborami": len(obserwator.wybory),
@@ -1001,7 +1002,7 @@ def main(argv=None) -> int:
     arguments = parser.parse_args(argv)
 
     try:
-        baza = baza_gry.Baza(arguments.baza, arguments.manifest, pamiec_chunkow=2048)
+        baza = baza_gry.Baza(arguments.baza, arguments.manifest, pamiec_chunkow=8192)
         zh = mapa_tekstow.zloz(arguments.zh)
         en = mapa_tekstow.zloz(arguments.en)
     except (baza_gry.BazaError, mapa_tekstow.MapaError) as error:
