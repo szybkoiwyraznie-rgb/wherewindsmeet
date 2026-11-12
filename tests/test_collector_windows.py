@@ -252,13 +252,27 @@ if os.name == "nt":
             self.assertEqual((outside / "should_not_enter.txt").read_text(encoding="utf-8"), "synthetic outside")
 
 
-        def test_update_mode_collects_patch_zh_cn_and_all_diffs_without_en_base(self):
-            self.write("Package/HD/oversea/locale/translate_words_map_fr_diff", b"synthetic fr diff")
+        def test_update_mode_collects_patch_zh_cn_and_relevant_diffs_skipping_blacklisted_files(self):
+            self.write("Package/HD/oversea/MANIFEST", b"synthetic package manifest")
+            self.write("Package/HD/oversea/data1001", b"synthetic package data1001")
+            self.write("Package/HD/oversea/index1001", b"synthetic package index1001")
+            self.write("Package/HD/oversea/locale/translate_words_map_en_diff", b"synthetic en diff")
             self.write("Package/HD/oversea/locale/translate_words_map_zh_cn_diff", b"synthetic zh diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_fr_diff", b"ignored fr diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_vi_diff", b"ignored vi diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_en__small_diff", b"ignored small diff")
+            self.write("Package/HD/oversea/CameraZone.json", b"{}")
+            self.write("Package/HD/oversea/Audio_Area", b"ignored audio area")
+            self.write("Package/HD/oversea/bulk_data/bulk_data.bin", b"ignored bulk bin")
             self.write("LocalData/Patch/HD/oversea/MANIFEST", b"synthetic patch manifest")
             self.write("LocalData/Patch/HD/oversea/data1001", b"synthetic data1001")
             self.write("LocalData/Patch/HD/oversea/index1001", b"synthetic index1001")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"synthetic patch en diff")
             self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff", b"synthetic patch zh diff")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_de_diff", b"ignored patch de diff")
+            self.write("LocalData/Patch/HD/oversea/CameraZone.json", b"{}")
+            self.write("LocalData/Patch/HD/oversea/Audio_Area", b"ignored patch audio")
+            self.write("LocalData/Patch/HD/oversea/bulk_data/501_bulk_data.bin", b"ignored patch bulk")
             self.write("LocalData/Patch/HD/oversea/model/face.bin", b"ignored model bin")
             self.original = self.game_files()
 
@@ -272,20 +286,52 @@ if os.name == "nt":
             self.assertEqual(report["mode"], "aktualizacja")
             self.assertEqual(report["status"], "collected")
             sources = {row["source"]: row for row in report["files"]}
-            self.assertIn("LocalData/Patch/HD/oversea/MANIFEST", sources)
-            self.assertIn("LocalData/Patch/HD/oversea/data1001", sources)
-            self.assertIn("LocalData/Patch/HD/oversea/index1001", sources)
-            self.assertIn("LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff", sources)
-            self.assertIn("Package/HD/oversea/locale/translate_words_map_fr_diff", sources)
-            self.assertIn("Package/HD/oversea/locale/translate_words_map_zh_cn", sources)
-            self.assertNotIn("Package/HD/oversea/locale/translate_words_map_en", sources)
-            self.assertNotIn("LocalData/Patch/HD/oversea/model/face.bin", sources)
+            for required in (
+                "LocalData/Patch/HD/oversea/MANIFEST",
+                "LocalData/Patch/HD/oversea/data1001",
+                "LocalData/Patch/HD/oversea/index1001",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff",
+                "Package/HD/oversea/MANIFEST",
+                "Package/HD/oversea/data1001",
+                "Package/HD/oversea/index1001",
+                "Package/HD/oversea/locale/translate_words_map_en_diff",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn_diff",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn",
+            ):
+                self.assertIn(required, sources)
+            for excluded in (
+                "Package/HD/oversea/locale/translate_words_map_en",
+                "Package/HD/oversea/locale/translate_words_map_fr_diff",
+                "Package/HD/oversea/locale/translate_words_map_vi_diff",
+                "Package/HD/oversea/locale/translate_words_map_en__small_diff",
+                "Package/HD/oversea/CameraZone.json",
+                "Package/HD/oversea/Audio_Area",
+                "Package/HD/oversea/bulk_data/bulk_data.bin",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_de_diff",
+                "LocalData/Patch/HD/oversea/CameraZone.json",
+                "LocalData/Patch/HD/oversea/Audio_Area",
+                "LocalData/Patch/HD/oversea/bulk_data/501_bulk_data.bin",
+                "LocalData/Patch/HD/oversea/model/face.bin",
+            ):
+                self.assertNotIn(excluded, sources)
             self.assertEqual(len(payload), len({row["stored_as"] for row in report["files"] if row["stored_as"]}))
             self.assertEqual(self.original, self.game_files())
 
-        def test_spakuj_dane_splits_parts_and_keeps_both_manifests(self):
+        def test_spakuj_dane_splits_parts_and_applies_blacklist(self):
+            self.write("Package/HD/oversea/index1", b"package index1 bytes")
+            self.write("Package/HD/oversea/CameraZone.json", b"{}")
+            self.write("Package/HD/oversea/VirtualWindow.json", b"{}")
+            self.write("Package/HD/oversea/Audio_Area", b"ignored audio")
+            self.write("Package/HD/oversea/bulk_data/bulk_data.bin", b"ignored bulk")
+            self.write("Package/HD/oversea/locale/translate_words_map_fr_diff", b"ignored fr diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_en__small_diff", b"ignored small diff")
             self.write("LocalData/Patch/HD/oversea/MANIFEST", b"patch manifest bytes")
             self.write("LocalData/Patch/HD/oversea/data1001", b"patch data1001 bytes")
+            self.write("LocalData/Patch/HD/oversea/index1001", b"patch index1001 bytes")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"patch en diff bytes")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_vi_diff", b"ignored vi diff")
+            self.write("LocalData/Patch/HD/oversea/model/face.bin", b"ignored model")
             self.original = self.game_files()
             dest = self.root / "Uzupelnienie"
             result = subprocess.run(
@@ -307,8 +353,28 @@ if os.name == "nt":
                     for row in manifest["files"]:
                         seen_sources.add(row["path"])
                         self.assertEqual(archive.read(row["stored_as"]), (self.game / row["path"]).read_bytes())
-            self.assertIn("Package/HD/oversea/MANIFEST", seen_sources)
-            self.assertIn("LocalData/Patch/HD/oversea/MANIFEST", seen_sources)
+            for required in (
+                "Package/HD/oversea/MANIFEST",
+                "Package/HD/oversea/index1",
+                "Package/HD/oversea/locale/translate_words_map_en",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn",
+                "LocalData/Patch/HD/oversea/MANIFEST",
+                "LocalData/Patch/HD/oversea/data1001",
+                "LocalData/Patch/HD/oversea/index1001",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+            ):
+                self.assertIn(required, seen_sources)
+            for excluded in (
+                "Package/HD/oversea/CameraZone.json",
+                "Package/HD/oversea/VirtualWindow.json",
+                "Package/HD/oversea/Audio_Area",
+                "Package/HD/oversea/bulk_data/bulk_data.bin",
+                "Package/HD/oversea/locale/translate_words_map_fr_diff",
+                "Package/HD/oversea/locale/translate_words_map_en__small_diff",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_vi_diff",
+                "LocalData/Patch/HD/oversea/model/face.bin",
+            ):
+                self.assertNotIn(excluded, seen_sources)
             self.assertEqual(self.original, self.game_files())
 
         def test_spakuj_dane_bat_autodetects_steam_and_runs_without_args(self):

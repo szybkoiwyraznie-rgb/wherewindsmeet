@@ -114,6 +114,23 @@ class CollectorKitTests(unittest.TestCase):
         self.assertIn("Unblock-File", readme)
         self.assertIn("nie zmienia ustawień systemowych", readme)
 
+    def test_collectors_define_explicit_blacklist_and_keep_index_tables(self):
+        files = kit.kit_files()
+        zbierz = files["zbierz.ps1"].decode("utf-8-sig")
+        spakuj = files["spakuj_dane.ps1"].decode("utf-8-sig")
+        for script in (zbierz, spakuj):
+            self.assertIn("camerazone.json", script)
+            self.assertIn("audio_area", script)
+            self.assertIn("bulk_data", script)
+            self.assertIn("translate_words_map_zh_cn", script)
+            self.assertIn("translate_words_map_en_diff", script)
+            self.assertIn("index", script)
+        self.assertIn("Is-BlacklistedUpdateSubpath", zbierz)
+        self.assertIn("Is-BlacklistedFile", spakuj)
+        self.assertNotIn("'Package/HD/oversea/CameraZone.json'", spakuj)
+        self.assertNotIn("'Package/HD/oversea/Audio_Area'", spakuj)
+        self.assertNotIn("'Package/HD/oversea/bulk_data/bulk_data.bin'", spakuj)
+
 
 if __name__ == "__main__":
     unittest.main()

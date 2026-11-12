@@ -9,8 +9,9 @@ echo WHERE WINDS MEET - DUZE DANE / DUZA AKTUALIZACJA
 echo ===============================================
 echo.
 echo Zamknij gre i poczekaj na koniec aktualizacji Steam.
-echo Program kopiuje pliki danych gry (data*, index*, MANIFEST, mapy)
-echo i dzieli wynik na czesci po ok. 85 MiB na Pulpicie.
+echo Program kopiuje niezbedne dane gry (data*, index*, MANIFEST, mapy zh_cn/en)
+echo z pominieciem innych jezykow i plikow z blacklisty oraz dzieli wynik
+echo na czesci po ok. 85 MiB na Pulpicie.
 echo Nic nie zmienia w grze i nie wysyla nic sam.
 echo.
 if not exist "%PS%" goto no_powershell

@@ -13,12 +13,15 @@ KTÓRY PLIK URUCHOMIĆ
 - Cotygodniowa aktualizacja po patchu gry: kliknij dwa razy
   URUCHOM_AKTUALIZACJE.bat. Na Pulpicie powstanie plik
   WWM_AKTUALIZACJA_<data>_<losowy-id>.zip (zawiera inwentarz, pliki z
-  LocalData\Patch\HD\oversea, wszystkie mapy _diff oraz mapę zh_cn).
+  LocalData\Patch\HD\oversea, index*/data*/MANIFEST, mapę zh_cn oraz
+  warstwy _diff dla zh_cn i en — bez innych języków i zbędnych zasobów).
 - Gdy duża aktualizacja zmieni wiele plików Package/HD/oversea/data*
   powyżej 90 MiB: kliknij dwa razy SPAKUJ_DANE.bat (automatycznie wykrywa
-  grę w Steam, zbiera data*, index*, MANIFEST i mapy oraz dzieli wynik
-  na części po ok. 85 MiB na Pulpicie). Możesz też uruchomić ręcznie
-  spakuj_dane.ps1 w PowerShell z własnym parametrem -Zakres.
+  grę w Steam, zbiera data*, index*, MANIFEST oraz mapy zh_cn/en i ich
+  warstwy _diff — z pominięciem innych języków oraz plików z blacklisty
+  takich jak CameraZone, VirtualWindow, Audio_Area, bulk_data czy model —
+  i dzieli wynik na części po ok. 85 MiB na Pulpicie). Możesz też
+  uruchomić ręcznie spakuj_dane.ps1 w PowerShell z własnym -Zakres.
 
 CO ZROBIĆ KROK PO KROKU
 
@@ -45,7 +48,9 @@ CO ZNAJDUJE SIĘ W WYNIKOWYM ZIP-IE
 - INWENTARZ.jsonl: względne nazwy, rozmiary i daty plików z gałęzi Package
   i LocalData/Patch. Nie ma w nim pełnej ścieżki do katalogu instalacji.
 - pliki/: kopie wybranych map i plików bazy (w trybie aktualizacji:
-  LocalData\Patch\HD\oversea, mapa zh_cn oraz wszystkie warstwy _diff).
+  LocalData\Patch\HD\oversea, potrzebne pliki index*/data*/MANIFEST,
+  mapa zh_cn oraz warstwy _diff wyłącznie dla zh_cn i en; pozostałe
+  języki i warianty __small/_mobile są pomijane).
   RAPORT.json wiąże je ze ścieżkami w instalacji. Identyczne bajty mogą
   być zapisane tylko raz, a raport wskazuje wspólną kopię.
 

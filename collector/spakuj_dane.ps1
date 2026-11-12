@@ -11,8 +11,8 @@
 #
 # Zakresy:
 #   -Zakres dialogi            -> data200-data212 bez data205
-#   -Zakres kontekst           -> pozostale dataN + indexN + MANIFEST + CameraZone + Audio_Area + LocalData/Patch
-#   -Zakres duza_aktualizacja  -> data* + index* + MANIFEST + mapy zh_cn/en + wszystkie _diff + LocalData/Patch
+#   -Zakres kontekst           -> pozostale dataN + indexN + MANIFEST + LocalData/Patch (bez plikow z blacklisty)
+#   -Zakres duza_aktualizacja  -> data* + index* + MANIFEST + mapy zh_cn/en (i ich _diff) + LocalData/Patch (bez innych jezykow i plikow z blacklisty)
 #   -Zakres wszystko           -> dialogi + kontekst
 #   -BezZip                    -> tylko skopiuj do folderu roboczego (bez pakowania)
 
@@ -252,13 +252,6 @@ $kontekst = @(
     'Package/HD/oversea/index203',
     'Package/HD/oversea/index204',
     'Package/HD/oversea/MANIFEST',
-    'Package/HD/oversea/CameraZone.json',
-    'Package/HD/oversea/VirtualWindow.json',
-    'Package/HD/oversea/Audio_Area',
-    'Package/HD/oversea/Audio_Area_BXX',
-    'Package/HD/oversea/Audio_Area_SRC',
-    'Package/HD/oversea/bulk_data/bulk_data.bin',
-    'Package/HD/oversea/bulk_data/501_bulk_data.bin',
     'LocalData/Patch/HD/oversea/data1001',
     'LocalData/Patch/HD/oversea/data1200',
     'LocalData/Patch/HD/oversea/index1001',
@@ -266,10 +259,34 @@ $kontekst = @(
     'LocalData/Patch/HD/oversea/MANIFEST'
 )
 
+# Jawna blacklista nieużywanych plików (inne języki niż zh_cn/en, warianty __small/_mobile,
+# Audio_Area, CameraZone, VirtualWindow, Voxel, model, bulk_data, binarki).
+# Pliki index* (index1..4, index200..204, index1001, index1200) zostają, bo są potrzebne do odczytu data*.
+$script:BlacklistedSubdirs = @('model', 'bulk_data', 'other', 'shader', 'shaders', 'sound', 'sounds', 'audio', 'texture', 'textures', 'video', 'videos', 'movie', 'movies')
+$script:BlacklistedNames = @('camerazone.json', 'virtualwindow.json', 'voxel.json', 'audio_area', 'audio_area_bxx', 'audio_area_src', 'model_ppm', 'bulk_data.bin', '501_bulk_data.bin')
+$script:BlacklistedExtensionsRegex = '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|mpk|mpkinfo|bnk|wem|sav|save|log|dmp|bak|pem|key|p12|pfx|env|lock|txt|json|db|db-shm|db-wal)$'
+$script:AllowedLocaleFiles = @('translate_words_map_zh_cn', 'translate_words_map_zh_cn_diff', 'translate_words_map_en', 'translate_words_map_en_diff')
+
+function Is-BlacklistedFile([string] $RelPath) {
+    if ($RelPath -match '(?i)^(?:Package|LocalData/Patch)/HD/(?:oversea|v2)/(.+)$') {
+        $sub = $Matches[1].ToLowerInvariant().Replace('\', '/')
+        $firstSeg = ($sub -split '/', 2)[0]
+        if ($script:BlacklistedSubdirs -contains $firstSeg) { return $true }
+        $leaf = [IO.Path]::GetFileName($sub)
+        if ($script:BlacklistedNames -contains $leaf) { return $true }
+        if ($sub -match $script:BlacklistedExtensionsRegex) { return $true }
+        if ($sub -match '^locale/(.+)$') {
+            if ($script:AllowedLocaleFiles -notcontains $Matches[1]) { return $true }
+        }
+    }
+    return $false
+}
+
 $lista = New-Object 'System.Collections.Generic.List[string]'
 $seen = @{}
 function Add-Rel([string] $Rel) {
     $norm = $Rel.Replace('\', '/')
+    if (Is-BlacklistedFile $norm) { return }
     $key = $norm.ToLowerInvariant()
     if (-not $seen.ContainsKey($key)) {
         $seen[$key] = $true
@@ -292,13 +309,14 @@ if ($Zakres -eq 'duza_aktualizacja') {
             foreach ($it in $items) {
                 if (($it.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
                 $low = $it.Name.ToLowerInvariant()
-                if ($low -match '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|sav|save|log|dmp|bak|pem|key|p12|pfx|env)$') { continue }
+                $relPath = $relDir + '/' + $it.Name
+                if (Is-BlacklistedFile $relPath) { continue }
                 if ($relDir -like '*/locale') {
-                    if ($low -match '^translate_words_map_(zh_cn|en)(?:_diff)?$' -or $low -match '^translate_words_map_[a-z0-9_]+_diff$') {
-                        Add-Rel ($relDir + '/' + $it.Name)
+                    if ($script:AllowedLocaleFiles -contains $low) {
+                        Add-Rel $relPath
                     }
-                } elseif ($relDir -like 'LocalData/Patch/*' -or $low -match '^(manifest|data[0-9]+|index[0-9]+)$') {
-                    Add-Rel ($relDir + '/' + $it.Name)
+                } elseif ($low -match '^(manifest|data[0-9]+|index[0-9]+)$') {
+                    Add-Rel $relPath
                 }
             }
         }

@@ -9,7 +9,8 @@ echo WHERE WINDS MEET - ZBIERANIE AKTUALIZACJI
 echo ===============================================
 echo.
 echo Zamknij gre i poczekaj na koniec aktualizacji Steam.
-echo Program zbiera pliki aktualizacji (LocalData\Patch, mapa zh_cn i _diff).
+echo Program zbiera potrzebne pliki aktualizacji (LocalData\Patch, index*, data*,
+echo mapy zh_cn oraz en/zh_cn _diff; bez innych jezykow i plikow z blacklisty).
 echo Nic nie zmienia w grze i nie wysyla nic sam.
 echo.
 if not exist "%PS%" goto no_powershell

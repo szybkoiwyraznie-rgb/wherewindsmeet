@@ -187,35 +187,52 @@ function Is-PrivateName([string] $Name, [bool] $Directory) {
     return ($lower -match '(^|[._-])(password|passwd|token|cookie|secret|credential|auth|login|account|profile|session|chat|save|screenshot|crash|dump|log)([._-]|$)')
 }
 
+# Blacklista zbędnych plików w trybie aktualizacji (inne języki niż zh_cn/en, warianty mobilne/small,
+# binarki, audio/kamera/bulk_data nieużywane przy indeksowaniu i łatkach tekstowych).
+# Uwaga: pliki index* (index1001, index1200) MUSZĄ zostać — bez nich data* są nieczytelne.
+$script:BlacklistedUpdateSubdirs = @('model', 'bulk_data', 'other', 'shader', 'shaders', 'sound', 'sounds', 'audio', 'texture', 'textures', 'video', 'videos', 'movie', 'movies')
+$script:BlacklistedUpdateNames = @('camerazone.json', 'virtualwindow.json', 'voxel.json', 'audio_area', 'audio_area_bxx', 'audio_area_src', 'model_ppm', 'bulk_data.bin', '501_bulk_data.bin')
+$script:BlacklistedUpdateExtensionsRegex = '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|mpk|mpkinfo|bnk|wem|sav|save|log|dmp|bak|pem|key|p12|pfx|env|lock|txt|json|db|db-shm|db-wal)$'
+$script:AllowedUpdateLocaleFiles = @('translate_words_map_zh_cn', 'translate_words_map_zh_cn_diff', 'translate_words_map_en', 'translate_words_map_en_diff')
+
+function Is-BlacklistedUpdateSubpath([string] $SubPath) {
+    $low = $SubPath.ToLowerInvariant().Replace('\', '/')
+    $firstSeg = ($low -split '/', 2)[0]
+    if ($script:BlacklistedUpdateSubdirs -contains $firstSeg) { return $true }
+    $leaf = [IO.Path]::GetFileName($low)
+    if ($script:BlacklistedUpdateNames -contains $leaf) { return $true }
+    if ($low -match $script:BlacklistedUpdateExtensionsRegex) { return $true }
+    if ($low -match '^locale/(.+)$') {
+        $locName = $Matches[1]
+        if ($script:AllowedUpdateLocaleFiles -notcontains $locName) { return $true }
+    }
+    return $false
+}
+
 function Candidate-ForFile($Item, [string] $Relative) {
     $name = $Item.Name.ToLowerInvariant()
     $kind = ''
     $priority = 99
     if ($Tryb -eq 'aktualizacja') {
         if ($Item.Name -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { return }
-        if ($name -match '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|sav|save|log|dmp|bak|pem|key|p12|pfx|env)$') { return }
         if ($Relative -match '(?i)^LocalData/Patch/HD/(oversea|v2)/(.+)$') {
             $sub = $Matches[2].ToLowerInvariant()
-            if ($sub -match '^model/') { return }
+            if (Is-BlacklistedUpdateSubpath $sub) { return }
             if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 0 }
-            elseif ($sub -match '^locale/translate_words_map_[a-z0-9_]+_diff$') { $kind = 'map_diff'; $priority = 0 }
-            elseif ($sub -match '^locale/translate_words_map_zh_cn') { $kind = 'map_zh_cn'; $priority = 0 }
+            elseif ($sub -match '^locale/translate_words_map_(en|zh_cn)_diff$') { $kind = 'map_diff'; $priority = 0 }
+            elseif ($sub -eq 'locale/translate_words_map_zh_cn') { $kind = 'map_zh_cn'; $priority = 0 }
             elseif ($sub -eq 'locale/translate_words_map_en') { $kind = 'map_en'; $priority = 5 }
-            elseif ($sub -match '^locale/translate_words_map_en') { $kind = 'map_en'; $priority = 1 }
             elseif ($sub -match '^data[0-9]+$') { $kind = 'db_data'; $priority = 0 }
             elseif ($sub -match '^index[0-9]+$') { $kind = 'db_index'; $priority = 0 }
             else { $kind = 'patch_other'; $priority = 1 }
         } elseif ($Relative -match '(?i)^Package/HD/(oversea|v2)/(.+)$') {
             $sub = $Matches[2].ToLowerInvariant()
+            if (Is-BlacklistedUpdateSubpath $sub) { return }
             if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 1 }
             elseif ($sub -match '^data(1001|1200)$') { $kind = 'db_data'; $priority = 1 }
             elseif ($sub -match '^index(1001|1200)$') { $kind = 'db_index'; $priority = 1 }
             elseif ($sub -match '^locale/translate_words_map_(zh_cn|en)_diff$') { $kind = 'map_diff'; $priority = 1 }
             elseif ($sub -eq 'locale/translate_words_map_zh_cn' -and (-not $BezMapyZh)) { $kind = 'map_zh_cn'; $priority = 2 }
-            elseif ($sub -match '^locale/translate_words_map_[a-z0-9_]+_diff$') {
-                if ($sub -match '(_mobile|__small)') { $kind = 'map_diff'; $priority = 4 }
-                else { $kind = 'map_diff'; $priority = 3 }
-            }
         }
     } else {
         if ($Item.Directory.Name -ieq 'locale' -and
@@ -472,8 +489,8 @@ try {
     if ($Tryb -eq 'aktualizacja') {
         $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $copiedMaps.Count -eq 0) { 'partial' } else { 'collected' }
         $reportFormat = 'wwm-collection-v2'
-        $collectorVer = '1.1.0'
-        $limList = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Update mode collects LocalData/Patch/HD/oversea data/index/manifest/locale, package _diff maps and zh_cn map within payload limit.', 'If the full client updated Package data* files beyond the payload limit, use spakuj_dane.ps1.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
+        $collectorVer = '1.2.0'
+        $limList = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Update mode collects LocalData/Patch/HD/oversea data/index/manifest/locale, package en/zh_cn _diff maps and zh_cn map within payload limit, excluding other languages, __small/_mobile variants and blacklisted asset files.', 'If the full client updated Package data* files beyond the payload limit, use spakuj_dane.ps1.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
     } else {
         $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $enMaps.Count -eq 0) { 'partial' } else { 'collected' }
         $reportFormat = 'wwm-collection-v1'

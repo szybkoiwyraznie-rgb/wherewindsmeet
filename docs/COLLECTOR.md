@@ -147,28 +147,29 @@ same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a r
 
 Do cotygodniowych patchy służy `URUCHOM_AKTUALIZACJE.bat` (`zbierz.ps1 -Tryb aktualizacja`),
 który zbiera do jednego ZIP-a (<90 MiB, format `wwm-collection-v2`):
-- zawartość `LocalData/Patch/HD/oversea/` (`MANIFEST`, `data*`, `index*`, `locale/*_diff`, z wykluczeniem `.bin`/`.exe`/`.dll` i nazw prywatnych),
+- potrzebne pliki z `LocalData/Patch/HD/oversea/` (`MANIFEST`, `data*`, `index*`, `locale/translate_words_map_{zh_cn,en}(_diff)`),
 - `Package/HD/oversea/MANIFEST`, `data1001`, `data1200`, `index1001`, `index1200`,
-- mapę źródłową `translate_words_map_zh_cn` oraz wszystkie warstwy `translate_words_map_*_diff`.
+- mapę źródłową `translate_words_map_zh_cn` oraz warstwy `_diff` wyłącznie dla `zh_cn` i `en` (wszystkie inne języki jak `de`, `es`, `fr`, `ja`, `ko`, `pt_br`, `ru`, `th`, `vi`, `zh_tw`, warianty `__small`/`_mobile`, katalogi `model/` i `bulk_data/` oraz pliki binarne/audiowizualne typu `.mpk`, `.bin`, `CameraZone.json`, `VirtualWindow.json`, `Audio_Area*` są na jawnej blackliście — natomiast pliki `index*` muszą pozostać, bo `baza_gry.py` wymaga ich do dekodowania schematów kolumn i offsetów rekordów w `data*`).
 
 Gdy duża aktualizacja klienta zmieni też bazę `Package/HD/oversea/data*`
 powyżej 90 MiB, służy osobny skrypt `spakuj_dane.ps1` (z wygodnym skrótem
 dwukliku `SPAKUJ_DANE.bat`, który automatycznie szuka gry w Steam), który
 **tylko czyta** katalog gry, zachowuje pełne ścieżki względne pod `pliki/`,
-liczy SHA-256, zapisuje `SPIS.json` i automatycznie dzieli wynik na części
-po ok. 85 MiB (poniżej limitu 100 MiB pobierania z Dysku):
+liczy SHA-256, zapisuje `SPIS.json`, stosuje tę samą czarną listę zbędnych
+języków i zasobów i automatycznie dzieli wynik na części po ok. 85 MiB
+(poniżej limitu 100 MiB pobierania z Dysku):
 
 ```powershell
-# duża aktualizacja (domyślne: data*, index*, MANIFEST, zh_cn, en, *_diff, LocalData/Patch)
+# duża aktualizacja (domyślne: data*, index*, MANIFEST, mapy zh_cn/en i ich _diff, LocalData/Patch)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres duza_aktualizacja
 
 # same dialogi (data200-data212 bez data205, ~133 MB w częściach <85 MiB)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres dialogi
 
-# kontekst: pozostałe dataN, indexN, MANIFEST, CameraZone, Audio_Area, bulk_data
+# kontekst: pozostałe dataN, indexN, MANIFEST oraz LocalData/Patch (bez blacklistowanych plików)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres kontekst
 
-# wszystko naraz (w częściach po ok. 85 MiB)
+# wszystko naraz (w częściach po ok. 85 MiB, z pominięciem blacklisty)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres wszystko
 ```
 
