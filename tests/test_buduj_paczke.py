@@ -20,6 +20,7 @@ ZH_EXTRA = {
     T + 204: "dialog z innego projektu",
     T + 205: "kwestia kowala",  # ten sam tekst co w scenie 100, inny identyfikator
     T + 206: "Efekt #Y{0}#E\nna dwie linie",
+    T + 207: "  ",  # sam odstęp: nie ma czego tłumaczyć
 }
 EN_EXTRA = {T + 200: "next by number", T + 201: "idle talk", T + 206: "Effect #Y{0}#E\nin two lines"}
 
@@ -37,7 +38,7 @@ def world() -> dict:
         data[f"dialog_timelines.{number}"] = scene([text], "tlo")
     data["dialog_timelines.900"] = scene([T + 204], "inny")
     data["spaces.s7.spawn_kit"] = [(1, {"self_talk_dialogs_list": [500, 501, 502]})]
-    data["buff"] = [(1, {"buff_name": T + 20, "buff_detail": T + 206})]
+    data["buff"] = [(1, {"buff_name": T + 20, "buff_detail": T + 206}), (2, {"buff_name": T + 207})]
     return data
 
 
@@ -61,7 +62,8 @@ class PackageTests(unittest.TestCase):
 
     def test_every_text_has_exactly_one_place_for_translation(self):
         slots = Counter(entry.klucz for entry in self.entries())
-        expected = set(self.ix.teksty) | {"@" + ident for ident in self.ix.warianty}
+        expected = (set(self.ix.teksty) - {K("  ")}) | {"@" + ident for ident in self.ix.warianty}
+        self.assertIn("(pusty tekst — nie ma czego tłumaczyć)", self.files["04_walka_i_umiejetnosci_01.md"])
         self.assertEqual(set(slots), expected)
         self.assertEqual(max(slots.values()), 1)
         self.assertEqual(self.manifest["liczby"]["do_wpisania"], len(expected))
@@ -121,6 +123,23 @@ class PackageTests(unittest.TestCase):
         manifest = json.loads((self.out / "paczka.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["format"], "wwm-paczka-v1")
         self.assertEqual(manifest["rodzaj"], "pełny")
+        with zipfile.ZipFile(self.out / "paczka_dla_tlumacza_wwm_v1.zip") as archive:
+            self.assertEqual(archive.namelist(), ["README.md", "sceny.zip", "widoki.zip"])
+
+    def test_self_check_reads_the_package_like_the_importer(self):
+        check = self.manifest["kontrola"]
+        self.assertTrue(check["zgodne"])
+        self.assertEqual((check["powtorzonych"], check["nieznanych"], check["brakujacych"]), (0, 0, 0))
+        self.assertEqual(check["miejsc_pl"], self.manifest["liczby"]["do_wpisania"])
+        # dopisany ręcznie drugi wpis tego samego klucza psuje kontrolę
+        generator = buduj_paczke.Generator(self.ix)
+        with tempfile.TemporaryDirectory(prefix="wwm-paczka-") as temp:
+            buduj_paczke.zbuduj(self.ix, Path(temp), wersja="1", data="2026-01-01", zip_=False)
+            path = Path(temp) / "widoki" / "03_przedmioty_01.md"
+            path.write_text(path.read_text(encoding="utf-8") + "9. [x] Miecz\n   klucz: " + K("Miecz") + "\n   PL:\n", encoding="utf-8")
+            broken = buduj_paczke.kontrola(generator, Path(temp))
+        self.assertFalse(broken["zgodne"])
+        self.assertEqual(broken["powtorzonych"], 1)
 
     def test_supplement_contains_only_new_texts_in_context(self):
         new = {K("kwestia kowala"), K("Opis miecza")}
@@ -131,6 +150,7 @@ class PackageTests(unittest.TestCase):
             files = {path.name: path.read_text(encoding="utf-8") for folder in ("sceny", "widoki") for path in (Path(temp) / folder).glob("*.md")}
             readme = (Path(temp) / "README.md").read_text(encoding="utf-8")
         self.assertEqual(manifest["rodzaj"], "uzupełniający")
+        self.assertTrue(manifest["kontrola"]["zgodne"])
         self.assertEqual({entry.klucz for entry in self.entries(files)}, new)
         scenes = "".join(text for name, text in files.items() if name[:2] in ("01", "80", "90"))
         self.assertIn("dialog 100", scenes)

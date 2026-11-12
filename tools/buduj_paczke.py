@@ -302,6 +302,10 @@ class Generator:
             return lines, False
         w_bloku[slot] = nr
         self._nowe_w_bloku.append((slot, miejsce.format(nr=nr)))
+        if not text.zrodlo.strip():
+            lines.append(f"{WCIECIE}(pusty tekst — nie ma czego tłumaczyć)")
+            self.liczby["pustych"] += 1
+            return lines, False
         lines.append(f"{WCIECIE}klucz: {slot}")
         lines += [WCIECIE + line for line in dodatkowe]
         tokens = fmt.rozne_tokeny(source)
@@ -731,6 +735,32 @@ def spakuj(katalog: Path, cel: Path) -> None:
             archive.writestr(info, path.read_bytes())
 
 
+def kontrola(generator: "Generator", wyj: Path) -> dict:
+    """Przeczytaj gotowe pliki tak, jak zrobi to import, i porównaj z wyciągiem.
+
+    Każde miejsce `PL:` ma klucz znany wyciągowi i występuje dokładnie raz;
+    w pakiecie pełnym miejsca pokrywają wszystkie niepuste teksty i wszystkie
+    kwestie zależne od płci, w uzupełniającym — dokładnie zamówione klucze.
+    """
+    ix = generator.ix
+    seen = Counter()
+    for folder in ("sceny", "widoki"):
+        for path in sorted((wyj / folder).glob("*.md")):
+            for entry in fmt.czytaj_wpisy(path.read_text(encoding="utf-8")):
+                seen[entry.klucz] += 1
+    wanted = {key for key, text in ix.teksty.items() if text.zrodlo.strip()} | {"@" + ident for ident in ix.warianty}
+    if generator.tylko is not None:
+        wanted &= generator.tylko
+    wanted = {slot for slot in wanted if not generator.magazyn.ma(slot)}
+    return {
+        "miejsc_pl": len(seen),
+        "powtorzonych": sum(1 for count in seen.values() if count > 1),
+        "nieznanych": len(set(seen) - wanted),
+        "brakujacych": len(wanted - set(seen)),
+        "zgodne": set(seen) == wanted and all(count == 1 for count in seen.values()),
+    }
+
+
 def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: set[str] | None = None, zip_: bool = True) -> dict:
     """Zbuduj pakiet w katalogu `wyj`; zwraca manifest pakietu."""
     try:
@@ -744,6 +774,8 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         if folder.is_dir():
             for old in folder.glob("*"):
                 old.unlink()
+    for old in wyj.glob("paczka_dla_tlumacza_wwm_v*.zip"):
+        old.unlink()
     generator = Generator(ix, magazyn, tylko_sloty)
     generator.sceny(wyj / "sceny")
     sceny_serie = list(generator.serie)
@@ -784,11 +816,20 @@ def zbuduj(ix, wyj: Path, *, wersja: str, data: str, magazyn=None, tylko_sloty: 
         "widoki": widoki_serie,
     }
     (wyj / "README.md").write_text(opis_paczki.readme(generator, manifest), encoding="utf-8", newline="\n")
+    manifest["kontrola"] = kontrola(generator, wyj)
     if zip_:
         for name in ("sceny", "widoki"):
             spakuj(wyj / name, wyj / f"{name}.zip")
+        # jeden plik do przekazania tłumaczowi: README.md + sceny.zip + widoki.zip
+        whole = wyj / f"paczka_dla_tlumacza_wwm_v{wersja}.zip"
+        with zipfile.ZipFile(whole, "w", zipfile.ZIP_STORED) as archive:
+            for name in ("README.md", "sceny.zip", "widoki.zip"):
+                info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+                info.external_attr = 0o644 << 16
+                archive.writestr(info, (wyj / name).read_bytes())
         manifest["archiwa"] = {
-            name: {"bajtow": (wyj / name).stat().st_size, "sha256": sha256(wyj / name)} for name in ("sceny.zip", "widoki.zip")
+            name: {"bajtow": (wyj / name).stat().st_size, "sha256": sha256(wyj / name)}
+            for name in ("sceny.zip", "widoki.zip", whole.name)
         }
     (wyj / "paczka.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     return manifest
@@ -814,8 +855,9 @@ def main(argv=None) -> int:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
     manifest = zbuduj(ix, Path(arguments.wyj), wersja=arguments.wersja, data=arguments.data, magazyn=magazyn, tylko_sloty=only, zip_=not arguments.bez_zip)
-    print(json.dumps({"ok": True, "rodzaj": manifest["rodzaj"], "liczby": manifest["liczby"], "uklad": manifest["uklad"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
-    return 0
+    ok = manifest["kontrola"]["zgodne"]
+    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "liczby": manifest["liczby"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
