@@ -37,6 +37,7 @@ from pathlib import Path
 try:
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
+    from tools import kontekst_cutscen as kc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -44,6 +45,7 @@ except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
+    from tools import kontekst_cutscen as kc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -87,7 +89,7 @@ CUTSCENY_TABELE = {
 }
 ZAKRES_BOTY_TM = (3_220_000, 3_269_999)
 ZAKRES_CUTSCEN_TM = (590_000, 592_694)
-ZAKRES_PROLOG_TM = (590_291, 590_459)
+ZAKRES_PROLOG_TM = kc.ZAKRES_PROLOG_TM
 
 # Tabele czysto techniczne/meta (samouczki, sterowanie, QTE, ustawienia, rankingi, komunikaty błędów programisty):
 # w trybie v2 zostają po angielsku w kliencie gry i nie trafiają do paczki dla tłumacza.
@@ -122,21 +124,6 @@ _RE_BLAD_SIECIOWY = re.compile(
     r"authentication failed|real-name authentication failed)",
     re.I,
 )
-_MOWCY_CUTSCEN_ZH = {
-    "伊刀": "伊刀 (Yi Dao)",
-    "我": "gracz (我)",
-    "寒香寻": "寒香寻 (Han Xiangxun)",
-    "江无浪": "江无浪 (Jiang Wulang)",
-    "江晏": "江晏 (Jiang Yan)",
-    "千夜": "千夜 (Qianye)",
-    "寒姨": "寒姨 (Ciotka Han)",
-    "陈子奚": "陈子奚 (Chen Zixi)",
-    "师父": "师父 (Mistrz)",
-    "老板娘": "老板娘 (Właścicielka gospody)",
-    "行当管理员": "行当管理员 (Zarządca fachu)",
-    "赵大哥": "赵大哥 (Brat Zhao)",
-    "东阙公子": "东阙公子 (Panicz Dongque)",
-}
 # (wzorzec nazwy tabeli, widok) — wygrywa pierwsza pasująca reguła
 REGULY = [
     (r"(text_msg|ccs_text_msg|programmer_text_msg)", "07_komunikaty"),
@@ -326,8 +313,41 @@ class Generator:
             if row.get("n"):
                 self._nazwa_po_tekscie.setdefault(ix.zh(row["n"]), row["n"])
         self._encyklopedia = {row["nazwa"]: row for row in ix.encyklopedia.values() if row.get("nazwa")}
+        self._encyklopedia_po_id: dict[int, dict] = dict(ix.encyklopedia)
+        self._encyklopedia_po_en: dict[str, dict] = {}
+        for row in ix.encyklopedia.values():
+            if row.get("nazwa"):
+                en_name = (ix.en(row["nazwa"]) or "").strip()
+                if en_name:
+                    self._encyklopedia_po_en.setdefault(en_name, row)
         for key in self._encyklopedia:
             self._nazwa_po_tekscie.setdefault(ix.zh(key), key)
+
+        self._klucz_nazwy_po_en: dict[str, str] = {}
+        wvpv_raw: dict[str, str] = {}
+        for kl, text in ix.teksty.items():
+            zr = ix.zrodlo(text)
+            if text.zrodlo and zr:
+                en_val = (ix.en(kl) or "").strip()
+                if en_val and len(en_val) <= 64 and (
+                    zr[0] in ("entity_billboard", "world_view_person_info", "cutscene_person_info_config", "avatars")
+                    or any(part in zr[1] for part in ("name", "title", "nazwa"))
+                ):
+                    if en_val not in self._klucz_nazwy_po_en or zr[0] in (
+                        "entity_billboard",
+                        "world_view_person_info",
+                        "cutscene_person_info_config",
+                    ):
+                        self._klucz_nazwy_po_en[en_val] = kl
+                if zr[0] == "world_view_person_voice" and zr[1] == "description":
+                    wvpv_raw[zr[2]] = text.zrodlo
+
+        (
+            self._glos_wvpv_dokladny,
+            self._mowca_napisow_exact,
+            self._mowca_napisow_dlugie,
+        ) = kc.zbuduj_indeksy_mowcow(ix, wvpv_raw, self._encyklopedia_po_id)
+
         self._wybory_po: dict[int, list[dict]] = defaultdict(list)
         for key in sorted(ix.wybory):
             row = ix.wybory[key]
@@ -341,6 +361,21 @@ class Generator:
             for lst in (task.get("przerywniki") or {}).values():
                 for cut_no in lst:
                     self._zadanie_przerywnika.setdefault(cut_no, task_no)
+
+        all_section_tasks = {tid for sec in self.uklad.sekcje for tid in sec.zadania}
+        self._powtorka_po_no: dict[int, dict] = {}
+        self._powtorki_po_zadaniu: dict[int, list[dict]] = defaultdict(list)
+        for row in ix.cutsceny_kontekst.get("powtorka", ()):
+            pno = row.get("no")
+            if pno is not None:
+                self._powtorka_po_no[pno] = row
+            tno = row.get("task_no")
+            fno = row.get("finish_task")
+            if tno:
+                self._powtorki_po_zadaniu[tno].append(row)
+            if fno and fno != tno and (not tno or tno not in all_section_tasks):
+                self._powtorki_po_zadaniu[fno].append(row)
+
         self._chronione_klucze = self._zbuduj_chronione_klucze()
         self._cutsceny_klucze = self._zbuduj_cutsceny_klucze()
 
@@ -352,7 +387,7 @@ class Generator:
                 if row.get("k"):
                     keys.add(row["k"])
         for row in ix.cutsceny_kontekst.get("powtorka", ()):
-            for field in ("nazwa", "rozdzial"):
+            for field in ("nazwa", "rozdzial", "streszczenie"):
                 if row.get(field):
                     keys.add(row[field])
         for row in ix.przerywniki.values():
@@ -504,7 +539,13 @@ class Generator:
         person = scena["o"][numer]
         name = podmiana or (person[3] if len(person) > 3 else None)
         if person[1] == TYP_GRACZ:
-            return f"gracz ({self.para(name)})" if name else "gracz"
+            if name:
+                zh_raw = (self.ix.teksty[name].zrodlo or "").strip() if name in self.ix.teksty else ""
+                en_raw = (self.ix.en(name) or "").strip().lower()
+                if zh_raw in kc.GENERYCZNE_NAZWY_GRACZA_ZH or en_raw in kc.GENERYCZNE_NAZWY_GRACZA_TXT:
+                    return "gracz"
+                return f"gracz (przebranie/rola: {self.para(name)})"
+            return "gracz"
         if name:
             return self.para(name)
         tag = person[0]
@@ -653,6 +694,14 @@ class Generator:
             lines.append(f"- opis: {self.para(task['opis'])}")
         if task.get("przestrzen") is not None:
             lines.append(f"- miejsce zadania: {self._miejsce(task['przestrzen'])}")
+        seen_pno: set[int | None] = set()
+        for prow in self._powtorki_po_zadaniu.get(numer, ()):
+            pno = prow.get("no")
+            if pno in seen_pno:
+                continue
+            seen_pno.add(pno)
+            czesci = [c for c in (self.para(prow.get(f)) for f in ("nazwa", "rozdzial")) if c]
+            lines.append(f"- powiązana cutscena w dzienniku: #{pno}" + (f" — {' · '.join(czesci)}" if czesci else ""))
         return lines
 
     def _nazwa_grupy(self, grupa) -> str:
@@ -788,58 +837,75 @@ class Generator:
             out.append(part)
         return "_".join(out)
 
-    def _mowca_cutsceny(self, row: dict, text) -> str:
-        audio = row.get("audio") or ""
-        if "_player_m_" in audio or "_pma_" in audio:
-            return "gracz (bohater)"
-        if "_player_f_" in audio or "_pfa_" in audio:
-            return "gracz (bohaterka)"
-        if "_zhujue_" in audio:
-            return "gracz"
-        zh = text.zrodlo.strip()
-        if " " in zh:
-            prefix = zh.split(" ", 1)[0]
-            if prefix in _MOWCY_CUTSCEN_ZH:
-                return _MOWCY_CUTSCEN_ZH[prefix]
-        mowca_en = (row.get("mowca_en") or "").strip()
-        if mowca_en and not mowca_en.startswith("(") and len(mowca_en.split()) <= 3:
-            return mowca_en
-        return ""
+    def _formatuj_mowce_cutsceny(self, sp_en: str | None, audio: str) -> str:
+        if not sp_en:
+            return ""
+        if sp_en == "You Xia":
+            if "_player_m_" in audio or "_pma_" in audio:
+                return "gracz (You Xia, bohater)"
+            if "_player_f_" in audio or "_pfa_" in audio:
+                return "gracz (You Xia, bohaterka)"
+            return "gracz (You Xia)"
+        entry = self._encyklopedia_po_en.get(sp_en)
+        if entry and entry.get("nazwa"):
+            para = self.para(entry["nazwa"])
+            if para:
+                return para
+        kl = self._klucz_nazwy_po_en.get(sp_en)
+        if kl:
+            para = self.para(kl)
+            if para:
+                return para
+        zh_found = next(
+            (
+                zh
+                for zh, en in (*kc.MOWCY_CUTSCEN_ZH_NA_EN.items(), *kc.MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA.items())
+                if en == sp_en
+            ),
+            None,
+        )
+        pl_role = kc.MOWCY_ROLE_PL.get(sp_en)
+        if zh_found and pl_role:
+            return f"{zh_found} ({sp_en} — {pl_role})"
+        if zh_found:
+            return f"{zh_found} ({sp_en})"
+        if pl_role:
+            return f"{sp_en} ({pl_role})"
+        return sp_en
+
+    def _mowca_cutsceny(self, row: dict, text, *, ignoruj_audio: bool = False) -> str:
+        en_raw = self.ix.en(row["k"]) or ""
+        sp_en = kc.rozwiaz_mowce_en(
+            row,
+            text.zrodlo,
+            en_raw,
+            self._glos_wvpv_dokladny,
+            self._mowca_napisow_exact,
+            self._mowca_napisow_dlugie,
+            ignoruj_audio=ignoruj_audio,
+        )
+        return self._formatuj_mowce_cutsceny(sp_en, row.get("audio") or "")
 
     def cutsceny(self, katalog: Path) -> None:
         ix = self.ix
         self._nowe_w_bloku = []
         wstep = ["Polski tekst wpisujesz w jednej linii po `PL:`. Zasady i podział na sekcje: `README.md`."]
+        streszczenia = defaultdict(list)
+        for row in ix.streszczenia:
+            if row.get("tekst"):
+                streszczenia[row.get("grupa")].append(row["tekst"])
 
-        # 1. 01_napisy_cutscen — text_msg 590000..592694 pogrupowane po lukach ID i segmentach audio
+        # 1. 01_napisy_cutscen — text_msg 590000..592694 pogrupowane po lukach ID i logicznych scenach fabularnych
         napisy = sorted(
             (r for r in ix.cutsceny_kontekst.get("napis", ()) if r.get("k") in ix.teksty),
             key=lambda r: r["wiersz"],
         )
-        plec_wiersza: dict[int, str] = {}
-        for idx in range(len(napisy) - 1):
-            a, b = napisy[idx], napisy[idx + 1]
-            if b["wiersz"] != a["wiersz"] + 1:
-                continue
-            ta, tb = ix.teksty[a["k"]], ix.teksty[b["k"]]
-            aud_a, aud_b = a.get("audio") or "", b.get("audio") or ""
-            is_mf_zh = (
-                ("小子" in ta.zrodlo and "小妮子" in tb.zrodlo)
-                or ("少侠" in ta.zrodlo and "女侠" in tb.zrodlo)
-                or ("小妮子" in ta.zrodlo and "小子" in tb.zrodlo)
-                or ("女侠" in ta.zrodlo and "少侠" in tb.zrodlo)
-            )
-            is_mf_aud = ("_m_" in aud_a and "_f_" in aud_b) or ("_pma_" in aud_a and "_pfa_" in aud_b)
-            if is_mf_zh or is_mf_aud:
-                if "小妮子" in ta.zrodlo or "女侠" in ta.zrodlo or "_f_" in aud_a or "_pfa_" in aud_a:
-                    plec_wiersza[a["wiersz"]] = "bohaterka (żeński)"
-                    plec_wiersza[b["wiersz"]] = "bohater (męski)"
-                else:
-                    plec_wiersza[a["wiersz"]] = "bohater (męski)"
-                    plec_wiersza[b["wiersz"]] = "bohaterka (żeński)"
+        plec_raw = kc.wykryj_plec_napisow(napisy, ix.teksty)
+        plec_wiersza = {
+            w: ("bohater (męski)" if v == "bohater" else "bohaterka (żeński)")
+            for w, v in plec_raw.items()
+        }
 
-        # Najpierw dzielimy po lukach ID (>1), wyodrębniając m.in. PROLOG (590291..590459),
-        # a w ramach dużych ciągów tniemy łagodnie po zmianie rodziny `vo_*` lub co 100 linii.
         ciagi: list[list[dict]] = []
         for row in napisy:
             if not ciagi or row["wiersz"] - ciagi[-1][-1]["wiersz"] > 1:
@@ -863,46 +929,96 @@ class Generator:
                     nagl = f"## Cutscena {nr_ciagu} (wiersze {start_w}–{stop_w}, {len(ciag)} linii)"
                 pisarz.naglowek(2, [nagl])
 
-                subblocks: list[list[dict]] = []
-                cur_sub: list[dict] = []
-                cur_vo = ""
-                for row in ciag:
-                    vo = self._vo_scena(row.get("audio"))
-                    if cur_sub and ((vo and cur_vo and vo != cur_vo and len(cur_sub) >= 12) or len(cur_sub) >= 100):
-                        subblocks.append(cur_sub)
-                        cur_sub = []
-                        cur_vo = vo
-                    elif vo and not cur_vo:
-                        cur_vo = vo
-                    cur_sub.append(row)
-                if cur_sub:
-                    subblocks.append(cur_sub)
-
-                for sub in subblocks:
-                    if not self._zawiera_nowe([r["k"] for r in sub]):
+                segmenty = kc.segmentuj_ciag_napisow(ciag)
+                wielosegmentowy = len(segmenty) > 1 or any(s["tytul"] for s in segmenty)
+                for seg in segmenty:
+                    seg_rows = seg["rows"]
+                    if not self._zawiera_nowe([r["k"] for r in seg_rows]):
                         continue
-                    lines: list[str] = []
-                    w_bloku: dict[str, int] = {}
-                    nr = opened = 0
-                    for row in sub:
-                        nr += 1
-                        key = row["k"]
-                        text = ix.teksty[key]
-                        speaker = self._mowca_cutsceny(row, text)
-                        audio = row.get("audio") or ""
-                        parts = [f"text_msg · {row['wiersz']}"]
-                        if audio:
-                            parts.append(audio)
-                        if speaker:
-                            parts.append(f"mówca: {speaker}")
-                        label = " · ".join(parts)
-                        extra: list[str] = []
-                        if row["wiersz"] in plec_wiersza:
-                            extra.append(f"wariant płci: {plec_wiersza[row['wiersz']]}")
-                        part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce=f"cutscena {row['wiersz']}, element {{nr}}")
-                        lines += part
-                        opened += is_open
-                    self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+                    wygl_wiersze = seg.get("wygladzono_audio") or set()
+                    mowcy_wiersza: dict[int, str] = {}
+                    unikatowi_mowcy: list[str] = []
+                    widziani_mowcy: set[str] = set()
+                    for row in seg_rows:
+                        sp_lbl = self._mowca_cutsceny(
+                            row,
+                            ix.teksty[row["k"]],
+                            ignoruj_audio=row["wiersz"] in wygl_wiersze,
+                        )
+                        mowcy_wiersza[row["wiersz"]] = sp_lbl
+                        if sp_lbl and sp_lbl not in widziani_mowcy:
+                            widziani_mowcy.add(sp_lbl)
+                            unikatowi_mowcy.append(sp_lbl)
+
+                    if wielosegmentowy:
+                        s_w, e_w = seg_rows[0]["wiersz"], seg_rows[-1]["wiersz"]
+                        tyt_seg = seg["tytul"] or f"Odcinek {s_w}–{e_w}"
+                        seg_head = [f"### {tyt_seg} (wiersze {s_w}–{e_w}, {len(seg_rows)} linii)"]
+                        if seg["grupa"] is not None:
+                            seg_head.append(f"- wątek: {self._nazwa_grupy(seg['grupa'])}")
+                            for skey in streszczenia.get(seg["grupa"], ())[:1]:
+                                spara = self.para(skey)
+                                if spara:
+                                    seg_head.append(f"- streszczenie wątku: {spara}")
+                        cut_opisy = []
+                        for cno in seg.get("cuts", ()):
+                            prow = self._powtorka_po_no.get(cno)
+                            if prow:
+                                czesci = [c for c in (self.para(prow.get(f)) for f in ("nazwa", "rozdzial")) if c]
+                                if czesci:
+                                    cut_opisy.append(f"#{cno} ({' · '.join(czesci)})")
+                        if cut_opisy:
+                            seg_head.append(f"- powiązane cutsceny w dzienniku: {', '.join(cut_opisy)}")
+                        if seg.get("notka"):
+                            seg_head.append(f"- uwaga: {seg['notka']}")
+                        if unikatowi_mowcy:
+                            seg_head.append(f"- rozpoznani mówcy: {', '.join(unikatowi_mowcy)}")
+                        pisarz.naglowek(3, seg_head)
+                    elif unikatowi_mowcy:
+                        pisarz.naglowek(2, [nagl, f"- rozpoznani mówcy: {', '.join(unikatowi_mowcy)}"])
+
+                    subblocks: list[list[dict]] = []
+                    cur_sub: list[dict] = []
+                    cur_vo = ""
+                    for row in seg_rows:
+                        vo = self._vo_scena(row.get("audio"))
+                        if cur_sub and ((vo and cur_vo and vo != cur_vo and len(cur_sub) >= 12) or len(cur_sub) >= 100):
+                            subblocks.append(cur_sub)
+                            cur_sub = []
+                            cur_vo = vo
+                        elif vo and not cur_vo:
+                            cur_vo = vo
+                        cur_sub.append(row)
+                    if cur_sub:
+                        subblocks.append(cur_sub)
+
+                    for sub in subblocks:
+                        if not self._zawiera_nowe([r["k"] for r in sub]):
+                            continue
+                        lines: list[str] = []
+                        w_bloku: dict[str, int] = {}
+                        nr = opened = 0
+                        for row in sub:
+                            nr += 1
+                            key = row["k"]
+                            ignoruj_a = row["wiersz"] in wygl_wiersze
+                            speaker = mowcy_wiersza.get(row["wiersz"], "")
+                            audio = row.get("audio") or ""
+                            parts = [f"text_msg · {row['wiersz']}"]
+                            if audio:
+                                parts.append(audio)
+                            if speaker:
+                                parts.append(f"mówca: {speaker}")
+                            label = " · ".join(parts)
+                            extra: list[str] = []
+                            if row["wiersz"] in plec_wiersza:
+                                extra.append(f"wariant płci: {plec_wiersza[row['wiersz']]}")
+                            if ignoruj_a and audio:
+                                extra.append("uwaga: przypisane po tekście audio może pochodzić z innej sceny (kolizja sound_data)")
+                            part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce=f"cutscena {row['wiersz']}, element {{nr}}")
+                            lines += part
+                            opened += is_open
+                        self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
             files = pisarz.koniec()
             if files:
                 self.serie.append({"baza": "01_napisy_cutscen", "tytul": "Napisy cutscen (`text_msg` 590000–592694)", "opis": "cutsceny", "pliki": files})
@@ -916,13 +1032,19 @@ class Generator:
             katalog.mkdir(parents=True, exist_ok=True)
             pisarz = Pisarz(katalog, "02_intro_i_filmy", "Intro i napisy filmowe — Where Winds Meet", wstep)
             if has_intro:
-                pisarz.naglowek(2, [f"## Intro — wds_oneday_intro_cutscene_data ({len(intro)} linii)"])
+                pisarz.naglowek(2, [f"## Intro — wds_oneday_intro_cutscene_data (Sekwencja wprowadzająca „One Day in the Imperial Service”, {len(intro)} linii)"])
                 lines, w_bloku, nr, opened = [], {}, 0, 0
                 for row in intro:
                     nr += 1
                     t0 = row["czas"]
                     t1 = t0 + row["trwanie"]
-                    label = f"intro · id {row['id']} · {t0:.1f}s–{t1:.1f}s · mówca {row['mowca']}"
+                    if row["mowca"] == 1:
+                        mowca_lbl = "mówca 1 (gracz: You Xia)"
+                    elif row["mowca"] == 2:
+                        mowca_lbl = "mówca 2 (Gwardia Cesarska)"
+                    else:
+                        mowca_lbl = f"mówca {row['mowca']}"
+                    label = f"intro · id {row['id']} · {t0:.1f}s–{t1:.1f}s · {mowca_lbl}"
                     part, is_open = self._element(nr, label, row["k"], w_bloku, miejsce=f"intro id {row['id']}")
                     lines += part
                     opened += is_open
@@ -955,43 +1077,72 @@ class Generator:
         )
         powtorki_nowe = [
             r for r in powtorki
-            if any((r.get(f) in ix.teksty and r.get(f) not in self.sloty) for f in ("nazwa", "rozdzial"))
-            and self._zawiera_nowe([r[f] for f in ("nazwa", "rozdzial") if r.get(f) and r.get(f) in ix.teksty])
+            if any((r.get(f) in ix.teksty and r.get(f) not in self.sloty) for f in ("nazwa", "rozdzial", "streszczenie"))
+            and self._zawiera_nowe([r[f] for f in ("nazwa", "rozdzial", "streszczenie") if r.get(f) and r.get(f) in ix.teksty])
         ]
-        przerywniki_nowe = [
-            row for _no, row in sorted(ix.przerywniki.items())
-            if any((row.get(f) and row.get(f) in ix.teksty and row.get(f) not in self.sloty) for f in ("tekst", "streszczenie"))
+        ma_przerywniki_do_dodania = any(
+            any((row.get(f) and row.get(f) in ix.teksty and row.get(f) not in self.sloty) for f in ("tekst", "streszczenie"))
             and self._zawiera_nowe([row[f] for f in ("tekst", "streszczenie") if row.get(f) and row.get(f) in ix.teksty])
-        ]
-        if powtorki_nowe or przerywniki_nowe:
+            for row in ix.przerywniki.values()
+        )
+        if powtorki_nowe or ma_przerywniki_do_dodania:
             katalog.mkdir(parents=True, exist_ok=True)
             pisarz = Pisarz(katalog, "03_plansze_i_streszczenia", "Plansze przerywników i powtórki w dzienniku — Where Winds Meet", wstep)
             if powtorki_nowe:
                 pisarz.naglowek(2, [f"## Powtórki cutscen w dzienniku — task_cutscene_replay ({len(powtorki_nowe)} wpisów)"])
                 for row in powtorki_nowe:
                     lines, w_bloku, nr, opened = [], {}, 0, 0
-                    task_no = row.get("task_no")
-                    task_info = ""
+                    extra: list[str] = []
+                    task_no = row.get("task_no") or row.get("finish_task")
                     if task_no and task_no in ix.zadania:
-                        task_info = f"zadanie {task_no} ({self.para(ix.zadania[task_no].get('nazwa'))})"
-                    for field, label in (("nazwa", "Nazwa powtórki"), ("rozdzial", "Rozdział powtórki")):
+                        extra.append(f"zadanie: {task_no} ({self.para(ix.zadania[task_no].get('nazwa'))})")
+                    if row.get("grupa") and row["grupa"] in ix.grupy:
+                        extra.append(f"wątek: {self._nazwa_grupy(row['grupa'])}")
+                    if row.get("przestrzen") not in (None, 501, 502, 504):
+                        extra.append(f"miejsce: {self._miejsce(row['przestrzen'])}")
+                    for field, label in (
+                        ("nazwa", "Nazwa powtórki"),
+                        ("rozdzial", "Rozdział powtórki"),
+                        ("streszczenie", "Streszczenie powtórki"),
+                    ):
                         key = row.get(field)
                         if not key or key not in ix.teksty:
                             continue
                         nr += 1
-                        extra = [task_info] if task_info else []
                         part, is_open = self._element(nr, f"task_cutscene_replay · {row['no']} · {label}", key, w_bloku, dodatkowe=extra, miejsce=f"powtórka {row['no']}, element {{nr}}")
                         lines += part
                         opened += is_open
                     if lines:
                         self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+
+            przerywniki_nowe = [
+                row for _no, row in sorted(ix.przerywniki.items())
+                if any((row.get(f) and row.get(f) in ix.teksty and row.get(f) not in self.sloty) for f in ("tekst", "streszczenie"))
+                and self._zawiera_nowe([row[f] for f in ("tekst", "streszczenie") if row.get(f) and row.get(f) in ix.teksty])
+            ]
             if przerywniki_nowe:
                 pisarz.naglowek(2, [f"## Plansze i streszczenia przerywników — cutscenes ({len(przerywniki_nowe)} wpisów)"])
                 for row in przerywniki_nowe:
                     lines, w_bloku, nr, opened = [], {}, 0, 0
                     cut_no = row["no"]
-                    task_no = self._zadanie_przerywnika.get(cut_no)
-                    extra = [f"zadanie: {task_no} — {self.para(ix.zadania[task_no].get('nazwa'))}"] if task_no and task_no in ix.zadania else []
+                    base_no = cut_no % 10_000_000
+                    prow = self._powtorka_po_no.get(cut_no) or (self._powtorka_po_no.get(base_no) if cut_no >= 10_000_000 else None)
+                    task_no = (
+                        self._zadanie_przerywnika.get(cut_no)
+                        or (self._zadanie_przerywnika.get(base_no) if cut_no >= 10_000_000 else None)
+                        or ((prow.get("task_no") or prow.get("finish_task")) if prow else None)
+                    )
+                    extra: list[str] = []
+                    if cut_no >= 10_000_000:
+                        extra.append(f"odpowiednik mobilny / klon cutsceny #{base_no}")
+                    if prow:
+                        czesci = [c for c in (self.para(prow.get(f)) for f in ("nazwa", "rozdzial")) if c]
+                        if czesci:
+                            extra.append(f"powtórka w dzienniku: {' · '.join(czesci)}")
+                    if task_no and task_no in ix.zadania:
+                        extra.append(f"zadanie: {task_no} — {self.para(ix.zadania[task_no].get('nazwa'))}")
+                    if prow and prow.get("grupa") and prow["grupa"] in ix.grupy:
+                        extra.append(f"wątek: {self._nazwa_grupy(prow['grupa'])}")
                     for field, label in (("tekst", "Plansza przerywnika"), ("streszczenie", "Streszczenie przerywnika")):
                         key = row.get(field)
                         if not key or key not in ix.teksty:

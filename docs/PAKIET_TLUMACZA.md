@@ -19,9 +19,9 @@ pliki gry (prywatne, poza Git)
         │  tools/wyciag.py                     (ok. 3,5 min)
         ▼
 index/  (Git)                           teksty raz na tekst + sceny + powiązania
-        │  tools/buduj_paczke.py               (ok. 25 s)
+        │  tools/buduj_paczke.py               (ok. 30 s)
         ▼
-README.md + sceny.zip + widoki.zip      → tłumacz (Dysk właściciela)
+README.md + sceny.zip + cutsceny.zip + widoki.zip → tłumacz (Dysk właściciela)
         │  zwrotka: te same pliki .md z wypełnionym PL:
         ▼  tools/import_zwrotki.py
 tlumaczenie/  (Git)                     klucz tekstu → przekład
@@ -131,17 +131,27 @@ identyfikatorów z `zh_cn` nie ma w mapie angielskiej).
 111 398 kwestii ma nazwę z gry (pole sceny albo tabliczka bytu), 37 407 to
 gracz, 37 168 ma tylko roboczą etykietę twórców (`entity_tag`), 52 nic.
 
-## Pakiet (`wwm-paczka-v1`)
+## Pakiet (`wwm-paczka-v1`, aktualnie wersja 3 z `--tylko-z-en`)
 
 ```sh
-python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v1 --wersja 1 --data 2026-11-12
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v3 --wersja 3 --data 2026-11-12 --tylko-z-en
 ```
 
-Wynik: `README.md`, `sceny/`, `widoki/`, `sceny.zip`, `widoki.zip`,
-`paczka_dla_tlumacza_wwm_v1.zip` (trzy poprzednie w jednym pliku) i `paczka.json`
-(manifest z liczbami, listą plików i wynikiem kontroli). Archiwa są
-powtarzalne: ta sama zawartość daje ten sam SHA-256. Kopia `README.md`
-i `paczka.json` każdej wysłanej wersji leży w `paczki/`.
+Wynik: `README.md`, `sceny/`, `cutsceny/`, `widoki/`, `sceny.zip`,
+`cutsceny.zip`, `widoki.zip`, `paczka_dla_tlumacza_wwm_v3.zip` (cztery
+poprzednie w jednym pliku) i `paczka.json` (manifest z liczbami, listą plików
+i wynikiem kontroli). Archiwa są powtarzalne: ta sama zawartość daje ten sam
+SHA-256. Kopia `README.md` i `paczka.json` każdej wysłanej wersji leży w
+`paczki/`.
+
+Kontekst cutscen i mówców między `tools/buduj_paczke.py` i
+`tools/buduj_czytanki.py` jest współdzielony w module
+`tools/kontekst_cutscen.py`. W wersji `v3` (`--tylko-z-en`) pakiet zawiera
+**418 773** miejsc `PL:` (`168 157` w `sceny.zip`, `4 116` w `cutsceny.zip`,
+`246 500` w `widoki.zip`), `0` powtórzonych i `0` brakujących; postać gracza
+w przebraniu oznaczana jest jako `gracz (przebranie/rola: …)`, a zadania z
+powiązaną powtórką w dzienniku dostają w nagłówku wpis `- powiązana cutscena
+w dzienniku: #…`.
 
 Element (pełny opis dla tłumacza jest w `README.md` pakietu):
 
@@ -215,12 +225,26 @@ których w scenach nie ma.
 **Gdzie jest otwierający prolog vs Rozdział 1.** Pierwsza cutscenka z początku
 gry (m.in. kwestie Jiang Yana i Chen Zixiego: `Even at the end of the road,` /
 `a drink to wet your throat.`, pościg o Nefryt Zhenguan) nie leży w tabelach
-`dialog_timelines`, lecz w napisach przerywnikowych `text_msg` i `text_msg__grey`
-(wiersze `590291–590390`). W pakiecie `v1` te dwie tabele są w `widoki.zip`
-w plikach **`07_komunikaty_04.md`** i **`07_komunikaty_12.md`**. Bezpośrednio
-po obudzeniu bohatera fabuła przechodzi już do **`sceny.zip`** →
-**`01_watek-glowny_rozdzial-1_01.md`** (zadania `220001`–`220003`, scena
-`1/73373`, dialog `4700001`).
+`dialog_timelines`, lecz w napisach przerywnikowych `text_msg` (wiersze
+`590291–590390`). Od pakietu `v2`/`v3` jest wydzielona w **`cutsceny.zip`** →
+**`01_napisy_cutscen_01.md`** (w `v3` w logicznym segmencie `### Prolog — nocna podróż powozem: Jiang Yan (Jiang Wulang) i Chen Zixi`, wraz z rozpoznanymi mówcami, wskazaniem kolizji `sound_data` oraz linkami do powtórek w dzienniku). W starym pakiecie `v1` leżała rozbita w `widoki.zip` między `07_komunikaty_04.md` i `07_komunikaty_12.md`. Bezpośrednio po obudzeniu bohatera fabuła przechodzi już do **`sceny.zip`** → **`01_watek-glowny_rozdzial-1_01.md`** (zadania `220001`–`220003`, dialog `4700001`).
+
+### `cutsceny.zip`
+
+Wydzielona sekcja cutscen (4 532 elementów, 4 116 `PL:` w `v3`):
+- `01_napisy_cutscen_01.md` — napisy `text_msg` `590000–592694` podzielone po
+  lukach ID i domenach audio (`sound_data`) na 91 pod-scen fabularnych
+  (w `v3`), z przypisaniem mówców z prefiksów ZH, `sound_data`, `mowca_en`
+  (bez fałszywych trafień `_npc_pma_` na gracza), wygładzonych cytatów
+  `world_view_person_voice`, adnotacjami o kolizjach `sound_data` oraz
+  linkami do powtórek `task_cutscene_replay`;
+- `02_intro_i_filmy_01.md` — sekwencja wprowadzająca *One Day in the Imperial
+  Service* (`wds_oneday_intro_cutscene_data`, z mówcami `gracz: You Xia` /
+  `Gwardia Cesarska`) i napisy filmowe (`entry_collect_movie_subtitle_data`);
+- `03_plansze_i_streszczenia_01.md` — powtórki w dzienniku
+  (`task_cutscene_replay`, w tym ich tytuły, rozdziały i streszczenia) oraz
+  pozostałe plansze `cutscenes` z powiązaniem klonów mobilnych (`>= 10 000 000`),
+  zadań i wątków.
 
 ## Zwrotka → magazyn przekładów
 

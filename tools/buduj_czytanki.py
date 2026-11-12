@@ -44,6 +44,7 @@ import zipfile
 try:
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
+    from tools import kontekst_cutscen as kc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -51,6 +52,7 @@ except ImportError:  # uruchomienie jako skrypt
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from tools import import_zwrotki
     from tools import indeks as indeks_mod
+    from tools import kontekst_cutscen as kc
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -59,7 +61,7 @@ FORMAT = "wwm-czytanki-v1"
 STALA_DATA_ZIP = (2026, 1, 1, 0, 0, 0)
 DOMYSLNY_LIMIT_BAJTOW = 1_500_000
 MAX_SZEROKOSC_TABELI = 120
-ZAKRES_PROLOG_TM = (590291, 590459)
+ZAKRES_PROLOG_TM = kc.ZAKRES_PROLOG_TM
 
 NAZWY_TYPOW_PL = {
     1: "Wątek główny",
@@ -88,188 +90,18 @@ _RE_KOLOR = re.compile(r"#(?:[0-9a-fA-F]{6}|[A-Z])")
 _RE_WIELE_SPACJI = re.compile(r"[ \t]{2,}")
 _RE_PUSTE_LINIE = re.compile(r"\n{3,}")
 _RE_SLOWA = re.compile(r"\w+")
-_RE_ZN_INTERP = re.compile(r"[\s，。？！、：；“”‘’（）()\[\]…—\-,.?!:;'\"]+")
 
-_GENERYCZNE_NAZWY_GRACZA_ZH = {"玩家", "主角", "我", "你"}
-_GENERYCZNE_NAZWY_GRACZA_TXT = {
-    "player",
-    "main character",
-    "me",
-    "gracz",
-    "bohater",
-    "bohaterka",
-    "you xia",
-}
+_GENERYCZNE_NAZWY_GRACZA_ZH = kc.GENERYCZNE_NAZWY_GRACZA_ZH
+_GENERYCZNE_NAZWY_GRACZA_TXT = kc.GENERYCZNE_NAZWY_GRACZA_TXT
+_MOWCY_CUTSCEN_EN_IGNORUJ = kc.MOWCY_CUTSCEN_EN_IGNORUJ
+_MOWCY_CUTSCEN_ZH_NA_EN = kc.MOWCY_CUTSCEN_ZH_NA_EN
+_MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA = kc.MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA
+_MOWCY_ROLE_PL = kc.MOWCY_ROLE_PL
+_VO_DOMENY = kc.VO_DOMENY
+_KOTWICE_SCEN_TM = kc.KOTWICE_SCEN_TM
 
-_MOWCY_CUTSCEN_EN_IGNORUJ = {"The ancients said", "(Vocal expression", "Answer"}
-
-# Jednoznaczne prefiksy w `text_msg` przed pojedynczą spacją (z wyłączeniem imion mogących być wołaczem w treści zdania)
-_MOWCY_CUTSCEN_ZH_NA_EN = {
-    "我": "Me",
-    "玩家": "Player",
-    "主角": "Player",
-    "师父": "Master",
-    "众弟子": "Disciples",
-    "行当管理员": "Profession Administrator",
-    "玄元教教徒": "Xuanyuan Cultist",
-    "李秀才": "Scholar Li",
-    "刘大娘": "Aunt Liu",
-    "聆杏村村长": "Apricot Village Chief",
-    "客人": "Guest",
-    "客人A": "Guest A",
-    "客人B": "Guest B",
-    "绣金楼男打手": "Aureate Pavilion Male Thug",
-    "绣金楼女打手": "Aureate Pavilion Female Thug",
-}
-
-# Dodatkowe mapowanie chińskich imion wyłącznie do wyszukiwania tłumaczenia mówcy na polski (nie jako prefiks zgadywany)
-_MOWCY_CUTSCEN_ZH_DO_TLUMACZENIA = {
-    "伊刀": "Yi Dao",
-    "寒香寻": "Han Xiangxun",
-    "江晏": "Jiang Yan",
-    "江无浪": "Jiang Wulang",
-    "陈子奚": "Chen Zixi",
-    "千夜": "Qianye",
-    "红线": "Ruby",
-    "赵大哥": "Big Zhao",
-    "多福": "Duofu",
-    "丁乐成": "Ding Lecheng",
-}
-
-# Polskie odpowiedniki ról cutscen niemających osobnego wpisu encyklopedycznego w `index/`
-_MOWCY_ROLE_PL = {
-    "Master": "Mistrz",
-    "Disciples": "Uczniowie",
-    "Profession Administrator": "Zarządca cechu",
-    "Xuanyuan Cultist": "Wyznawca Kultu Xuanyuan",
-    "Scholar Li": "Uczony Li",
-    "Aunt Liu": "Ciotka Liu",
-    "Apricot Village Chief": "Sołtys Wioski Morelowej",
-    "Duofu": "Duofu",
-    "Ding Lecheng": "Ding Lecheng",
-    "Guest": "Gość",
-    "Guest A": "Gość A",
-    "Guest B": "Gość B",
-    "Anxi Army": "Żołnierz Armii Anxi",
-    "Aureate Pavilion Male Thug": "Zbir Złotego Pawilonu",
-    "Aureate Pavilion Female Thug": "Bandytka Złotego Pawilonu",
-}
-
-# Dopasowanie prefiksów `audio` (dłuższe / bardziej szczegółowe zawsze przed ogólnymi!)
-_VO_DOMENY: list[tuple[str, str, str, int | None, tuple[int, ...]]] = [
-    ("vo_xinshou", "PROLOG_WOZ", "Prolog — nocny powóz: Jiang Yan i Chen Zixi", None, ()),
-    ("vo_xsfb", "PROLOG_WOZ", "Prolog — nocny powóz: Jiang Yan i Chen Zixi", None, ()),
-    ("vo_sm_xsm9p3", "PROLOG_ZASADZKA", "Prolog — zasadzka w ulewie i Nefryt Zhenguan", None, ()),
-    ("vo_sm_xsm9p4", "QH_POLIGON_TY", "Qinghe — poligon Tian Yinga", None, ()),
-    ("vo_sm_xs", "PROLOG_ZASADZKA", "Prolog — zasadzka w ulewie i Nefryt Zhenguan", None, ()),
-    ("vo_sm_sxdm4_cs_wnyf", "QH_POKOJ_HAN", "Qinghe — pokój Han Xiangxun", 1, (30185,)),
-    ("vo_sm_sxdm4_cs_zlxl", "QH_BAMBUS_RUBY", "Qinghe (Bambusowy Gaj) — przebudzenie z Ruby", 1, (30161,)),
-    ("vo_sm_sxdm4_cs_xhyd", "QH_BLISSFUL", "Qinghe — zasadzka i wrobienie Yi Dao", 1, (30188,)),
-    ("vo_gp_bxxdg", "QH_PODZIEMIA", "Qinghe — podziemia pod gospodą", 1, ()),
-    ("vo_shenxiandu", "QH_BLISSFUL", "Qinghe — gospoda i Rozdział I", 1, ()),
-    ("vo_sm_sxd", "QH_BLISSFUL", "Qinghe — gospoda i Rozdział I", 1, ()),
-    ("vo_tianzai", "QH_APRICOT", "Qinghe — Wioska Morelowa i Kult Xuanyuan", None, ()),
-    ("vo_ss_tq_cs_dtgt", "QH_TQ", "Qinghe (Studnia Niebios) — rada starszych i sprawa rodu Xie", None, ()),
-    ("vo_ss_tq_cs_hyrzzfnr", "QH_TQ", "Qinghe (Studnia Niebios) — konfrontacja w sekcie", None, ()),
-    ("vo_ss_tq_cs_mygdh", "QH_TQ", "Qinghe (Studnia Niebios) — rozmowa o Feng Buyu", None, ()),
-    ("vo_tianquan", "QH_TQ", "Qinghe (Studnia Niebios) — rada starszych i sprawa rodu Xie", None, ()),
-    ("vo_ss_tq", "QH_TQ_SPRAWA", "Qinghe (Studnia Niebios)", None, ()),
-    ("vo_gp_qhptkh", "QH_YE_WANSHAN", "Qinghe — Generał Ye Wanshan i najazd Kitanów", None, (30182,)),
-    ("vo_gp_qhfgd", "QH_TIAN_YING", "Qinghe — Szczyt Halo i rozkaz Tian Yinga", None, ()),
-    ("vo_ss_yyry", "QH_POLIGON_TY", "Qinghe — poligon Tian Yinga", None, ()),
-    ("vo_gp_yyry", "QH_POLIGON_TY", "Qinghe — poligon Tian Yinga", None, ()),
-    ("vo_ss_axnzgz", "QH_POBOCZNE", "Qinghe — Nanzhu / Południowy księżyc", None, ()),
-    ("vo_sm_qhmzbxxm8", "QH_POBOCZNE", "Qinghe — wątki poboczne", None, ()),
-    ("vo_ss_qhsj", "QH_POBOCZNE", "Qinghe — wątki poboczne", None, ()),
-    ("vo_ss_qhyxd", "QH_BLISSFUL", "Qinghe — finał Rozdziału I", 1, (30376, 30377)),
-    ("vo_ss_qhjz", "KAIFENG_POBOCZNE", "Kaifeng — skazaniec i straż", 4, ()),
-    ("vo_gp_jmc", "KAIFENG_JMC", "Kaifeng — Basen Jinming (Jinming Pool)", None, ()),
-    ("vo_ss_zszdm8p2", "KAIFENG_JMC", "Kaifeng — Basen Jinming (wspomnienia)", None, ()),
-    ("vo_ss_qjsjm8p2", "KAIFENG_JMC", "Kaifeng — Basen Jinming", None, ()),
-    ("vo_gp_zhyfhdym7", "KAIFENG_JMC", "Kaifeng — Basen Jinming (punkt obserwacyjny Ruolan)", None, ()),
-    ("vo_gp_wswll", "KAIFENG_FIVE_RATS", "Kaifeng — pościg po dachach (Pięć Szczurów)", 4, ()),
-    ("vo_gp_glwswll", "KAIFENG_FIVE_RATS", "Kaifeng — pościg po dachach (Pięć Szczurów)", 4, ()),
-    ("vo_amb_glwswll", "KAIFENG_FIVE_RATS", "Kaifeng — po pościgu po dachach", 4, ()),
-    ("vo_gp_bjshgz", "KAIFENG_FIVE_RATS", "Kaifeng — pościg po dachach", 4, ()),
-    ("vo_sm_bjsp", "KAIFENG_FIVE_RATS", "Kaifeng — pościg po dachach", 4, ()),
-    ("vo_sm_kfm7", "KAIFENG_GLOWNE", "Kaifeng — Rozdział II", 4, ()),
-    ("vo_sm_kfm8", "KAIFENG_GLOWNE", "Kaifeng — Rozdział II", 4, ()),
-    ("vo_gp_ggjy", "KAIFENG_GLOWNE", "Kaifeng — tajna komnata i skarb", 4, ()),
-    ("vo_gp_dyrl", "KAIFENG_GLOWNE", "Kaifeng — Piec Prawości", 4, ()),
-    ("vo_sm_kfdyrl", "KAIFENG_GLOWNE", "Kaifeng — Piec Prawości", 4, ()),
-    ("vo_ss_wcwm", "KAIFENG_GLOWNE", "Kaifeng — zbrojownia i spór o dziedzictwo", 4, ()),
-    ("vo_gp_xjwcwm", "KAIFENG_GLOWNE", "Kaifeng — zbrojownia", 4, ()),
-    ("vo_gp_dazswll", "KAIFENG_GLOWNE", "Kaifeng — Piec Prawości", 4, ()),
-    ("vo_gp_cpczs", "KAIFENG_GLOWNE", "Kaifeng — północny Kaifeng", 4, ()),
-    ("vo_gp_tslzs", "KAIFENG_RZEKA", "Kaifeng — powrót Mistrza Rzeki", None, ()),
-    ("vo_ss_yyps", "KAIFENG_DUCHY", "Kaifeng — Złoty Liść i opowieści miasta", None, ()),
-    ("vo_ss_hcjy", "KAIFENG_VELVET", "Kaifeng — Velvet Shade / Posłaniec Kwiatów", None, ()),
-    ("vo_ss_jlzy", "KAIFENG_NINEWAYS", "Kaifeng — Dziewięć Dróg (Nine Mortal Ways)", None, ()),
-    ("vo_sm_hxzx", "HEXI_ANXI", "Hexi — Przełęcz Bramy Nefrytowej i Armia Anxi", 6, ()),
-    ("vo_gp_btczs", "HEXI_ANXI", "Hexi — Armia Anxi", 6, ()),
-    ("vo_gp_ymgzs", "HEXI_ANXI", "Hexi — Armia Anxi", 6, ()),
-    ("vo_gp_hxzsbtc", "HEXI_ANXI", "Hexi — Armia Anxi", 6, ()),
-    ("vo_gp_ptjm11p3", "HEXI_PTJ", "Hexi — krwawa uczta (Aynur i księżyc)", 6, ()),
-    ("vo_ss_cjlzm11p2", "HEXI_PTJ", "Hexi — poszukiwania Maojie", 6, ()),
-    ("vo_gp_zychca", "HEXI_ANXI", "Hexi — Generał Zhang Yichao i powrót do Tang", 6, ()),
-    ("vo_ss_lzsl", "HEXI_ANXI", "Hexi — Generał Zhang Yichao i powrót do Tang", 6, ()),
-    ("vo_sm_hxp2lzq", "HEXI_LIANGZHOU", "Hexi — Melodia Liangzhou", 6, ()),
-    ("vo_sm_hxp3zyl", "HEXI_PAPIEROWY_KSIEZYC", "Hexi — Księżyc z Papieru", 6, ()),
-    ("vo_gp_xzzs", "HEXI_BANQUET", "Hexi — uczta i przysięga ostrza", 7, ()),
-    ("vo_ss_lyax", "HEXI_FIN", "Hexi — epilog", 7, ()),
-    ("vo_ai_b_", "BOSS_WYZWANIA", "Wyzwania i starcia z bossami", None, ()),
-    ("vo_gp_wydzs", "BOSS_WYZWANIA", "Wyzwania Jianghu", None, ()),
-]
-
-# Sprawdzone w `index/` granice pod-scen wewnątrz spójnych bloków `text_msg` (ID początkowe -> (tytuł, grupa_id, powiazane_cutsceny, notka))
-_KOTWICE_SCEN_TM: dict[int, tuple[str, int | None, tuple[int, ...], str]] = {
-    590000: ("Qinghe (Studnia Niebios) — przysięga uczniów", None, (), ""),
-    590011: ("Qinghe — ucieczka z Bambusowej Wioski", 1, (), ""),
-    590016: ("Qinghe — przybycie do Bambusowej Wioski", 1, (), ""),
-    590021: ("Świat gry — przysięga Gildii Uzdrowicieli", None, (), ""),
-    590025: ("Świat gry — kronika ścieżek Uczonego i Medyka", None, (), ""),
-    590050: ("Świat gry — próba lekkości i wyzwanie na niebie", None, (), ""),
-    590058: ("Qinghe — walka Yi Dao z Aureate Pavilion i Qianye (przysięga trzech pucharów)", 1, (30377,), ""),
-    590148: ("Qinghe — Generał Ye Wanshan i najazd Kitanów", None, (30182,), ""),
-    590188: ("Qinghe — gwar przed gospodą w Rozdziale I", 1, (), ""),
-    590208: ("Qinghe — gospoda Cioci Han i Qianye (wersja filmowa bez prefiksów)", 1, (30166, 30167), "Wariant filmowy sceny z gospody (por. napisy 590230–590250)."),
-    590216: ("Qinghe — trening Tai Chi i biały niedźwiedź", None, (), ""),
-    590225: ("Qinghe — pisanie listu do Cioci Han", 1, (30177,), ""),
-    590230: ("Qinghe — gospoda Cioci Han, Parting Tears i Qianye", 1, (30166, 30167), ""),
-    590251: ("Qinghe — powrót pod gospodę i rozmowa z Ciocią Han po ataku", 1, (), ""),
-    590266: ("Qinghe — rozmowa Yi Dao i Han Xiangxun o Chu Qingquanie i Kaifengu", 1, (), ""),
-    590282: ("Qinghe — gospoda Cioci Han (krótka wersja napisowa)", 1, (30166,), "Krótki wariant sceny z gospody."),
-    # Pasmo 590291–590459 (Prolog i Rozdział I)
-    590291: ("Qinghe — gospoda Cioci Han (wariant napisowy)", 1, (30166,), "Wariant napisowy początku spotkania w gospodzie (por. 590248–590250)."),
-    590296: ("Qinghe — oblężenie Aureate Pavilion i skrzynka do Kaifengu", 1, (30178, 30413), ""),
-    590314: ("Qinghe — incydent z Paniczem Qu i słowa Cioci Han", 1, (), ""),
-    590321: ("Prolog — nocna podróż powozem: Jiang Yan (Jiang Wulang) i Chen Zixi", None, (), "Otwierający filmowy dialog w nocnym powozie (wraz z wizytówką Jiang Yana)."),
-    590336: ("Prolog — zasadzka w ulewie i pościg o Nefryt Zhenguan", None, (), "Kontynuacja filmowego Prologu: nocna ucieczka z niemowlęciem i Nefrytem Zhenguan."),
-    590352: ("Qinghe — przepisywanie ksiąg u Cioci Han i rozmowa o Yi Dao", 1, (30207,), ""),
-    590373: ("Qinghe — przebudzenie w podziemiach", 1, (), ""),
-    590376: ("Qinghe — pożar gospody, poświęcenie Ruby i starcie z Qianye", 1, (30413, 30374, 30375), ""),
-    590432: ("Qinghe (Iluzja Qianye) — pożegnanie Yi Dao i przebudzenie w Bambusowym Gaju", 1, (30376, 30377, 30161), ""),
-    590457: ("Wstawka miejska — spokój w mieście", None, (), ""),
-    # Pasmo powtórkowe / alternatywne warianty napisów
-    591487: ("Warianty i powtórki napisów (Prolog, Qinghe, Five Rats, Kaifeng)", None, (), "Alternatywne / późniejsze warianty napisów do wcześniejszych scen fabularnych."),
-}
-
-
-def _norm_cut_zh(text: str) -> str:
-    return _RE_ZN_INTERP.sub("", text or "")
-
-
-def _wvpv_pid(vid: str, encyklopedia: dict[int, dict]) -> int | None:
-    if not vid.isdigit():
-        return None
-    iv = int(vid)
-    if iv >= 100000 and iv % 100 == 0 and (iv // 100000) in encyklopedia:
-        return iv // 100000
-    if (iv // 1000) in encyklopedia:
-        return iv // 1000
-    if (iv // 100) in encyklopedia:
-        return iv // 100
-    return None
+_norm_cut_zh = kc.norm_cut_zh
+_wvpv_pid = kc.wvpv_pid
 
 
 class CzytankiError(Exception):
@@ -627,102 +459,15 @@ class BudowniczyCzytanek:
         self._kandydaci_wzmianek: list[tuple[str, str, str, tuple[str, ...]]] | None = None
 
     def _przygotuj_mowcow_napisow(self, wvpv_raw: dict[str, str]) -> None:
-        ix = self.ix
-        kandydaci: dict[str, set[str]] = defaultdict(set)
-        wvpv_dokladne: dict[str, set[str]] = defaultdict(set)
-
-        for vid, zh_txt in wvpv_raw.items():
-            pid = _wvpv_pid(vid, self.encyklopedia_po_id)
-            if pid is None:
-                continue
-            entry = self.encyklopedia_po_id.get(pid)
-            if not entry or not entry.get("nazwa"):
-                continue
-            en_name = (ix.en(entry["nazwa"]) or "").strip()
-            if not en_name:
-                continue
-            nz = _norm_cut_zh(zh_txt)
-            if len(nz) >= 6:
-                wvpv_dokladne[nz].add(en_name)
-                kandydaci[nz].add(en_name)
-            for czesc in re.split(r"[\n。？！；]+", zh_txt):
-                nc = _norm_cut_zh(czesc)
-                if len(nc) >= 8:
-                    kandydaci[nc].add(en_name)
-
-        for row in ix.cutsceny_kontekst.get("napis", ()):
-            kl = row.get("k")
-            if kl not in ix.teksty:
-                continue
-            sp = self._bezposredni_mowca_en(row, ix.teksty[kl].zrodlo, ix.en(kl) or "")
-            if not sp:
-                continue
-            zh = ix.teksty[kl].zrodlo.strip()
-            nz = _norm_cut_zh(zh)
-            if len(nz) >= 6:
-                kandydaci[nz].add(sp)
-            # Jeśli w ZH przed pojedynczą spacją był prefiks mówcy ze słownika, zapisujemy też samą treść
-            m_zh = re.match(r"^([^\s]+) (.+)$", zh)
-            if m_zh and m_zh.group(1) in _MOWCY_CUTSCEN_ZH_NA_EN and not m_zh.group(2).startswith(" "):
-                nt = _norm_cut_zh(m_zh.group(2))
-                if len(nt) >= 6:
-                    kandydaci[nt].add(sp)
-
-        self.glos_wvpv_dokladny: dict[str, str] = {
-            nz: next(iter(sps)) for nz, sps in wvpv_dokladne.items() if len(sps) == 1
-        }
-        self.mowca_napisow_exact: dict[str, str] = {
-            nz: next(iter(sps)) for nz, sps in kandydaci.items() if len(sps) == 1
-        }
-        self.mowca_napisow_dlugie: list[tuple[str, str]] = [
-            (nz, next(iter(sps)))
-            for nz, sps in kandydaci.items()
-            if len(sps) == 1 and len(nz) >= 8
-        ]
+        (
+            self.glos_wvpv_dokladny,
+            self.mowca_napisow_exact,
+            self.mowca_napisow_dlugie,
+        ) = kc.zbuduj_indeksy_mowcow(self.ix, wvpv_raw, self.encyklopedia_po_id)
 
     @staticmethod
     def _bezposredni_mowca_en(row: dict, zh: str, en_txt: str, *, ignoruj_audio: bool = False) -> str | None:
-        if not ignoruj_audio:
-            aud = row.get("audio") or ""
-            if "_npc_" not in aud and any(
-                tok in aud for tok in ("_player_m_", "_player_f_", "_pma_", "_pfa_", "_zhujue_", "_zjnan_")
-            ):
-                return "You Xia"
-            if aud.startswith("vo_xinshou_jwl_"):
-                return "Jiang Yan"
-            if aud.startswith(("vo_xinshou_ly_", "vo_xsfb_liyu_")):
-                return "Chen Zixi"
-            if "_cs_zlxl_hx_" in aud:
-                return "Ruby"
-            if "_cs_xhyd_yd_" in aud or "_cs_wnyf_yd_" in aud:
-                return "Yi Dao"
-            if "_cs_mygdh_fby_" in aud:
-                return "Feng Buyu"
-            if "_cs_fgdws_ty_" in aud:
-                return "Tian Ying"
-
-        men = (row.get("mowca_en") or "").strip()
-        if men and men not in _MOWCY_CUTSCEN_EN_IGNORUJ and "(" not in men:
-            if men in ("Me", "Player", "Main Character"):
-                return "You Xia"
-            return men
-
-        m_en = re.match(r"^([A-Za-z][A-Za-z0-9 '\-]{0,30}):\s+(.+)$", en_txt.strip())
-        if m_en:
-            pref = m_en.group(1).strip()
-            if pref in ("Me", "Player"):
-                return "You Xia"
-            if pref in _MOWCY_ROLE_PL or pref in ("Yi Dao", "Han Xiangxun", "Ruby", "Jiang Yan", "Jiang Wulang", "Chen Zixi", "Qianye", "Big Zhao"):
-                return pref
-
-        zh_s = (zh or "").strip()
-        m_zh = re.match(r"^([^\s]+) (.+)$", zh_s)
-        if m_zh and m_zh.group(1) in _MOWCY_CUTSCEN_ZH_NA_EN and not m_zh.group(2).startswith(" "):
-            if m_zh.group(1) == "我" and zh_s.startswith("我 我"):
-                return None
-            mapped = _MOWCY_CUTSCEN_ZH_NA_EN[m_zh.group(1)]
-            return "You Xia" if mapped in ("Me", "Player") else mapped
-        return None
+        return kc.bezposredni_mowca_en(row, zh, en_txt, ignoruj_audio=ignoruj_audio)
 
     def przerywniki_w_zadaniu_add(self, lst) -> None:
         self.przerywniki_w_zadaniach.update(lst)
@@ -836,45 +581,24 @@ class BudowniczyCzytanek:
         zh = self.ix.teksty[kl].zrodlo
         en_raw = self.ix.en(kl) or ""
 
-        sp_en = self._bezposredni_mowca_en(row, zh, en_raw, ignoruj_audio=ignoruj_audio)
-        if not sp_en:
-            nz = _norm_cut_zh(zh)
-            sp_en = self.glos_wvpv_dokladny.get(nz)
-            if not sp_en and not ignoruj_audio:
-                sp_en = self.mowca_napisow_exact.get(nz)
-                if not sp_en and len(nz) >= 8:
-                    found: set[str] = set()
-                    for cand_nz, cand_sp in self.mowca_napisow_dlugie:
-                        if nz in cand_nz or cand_nz in nz:
-                            found.add(cand_sp)
-                            if len(found) > 1:
-                                break
-                    if len(found) == 1:
-                        sp_en = next(iter(found))
-
+        sp_en = kc.rozwiaz_mowce_en(
+            row,
+            zh,
+            en_raw,
+            self.glos_wvpv_dokladny,
+            self.mowca_napisow_exact,
+            self.mowca_napisow_dlugie,
+            ignoruj_audio=ignoruj_audio,
+        )
         mowca_out = self._tlumacz_mowce_cutsceny(sp_en) if sp_en else None
-        czy_gracz = sp_en == "You Xia"
-
-        # Wycinamy jawny zduplikowany prefiks `Ktoś: treść` z tekstu (EN lub PL)
-        cleaned_txt = txt
-        m_colon = re.match(r"^([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9 '\-]{1,32}):\s+(.+)$", txt.strip())
-        if m_colon:
-            pref = m_colon.group(1).strip()
-            rest = m_colon.group(2).strip()
-            known_prefs = {"Me", "Player", "Ja", "You Xia", *(k for k in _MOWCY_ROLE_PL), *(_MOWCY_ROLE_PL.values())}
-            if (
-                pref in known_prefs
-                or (sp_en and pref.lower() == sp_en.lower())
-                or (mowca_out and pref.lower() == mowca_out.lower())
-                or pref in ("Yi Dao", "Han Xiangxun", "Ruby", "Jiang Yan", "Jiang Wulang", "Chen Zixi", "Qianye", "Big Zhao")
-            ):
-                cleaned_txt = rest
-                if not mowca_out:
-                    if pref in ("Me", "Player", "Ja", "You Xia"):
-                        mowca_out = "You Xia"
-                        czy_gracz = True
-                    else:
-                        mowca_out = self._tlumacz_mowce_cutsceny(pref) or (pref if getattr(self.pl, "jest_podgladem_en", False) else None)
+        cleaned_txt, detected_sp, czy_gracz = kc.wyczysc_prefiks_mowcy(txt, sp_en, mowca_out)
+        if not mowca_out and detected_sp:
+            if detected_sp == "You Xia":
+                mowca_out = "You Xia"
+            else:
+                mowca_out = self._tlumacz_mowce_cutsceny(detected_sp) or (
+                    detected_sp if getattr(self.pl, "jest_podgladem_en", False) else None
+                )
 
         return mowca_out, cleaned_txt, czy_gracz
 
@@ -1145,12 +869,7 @@ class BudowniczyCzytanek:
     # -------------------------------------------------------- budowa ksiąg
 
     def _dopasuj_domene_vo(self, aud: str) -> tuple[str, str, int | None, tuple[int, ...]] | None:
-        if not aud or aud.startswith("func_"):
-            return None
-        for pref, dom, tytul, gid, cuts in _VO_DOMENY:
-            if aud.startswith(pref):
-                return (dom, tytul, gid, cuts)
-        return None
+        return kc.dopasuj_domene_vo(aud)
 
     def _tytul_powtorki(self, cut_no: int) -> str | None:
         prow = self.powtorka_po_no.get(cut_no)
@@ -1167,122 +886,7 @@ class BudowniczyCzytanek:
 
     def _segmentuj_ciag_napisow(self, ciag: list[dict]) -> list[dict]:
         """Podziel ciągły blok `text_msg` na logiczne pod-sceny z metadanymi kontekstowymi."""
-        if len(ciag) < 10:
-            return [{
-                "rows": ciag,
-                "tytul": "",
-                "grupa": None,
-                "cuts": (),
-                "notka": "",
-                "wygladzono_audio": set(),
-            }]
-
-        raw = [self._dopasuj_domene_vo(r.get("audio") or "") for r in ciag]
-        n = len(ciag)
-        # Sprawdzamy najpierw, które wiersze mają przynajmniej jednego bliskiego sąsiada tej samej domeny
-        ma_kompana: list[bool] = [False] * n
-        for i, d in enumerate(raw):
-            if d is None:
-                continue
-            wi = ciag[i]["wiersz"]
-            for j in range(max(0, i - 25), min(n, i + 26)):
-                if j != i and raw[j] is not None and raw[j][0] == d[0] and abs(ciag[j]["wiersz"] - wi) <= 25:
-                    ma_kompana[i] = True
-                    break
-
-        smooth = list(raw)
-        wygladzono_audio: set[int] = set()
-        for i, d in enumerate(raw):
-            if d is None or ma_kompana[i]:
-                continue
-            w = ciag[i]["wiersz"]
-            prev_d = None
-            for j in range(i - 1, -1, -1):
-                if w - ciag[j]["wiersz"] > 35:
-                    break
-                if raw[j] is not None and ma_kompana[j]:
-                    prev_d = raw[j]
-                    break
-            next_d = None
-            for j in range(i + 1, n):
-                if ciag[j]["wiersz"] - w > 35:
-                    break
-                if raw[j] is not None and ma_kompana[j]:
-                    next_d = raw[j]
-                    break
-            if prev_d and next_d and prev_d[0] == next_d[0] and prev_d[0] != d[0]:
-                smooth[i] = prev_d
-                wygladzono_audio.add(w)
-
-        # Tworzymy segmenty
-        wynik: list[dict] = []
-        cur_rows: list[dict] = []
-        cur_dom: str | None = None
-        cur_tytul = ""
-        cur_grupa: int | None = None
-        cur_cuts: tuple[int, ...] = ()
-        cur_notka = ""
-
-        def flush() -> None:
-            if not cur_rows:
-                return
-            wynik.append({
-                "rows": list(cur_rows),
-                "tytul": cur_tytul,
-                "grupa": cur_grupa,
-                "cuts": cur_cuts,
-                "notka": cur_notka,
-                "wygladzono_audio": wygladzono_audio,
-            })
-
-        for i, r in enumerate(ciag):
-            w = r["wiersz"]
-            d = smooth[i]
-            anchor = _KOTWICE_SCEN_TM.get(w)
-            split = False
-            if not cur_rows:
-                split = True
-            elif anchor is not None:
-                split = True
-            elif d is not None and cur_dom is not None and d[0] != cur_dom:
-                # Wewnątrz dobrze opisanych scen Prologu/Rozdziału I oraz bloku wariantów nie rozbijamy przez drobne skoki tego samego pasma
-                in_locked_span = (
-                    (590296 <= w <= 590372)
-                    or (590376 <= w <= 590456)
-                )
-                if not in_locked_span:
-                    split = True
-
-            if split:
-                flush()
-                cur_rows = [r]
-                if anchor is not None:
-                    cur_tytul, cur_grupa, cur_cuts, cur_notka = anchor
-                    cur_dom = d[0] if d else None
-                elif d is not None:
-                    cur_dom, cur_tytul, cur_grupa, cur_cuts = d
-                    cur_notka = ""
-                else:
-                    cur_dom = None
-                    cur_tytul = ""
-                    cur_grupa = None
-                    cur_cuts = ()
-                    cur_notka = ""
-            else:
-                cur_rows.append(r)
-                if cur_dom is None and d is not None:
-                    cur_dom = d[0]
-                    if not cur_tytul:
-                        cur_tytul = d[1]
-                    if cur_grupa is None:
-                        cur_grupa = d[2]
-                    if not cur_cuts:
-                        cur_cuts = d[3]
-                elif d is not None and d[3] and not cur_cuts:
-                    cur_cuts = d[3]
-
-        flush()
-        return wynik
+        return kc.segmentuj_ciag_napisow(ciag)
 
     def _buduj_prolog_i_przerywniki(self) -> ZbudowanyPlik:
         ix = self.ix
@@ -1328,25 +932,7 @@ class BudowniczyCzytanek:
                 ciagi[-1].append(row)
 
         # Wykrywanie par męski/żeński w ciągach
-        plec_wiersza: dict[int, str] = {}
-        for idx in range(len(napisy) - 1):
-            a, b = napisy[idx], napisy[idx + 1]
-            if b["wiersz"] != a["wiersz"] + 1:
-                continue
-            ta, tb = ix.teksty[a["k"]], ix.teksty[b["k"]]
-            aud_a, aud_b = a.get("audio") or "", b.get("audio") or ""
-            is_mf_zh = any(
-                (p1 in ta.zrodlo and p2 in tb.zrodlo)
-                for p1, p2 in (("小子", "小妮子"), ("少侠", "女侠"), ("小妮子", "小子"), ("女侠", "少侠"))
-            )
-            is_mf_aud = ("_m_" in aud_a and "_f_" in aud_b) or ("_pma_" in aud_a and "_pfa_" in aud_b)
-            if is_mf_zh or is_mf_aud:
-                if any(x in ta.zrodlo for x in ("小妮子", "女侠")) or "_f_" in aud_a or "_pfa_" in aud_a:
-                    plec_wiersza[a["wiersz"]] = "bohaterka"
-                    plec_wiersza[b["wiersz"]] = "bohater"
-                else:
-                    plec_wiersza[a["wiersz"]] = "bohater"
-                    plec_wiersza[b["wiersz"]] = "bohaterka"
+        plec_wiersza = kc.wykryj_plec_napisow(napisy, ix.teksty)
 
         prolog_ciagi = [c for c in ciagi if not (c[-1]["wiersz"] < ZAKRES_PROLOG_TM[0] or c[0]["wiersz"] > ZAKRES_PROLOG_TM[1])]
         inne_ciagi = [c for c in ciagi if c not in prolog_ciagi]

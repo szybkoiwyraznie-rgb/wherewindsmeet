@@ -288,7 +288,10 @@ def readme(generator, manifest: dict) -> str:
         f"z budowy sceny, nie zgadywane z treści (kwestii bez grupy mówcy: {pokrycie['kwestii_bez_grupy_mowcy']})."
     )
     add("")
-    add(f"- `gracz` — postać gracza ({_l(mowcy.get('gracz', 0))} kwestii).")
+    add(
+        f"- `gracz` — postać gracza ({_l(mowcy.get('gracz', 0))} kwestii); gdy bohater występuje w przebraniu lub cudzej roli, "
+        "widnieje opis `gracz (przebranie/rola: …)`."
+    )
     add(f"- `红线 (Ruby)` — nazwa z gry: z tabliczki nad postacią albo z samej sceny ({_l(mowcy.get('nazwa_z_gry', 0))} kwestii). W nawiasie wersja angielska.")
     add(
         f"- `江湖人*` — **gwiazdka**: gra nie ma dla tego mówcy nazwy na ekranie; to robocza etykieta twórców ({_l(mowcy.get('etykieta_robocza', 0))} kwestii). "
@@ -331,11 +334,19 @@ def readme(generator, manifest: dict) -> str:
         out.extend(_tabela_serii(cut_serie, sceny=False))
         add("")
         add(
-            "- `01_napisy_cutscen_NN.md` — napisy z zakresu `text_msg 590000–592694` pogrupowane według ciągów ID i nagrań audio (`vo_*`), "
-            "z wyraźnie oznaczonym **PROLOGIEM** (`590291–590459`), podpowiedzią mówcy, identyfikatorem nagrania i parami bohater/bohaterka."
+            "- `01_napisy_cutscen_NN.md` — napisy z zakresu `text_msg 590000–592694` podzielone na logiczne sceny fabularne i regiony "
+            "(m.in. **PROLOG**, Qinghe, Studnia Niebios, Kaifeng, Hexi), z nazwą wątku i powiązanymi cutscenami w dzienniku, "
+            "rozpoznanym mówcą (z nagrań, `mowca_en` oraz cytatów `world_view_person_voice`), adnotacjami o ewentualnych kolizjach `sound_data` "
+            "oraz parami bohater/bohaterka."
         )
-        add("- `02_intro_i_filmy_*.md` — intro gry (`wds_oneday_intro_cutscene_data`) oraz napisy filmowe ze znacznikami czasu.")
-        add("- `03_plansze_i_streszczenia_*.md` — powtórki cutscen w dzienniku (`task_cutscene_replay`) z powiązaniem do zadania i pozostałe plansze `cutscenes`.")
+        add(
+            "- `02_intro_i_filmy_*.md` — sekwencja wprowadzająca (`wds_oneday_intro_cutscene_data`) z opisanym mówcą "
+            "(`gracz: You Xia` / `Gwardia Cesarska`) oraz napisy filmowe ze znacznikami czasu."
+        )
+        add(
+            "- `03_plansze_i_streszczenia_*.md` — powtórki cutscen w dzienniku (`task_cutscene_replay`, wraz z tytułami, rozdziałami i streszczeniami) "
+            "oraz pozostałe plansze `cutscenes` wzbogacone o powiązania z zadaniami, wątkami i odpowiednikami mobilnymi."
+        )
         add("")
     add("## 9. Widoki")
     add("")
