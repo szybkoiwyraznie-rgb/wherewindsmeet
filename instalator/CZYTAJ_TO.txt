@@ -1,0 +1,53 @@
+WHERE WINDS MEET — INSTALACJA, KOPIA I PRZYWRACANIE ŁATKI (Windows)
+=====================================================================
+
+Ten zestaw podmienia wyłącznie pliki map tekstowych wskazane w pliku latka.json,
+przy wyłączonej grze. Zanim cokolwiek zmieni, sprawdza sumy SHA-256 i tworzy
+zweryfikowaną kopię zapasową oryginałów poza folderem gry.
+
+UWAGA: łatka nie została jeszcze przetestowana w uruchomionej grze i nie ma
+gwarancji bezpieczeństwa konta ani zgodności z przyszłymi aktualizacjami.
+Jeśli Steam albo launcher gry przywróci oryginalne pliki, nie próbuj tego
+obchodzić — zgłoś wynik testu.
+
+KTÓRY PLIK URUCHOMIĆ
+
+- ZAINSTALUJ.bat   — sprawdza wersję i pliki gry, zapisuje kopię zapasową
+                     oryginałów i instaluje łatkę z tego folderu.
+- PRZYWROC.bat     — przywraca oryginalne pliki gry z zapisanej kopii.
+- SPRAWDZ_STAN.bat — tryb tylko do odczytu: sprawdza stan plików gry i kopii,
+                     niczego nie zapisuje.
+
+GDZIE JEST KOPIA ZAPASOWA
+
+Domyślnie: %LOCALAPPDATA%\WhereWindsMeetPL\kopia
+Kopia leży poza folderem gry, więc nie zniknie nawet gdy skasujesz folder
+z poprzednią wersją łatki. Możesz w każdej chwili przywrócić oryginały przez
+PRZYWROC.bat (albo przez „Sprawdź spójność plików gry” w Steam).
+
+JAK UŻYĆ
+
+1. Zamknij grę i upewnij się, że Steam nie pobiera aktualizacji.
+2. Rozpakuj cały folder z łatką poza katalog gry (np. na Pulpit).
+3. Opcjonalnie uruchom SPRAWDZ_STAN.bat, żeby zobaczyć stan plików przed zmianą.
+4. Kliknij dwa razy ZAINSTALUJ.bat (albo przeciągnij na niego główny folder gry).
+   Program sam wyszuka grę w bibliotekach Steam, sprawdzi build i SHA-256
+   każdego pliku, zapisze kopię i dopiero potem wgra łatkę.
+5. Gdy chcesz wrócić do oryginału, kliknij dwa razy PRZYWROC.bat.
+
+KIEDY PROGRAM ODMÓWI ZAPISU (OCHRONA)
+
+- Gra jest uruchomiona.
+- Build gry w Steam różni się od buildu łatki.
+- Plik w grze ma inny SHA-256 niż oczekiwany oryginał (np. po aktualizacji gry).
+  W takim wypadku uruchom zbieracz (URUCHOM_AKTUALIZACJE.bat), żeby zbudować
+  łatkę pod nową wersję gry.
+- Podczas przywracania plik w grze zmienił się poza łatką (np. Steam już
+  zaktualizował grę) — program nie cofnie nowszej wersji gry na ślepo.
+
+BEZPIECZEŃSTWO SKRYPTÓW
+
+Pliki .bat uruchamiają Windows PowerShell z parametrem -ExecutionPolicy Bypass
+wyłącznie dla tego jednego procesu i zdejmują znacznik „z internetu”
+(Unblock-File) z plików *.ps1 w tym folderze. Nie zmieniają ustawień systemu
+ani rejestru, niczego nie pobierają i nie wymagają Pythona.

@@ -187,6 +187,54 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(zbuduj_latke.main([*common, "--magazyn", str(self.root / "pusty"), "--wyj", str(self.root / "latka2")]), 1)
         self.assertEqual(zbuduj_latke.main([*common, "--magazyn", str(self.root / "pusty"), "--wyj", str(maps)]), 1)
 
+    def test_patch_supports_explicit_game_paths_identical_basenames_and_build_id(self):
+        maps = self.root / "mapy_duplikaty"
+        a = maps / "a" / "translate_words_map_en_diff"
+        b = maps / "b" / "translate_words_map_en_diff"
+        zh = maps / "zh"
+        a.parent.mkdir(parents=True)
+        b.parent.mkdir(parents=True)
+        zh.parent.mkdir(parents=True, exist_ok=True)
+        zh.write_bytes(container([table([(T + 1, b"kwestia kowala"), (T + 20, b"Miecz")])], with_metadata=True))
+        a.write_bytes(container([table([(T + 1, b"blacksmith line")])], with_metadata=True))
+        b.write_bytes(container([table([(T + 20, b"Sword")])], with_metadata=True))
+
+        store = tlumaczenie.Magazyn()
+        store.ustaw(K("kwestia kowala"), "kwestia kowala PL")
+        store.ustaw(K("Miecz"), "Miecz PL")
+        tlumaczenie.zapisz(self.root / "tlum", store)
+
+        # Duplicate basenames via --cel without Package/ or LocalData/Patch/ context must fail clearly
+        self.assertEqual(zbuduj_latke.main([
+            "--indeks", str(self.root / "index"), "--magazyn", str(self.root / "tlum"),
+            "--zh", str(zh), "--cel", str(a), "--cel", str(b), "--wyj", str(self.root / "bad_out"),
+        ]), 1)
+
+        out = self.root / "latka_duplikaty"
+        rc = zbuduj_latke.main([
+            "--indeks", str(self.root / "index"), "--magazyn", str(self.root / "tlum"),
+            "--zh", str(zh),
+            "--mapa", "Package/HD/oversea/locale/translate_words_map_en_diff", str(a),
+            "--mapa", "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", str(b),
+            "--build-gry", "25906190",
+            "--wyj", str(out),
+        ])
+        self.assertEqual(rc, 0)
+        manifest = json.loads((out / "latka.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["build_gry"], "25906190")
+        by_game = {entry["sciezka_w_grze"]: entry for entry in manifest["pliki"]}
+        self.assertEqual(
+            set(by_game),
+            {
+                "Package/HD/oversea/locale/translate_words_map_en_diff",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+            },
+        )
+        self.assertNotEqual(by_game["Package/HD/oversea/locale/translate_words_map_en_diff"]["plik_latki"],
+                            by_game["LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff"]["plik_latki"])
+        self.assertTrue((out / by_game["Package/HD/oversea/locale/translate_words_map_en_diff"]["plik_latki"]).is_file())
+        self.assertTrue((out / by_game["LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff"]["plik_latki"]).is_file())
+
     def test_audit_finds_new_texts_changed_scenes_and_feeds_the_supplement(self):
         zh2 = dict(ZH_ALL)
         en2 = dict(EN_ALL)
