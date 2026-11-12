@@ -363,6 +363,7 @@ class Baza:
         manifest_path = Path(manifest) if manifest else self.pliki.get("MANIFEST")
         if manifest_path is None:
             raise BazaError("nie znaleziono pliku MANIFEST")
+        self.sciezka_manifestu = manifest_path
         self.manifest = read_manifest(manifest_path)
         self.tabele = self.manifest.tabele
         self._kontenery: dict[str, list[bytes]] = {}
