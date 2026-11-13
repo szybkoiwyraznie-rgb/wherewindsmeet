@@ -46,7 +46,8 @@ Skrypt w jednym przebiegu (tryb domyślny — **standalone**):
 - odczytuje zainstalowane mapy `translate_words_map_zh_cn*` i `translate_words_map_en*` z `Package/HD/oversea/locale/` oraz `LocalData/Patch/HD/oversea/locale/` (dla odczytu warstwy źródeł `zh_cn` korzysta z `wybierz_warstwy_gry`, odrzucając starsze `Package/.../_diff`, jeśli istnieje `LocalData/Patch/.../_diff`, a przy zapisie nadpisuje oba pliki docelowe niezależnie, utrzymując ich spójność nawet po aktualizacjach gry),
 - kopiuje oryginały poza katalog gry do `%LOCALAPPDATA%\WhereWindsMeetPL\kopia_standalone_<hash>\` (z pełną weryfikacją SHA-256) i nie nadpisuje zachowanego oryginału przy aktualizacjach łatki `v1 -> v2` (a po aktualizacji gry przez Steam automatycznie zachowuje nową wersję oryginału przed nałożeniem przekładów),
 - przepisuje mapy lokalnie na maszynie gracza, weryfikuje każdy zmieniony wpis i wgrywa transakcyjnie (z pełnym rollbackiem przy błędzie).
-- `PRZYWROC.bat` przywraca oryginały (i blokuje nadpisanie, jeśli plik w grze zmienił się z zewnątrz np. przez Steam, chyba że użyto `--wymus`), a `SPRAWDZ_STAN.bat` odczytuje bieżący stan plików i kopii bez zmian na dysku.
+- `PRZYWROC.bat` przywraca oryginały z kopii zapasowej; jeśli aktualizacja gry nadpisała lub usunęła wcześniej część plików, nie nadpisuje nowszej wersji z gry starą kopią (bez `--wymus`), tylko bezpiecznie pomija zmienione pliki i cofa wszystkie pozostałe pliki nadal noszące spolszczenie. `SPRAWDZ_STAN.bat` odczytuje bieżący stan plików i kopii bez zmian na dysku.
+- Flaga `--wydanie` (np. `v0.1.0`) zapisuje nazwę i numer wydania w `plan_latki.json`, w `CZYTAJ_TO.txt`, w tytułach okien `.bat` oraz w raporcie działania.
 
 W przypadku błędów w zwrotce (np. zgubione tokeny lub złamana linia) `one_click_patch.py`
 domyślnie przerywa z listą błędów w JSON (`exit code 2`); flaga `--pomin-bledne`

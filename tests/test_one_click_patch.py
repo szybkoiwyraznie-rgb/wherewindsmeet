@@ -413,13 +413,22 @@ class OneClickPatchTests(unittest.TestCase):
         patched_patch_diff = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
         self.assertEqual(patched_patch_diff[t_only_en], "Świeża linia z hotfixa")
 
-        # Upgrade łatki v1 -> v2 (np. zmiana tekstu T+21 na v2): nie może nadpisać backupu oryginału!
+        # Upgrade łatki v1 -> v2 (np. zmiana tekstu T+21 na v2) + jawny numer wydania: nie może nadpisać backupu oryginału!
         md2.write_text(fill(raw_wid, {K("Opis miecza"): "Zażółć gęślą jaźń v2"}), encoding="utf-8")
-        out_zip2 = self.root / "dist_sa" / "WWM_LATKA_PL_v2.zip"
-        self.assertEqual(one_click_patch.main(["--zwrotka", str(md1), str(md2), str(md3), str(md4), "--indeks", str(ix_dir), "--tylko-zwrotka", "--wyj-zip", str(out_zip2)]), 0)
+        out_zip2 = self.root / "dist_sa" / "WWM_Spolszczenie_PL_v0.2.0.zip"
+        self.assertEqual(
+            one_click_patch.main(["--zwrotka", str(md1), str(md2), str(md3), str(md4), "--indeks", str(ix_dir), "--tylko-zwrotka", "--wydanie", "v0.2.0", "--wyj-zip", str(out_zip2)]),
+            0,
+        )
         unpack2 = self.root / "unpacked_sa2"
         with zipfile.ZipFile(out_zip2) as zf:
             zf.extractall(unpack2)
+        plan2 = json.loads((unpack2 / "narzedzia" / "plan_latki.json").read_text(encoding="utf-8"))
+        self.assertEqual(plan2["wydanie"], "v0.2.0")
+        readme2 = (unpack2 / "CZYTAJ_TO.txt").read_text(encoding="utf-8-sig")
+        self.assertIn("wydanie v0.2.0", readme2)
+        self.assertNotIn("łatka testowa", readme2.lower())
+
         res_up = subprocess.run(
             [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
             cwd=str(unpack2 / "narzedzia"),
@@ -432,18 +441,38 @@ class OneClickPatchTests(unittest.TestCase):
         patched_pkg_diff_v2 = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "Package/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
         self.assertEqual(patched_pkg_diff_v2[T + 21], "Zażółć gęślą jaźń v2")
 
-        # Symulacja aktualizacji Steam na jednym z plików: odmowa przywracania bez --wymus,
-        # a ponowna instalacja zapisuje kopię nowej wersji gry i nakłada łatkę na nową mapę.
+        # Scenariusz 1 po częściowym patchu Steam (jeden plik nadpisany przez grę, reszta nadal po polsku):
+        # Zwykłe `przywroc` NIE blokuje odinstalowania reszty: przywraca nienaruszone pliki łatki do oryginału,
+        # a zaktualizowany plik Steam zostawia w spokoju w nowej wersji gry!
         new_steam_patch_diff = diff_container([0], 1, [table([(t_only_en, b"Fresh Hotfix Line"), (T + 998, b"New Steam Line")])])
         (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").write_bytes(new_steam_patch_diff)
-        res_refuse = subprocess.run(
-            [sys.executable, "patcher_wwm.py", "--akcja", "przywroc", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+        res_partial_rest = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "przywroc", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive", "--json"],
             cwd=str(unpack2 / "narzedzia"),
             capture_output=True,
             text=True,
             check=False,
         )
-        self.assertEqual(res_refuse.returncode, 1)
+        self.assertEqual(res_partial_rest.returncode, 0, res_partial_rest.stderr or res_partial_rest.stdout)
+        partial_rep = json.loads(res_partial_rest.stdout.splitlines()[-12:] and res_partial_rest.stdout[res_partial_rest.stdout.find("{"):])
+        self.assertEqual(partial_rep["przywrocono"], 2)
+        self.assertEqual(partial_rep["pominieto_zmienione"], 1)
+        self.assertEqual((game / "Package/HD/oversea/locale/translate_words_map_en").read_bytes(), en_base_orig)
+        self.assertEqual((game / "Package/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), en_pkg_diff_orig)
+        self.assertEqual((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff)
+
+        # Ponowna instalacja na czystej zaktualizowanej grze, a następnie Scenariusz 2:
+        # kolejny częściowy patch Steam bez przywracania — samo `instaluj` rotuje kopię i ponownie nakłada łatkę.
+        res_reins = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_reins.returncode, 0, res_reins.stderr or res_reins.stdout)
+        new_steam_patch_diff_2 = diff_container([0], 1, [table([(t_only_en, b"Fresh Hotfix Line"), (T + 998, b"New Steam Line v2")])])
+        (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").write_bytes(new_steam_patch_diff_2)
         res_repatch = subprocess.run(
             [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
             cwd=str(unpack2 / "narzedzia"),
@@ -452,10 +481,10 @@ class OneClickPatchTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(res_repatch.returncode, 0, res_repatch.stderr or res_repatch.stdout)
-        self.assertEqual((backup / "pliki/LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff)
+        self.assertEqual((backup / "pliki/LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff_2)
         patched_after_steam = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes())}
         self.assertEqual(patched_after_steam[t_only_en], "Świeża linia z hotfixa")
-        self.assertEqual(patched_after_steam[T + 998], "New Steam Line")
+        self.assertEqual(patched_after_steam[T + 998], "New Steam Line v2")
 
         # Przywrócenie oryginałów przywraca już nową wersję Steam w zmodyfikowanym pliku oraz pierwotną bazę EN!
         res_rest = subprocess.run(
@@ -467,7 +496,38 @@ class OneClickPatchTests(unittest.TestCase):
         )
         self.assertEqual(res_rest.returncode, 0, res_rest.stderr or res_rest.stdout)
         self.assertEqual((game / "Package/HD/oversea/locale/translate_words_map_en").read_bytes(), en_base_orig)
-        self.assertEqual((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff)
+        self.assertEqual((game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").read_bytes(), new_steam_patch_diff_2)
+
+        # Gdy zaktualizowany przez grę plik nie ma żadnych pasujących wpisów (`skip_write=True`),
+        # `instaluj` i tak odświeża kopię zapasową, żeby `stan` był spójny (KOPIA_OK zamiast KOPIA_USZKODZONA).
+        res_ins_zero = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_ins_zero.returncode, 0)
+        new_steam_zero_match = diff_container([0], 1, [table([(T + 999, b"Unmatched Steam Line")])])
+        (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff").write_bytes(new_steam_zero_match)
+        res_repatch_zero = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_repatch_zero.returncode, 0)
+        res_stan = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "stan", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive", "--json"],
+            cwd=str(unpack2 / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res_stan.returncode, 0)
+        stan_rep = json.loads(res_stan.stdout[res_stan.stdout.find("{"):])
+        self.assertTrue(all(row["kopia"] == "KOPIA_OK" for row in stan_rep["pliki"]))
 
     def test_latka_testowa_standalone_mode_builds_without_game_binaries(self):
         t_cut = T + 860

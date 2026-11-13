@@ -240,6 +240,7 @@ def zbuduj_ze_zwrotki(
     cel_paths: list[str | Path] = (),
     wyj_zip: str | Path = "dist/WWM_LATKA_PL.zip",
     build_gry: str = "",
+    wydanie: str = "",
     jezyk_celu: str = "en",
     poziom: int = 9,
     pomin_bledne: bool = False,
@@ -293,12 +294,14 @@ def zbuduj_ze_zwrotki(
             magazyn,
             jezyk_celu=jezyk_celu,
             build_gry=build_gry.strip(),
+            wydanie=wydanie.strip(),
         )
         digest, size, members = build_standalone_patcher.build_standalone_zip(out_zip, plan)
         report = {
             "ok": True,
             "format": "wwm-one-click-standalone-v1",
             "tryb": "standalone",
+            "wydanie": plan.get("wydanie", ""),
             "zip": str(out_zip),
             "bajtow": size,
             "sha256": digest,
@@ -417,6 +420,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--mapa", nargs=2, action="append", default=[], metavar=("SCIEZKA_W_GRZE", "PLIK"))
     parser.add_argument("--cel", action="append", default=[], help="jawny plik mapy celu")
     parser.add_argument("--build-gry", default="", help="opcjonalny buildid Steam (domyślnie z RAPORT.json w --dane-gry)")
+    parser.add_argument("--wydanie", default="", help="opcjonalna etykieta/numer wydania (np. v0.1.0)")
     parser.add_argument("--wyj-zip", default="dist/WWM_LATKA_PL.zip", help="ścieżka wynikowego ZIP-a instalatora Windows")
     parser.add_argument("--raport", help="opcjonalny plik JSON z pełnym raportem")
     parser.add_argument("--poziom", type=int, default=9, help="poziom kompresji zstd (domyślnie: 9)")
@@ -437,6 +441,7 @@ def main(argv: list[str] | None = None) -> int:
             cel_paths=args.cel,
             wyj_zip=args.wyj_zip,
             build_gry=args.build_gry,
+            wydanie=args.wydanie,
             jezyk_celu=args.jezyk_celu,
             poziom=args.poziom,
             pomin_bledne=args.pomin_bledne,

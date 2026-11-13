@@ -132,13 +132,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-1. Po testach w grze albo przygotowaniu kolejnej partii: zbudować aktualną
-   samowystarczalną łatkę `WWM_LATKA_PL.zip` (`python3 tools/one_click_patch.py
-   --tylko-magazyn --wyj-zip dist/WWM_LATKA_PL.zip`, ~`4,3 MB`) z bieżącego
-   magazynu `tlumaczenie/` (`75 685` przekładów) i potwierdzić w oknie gry
-   (Patch 2.4 `26592996`, [TEST_W_GRZE.md](TEST_W_GRZE.md)).
+1. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
+   pierwsze wydanie samowystarczalnego spolszczenia **`WWM_Spolszczenie_PL_v0.1.0.zip`**
+   (`75 685` przekładów z `tlumaczenie/`, ok. `4,3 MB`, `tools/one_click_patch.py
+   --tylko-magazyn --wydanie v0.1.0 --wyj-zip dist/WWM_Spolszczenie_PL_v0.1.0.zip`).
 2. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
    → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
-   Czytanek (`tools/buduj_czytanki.py`) i łatki `WWM_LATKA_PL.zip`.
+   Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
 3. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).

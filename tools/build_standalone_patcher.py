@@ -47,9 +47,7 @@ PACKAGED_TOOLS = (
     "mapa_tekstow.py",
 )
 
-README_PL = """Where Winds Meet — samowystarczalna łatka PL (bez binarek w paczce)
-
-JAK ZAINSTALOWAĆ
+README_BODY_PL = """JAK ZAINSTALOWAĆ
 
 1. Zamknij grę i poczekaj, aż Steam zakończy aktualizacje.
 2. Rozpakuj CAŁE archiwum ZIP do jednego nowego folderu poza grą (np. na Pulpicie).
@@ -60,21 +58,46 @@ JAK ZAINSTALOWAĆ
      w folderze narzedzia\\.venv i pobierze małą bibliotekę zstandard (ok. 0.5 MB).
    - Patcher znajdzie instalację Steam gry (możesz też przeciągnąć folder gry
      na plik .bat), zapisze zweryfikowaną kopię zapasową oryginałów poza grą,
-     przepisz mapy lokalnie na Twoim komputerze i sprawdzi SHA-256 każdego pliku.
+     przepisze mapy lokalnie na Twoim komputerze i sprawdzi SHA-256 każdego pliku.
 
 SPRAWDZANIE STANU I PRZYWRACANIE
 
-- SPRAWDZ_STAN.bat — tylko odczyt: sprawdza, czy w grze są oryginały czy łatka
+- SPRAWDZ_STAN.bat — tylko odczyt: sprawdza, czy w grze są oryginały czy spolszczenie
   oraz czy kopia zapasowa jest kompletna.
 - PRZYWROC.bat — przywraca oryginalne pliki gry z zapisanej kopii zapasowej
-  (z weryfikacją SHA-256).
+  (z weryfikacją SHA-256). Jeśli aktualizacja gry nadpisała w międzyczasie część
+  plików nową wersją, PRZYWROC.bat bezpiecznie je pomija (zostawiając nowsze pliki
+  z gry) i cofa tylko pozostałe pliki, w których nadal jest spolszczenie.
 
 AKTUALIZACJE GRY
 
-Ponieważ łatka zawiera czysty plan tłumaczeń (plan_latki.json) i działa na
+Ponieważ paczka zawiera czysty plan tłumaczeń (plan_latki.json) i działa na
 Twoich plikach gry na dysku, po drobnych poprawkach/patchach gry nie trzeba
-wysyłać ciężkich plików binarnych — wystarczy ponownie kliknąć ZAINSTALUJ.bat.
+pobierać ciężkich plików binarnych — wystarczy ponownie kliknąć ZAINSTALUJ.bat
+(wykryje zaktualizowane pliki, zachowa ich nowe oryginały i nałoży przekład).
 """
+
+
+def _build_readme_text(plan: dict) -> str:
+    wydanie = str(plan.get("wydanie") or "").strip()
+    tytul = (
+        f"Where Winds Meet — Spolszczenie PL (wydanie {wydanie})"
+        if wydanie
+        else "Where Winds Meet — Spolszczenie PL"
+    )
+    opis = str(plan.get("opis") or "").strip()
+    przekladow = len(plan.get("po_kluczu", {})) + len(plan.get("po_id", {}))
+    lines = [tytul]
+    if opis or przekladow:
+        szczegoly = []
+        if przekladow:
+            szczegoly.append(f"wpisów w planie: {przekladow:,}".replace(",", " "))
+        if opis:
+            szczegoly.append(f"dane gry: {opis}")
+        lines.append(" · ".join(szczegoly))
+    lines.append("")
+    lines.append(README_BODY_PL)
+    return "\n".join(lines)
 
 
 def _windows_lines(text: str) -> bytes:
@@ -185,6 +208,7 @@ def zbuduj_plan(
     *,
     jezyk_celu: str = "en",
     build_gry: str = "",
+    wydanie: str = "",
 ) -> dict:
     """Zbuduj czysty plan łatki `wwm-plan-latki-v1` wyłącznie z `index/` i magazynu."""
     if not len(magazyn):
@@ -231,8 +255,9 @@ def zbuduj_plan(
                 en_jednoznaczne[mapa_tekstow.klucz(en_text)] = next(iter(translated_vals))
 
     opis = str(ix.manifest.get("wejscia", {}).get("opis") or "").strip()
-    return {
+    plan = {
         "format": PLAN_FORMAT,
+        "wydanie": wydanie.strip(),
         "jezyk_celu": jezyk_celu.lower(),
         "opis": opis,
         "oczekiwany_build": build_gry.strip(),
@@ -241,6 +266,7 @@ def zbuduj_plan(
         "kolizje": kolizje,
         "en_jednoznaczne": en_jednoznaczne,
     }
+    return plan
 
 
 def build_standalone_zip(output: Path, plan: dict) -> tuple[str, int, dict[str, bytes]]:
@@ -248,23 +274,26 @@ def build_standalone_zip(output: Path, plan: dict) -> tuple[str, int, dict[str, 
     if plan.get("format") != PLAN_FORMAT:
         raise ValueError(f"niepoprawny format planu: {plan.get('format')!r}")
 
+    wydanie_ascii = str(plan.get("wydanie") or "").encode("ascii", "ignore").decode("ascii").strip()
+    suffix = f" {wydanie_ascii}" if wydanie_ascii else ""
+
     files: dict[str, bytes] = {
-        "CZYTAJ_TO.txt": b"\xef\xbb\xbf" + _windows_lines(README_PL),
+        "CZYTAJ_TO.txt": b"\xef\xbb\xbf" + _windows_lines(_build_readme_text(plan)),
         "ZAINSTALUJ.bat": _make_bat(
             "instaluj",
-            "WHERE WINDS MEET - INSTALACJA LATKI PL",
-            "GOTOWE. Latka zainstalowana lokalnie z Twoich plikow gry, kopia oryginalow zapisana.",
+            f"WHERE WINDS MEET - SPOLSZCZENIE PL{suffix} - INSTALACJA",
+            "GOTOWE. Spolszczenie zainstalowane lokalnie z Twoich plikow gry, kopia oryginalow zapisana.",
             need_zstd=True,
         ),
         "PRZYWROC.bat": _make_bat(
             "przywroc",
-            "WHERE WINDS MEET - PRZYWRACANIE ORYGINALOW",
+            f"WHERE WINDS MEET - SPOLSZCZENIE PL{suffix} - PRZYWRACANIE",
             "GOTOWE. Przywrocono oryginalne pliki gry z kopii zapasowej.",
             need_zstd=False,
         ),
         "SPRAWDZ_STAN.bat": _make_bat(
             "stan",
-            "WHERE WINDS MEET - SPRAWDZENIE STANU PLIKOW",
+            f"WHERE WINDS MEET - SPOLSZCZENIE PL{suffix} - SPRAWDZENIE STANU",
             "GOTOWE. Sprawdzenie zakonczone (bez zmian w grze).",
             need_zstd=False,
         ),
@@ -303,12 +332,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--magazyn", default="tlumaczenie", help="katalog magazynu przekładów")
     parser.add_argument("--jezyk-celu", default="en", help="kod języka mapy celu w grze (domyślnie: en)")
     parser.add_argument("--build-gry", default="", help="opcjonalny wymuszany buildid Steam")
+    parser.add_argument("--wydanie", default="", help="opcjonalny numer/etykieta wydania (np. v0.1.0)")
     parser.add_argument("--output", required=True, help="ścieżka wynikowego ZIP-a standalone")
     args = parser.parse_args(argv)
 
     ix = indeks_mod.wczytaj(args.indeks, sceny=False)
     magazyn = magazyn_mod.wczytaj(args.magazyn)
-    plan = zbuduj_plan(ix, magazyn, jezyk_celu=args.jezyk_celu, build_gry=args.build_gry)
+    plan = zbuduj_plan(ix, magazyn, jezyk_celu=args.jezyk_celu, build_gry=args.build_gry, wydanie=args.wydanie)
     digest, size, files = build_standalone_zip(Path(args.output), plan)
     print(
         json.dumps(

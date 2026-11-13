@@ -479,10 +479,11 @@ def run_patcher(
 
     live_build = read_build_for_game(game_root)
     zh_layers, target_layers = discover_locale_layers(game_root, jezyk_celu)
+    wydanie = str(plan.get("wydanie") or "").strip()
 
     log_lines = [
         f"Data (UTC): {datetime.now(timezone.utc).isoformat()}",
-        f"Akcja: {akcja}",
+        f"Akcja: {akcja}" + (f" (wydanie {wydanie})" if wydanie else ""),
         f"Folder gry: {game_root}" + (f" (build {live_build})" if live_build else ""),
         f"Katalog kopii: {backup_dir}",
     ]
@@ -535,30 +536,52 @@ def run_patcher(
         if existing_state is None or not existing_state.get("files"):
             raise PatcherError(f"Brak zapisanej kopii zapasowej w: {backup_dir}")
         plan_restore: list[dict] = []
+        skipped_external = 0
+        skipped_missing = 0
+        kept_state_records: list[dict] = []
+
         for rec in existing_state["files"]:
             rel = str(rec["relative_path"])
             target = game_root / rel
             bak_file = backup_dir / rec["backup_relative"]
-            assert_regular_file(bak_file)
-            bak_bytes = bak_file.read_bytes()
-            if _sha256_bytes(bak_bytes) != rec["original_sha256"]:
-                raise PatcherError(f"Kopia zapasowa ma błędny SHA-256: {rel}")
             if not target.exists():
                 if not wymus:
-                    raise PatcherError(f"Brak docelowego pliku w grze (użyj --wymus aby odtworzyć): {rel}")
+                    skipped_missing += 1
+                    msg = f"Pominięto (plik usunięty w grze przez aktualizację): {rel}"
+                    print(msg)
+                    log_lines.append(msg)
+                    continue
+                assert_regular_file(bak_file)
+                bak_bytes = bak_file.read_bytes()
+                if _sha256_bytes(bak_bytes) != rec["original_sha256"]:
+                    raise PatcherError(f"Kopia zapasowa ma błędny SHA-256: {rel}")
                 plan_restore.append({"rel": rel, "target": target, "bytes": bak_bytes, "sha": rec["original_sha256"], "skip": False})
+                kept_state_records.append(rec)
                 continue
+
             assert_regular_file(target)
             cur_sha = _sha256_file(target)
             if cur_sha == rec["original_sha256"]:
+                assert_regular_file(bak_file)
+                bak_bytes = bak_file.read_bytes()
+                if _sha256_bytes(bak_bytes) != rec["original_sha256"]:
+                    raise PatcherError(f"Kopia zapasowa ma błędny SHA-256: {rel}")
                 plan_restore.append({"rel": rel, "target": target, "bytes": bak_bytes, "sha": rec["original_sha256"], "skip": True})
+                kept_state_records.append(rec)
             elif cur_sha == rec["patched_sha256"] or wymus:
+                assert_regular_file(bak_file)
+                bak_bytes = bak_file.read_bytes()
+                if _sha256_bytes(bak_bytes) != rec["original_sha256"]:
+                    raise PatcherError(f"Kopia zapasowa ma błędny SHA-256: {rel}")
                 plan_restore.append({"rel": rel, "target": target, "bytes": bak_bytes, "sha": rec["original_sha256"], "skip": False})
+                kept_state_records.append(rec)
             else:
-                raise PatcherError(
-                    f"Plik w grze został zmieniony (prawdopodobnie aktualizacja gry): {rel}. "
-                    "Nie nadpisuję go starą kopią (użyj --wymus jeśli jesteś pewien)."
+                skipped_external += 1
+                msg = (
+                    f"Pominięto (zaktualizowany/zmieniony przez grę — zostawiam obecną wersję pliku): {rel}"
                 )
+                print(msg)
+                log_lines.append(msg)
 
         restored = 0
         already_orig = 0
@@ -567,14 +590,18 @@ def run_patcher(
             for item in plan_restore:
                 if item["skip"]:
                     already_orig += 1
-                    print(f"Już oryginał: {item['rel']}")
+                    msg = f"Już oryginał: {item['rel']}"
+                    print(msg)
+                    log_lines.append(msg)
                     continue
                 old_bytes = item["target"].read_bytes() if item["target"].exists() else None
                 _write_bytes_atomic(item["target"], item["bytes"], item["sha"])
                 if old_bytes is not None:
                     written_rollback.append((item["target"], old_bytes))
                 restored += 1
-                print(f"Przywrócono oryginał: {item['rel']}")
+                msg = f"Przywrócono oryginał: {item['rel']}"
+                print(msg)
+                log_lines.append(msg)
         except Exception:
             for target_path, prev_bytes in reversed(written_rollback):
                 try:
@@ -589,12 +616,28 @@ def run_patcher(
             "status": "restored",
             "game_root": str(game_root),
             "build": live_build,
-            "files": existing_state["files"],
+            "files": kept_state_records,
         }
         _save_state(state_path, new_state)
-        log_lines.append(f"Przywrócono: {restored}, już było oryginalne: {already_orig}")
+        summary = (
+            f"Przywrócono: {restored}, już było oryginalne: {already_orig}, "
+            f"pominięto zmienione przez grę: {skipped_external}, usunięte w grze: {skipped_missing}"
+        )
+        log_lines.append(summary)
+        if skipped_external or skipped_missing:
+            print(
+                "UWAGA: część plików została wcześniej nadpisana/usunięta przez aktualizację gry, "
+                "więc została w nowszej wersji z gry; pozostałe pliki łatki przywrócono do oryginału."
+            )
         _write_report(backup_dir, log_lines)
-        return {"ok": True, "akcja": "przywroc", "przywrocono": restored, "juz_oryginal": already_orig}, 0
+        return {
+            "ok": True,
+            "akcja": "przywroc",
+            "przywrocono": restored,
+            "juz_oryginal": already_orig,
+            "pominieto_zmienione": skipped_external,
+            "pominieto_usuniete": skipped_missing,
+        }, 0
 
     # Akcja: instaluj
     if wymagany_build and live_build and live_build != wymagany_build and not pomin_wersje:
@@ -689,9 +732,22 @@ def run_patcher(
 
     # 1. Zapisz/zrotuj kopię oryginałów dopiero wtedy, gdy wszystkie nowe mapy są zbudowane i zweryfikowane.
     backup_rollback: list[tuple[Path, bytes | None]] = []
+    archive_stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    stage_by_bak = {item["bak_rel"]: item for item in staged_items}
     for bak_path, orig_bytes, orig_sha in backup_stage_files:
-        if any(not item["skip_write"] and item["bak_rel"] == f"pliki/{item['rel']}" and (backup_dir / item["bak_rel"]) == bak_path for item in staged_items) or not bak_path.exists():
-            backup_rollback.append((bak_path, bak_path.read_bytes() if bak_path.exists() else None))
+        rel_for_bak = bak_path.relative_to(backup_dir).as_posix()
+        item = stage_by_bak.get(rel_for_bak)
+        should_update_bak = (
+            not bak_path.exists()
+            or (item is not None and item["source_mode"] == "updated_game")
+            or (item is not None and not item["skip_write"])
+        )
+        if should_update_bak:
+            prev_bak = bak_path.read_bytes() if bak_path.exists() else None
+            if prev_bak is not None and _sha256_bytes(prev_bak) != orig_sha and item is not None:
+                arch_path = backup_dir / "kopie_poprzednie" / archive_stamp / item["rel"]
+                _write_bytes_atomic(arch_path, prev_bak, _sha256_bytes(prev_bak))
+            backup_rollback.append((bak_path, prev_bak))
             _write_bytes_atomic(bak_path, orig_bytes, orig_sha)
 
     # 2. Transakcyjnie wgraj wszystkie zmienione mapy do gry.
