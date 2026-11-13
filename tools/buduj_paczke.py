@@ -29,6 +29,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import sys
 import zipfile
 from collections import Counter, defaultdict
@@ -91,6 +92,23 @@ CUTSCENY_TABELE = {
 ZAKRES_BOTY_TM = (3_220_000, 3_269_999)
 ZAKRES_CUTSCEN_TM = (590_000, 592_694)
 ZAKRES_PROLOG_TM = kc.ZAKRES_PROLOG_TM
+
+_UI_META_WIDOKI = frozenset({"07_komunikaty", "08_interfejs_i_systemy"})
+_UI_META_TABELE_RE = re.compile(
+    r"^(?:"
+    r"buff|passive_skills|xinfa_uprank_info|attr_|formula|"
+    r"zzq_|oversea_home_entry_bag_search|gacha_|recommend_store_|waiguan_recommend_|"
+    r"multi_dungeon_race_|club_|activity_|kebei_|yingdeng_|fxds_|sandbox_|score_|"
+    r"gameplay_announce|chat_quick_reply|weapon_reroll|ac_raw|achievement|rank_|"
+    r"guider_|setting_|input_|key_|keymap_|ui_"
+    r")"
+)
+
+
+def czy_ui_meta(widok: str, tabela: str = "") -> bool:
+    """True dla działów i tabel czysto UI/meta/mechanicznych pomijanych w licznikach fabularnych."""
+    base = tabela.removesuffix("__grey")
+    return widok in _UI_META_WIDOKI or bool(base and _UI_META_TABELE_RE.match(base))
 
 # Tabele czysto techniczne/meta (samouczki, sterowanie, QTE, ustawienia, rankingi, komunikaty błędów programisty):
 # w trybie v2 zostają po angielsku w kliencie gry i nie trafiają do paczki dla tłumacza.
@@ -299,14 +317,19 @@ class Generator:
         *,
         tylko_z_en: bool = False,
         wszystko: bool = False,
+        wypelnij_pl: bool = False,
     ):
         self.ix = ix
         self.magazyn = magazyn or magazyn_mod.Magazyn()
         self.tylko = set(tylko_sloty) if tylko_sloty is not None else None  # None = pakiet pełny; zbiór = pakiet uzupełniający
         self.tylko_z_en = tylko_z_en
         self.wszystko = wszystko
+        self.wypelnij_pl = wypelnij_pl
         self.sloty: dict[str, tuple[str, str]] = {}  # slot -> (plik, opis miejsca)
+        self.sloty_lokacje: dict[str, tuple[str, str]] = {}  # slot -> (sekcja, plik)
+        self._aktualna_sekcja = "sceny"
         self.liczby = Counter()
+        self.liczby_widoki_bez_ui_meta = Counter()
         self.wykluczenia = Counter()
         self.uklad = uklad_scen.uloz(ix)
         self._nazwa_po_tekscie: dict[str, str] = {}
@@ -510,6 +533,17 @@ class Generator:
             lines.append(f"{WCIECIE}EN: (brak wersji angielskiej w grze)")
         done = self.magazyn.przeklad(slot)
         if done is not None:
+            if self.wypelnij_pl:
+                lead, trail = fmt.brzegi(text.zrodlo)
+                body = done
+                if lead and body.startswith(lead):
+                    body = body[len(lead):]
+                if trail and body.endswith(trail):
+                    body = body[:-len(trail)]
+                lines.append(f"{WCIECIE}PL: {fmt.zakoduj(body)}")
+                self.liczby["juz_przetlumaczone"] += 1
+                self.liczby["wypelnionych_pl"] += 1
+                return lines, False
             lines.append(f"{WCIECIE}PL (już jest): {fmt.zakoduj(done)}")
             self.liczby["juz_przetlumaczone"] += 1
             return lines, False
@@ -529,6 +563,7 @@ class Generator:
         plik = pisarz.blok(lines, scen=scen, elementow=elementow, do_wpisania=do_wpisania)
         for slot, where in self._nowe_w_bloku:
             self.sloty[slot] = (plik, where)
+            self.sloty_lokacje[slot] = (self._aktualna_sekcja, plik)
         self._nowe_w_bloku = []
         return plik
 
@@ -720,6 +755,7 @@ class Generator:
 
     def sceny(self, katalog: Path) -> None:
         ix, uklad = self.ix, self.uklad
+        self._aktualna_sekcja = "sceny"
         katalog.mkdir(parents=True, exist_ok=True)
         self._nowe_w_bloku: list[tuple[str, str]] = []
         self._przerywniki_gotowe: set[int] = set()
@@ -889,6 +925,7 @@ class Generator:
 
     def cutsceny(self, katalog: Path) -> None:
         ix = self.ix
+        self._aktualna_sekcja = "cutsceny"
         self._nowe_w_bloku = []
         wstep = ["Polski tekst wpisujesz w jednej linii po `PL:`. Zasady i podział na sekcje: `README.md`."]
         streszczenia = defaultdict(list)
@@ -1162,6 +1199,7 @@ class Generator:
 
     def widoki(self, katalog: Path) -> None:
         ix = self.ix
+        self._aktualna_sekcja = "widoki"
         katalog.mkdir(parents=True, exist_ok=True)
         self._nowe_w_bloku = []
         limity: dict[int, int] = defaultdict(int)
@@ -1258,9 +1296,15 @@ class Generator:
                     self.liczby["elementow"] += 1
                     self.liczby["powtorzen"] += 1
                     continue
+                before_done = self.liczby["juz_przetlumaczone"]
                 part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce="element {nr}")
                 block += part
                 opened += is_open
+                if not czy_ui_meta(view, base):
+                    if is_open:
+                        self.liczby_widoki_bez_ui_meta["do_wpisania"] += 1
+                    elif self.liczby["juz_przetlumaczone"] > before_done:
+                        self.liczby_widoki_bez_ui_meta["juz_przetlumaczone"] += 1
             flush()
             files = pisarz.koniec()
             self.serie.append({"baza": view, "tytul": title, "opis": "widok", "pliki": files})
@@ -1311,7 +1355,8 @@ def kontrola(generator: "Generator", wyj: Path) -> dict:
     }
     if generator.tylko is not None:
         wanted &= generator.tylko
-    wanted = {slot for slot in wanted if not generator.magazyn.ma(slot)}
+    if not generator.wypelnij_pl:
+        wanted = {slot for slot in wanted if not generator.magazyn.ma(slot)}
     return {
         "miejsc_pl": len(seen),
         "powtorzonych": sum(1 for count in seen.values() if count > 1),
@@ -1331,6 +1376,8 @@ def zbuduj(
     tylko_sloty: Iterable[str] | None = None,
     tylko_z_en: bool = False,
     wszystko: bool = False,
+    wypelnij_pl: bool = False,
+    dodatki: Iterable[Path | str] | None = None,
     zip_: bool = True,
 ) -> dict:
     """Zbuduj pakiet w katalogu `wyj`; zwraca manifest pakietu."""
@@ -1352,7 +1399,7 @@ def zbuduj(
         if old_zip.exists():
             old_zip.unlink()
 
-    generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en, wszystko=wszystko)
+    generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en, wszystko=wszystko, wypelnij_pl=wypelnij_pl)
     generator.sceny(wyj / "sceny")
     sceny_serie = list(generator.serie)
     generator.serie = []
@@ -1375,6 +1422,42 @@ def zbuduj(
         handle.write("scena\tdialog\tplik\tczesc\tzadanie\tsposob\telementow\n")
         for row in generator.spis_scen:
             handle.write("\t".join("" if value is None else str(value) for value in row) + "\n")
+
+    dodatki_info: dict[str, dict] = {}
+    dodatki_names: list[str] = []
+    for extra in dodatki or ():
+        src = Path(extra)
+        dst = wyj / src.name
+        if src.resolve() != dst.resolve():
+            shutil.copyfile(src, dst)
+        raw = dst.read_text(encoding="utf-8", errors="replace")
+        dodatki_names.append(dst.name)
+        dodatki_info[dst.name] = {
+            "bajtow": dst.stat().st_size,
+            "wierszy": sum(1 for line in raw.splitlines() if line.strip()),
+            "sha256": sha256(dst),
+        }
+
+    wid_bez = generator.liczby_widoki_bez_ui_meta
+    bez_ui_meta = {
+        "sceny": {
+            "do_wpisania": liczby_scen.get("do_wpisania", 0),
+            "juz_przetlumaczone": liczby_scen.get("juz_przetlumaczone", 0),
+        },
+        "cutsceny": {
+            "do_wpisania": liczby_cutsceny.get("do_wpisania", 0),
+            "juz_przetlumaczone": liczby_cutsceny.get("juz_przetlumaczone", 0),
+        },
+        "widoki": {
+            "do_wpisania": wid_bez.get("do_wpisania", 0),
+            "juz_przetlumaczone": wid_bez.get("juz_przetlumaczone", 0),
+        },
+        "razem": {
+            "do_wpisania": liczby_scen.get("do_wpisania", 0) + liczby_cutsceny.get("do_wpisania", 0) + wid_bez.get("do_wpisania", 0),
+            "juz_przetlumaczone": liczby_scen.get("juz_przetlumaczone", 0) + liczby_cutsceny.get("juz_przetlumaczone", 0) + wid_bez.get("juz_przetlumaczone", 0),
+        },
+    }
+
     manifest = {
         "format": "wwm-paczka-v1",
         "wersja": wersja,
@@ -1382,6 +1465,7 @@ def zbuduj(
         "rodzaj": "pełny" if tylko_sloty is None else "uzupełniający",
         "tylko_z_en": tylko_z_en,
         "wszystko": wszystko,
+        "wypelnij_pl": wypelnij_pl,
         "indeks": {
             "format": ix.manifest["format"],
             "opis": ix.manifest.get("wejscia", {}).get("opis", ""),
@@ -1391,6 +1475,7 @@ def zbuduj(
         "liczby_sceny": dict(liczby_scen),
         "liczby_cutsceny": dict(liczby_cutsceny),
         "liczby_widoki": dict(liczby_widokow),
+        "liczby_bez_ui_meta": bez_ui_meta,
         "wykluczenia": dict(generator.wykluczenia),
         "uklad": {
             "scen_w_zadaniach": sum(1 for row in generator.spis_scen if row[3] == "zadania"),
@@ -1403,6 +1488,8 @@ def zbuduj(
         "cutsceny": cutsceny_serie,
         "widoki": widoki_serie,
     }
+    if dodatki_info:
+        manifest["dodatki"] = dodatki_info
     (wyj / "README.md").write_text(opis_paczki.readme(generator, manifest), encoding="utf-8", newline="\n")
     manifest["kontrola"] = kontrola(generator, wyj)
     if zip_:
@@ -1412,16 +1499,16 @@ def zbuduj(
             if folder.is_dir() and any(folder.iterdir()):
                 spakuj(folder, wyj / f"{name}.zip")
                 arch_parts.append(f"{name}.zip")
-        # jeden plik do przekazania tłumaczowi: README.md + istniejące archiwa działów
+        # jeden plik do przekazania tłumaczowi: README.md + istniejące archiwa działów (+ opcjonalne dodatki JSONL/TXT)
         whole = wyj / f"paczka_dla_tlumacza_wwm_v{wersja}.zip"
         with zipfile.ZipFile(whole, "w", zipfile.ZIP_STORED) as archive:
-            for name in ["README.md", *arch_parts]:
+            for name in ["README.md", *arch_parts, *dodatki_names]:
                 info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, (wyj / name).read_bytes())
         manifest["archiwa"] = {
             name: {"bajtow": (wyj / name).stat().st_size, "sha256": sha256(wyj / name)}
-            for name in [*arch_parts, whole.name]
+            for name in [*arch_parts, *dodatki_names, whole.name]
         }
     (wyj / "paczka.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     return manifest
@@ -1438,6 +1525,8 @@ def main(argv=None) -> int:
     parser.add_argument("--tylko-sloty", help="plik z listą kluczy (jeden na linię): pakiet uzupełniający")
     parser.add_argument("--tylko-z-en", action="store_true", help="pomiń wpisy bez wersji angielskiej w grze (tylko chińskie)")
     parser.add_argument("--wszystko", action="store_true", help="nie stosuj wykluczeń v2 (uwzględnij też boty, programmer i tabele meta)")
+    parser.add_argument("--wypelnij-pl", action="store_true", help="istniejące przekłady z magazynu wpisz jako edytowalne `PL: <tekst>` zamiast `PL (już jest):`")
+    parser.add_argument("--dodatek", action="append", default=[], help="dodatkowy plik (np. rewizje_en.jsonl, usuniete_klucze.jsonl) dołączony do głównego ZIP-a")
     parser.add_argument("--bez-zip", action="store_true")
     arguments = parser.parse_args(argv)
     try:
@@ -1458,10 +1547,12 @@ def main(argv=None) -> int:
         tylko_sloty=only,
         tylko_z_en=arguments.tylko_z_en,
         wszystko=arguments.wszystko,
+        wypelnij_pl=arguments.wypelnij_pl,
+        dodatki=arguments.dodatek,
         zip_=not arguments.bez_zip,
     )
     ok = manifest["kontrola"]["zgodne"]
-    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "tylko_z_en": manifest["tylko_z_en"], "wszystko": manifest["wszystko"], "liczby": manifest["liczby"], "wykluczenia": manifest["wykluczenia"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
+    print(json.dumps({"ok": ok, "rodzaj": manifest["rodzaj"], "tylko_z_en": manifest["tylko_z_en"], "wszystko": manifest["wszystko"], "wypelnij_pl": manifest["wypelnij_pl"], "liczby": manifest["liczby"], "liczby_bez_ui_meta": manifest["liczby_bez_ui_meta"], "wykluczenia": manifest["wykluczenia"], "uklad": manifest["uklad"], "kontrola": manifest["kontrola"], "archiwa": manifest.get("archiwa")}, ensure_ascii=False, indent=1))
     return 0 if ok else 1
 
 

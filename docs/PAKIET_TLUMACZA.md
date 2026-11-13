@@ -1,6 +1,6 @@
 # Pakiet dla tłumacza i potok aktualizacji
 
-Stan na **2026-11-12**. Ten dokument opisuje cały obieg: pliki gry → wyciąg
+Stan na **2026-11-13**. Ten dokument opisuje cały obieg: pliki gry → wyciąg
 `index/` → pakiet dla tłumacza → zwrotka → magazyn przekładów → łatka, oraz to
 samo przyrostowo po aktualizacji gry. Cel i kryteria: [CEL.md](CEL.md). Format
 plików gry: [BAZA_GRY.md](BAZA_GRY.md), [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md).
@@ -136,30 +136,44 @@ identyfikatorów z `zh_cn` nie ma w mapie angielskiej).
 111 975 kwestii ma nazwę z gry (pole sceny albo tabliczka bytu), 37 458 to
 gracz, 36 803 ma tylko roboczą etykietę twórców (`entity_tag`), 52 nic.
 
-## Pakiet (`wwm-paczka-v1`, wysłana wersja `v3` + gotowy wyciąg pod `v4` / `patch24`)
+## Pakiet (`wwm-paczka-v1`, wysłana wersja `v4` / Patch 2.4)
 
 ```sh
-python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v4 --wersja 4 --data 2026-11-13 --tylko-z-en
+# Pełny pakiet z przeniesieniem już istniejących przekładów (PL: tekst) i dodatkami audytu:
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v4 \
+  --wersja 4 --data 2026-11-13 --tlumaczenie tlumaczenie --tylko-z-en --wypelnij-pl \
+  --dodatek dist/audyt/rewizje_en.jsonl --dodatek dist/audyt/usuniete_klucze.jsonl
 ```
 
 Wynik: `README.md`, `sceny/`, `cutsceny/`, `widoki/`, `sceny.zip`,
-`cutsceny.zip`, `widoki.zip`, `paczka_dla_tlumacza_wwm_v4.zip` (cztery
-poprzednie w jednym pliku) i `paczka.json` (manifest z liczbami, listą plików
-i wynikiem kontroli). Archiwa są powtarzalne: ta sama zawartość daje ten sam
-SHA-256. Kopia `README.md` i `paczka.json` każdej **wysłanej** wersji leży w
-`paczki/`.
+`cutsceny.zip`, `widoki.zip`, wszystkie pliki wskazane przez `--dodatek`,
+`paczka_dla_tlumacza_wwm_v4.zip` (całość w jednym pliku) i `paczka.json`
+(manifest z liczbami — w tym `liczby_bez_ui_meta`, listą plików, opisem
+dodatków i wynikiem kontroli). Archiwa są powtarzalne: ta sama zawartość daje
+ten sam SHA-256. Kopia `README.md` i `paczka.json` każdej **wysłanej** wersji
+leży w `paczki/`.
 
 Kontekst cutscen i mówców między `tools/buduj_paczke.py` i
 `tools/buduj_czytanki.py` jest współdzielony w module
 `tools/kontekst_cutscen.py`. W wysłanej wersji `v3` (`25906190`, `--tylko-z-en`)
 pakiet zawierał **418 773** miejsc `PL:`; po aktualizacji `index/` do Patcha 2.4
-(`26592996`) pełny `v4` ma **422 248** miejsc `PL:` (`168 191` w `sceny.zip`,
-`4 116` w `cutsceny.zip`, `249 941` w `widoki.zip`), `0` powtórzonych i `0`
-brakujących, a pakiet uzupełniający różnicy `25906190 → 26592996` ma **4 010**
-miejsc `PL:` (`42` w `sceny.zip`, `6` w `cutsceny.zip`, `3 962` w `widoki.zip`).
-Postać gracza w przebraniu oznaczana jest jako `gracz (przebranie/rola: …)`,
-a zadania z powiązaną powtórką w dzienniku dostają w nagłówku wpis `- powiązana cutscena
-w dzienniku: #…`.
+(`26592996`) oraz imporcie pierwszej zwrotki `WWM_PL1.zip` (`75 685` przekładów)
+zregenerowany pełny pakiet **`v4`** (`--wypelnij-pl`) ma **422 248** miejsc `PL:`
+(`168 191` w `sceny.zip`, `4 116` w `cutsceny.zip`, `249 941` w `widoki.zip`),
+w tym **`75 683` wypełnionych `PL: tekst`** i **`346 565` pustych `PL:`**
+(**`253 693` pustych `PL:`** po odjęciu tabel UI/meta), `0` powtórzonych i `0`
+brakujących. Pakiet uzupełniający różnicy `25906190 → 26592996` ma **4 010**
+miejsc `PL:` (`42` w `sceny.zip`, `6` w `cutsceny.zip`, `3 962` w `widoki.zip`;
+**`677`** po odjęciu tabel UI/meta). Postać gracza w przebraniu oznaczana jest
+jako `gracz (przebranie/rola: …)`, a zadania z powiązaną powtórką w dzienniku
+dostają w nagłówku wpis `- powiązana cutscena w dzienniku: #…`.
+Zarówno w pełnym pakiecie, jak i w pakiecie uzupełniającym `README.md` oraz
+`paczka.json` raportują równolegle liczby surowe oraz kolumnę „bez UI/meta”
+(pomijającą `08_interfejs_i_systemy`, `07_komunikaty` i tabele mechaniczne /
+minigier, m.in. `buff`, `passive_skills`, `xinfa_uprank_info`, `zzq_*`, `gacha_*`,
+`kebei_*`, `club_*`, `activity_*`). Flaga `--wypelnij-pl` wpisuje istniejący
+przekład wprost w aktywną linię `PL: <tekst>`, żeby tłumacz mógł poprawiać
+lub potwierdzać wcześniejsze tłumaczenia podczas rewizji pełnej paczki.
 
 Element (pełny opis dla tłumacza jest w `README.md` pakietu):
 
@@ -269,8 +283,13 @@ do magazynu i trafia do raportu z plikiem i numerem linii (bez treści).
 
 Magazyn (`tools/tlumaczenie.py`): `tlumaczenie/pl_0…f.jsonl`
 (`{"k": klucz, "pl": przekład}`) i `tlumaczenie/pl_warianty.jsonl`
-(`{"id": identyfikator, "pl": przekład}`). Katalog powstanie przy pierwszej
-zwrotce i jest wersjonowany — to jest właściwy dorobek projektu.
+(`{"id": identyfikator, "pl": przekład}`). Jest wersjonowany w Git —
+stanowi główny dorobek projektu (od `WWM_PL1.zip`: **75 685** przekładów, w tym
+**75 603** po kluczu i **82** warianty płciowe).
+W `tools/format_paczki.py` i `tools/import_zwrotki.py` dopuszcza się również
+kody techniczne `</...>` wieloliterowe, dwuczłonowy heks po przekształceniu
+koloru (np. `#ffc89c`) oraz komentarzowe `#` wprost przed słowem (`#Gracz`),
+o ile występują w tekście źródłowym (`ZH` lub `EN`).
 
 ## Łatka
 
@@ -320,15 +339,20 @@ oknie gry. Nie obiecujemy bezpieczeństwa konta.
 2. **Agent** pobiera pliki do `google_drive/`, wypakowuje do `local/`
    i przebudowuje wyciąg w katalogu roboczym (`tools/wyciag.py`, jak wyżej).
 3. Audyt względem ostatniego commita (flaga `--tylko-z-en` wyłapuje również
-   wcześniejsze wpisy wyłącznie chińskie, które właśnie dostały wydanie EN):
+   wcześniejsze wpisy wyłącznie chińskie, które właśnie dostały wydanie EN;
+   opcjonalne `--paczka`, `--stara-paczka` i `--usuniete-pl-z` dopisują dokładne
+   nazwy plików `.md` oraz eksportują `rewizje_en.jsonl` i `usuniete_klucze.jsonl`):
 
    ```sh
    python3 tools/audyt_aktualizacji.py --stary-git HEAD --nowy index \
-     --wyj dist/audyt --tlumaczenie tlumaczenie --tylko-z-en
+     --wyj dist/audyt --tlumaczenie tlumaczenie --tylko-z-en \
+     --paczka dist/paczka_wwm_v4
    ```
 
    `AUDYT.md` mówi, ile jest nowych i usuniętych tekstów, które sceny są nowe
-   albo zmienione i ile po aktualizacji brakuje przekładów.
+   albo zmienione, ile z już przetłumaczonych wpisów zmieniło brzmienie `EN`
+   (zapisane do `rewizje_en.jsonl`) i ile po aktualizacji brakuje przekładów.
+   Lista `usuniete_klucze.txt` / `usuniete_klucze.jsonl` wylicza usunięte klucze.
 4. Pakiet uzupełniający — tylko nowe teksty, w kontekście:
 
    ```sh

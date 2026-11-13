@@ -6,15 +6,17 @@ pliki gry → wyciąg `index/` → pakiet dla tłumacza → import zwrotki do ma
 aktualizacjach gry). Cel i kryteria akceptacji opisuje [docs/CEL.md](docs/CEL.md).
 
 **Stan (2026-11-13): wyciąg `index/` i narzędzia są zaktualizowane do Patcha 2.4 (Steam build `26592996`),**
-gotowy jest audyt różnicy oraz paczka uzupełniająca (`4 010` nowych miejsc `PL:` względem przekazanego
-wcześniej pakietu `v3` z buildu `25906190` / `--tylko-z-en`). Cały obieg po stronie narzędzi (ekstrakcja bazy,
+a do magazynu **`tlumaczenie/` zaimportowano pierwszą zwrotkę (`WWM_PL1.zip`: `75 685` przekładów, `15,46%` tekstów gry)**.
+Zbudowano i wysłano zregenerowany pełny pakiet **`v4`** (`paczka_dla_tlumacza_wwm_v4.zip`, `422 248` miejsc `PL:`, w tym `75 683` przeniesionych
+jako `PL: tekst` i `346 565` pustych / `253 693` bez tabel UI/meta) wraz z raportami zmian **`rewizje_en.jsonl`** (`899` rewizji EN dla
+przetłumaczonych wpisów) oraz **`usuniete_klucze.jsonl`** (`566` usuniętych kluczy). Cały obieg po stronie narzędzi (ekstrakcja bazy,
 budowa pakietu, trzyplikowe Czytanki z limitem `<5 MB/część`, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
 audyt aktualizacji i pakiet uzupełniający) działa i został przetestowany na prawdziwych plikach Patcha 2.4.
 **Zweryfikowano dotąd w uruchomionej grze (Steam Windows, poprzedni build `25906190`):** mała łatka testowa
 (`tools/latka_testowa.py` w trybie binarnym — menu, ustawienia i napisy otwierającego prologu) załadowała się
 w kliencie bez problemu, a czcionki gry wyświetliły komplet polskich znaków diakrytycznych
 (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
-**Wciąż czeka na sprawdzenie w oknie gry:** pełna łatka fabularna (brak jeszcze zwrotki przekładu w `tlumaczenie/`),
+**Wciąż czeka na sprawdzenie w oknie gry:** pierwsza łatka `v1` na pełnej bazie `tlumaczenie/` (`75 685` przekładów, m.in. cutsceny i ponad 9,7 tys. kwestii dialogowych),
 zachowanie gry na Patchu 2.4 (`26592996`) oraz bezpośrednie uruchomienie samowystarczalnego instalatora `patcher_wwm.py`
 w oknie gry (na kopii plików `26592996` przeszedł w piaskownicy pełny cykl instalacji i przywrócenia SHA-256).
 Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`, przetestowany

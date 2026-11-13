@@ -56,12 +56,12 @@ def odkoduj(line: str) -> str:
 # ma znaczenie: dłuższe i bardziej szczegółowe wzorce stoją pierwsze.
 TOKEN = re.compile(
     r"\[\[|\]\]"  # nawiasy bloku warunkowego [[{4}?…]]
-    r"|</?[A-Z]+(?:\s[^<>\n]*)?>"  # <LINK id='…'>, </LINK>, <IMAGE …>
+    r"|</?[A-Z]{2,}(?:\s[^<>\n]*)?>"  # <LINK id='…'>, </LINK>, <IMAGE …>, <TEXT …>
     r"|(?:\|[^|<>\n]*)+>"  # końcówka odnośnika <nazwa|780|#C|15>
     r"|\{[^{}\n]*\}"  # {}, {0}, {name}, {1:.1f}
     r"|\$[A-Za-z_][A-Za-z_0-9]*(?:\([^()\n]*\))?"  # $T(2001), $E, $STEADY_CRI
     r"|%(?:\d+\$)?[-0-9.]*[sdf%]"  # %s, %d, %02d, %.2f, %%
-    r"|#[0-9a-f][0-9a-fA-F]{5}(?![0-9a-fA-F])"  # kolor #a66b3c
+    r"|#(?:[0-9a-f]{6}|[0-9A-F]{6}|[0-9][0-9a-fA-F]{5})"  # kolor #a66b3c, #8C5823, #FFFFFF (także przed literą słowa)
     r"|#[A-Z]"  # #Y … #E, #R, #G, #H, #C
     r"|\[#[^\[\]\n]{1,12}\]"  # emotikony [#201], [#微笑]
     r"|@[Tt]"

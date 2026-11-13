@@ -5,12 +5,15 @@ akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
 ## Gdzie jesteśmy
 
-**Wysłany pakiet dla tłumacza (`v3`, `--tylko-z-en`) bazował na buildzie `25906190`,
-a wyciąg `index/` w repozytorium jest już zaktualizowany do Patcha 2.4
-(`build 26592996`, dane z `2026-11-13`)** wraz z policzonym audytem różnicy
-(`+4 171` nowych tekstów w zakresie `EN`, `4 010` miejsc `PL:` w paczce
-uzupełniającej oraz `422 248` w pełnym pakiecie `v4`). Cały obieg — wyciąg
-z plików gry, pakiet, Czytanki `v2`, import zwrotki, łatka map tekstów (także
+**Wyciąg `index/` w repozytorium jest już zaktualizowany do Patcha 2.4
+(`build 26592996`, dane z `2026-11-13`), do `tlumaczenie/` zaimportowano pierwszą
+zwrotkę tłumacza (`WWM_PL1.zip`: `75 685` przekładów = `15,46%` gry), a na Dysk
+Google wysłano zregenerowany pakiet `v4`** (`paczka_dla_tlumacza_wwm_v4.zip`,
+`422 248` miejsc `PL:`, w tym `75 683` przeniesionych jako aktywne `PL: tekst`,
+`346 565` pustych `PL:` — albo `253 693` po pominięciu tabel UI/meta — oraz
+dodatkowe listy `rewizje_en.jsonl` [`899` pozycji] i `usuniete_klucze.jsonl`
+[`566` pozycji]). Cały obieg — wyciąg z plików gry, pakiet (także `--wypelnij-pl`
+i `--dodatek`), Czytanki `v2`, import zwrotki, łatka map tekstów (także
 standalone `patcher_wwm.py`), audyt aktualizacji i pakiet uzupełniający —
 działa i jest przetestowany na prawdziwych plikach Patcha 2.4 **w piaskownicy**.
 Opis i polecenia: [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
@@ -31,8 +34,8 @@ polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź 
 (`26592996`), nowego samowystarczalnego wrappera `patcher_wwm.py` uruchomionego
 bezpośrednio na komputerze z grą (na kopii plików `26592996` w piaskownicy
 przeszedł pełny cykl `instaluj → stan → przywroc` z dokładnym odtworzeniem
-SHA-256) oraz pełnej fabuły (wciąż czekamy na pierwszą zwrotkę przekładu
-w `tlumaczenie/`).
+SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
+(`75 685` przekładów w `tlumaczenie/`).
 
 ## Co wiadomo
 
@@ -55,12 +58,17 @@ w `tlumaczenie/`).
 - **Poprzedni indeks (`wwm-indeks-v1`) był błędny** i został usunięty 2026-11-12:
   stary parser przypisywał scenie numer i projekt sceny następnej („5 859
   brakujących dialogów” było artefaktem).
-- **Pakiety `v1`/`v3` i gotowy wyciąg pod `v4`**: wysłany `v1` miał `485 047`
-  miejsc `PL:`, wysłany `v3` (`--tylko-z-en`, build `25906190`) `418 773`
-  miejsc `PL:`; po aktualizacji `index/` do Patcha 2.4 pełny `v4` ma `422 248`
-  miejsc `PL:`, a pakiet uzupełniający różnicy `25906190 → 26592996` ma
-  `4 010` miejsc `PL:` (`+4 171` nowych tekstów z EN, `57` nowych i `21`
-  zmienionych scen). Każdy tekst ma dokładnie jedno `PL:`.
+- **Pakiety `v1`/`v3`/`v4` i magazyn `tlumaczenie/`**: wysłany `v1` miał
+  `485 047` miejsc `PL:`, wysłany `v3` (`--tylko-z-en`, build `25906190`)
+  `418 773` miejsc `PL:`. Z pierwszej zwrotki (`WWM_PL1.zip`) zaimportowano
+  **`75 685` przekładów** (`82` warianty płci + `75 603` po kluczu = `15,46%`
+  tekstów gry) do `tlumaczenie/`. Po aktualizacji `index/` do Patcha 2.4
+  wysłano zregenerowany pełny pakiet **`v4`** (`--wypelnij-pl`): `422 248` miejsc
+  `PL:` (`75 683` przeniesionych jako aktywne `PL: tekst`, `346 565` pustych
+  `PL:` lub **`253 693` po odjęciu tabel UI/meta**), uzupełniony o
+  `rewizje_en.jsonl` (`899`) i `usuniete_klucze.jsonl` (`566`). Pakiet
+  uzupełniający różnicy `25906190 → 26592996` ma `4 010` miejsc `PL:` (`677`
+  bez UI/meta). Każdy tekst ma dokładnie jedno `PL:`.
 - **Kolejność scen** pochodzi z danych (dla `index/` Patcha 2.4 w pełnym `v4`):
   34 491 scen uporządkowanych w zadaniach (w tym 25 434 „według numeracji” za
   taką sceną — oznaczone w nagłówku jako kolejność z numeracji, nie powiązanie),
@@ -91,7 +99,7 @@ w `tlumaczenie/`).
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami (z obsługą zastępowania `Package/.../_diff` przez `LocalData/Patch/.../_diff`) — sprawdzone na Patchu 2.4 (`26592996`). |
 | Wyciąg i powiązania | `index/` w Git (`wwm-indeks-v2`, Patch 2.4 `26592996`), deterministyczny, ze stałym podziałem plików. |
 | Pakiet tłumacza i Czytanki | Pakiety (`--tylko-z-en`, w tym paczki uzupełniające `--tylko-sloty`) i trzyplikowe Czytanki `wwm-czytanki-v2` (`epizody.md`, `kontekst_scen.md`, `dodatkowe.md` pod limitem `<5 MB/część`, 100% pokrycia) budują się **100% standalone z `index/`** (zero binarek gry). |
-| Import zwrotki | Gotowy i przetestowany (`tools/import_zwrotki.py`); czeka na pierwszą zwrotkę. |
+| Import zwrotki | Gotowy i zweryfikowany produkcyjnie na `WWM_PL1.zip` (`tools/import_zwrotki.py`: `75 685` zaimportowanych przekładów w `tlumaczenie/`, `0` błędów formatu/tokenów, `21` kluczy odrzuconych z powodu usunięcia w Patchu 2.4). |
 | Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` na `25906190`) **zweryfikowana w uruchomionej grze Steam**; pełna łatka fabularna i test `patcher_wwm.py` na Patchu 2.4 (`26592996`) w realnym oknie gry czekają na sprawdzenie. |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`, przetestowany 8-częściowy zrzut 516 MB z Patcha 2.4), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
@@ -124,13 +132,13 @@ w `tlumaczenie/`).
 
 ## Następny krok
 
-1. Po decyzji właściciela: wysłać na Dysk Google pakiet uzupełniający różnicy
-   `v3 → Patch 2.4` (`4 010` miejsc `PL:`, ~364 KB) i/lub pełny pakiet `v4`,
-   oraz odświeżoną próbną paczkę `WWM_LATKA_TEST_PL.zip` dla Patcha 2.4.
-2. Czekać na zwrotkę tłumacza → `tools/import_zwrotki.py` → commit `tlumaczenie/`
-   → pełne Czytanki (`tools/buduj_czytanki.py`) i paczka standalone
-   (`tools/one_click_patch.py`).
-3. Opcjonalnie potwierdzić w oknie gry (`26592996`) próbną paczkę standalone
-   z `tools/latka_testowa.py` (`patcher_wwm.py`, patrz [TEST_W_GRZE.md](TEST_W_GRZE.md)).
-4. Po każdym kolejnym patchu gry: właściciel klika
+1. Po testach w grze albo przygotowaniu kolejnej partii: zbudować aktualną
+   samowystarczalną łatkę `WWM_LATKA_PL.zip` (`python3 tools/one_click_patch.py
+   --tylko-magazyn --wyj-zip dist/WWM_LATKA_PL.zip`, ~`4,3 MB`) z bieżącego
+   magazynu `tlumaczenie/` (`75 685` przekładów) i potwierdzić w oknie gry
+   (Patch 2.4 `26592996`, [TEST_W_GRZE.md](TEST_W_GRZE.md)).
+2. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
+   → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
+   Czytanek (`tools/buduj_czytanki.py`) i łatki `WWM_LATKA_PL.zip`.
+3. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).

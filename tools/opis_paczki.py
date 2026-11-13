@@ -133,6 +133,10 @@ def readme(generator, manifest: dict) -> str:
     pokrycie = ix.manifest["pokrycie"]
     mowcy = pokrycie["kwestie_wg_nazwy_mowcy"]
     pelny = manifest["rodzaj"] == "pełny"
+    wypelnij_pl = bool(manifest.get("wypelnij_pl"))
+    juz_gotowe = liczby.get("juz_przetlumaczone", 0)
+    bez_ui = manifest.get("liczby_bez_ui_meta") or {}
+    dodatki = manifest.get("dodatki") or {}
 
     lengths = sorted(
         len(fmt.zakoduj(text.en))
@@ -158,6 +162,11 @@ def readme(generator, manifest: dict) -> str:
             "oraz wszystkie nazwy, opisy i komunikaty z tabel gry. Tłumaczy się **tekst w plikach `.md`**, wpisując "
             "polski po znaczniku `PL:`. Nie trzeba znać formatów gry ani żadnych narzędzi."
         )
+        if wypelnij_pl and juz_gotowe:
+            add(
+                f"Ta wersja zawiera już **{_l(juz_gotowe)} dotychczasowych przekładów** wpisanych wprost po znaczniku "
+                "`PL: <tekst>` (można je weryfikować, poprawiać na miejscu i zliczać na nich postęp)."
+            )
     else:
         add(
             "To jest **pakiet uzupełniający** po aktualizacji gry: zawiera tylko teksty, których nie było we "
@@ -192,6 +201,63 @@ def readme(generator, manifest: dict) -> str:
     )
     add(f"{next_step + 1}. Pod każdym tekstem chińskim są linie `EN:` (angielska wersja gry jako odniesienie) i `PL:` — **polski wpisujesz po `PL:`**.")
     add(f"{next_step + 2}. Odsyłasz pliki **tak jak są** (może być zip). Nie zmieniasz nazw plików, linii `klucz:` ani tekstu chińskiego.")
+
+    if bez_ui and (not pelny or (wypelnij_pl and juz_gotowe)):
+        add("")
+        if pelny and wypelnij_pl:
+            add("### Podsumowanie postępu (wszystkie vs bez tabel UI/meta)")
+            add("")
+            add("| dział | wszystkie miejsca `PL:` | już przetłumaczone (`PL: tekst`) | puste `PL:` (wszystkie) | puste `PL:` (bez UI/meta) |")
+            add("|---|---:|---:|---:|---:|")
+            for key, label in (("sceny", "`sceny.zip`"), ("cutsceny", "`cutsceny.zip`"), ("widoki", "`widoki.zip`")):
+                sec_cnt = {"sceny": sceny, "cutsceny": cutsceny, "widoki": widoki}[key]
+                done_n = sec_cnt.get("juz_przetlumaczone", 0)
+                todo_n = sec_cnt.get("do_wpisania", 0)
+                if key != "widoki" and not done_n and not todo_n and not cut_serie:
+                    continue
+                todo_no_ui = (bez_ui.get(key) or {}).get("do_wpisania", todo_n)
+                add(f"| {label} | {_l(done_n + todo_n)} | {_l(done_n)} | {_l(todo_n)} | {_l(todo_no_ui)} |")
+            razem_todo = liczby.get("do_wpisania", 0)
+            razem_no_ui = (bez_ui.get("razem") or {}).get("do_wpisania", razem_todo)
+            add(f"| **Razem** | **{_l(juz_gotowe + razem_todo)}** | **{_l(juz_gotowe)}** | **{_l(razem_todo)}** | **{_l(razem_no_ui)}** |")
+        else:
+            add("### Liczby pakietu uzupełniającego (surowe vs bez UI/meta)")
+            add("")
+            add("| dział | nowe `PL:` (wszystkie) | nowe `PL:` (bez UI/meta) |")
+            add("|---|---:|---:|")
+            for key, label in (("sceny", "`sceny.zip`"), ("cutsceny", "`cutsceny.zip`"), ("widoki", "`widoki.zip`")):
+                sec_cnt = {"sceny": sceny, "cutsceny": cutsceny, "widoki": widoki}[key]
+                todo_n = sec_cnt.get("do_wpisania", 0)
+                todo_no_ui = (bez_ui.get(key) or {}).get("do_wpisania", todo_n)
+                add(f"| {label} | {_l(todo_n)} | {_l(todo_no_ui)} |")
+            razem_todo = liczby.get("do_wpisania", 0)
+            razem_no_ui = (bez_ui.get("razem") or {}).get("do_wpisania", razem_todo)
+            add(f"| **Razem** | **{_l(razem_todo)}** | **{_l(razem_no_ui)}** |")
+        add("")
+        add(
+            "*Kolumna „bez UI/meta” pomija działy `08_interfejs_i_systemy` i `07_komunikaty` oraz tabele mechaniczne/minigier/ustawień "
+            "(m.in. `buff`, `passive_skills`, `xinfa_uprank_info`, `zzq_*`, `gacha_*`, `kebei_*`, `club_*`, `activity_*`), "
+            "które zgodnie z decyzją projektową mogą pozostać nieprzetłumaczone (po angielsku).*"
+        )
+
+    if dodatki:
+        add("")
+        add("### Dodatkowe pliki przeglądowe (JSONL / listy zmian)")
+        add("")
+        for name, info in dodatki.items():
+            rows_n = info.get("wierszy", 0)
+            if "rewizj" in name:
+                add(
+                    f"- **`{name}`** — {_l(rows_n)} rekordów rewizji angielskich (`EN -> EN`) wyłącznie dla już przetłumaczonych wpisów "
+                    '(pola `{"k","sekcja","plik","zh","en_przed","en_po","pl"}`). Służy do przeglądu ewentualnych zmian sensu w `EN:` '
+                    "— ewentualne poprawki wpisujesz normalnie po `PL:` we wskazanym pliku `.md`."
+                )
+            elif "usuniet" in name:
+                add(
+                    f"- **`{name}`** — lista {_l(rows_n)} kluczy usuniętych z gry w tej aktualizacji (dla porządku w słowniku / raportach)."
+                )
+            else:
+                add(f"- **`{name}`** — plik dodatkowy ({_l(rows_n)} wierszy).")
     add("")
     add("## 1. Jak wygląda jeden element")
     add("")
@@ -257,7 +323,9 @@ def readme(generator, manifest: dict) -> str:
     add("")
     add("- `(powtórzenie elementu N — nie wpisuj tu nic)` — ten sam tekst jest wyżej w tej samej scenie.")
     add("- `(powtórzenie — tłumaczysz raz: plik, scena N, element M)` — ten sam tekst ma swoje `PL:` we wskazanym miejscu; przekład dziedziczy się sam.")
-    add("- `PL (już jest): …` — tekst został już przetłumaczony; pokazany dla kontekstu.")
+    add("- `PL (już jest): …` — tekst został już przetłumaczony; pokazany dla kontekstu (w pakietach uzupełniających).")
+    if wypelnij_pl and juz_gotowe:
+        add("- `PL: <tekst>` — w pełnej wersji z przeniesionym przekładem wpis ten jest aktywny i możesz go bezpośrednio poprawiać albo zatwierdzić.")
     if not pelny:
         add("- `(tekst z wcześniejszego pakietu — tu nic nie wpisuj)` — stary tekst pokazany dla kontekstu nowej kwestii.")
     add("- `EN: (brak wersji angielskiej w grze)` — tłumaczysz z chińskiego jak resztę.")

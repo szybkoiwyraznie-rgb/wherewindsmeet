@@ -517,6 +517,78 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("Zgadza się — przyszliśmy cię pojmać", got[t_prolog])
         self.assertEqual(got[t_skill_1], "Relentless Advance")
 
+    def test_import_allows_source_comment_hash_before_word_but_rejects_added_hash(self):
+        zh = {T + 10: "#玩家开始潜行", T + 11: "普通台词"}
+        en = {T + 10: "#The player sneaks", T + 11: "Normal line"}
+        tables = {"cutscenes": [(10, {"content": T + 10}), (11, {"content": T + 11})]}
+        with tempfile.TemporaryDirectory(prefix="wwm-hash-") as temp:
+            wyciag.zbuduj(FakeBaza(tables), zh, en, Path(temp) / "index", {}, log=lambda _t: None)
+            ix = indeks.wczytaj(Path(temp) / "index")
+            ok_content = f"1. [x] #玩家\n   klucz: {K(zh[T + 10])}\n   PL: #Gracz zaczyna się skradać\n"
+            store = tlumaczenie.Magazyn()
+            rep_ok = import_zwrotki.importuj(ix, [("cut.md", ok_content)], store)
+            self.assertEqual(rep_ok["odrzucone"], 0)
+            self.assertEqual(store.przeklad(K(zh[T + 10])), "#Gracz zaczyna się skradać")
+
+            bad_content = (
+                f"1. [x] normal\n   klucz: {K(zh[T + 11])}\n   PL: #Gracz bez źródłowego hasza\n"
+                f"2. [x] spacja po G\n   klucz: {K(zh[T + 10])}\n   PL: #G Gracz ze spacją\n"
+            )
+            rep_bad = import_zwrotki.importuj(ix, [("bad.md", bad_content)], tlumaczenie.Magazyn())
+            self.assertEqual(rep_bad["odrzucone"], 2)
+            self.assertEqual(rep_bad["problemy_wg_rodzaju"], {"tokeny": 2})
+
+    def test_audit_en_revisions_jsonl_and_deleted_keys_export(self):
+        zh2 = dict(ZH_ALL)
+        en2 = dict(EN_ALL)
+        en2[T + 1] = "blacksmith line, revised"  # już przetłumaczone -> musi trafić do rewizje_en.jsonl
+        en2[T + 20] = "Longsword"  # nieprzetłumaczone -> NIE może trafić do rewizje_en.jsonl
+        tables = world()
+        del tables["dialog_timelines.900"]  # usunięty tekst (T+204)
+        wyciag.zbuduj(FakeBaza(tables), zh2, en2, self.root / "index_rev", {"opis": "wersja rev"}, log=lambda _t: None)
+        new_ix = indeks.wczytaj(self.root / "index_rev")
+
+        paczka_new = self.root / "paczka_rev"
+        buduj_paczke.zbuduj(new_ix, paczka_new, wersja="2", data="2026-11-13", zip_=False)
+
+        mag_dir = self.root / "mag_rev"
+        store = tlumaczenie.Magazyn()
+        store.ustaw(K("kwestia kowala"), "kwestia kowala po polsku")
+        tlumaczenie.zapisz(mag_dir, store)
+
+        zwrotka_deleted = self.root / "zwrotka_del.md"
+        zwrotka_deleted.write_text(f"1. [x] x\n   klucz: {K('dialog z innego projektu')}\n   PL: usunięty dialog PL\n", encoding="utf-8")
+
+        out = self.root / "audyt_rev"
+        rc = audyt_aktualizacji.main([
+            "--stary", str(self.root / "index"),
+            "--nowy", str(self.root / "index_rev"),
+            "--tlumaczenie", str(mag_dir),
+            "--paczka", str(paczka_new),
+            "--stara-paczka", str(self.root / "paczka"),
+            "--usuniete-pl-z", str(zwrotka_deleted),
+            "--wyj", str(out),
+        ])
+        self.assertEqual(rc, 0)
+        revs = [json.loads(line) for line in (out / "rewizje_en.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        self.assertEqual(len(revs), 1)
+        self.assertEqual(revs[0], {
+            "k": K("kwestia kowala"),
+            "sekcja": "sceny",
+            "plik": "01_watek-glowny_rozdzial-1_01.md",
+            "zh": "kwestia kowala",
+            "en_przed": "smith line",
+            "en_po": "blacksmith line, revised",
+            "pl": "kwestia kowala po polsku",
+        })
+        dels = [json.loads(line) for line in (out / "usuniete_klucze.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        self.assertEqual(len(dels), 1)
+        self.assertEqual(dels[0]["k"], K("dialog z innego projektu"))
+        self.assertEqual(dels[0]["plik"], "80_dialogi-wg-projektow_01.md")
+        self.assertEqual(dels[0]["pl"], "usunięty dialog PL")
+        self.assertEqual((out / "usuniete_klucze.txt").read_text(encoding="utf-8").splitlines(), [K("dialog z innego projektu")])
+        self.assertIn("rewizje_en.jsonl", (out / "AUDYT.md").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

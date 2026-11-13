@@ -10,7 +10,7 @@ from pathlib import Path
 from tests.test_sceny_z_bazy import group, rows, span, text_track
 from tests.test_wyciag_indeks import EN, ZH, K, T, tables
 from tests.test_zrodla_tekstow import FakeBaza
-from tools import buduj_paczke, format_paczki, indeks, tlumaczenie, wyciag
+from tools import buduj_paczke, format_paczki, import_zwrotki, indeks, tlumaczenie, wyciag
 
 ZH_EXTRA = {
     T + 200: "scena obok numerem",
@@ -497,6 +497,88 @@ class V3CutsceneAndDisguiseContextTests(unittest.TestCase):
             self.assertIn("[Kwestia — gracz (przebranie/rola: 麻布袋 (Burlap Sack))] 别说话，跟着走。", sceny_md)
             self.assertNotIn("gracz (主角", sceny_md)
             self.assertIn("- powiązana cutscena w dzienniku: #305 — 长夜未央 (Endless Night)", sceny_md)
+
+
+class V4RegenerationAndMetricsTests(unittest.TestCase):
+    def test_wypelnij_pl_round_trip_dodatki_and_ui_meta_metrics(self):
+        data = world()
+        zh = {**ZH, **ZH_EXTRA, T + 950: "  tekst ze spacją\ni nową linią ", T + 951: "karta zzq"}
+        en = {**EN, **EN_EXTRA, T + 950: "spaced\nline", T + 951: "ZZQ Card"}
+        data["text_msg"] = [(10, {"content": T + 950})]
+        data["zzq_chess_hex_data"] = [(1, {"name": T + 951})]
+
+        with tempfile.TemporaryDirectory(prefix="wwm-v4-test-") as temp:
+            root = Path(temp)
+            wyciag.zbuduj(FakeBaza(data), zh, en, root / "index", {"opis": "test v4"}, log=lambda _t: None)
+            ix = indeks.wczytaj(root / "index")
+
+            store = tlumaczenie.Magazyn()
+            store.ustaw(K("kwestia kowala"), "Kwestia kowala PL")
+            store.ustaw(K("  tekst ze spacją\ni nową linią "), "  przekład ze spacją\ni nową linią ")
+
+            rev_path = root / "rewizje_en.jsonl"
+            rev_path.write_text('{"k":"0123456789abcdef","sekcja":"sceny","plik":"x.md","zh":"a","en_przed":"b","en_po":"c","pl":"d"}\n', encoding="utf-8")
+            del_path = root / "usuniete_klucze.jsonl"
+            del_path.write_text('{"k":"fedcba9876543210","sekcja":"widoki","plik":"y.md","zh":"x","en":"y","pl":null}\n', encoding="utf-8")
+
+            manifest = buduj_paczke.zbuduj(
+                ix,
+                root / "out_v4",
+                wersja="4",
+                data="2026-11-13",
+                magazyn=store,
+                tylko_z_en=True,
+                wypelnij_pl=True,
+                dodatki=[rev_path, del_path],
+            )
+            self.assertTrue(manifest["kontrola"]["zgodne"])
+            self.assertTrue(manifest["wypelnij_pl"])
+            self.assertEqual(manifest["liczby"]["juz_przetlumaczone"], 2)
+            self.assertEqual(manifest["liczby"]["wypelnionych_pl"], 2)
+            self.assertEqual(manifest["dodatki"]["rewizje_en.jsonl"]["wierszy"], 1)
+            self.assertEqual(manifest["dodatki"]["usuniete_klucze.jsonl"]["wierszy"], 1)
+
+            sceny_md = (root / "out_v4" / "sceny" / "01_watek-glowny_rozdzial-1_01.md").read_text(encoding="utf-8")
+            self.assertIn("PL: Kwestia kowala PL\n", sceny_md)
+            self.assertNotIn("PL (już jest):", sceny_md)
+
+            readme = (root / "out_v4" / "README.md").read_text(encoding="utf-8")
+            self.assertIn("### Podsumowanie postępu (wszystkie vs bez tabel UI/meta)", readme)
+            self.assertIn("rewizje_en.jsonl", readme)
+            self.assertIn("usuniete_klucze.jsonl", readme)
+
+            # Bez UI/meta pomija text_msg (07_komunikaty) oraz buff (04) i zzq_chess_hex_data (09)
+            no_ui = manifest["liczby_bez_ui_meta"]
+            self.assertGreater(manifest["liczby_widoki"]["do_wpisania"], no_ui["widoki"]["do_wpisania"])
+
+            # ZIP główny zawiera README, działy i obydwa dodatki JSONL
+            with zipfile.ZipFile(root / "out_v4" / "paczka_dla_tlumacza_wwm_v4.zip") as zf:
+                names = zf.namelist()
+                self.assertIn("rewizje_en.jsonl", names)
+                self.assertIn("usuniete_klucze.jsonl", names)
+
+            # Re-import z takiego pełnego pakietu v4 zachowuje przekłady bit-w-bit (łącznie ze spacjami i \n)
+            re_store = tlumaczenie.Magazyn()
+            rep = import_zwrotki.importuj(ix, import_zwrotki.pliki_zwrotki([root / "out_v4" / "paczka_dla_tlumacza_wwm_v4.zip"]), re_store)
+            self.assertEqual(rep["odrzucone"], 0)
+            self.assertEqual(re_store.po_kluczu, store.po_kluczu)
+
+            # Delta paczka ma dwukolumnową tabelkę surowe vs bez UI/meta
+            delta_manifest = buduj_paczke.zbuduj(
+                ix,
+                root / "out_delta",
+                wersja="4d",
+                data="2026-11-13",
+                magazyn=store,
+                tylko_sloty={K("Miecz"), K("karta zzq")},
+                tylko_z_en=True,
+                zip_=False,
+            )
+            self.assertTrue(delta_manifest["kontrola"]["zgodne"])
+            self.assertEqual(delta_manifest["liczby_widoki"]["do_wpisania"], 2)
+            self.assertEqual(delta_manifest["liczby_bez_ui_meta"]["widoki"]["do_wpisania"], 1)
+            delta_readme = (root / "out_delta" / "README.md").read_text(encoding="utf-8")
+            self.assertIn("### Liczby pakietu uzupełniającego (surowe vs bez UI/meta)", delta_readme)
 
 
 if __name__ == "__main__":

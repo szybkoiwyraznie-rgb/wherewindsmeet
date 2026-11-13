@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import re
 import sys
 import zipfile
 from collections import Counter
@@ -46,6 +47,28 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import wypisz
 
 MAKS_PROBLEMOW_W_RAPORCIE = 2000
+_RE_HASZ_ZE_SLOWEM = re.compile(r"#[A-Z][a-z]")
+
+
+def _tylko_komentarz_hasz(encoded_source: str, english: str | None, przeklad: str, missing: list[str], extra: list[str]) -> bool:
+    """True, jeśli rzekome nadmiarowe tokeny `#[A-Z]` to literalne `#` komentarzy ze źródła przed słowem."""
+    if missing or not extra or any(len(tok) != 2 or not tok.startswith("#") or not tok[1].isupper() for tok in extra):
+        return False
+    rem = list(extra)
+    for match in _RE_HASZ_ZE_SLOWEM.finditer(przeklad):
+        tok = match.group(0)[:2]
+        if tok in rem:
+            rem.remove(tok)
+    if rem:
+        return False
+    lit_pl = przeklad.count("#") - sum(1 for tok in fmt.tokeny(przeklad) if tok.startswith("#"))
+    for ref in (encoded_source, fmt.zakoduj(english) if english else None):
+        if not ref:
+            continue
+        lit_ref = ref.count("#") - sum(1 for tok in fmt.tokeny(ref) if tok.startswith("#"))
+        if lit_ref >= lit_pl + len(extra):
+            return True
+    return False
 
 
 class ZwrotkaError(Exception):
@@ -131,6 +154,8 @@ def importuj(ix, pliki, magazyn: magazyn_mod.Magazyn, *, mimo_tokenow: bool = Fa
                 missing_en, extra_en = fmt.roznica_tokenow(fmt.zakoduj(english), entry.pl)
                 if not missing_en and not extra_en:
                     missing, extra = [], []
+            if (missing or extra) and _tylko_komentarz_hasz(encoded_source, english, entry.pl, missing, extra):
+                missing, extra = [], []
             if missing or extra:
                 problem("tokeny", name, entry, brakuje=missing, nadmiar=extra)
                 if not mimo_tokenow:

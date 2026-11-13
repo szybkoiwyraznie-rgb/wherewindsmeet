@@ -34,6 +34,20 @@ class EncodingTests(unittest.TestCase):
     def test_text_after_end_colour_is_not_taken_for_a_hex_colour(self):
         self.assertEqual(fmt.tokeny("#Y10#E #EDefeat"), ["#Y", "#E", "#E"])
 
+    def test_hex_colour_directly_before_polish_word_and_angle_quote_dialogue(self):
+        self.assertEqual(
+            fmt.tokeny("#a66829Cong Buwen#E #d5e3f0Cztery #cae2d6Boski #8C5823175 #FFFFFFNagroda#E"),
+            ["#a66829", "#E", "#d5e3f0", "#cae2d6", "#8C5823", "#FFFFFF", "#E"],
+        )
+        self.assertEqual(
+            fmt.tokeny("Pi! <W tej jaskini mieszkają przecież ludzie, a nie szczury.>"),
+            [],
+        )
+        self.assertEqual(
+            fmt.tokeny("<TEXT font_size='64'>x</TEXT>"),
+            ["<TEXT font_size='64'>", "</TEXT>"],
+        )
+
     def test_token_difference(self):
         self.assertEqual(fmt.roznica_tokenow("#Ya#E {0}", "#Ya {0} {1}"), (["#E"], ["{1}"]))
         self.assertEqual(fmt.roznica_tokenow("{0} {1}", "{1} {0}"), ([], []))
