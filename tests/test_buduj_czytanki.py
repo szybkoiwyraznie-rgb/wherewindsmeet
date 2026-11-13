@@ -254,7 +254,7 @@ class CzytankiTests(unittest.TestCase):
         self.assertTrue(out_zip.is_file())
 
         all_md = {p.name: p.read_text(encoding="utf-8") for p in out_dir.glob("*.md")}
-        self.assertEqual(set(all_md), {"README.md", "epizody.md", "kontekst_scen.md"})
+        self.assertEqual(set(all_md), {"README.md", "epizody.md", "kontekst_scen.md", "dodatkowe.md"})
 
         # ZERO wycieku angielskiego ani chińskiego tekstu nigdzie w plikach .md!
         joined = "\n".join(all_md.values())
@@ -265,6 +265,7 @@ class CzytankiTests(unittest.TestCase):
 
         ep_md = all_md["epizody.md"]
         ctx_md = all_md["kontekst_scen.md"]
+        dod_md = all_md["dodatkowe.md"]
 
         # Lustrzane nagłówki Epizod E / Scena E.S dokładnie 1:1 pomiędzy epizody.md i kontekst_scen.md
         self.assertEqual(_naglowki_epizody_i_sceny(ep_md), _naglowki_epizody_i_sceny(ctx_md))
@@ -287,13 +288,15 @@ class CzytankiTests(unittest.TestCase):
         # Czysty skrypt nie zawiera ścian tabel ani biografii encyklopedycznych
         self.assertNotIn("Pierwszy wpis z księgi życia kowala.", ep_md)
 
-        # W kontekst_scen.md: pierwsza historia przy scenie, brak spoilerów przed końcem, katalog reszty na końcu
+        # W kontekst_scen.md: pierwsza historia przy scenie, brak spoilerów przed końcem, bez nieprzypisanego katalogu
         self.assertIn("Pierwszy wpis z księgi życia kowala.", ctx_md)
         pos_druga_bio = ctx_md.index("Tajna druga biografia kowala.")
         pos_dalsze = ctx_md.index("## Dalsze wpisy encyklopedii postaci i relacji")
         self.assertGreater(pos_druga_bio, pos_dalsze)
+        self.assertNotIn("## Katalog nieprzypisanych haseł ze świata gry", ctx_md)
+        self.assertNotIn("Szlachetna Zbroja", ctx_md)
 
-        # Całe zaplecze świata jest skonsolidowane w kontekst_scen.md
+        # Całe nieprzypisane zaplecze świata trafia przejrzyście według rodzaju do `dodatkowe.md`
         for expected in (
             "Bitwa pod Kaifengiem",
             "Księga Pierwszych Dni",
@@ -306,11 +309,11 @@ class CzytankiTests(unittest.TestCase):
             "Sztuka Spokojnego Serca",
             "Krok Wiatru",
         ):
-            self.assertIn(expected, ctx_md)
+            self.assertIn(expected, dod_md)
 
-        # Deterministyczny ZIP zawiera README + oba pliki główne
+        # Deterministyczny ZIP zawiera README + wszystkie 3 pliki treści
         with zipfile.ZipFile(out_zip) as zf:
-            self.assertEqual(sorted(zf.namelist()), ["README.md", "epizody.md", "kontekst_scen.md"])
+            self.assertEqual(sorted(zf.namelist()), ["README.md", "dodatkowe.md", "epizody.md", "kontekst_scen.md"])
 
     def test_gender_filter_and_zakres_kompletne_rozdzialy_and_splitting_and_main_only(self):
         # 1. Filtrowanie płci --plec bohaterka + wymuszone dzielenie --podziel-powyzej 500
@@ -817,6 +820,115 @@ class CzytankiTests(unittest.TestCase):
         sc_401_end = ctx_txt.index("## ", sc_401_start)
         sc_401_block = ctx_txt[sc_401_start:sc_401_end]
         self.assertNotIn("Iron Guild description", sc_401_block)
+        self.assertIn("Iron Guild description", by_name["dodatkowe.md"])
+
+    def test_dodatkowe_md_zero_gaps_and_all_categories_and_subsplitting(self):
+        """Każdy przetłumaczony tekst spoza scen trafia bez duplikatów do właściwego działu `dodatkowe.md`, bez wycieku EN."""
+        Q = T + 9000
+        zh = {
+            **ZH_CZYTANKI,
+            Q + 1: "Strój Wędrowca",
+            Q + 2: "Lekki płaszcz podróżny z jedwabiu.",
+            Q + 3: "List z Jiangnan",
+            Q + 4: "Spotkajmy się o świcie przy przystani.",
+            Q + 5: "Osiągnięcie Pierwszy Krok",
+            Q + 6: "Ukończ swój pierwszy rozdział.",
+            Q + 7: "Wpis techniczny debug",
+            Q + 8: "Tekst bez nazwy tabeli źródłowej",
+            Q + 9: "Nieprzetłumaczony wpis dodatkowy",
+        }
+        en = {
+            **EN_CZYTANKI,
+            Q + 1: "Wanderer Outfit EN",
+            Q + 2: "Light silk traveling cloak EN",
+            Q + 3: "Letter from Jiangnan EN",
+            Q + 4: "Meet at dawn at the pier EN",
+            Q + 5: "First Step Achievement EN",
+            Q + 6: "Finish your first chapter EN",
+            Q + 7: "Debug UI msg EN",
+            Q + 8: "Sourceless entry EN",
+            Q + 9: "Untranslated Extra Entry EN",
+        }
+        data = rich_world()
+        data["fashion_items"] = [(501, {"id": 501, "name": Q + 1, "describe_str": Q + 2})]
+        data["emails_data"] = [(601, {"id": 601, "mail_title": Q + 3, "content": Q + 4})]
+        data["ac_raw"] = [(701, {"id": 701, "achievement_name": Q + 5, "achievement_info": Q + 6})]
+        data["programmer_text_msg"] = [(801, {"id": 801, "text": Q + 7})]
+        # Dodatkowy wiersz bez przypisanej tabeli i bez tłumaczenia dla Q+9
+        data["stuff_items"] = [*data["stuff_items"], (901, {"id": 901, "name": Q + 9})]
+
+        root_z = self.root / "zero_gaps"
+        wyciag.zbuduj(FakeBaza(data), zh, en, root_z / "index", {"opis": "zero gaps"}, log=lambda _t: None)
+        ix_z = indeks.wczytaj(root_z / "index")
+        # Dodajemy sztuczny klucz spoza tabel (10_bez_zrodla)
+        from tools.indeks import Tekst
+
+        kl_bez = K(zh[Q + 8])
+        ix_z.teksty[kl_bez] = Tekst(
+            zrodlo=zh[Q + 8],
+            en=en[Q + 8],
+            n=1,
+            w=None,
+            z_en=False,
+        )
+
+        mag = tlumaczenie.Magazyn()
+        for slot, val in self.magazyn.po_kluczu.items():
+            mag.ustaw(slot, val)
+        for ident, val in self.magazyn.po_id.items():
+            mag.ustaw("@" + ident, val)
+        pl_entries = {
+            Q + 1: "Strój Nocnego Wędrowca PL",
+            Q + 2: "Lekki płaszcz jedwabny PL.",
+            Q + 3: "List znad Rzeki PL",
+            Q + 4: "Spotkajmy się na pomoście o świcie PL.",
+            Q + 5: "Osiągnięcie: Pierwszy Krok PL",
+            Q + 6: "Ukończ pierwszy rozdział opowieści PL.",
+            Q + 7: "Wpis systemowy z tabeli technicznej PL.",
+            Q + 8: "Tekst bez przypisanej tabeli PL.",
+        }
+        for num, txt in pl_entries.items():
+            mag.ustaw(K(zh[num]), txt)
+
+        builder = buduj_czytanki.BudowniczyCzytanek(ix_z, buduj_czytanki.ZrodloPL(ix_z, mag), z_otoczeniem=True)
+        pliki, _ = builder.buduj_z_epizodami()
+        by_name = {p.nazwa: "\n".join(p.linie) for p in pliki}
+        ep_txt = by_name["epizody.md"]
+        ctx_txt = by_name["kontekst_scen.md"]
+        dod_txt = by_name["dodatkowe.md"]
+
+        # 1. Wszystkie 8 dodatkowych polskich tekstów znalazło się w `dodatkowe.md` (i nigdzie indziej), zero wycieku EN
+        for txt in pl_entries.values():
+            self.assertIn(txt, dod_txt)
+        for en_sentinel in (
+            "Wanderer Outfit EN",
+            "Untranslated Extra Entry EN",
+            "Sourceless entry EN",
+            "Debug UI msg EN",
+        ):
+            self.assertNotIn(en_sentinel, ep_txt + ctx_txt + dod_txt)
+
+        # 2. Podział tematyczny na sekcje `dodatkowe.md`
+        self.assertIn("## 3. Przedmioty, wyposażenie, stroje i budowle", dod_txt)
+        self.assertIn("## 4. Encyklopedia świata, historia, księgi, poszlaki i listy", dod_txt)
+        self.assertIn("## 8. Osiągnięcia, poradniki, interfejs i systemy gry", dod_txt)
+        self.assertIn("## 9. Pozostałe tabele i teksty bez przypisanej tabeli", dod_txt)
+
+        # 3. Elementy z `epizody.md` i `kontekst_scen.md` NIE duplikują się w `dodatkowe.md`
+        self.assertNotIn("Witaj w mojej kuźni.", dod_txt)
+        self.assertNotIn("Pierwszy wpis z księgi życia kowala.", dod_txt)
+        self.assertNotIn("Tajna druga biografia kowala.", dod_txt)
+
+        # 4. Tryb `--zakres wszystko` ujawnia brakujący Q+9 jawnym znacznikiem PL (bez EN)
+        builder_all = buduj_czytanki.BudowniczyCzytanek(ix_z, buduj_czytanki.ZrodloPL(ix_z, mag), zakres="wszystko", z_otoczeniem=True)
+        pliki_all, _ = builder_all.buduj_z_epizodami()
+        dod_all = "\n".join(next(p for p in pliki_all if p.nazwa == "dodatkowe.md").linie)
+        self.assertIn(f"[Brak polskiego tekstu: {K(zh[Q + 9])}]", dod_all)
+
+        # 5. Podział `_podziel_na_czesci` z małym limitem tnie także po `### ` i dużych tabelach w `dodatkowe.md`
+        czesci = buduj_czytanki._podziel_na_czesci(pliki[2], 700)
+        self.assertGreaterEqual(len(czesci), 3)
+        self.assertEqual(czesci[0][0], "dodatkowe_czesc_01.md")
 
 
 if __name__ == "__main__":

@@ -126,11 +126,12 @@ Wymaga `zstandard` (`pip install -r requirements-dev.txt`). Czyta kontener
 ([LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)), przepisuje chunk 0 bez zmian,
 przepakowuje tabele z nowymi offsetami i weryfikuje wynik przed zapisem.
 
-## Czego jeszcze nie ma i co nie zostało sprawdzone
+## Co jest już potwierdzone, a co jeszcze czeka na test
 
-- **Nie przetestowano łatki w rzeczywistej grze** (klient może sprawdzać sumy kontrolne plików przy starcie lub aktualizacji, czcionki mogą nie mieć wszystkich polskich znaków, a pola interfejsu mają nieznane limity szerokości).
-- **Nie wybrano docelowo zastępowanego języka klienta** (dotychczasowe próby na mapie EN w piaskownicy).
-- **Skrypty instalatora i przywracania (`patcher_wwm.py` w trybie standalone oraz `instalator/` w trybie binarnym)** przeszły automatyczne testy na Linuksie i w Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, wykrywanie aktualizacji gry, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie), ale **nie były jeszcze uruchamiane na rzeczywistej instalacji gry właściciela** ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
+- **Potwierdzone w uruchomionej grze (Steam Windows):** mała łatka testowa (`tools/latka_testowa.py`, oparta na tym samym formacie map `translate_words_map_en*`) załadowała się w kliencie bez błędu, a wbudowane czcionki gry wyświetlają poprawnie wszystkie polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`) zarówno w UI, jak i w napisach prologu.
+- **Wciąż czeka na sprawdzenie w grze:** pełna łatka fabularna (po spłynięciu zwrotki tłumacza do `tlumaczenie/`), limity szerokości dłuższych napisów interfejsu oraz zachowanie po cotygodniowej aktualizacji gry.
+- **Nie wybrano docelowo zastępowanego języka klienta** poza sprawdzoną dotąd mapą angielską.
+- **Skrypty instalatora i przywracania (`patcher_wwm.py` w trybie standalone oraz `instalator/` w trybie binarnym)** przeszły automatyczne testy na Linuksie i w Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, wykrywanie aktualizacji gry, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie); nowy wrapper `patcher_wwm.py` produkuje identyczny format binarny map jak sprawdzony tryb testowy, lecz nie był jeszcze odpalony bezpośrednio w oknie gry właściciela ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
 
 ## Wynik na realnych mapach w piaskownicy
 

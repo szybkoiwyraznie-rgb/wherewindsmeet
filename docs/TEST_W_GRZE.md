@@ -15,8 +15,15 @@ z sekcji `cutsceny/01_napisy_cutscen_*.md`, m.in. `Even at the end of the road,`
 rozdzielania kolizji z Wariantu A), bez modyfikacji plików `.exe`, `.dll` ani
 pamięci procesu.
 
-**Zastrzeżenie:** test nie był jeszcze uruchomiony w prawdziwej grze.
-Projekt nie gwarantuje bezpieczeństwa konta ani zgodności z warunkami wydawcy.
+**Stan sprawdzenia:** ta próba została już wykonana na uruchomionej grze
+(Steam Windows, tryb binarny `latka_testowa.py`): klient przyjął przepisane
+mapy `translate_words_map_en*` w menu i otwierającym prologu, a wbudowane
+czcionki gry wyświetliły komplet polskich znaków diakrytycznych
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). Nadal warto powtórzyć próbę dla
+nowego samowystarczalnego instalatora (`patcher_wwm.py`) po dużych
+aktualizacjach gry, a pełna łatka fabularna czeka na pierwszą zwrotkę
+tłumaczenia. Projekt nie gwarantuje bezpieczeństwa konta ani zgodności z
+warunkami wydawcy.
 
 ---
 

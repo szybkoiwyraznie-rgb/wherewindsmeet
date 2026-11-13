@@ -5,15 +5,17 @@ pliki gry → wyciąg `index/` → pakiet dla tłumacza → import zwrotki do ma
 `tlumaczenie/` → łatka map tekstów (oraz powtarzalny obieg przyrostowy po
 aktualizacjach gry). Cel i kryteria akceptacji opisuje [docs/CEL.md](docs/CEL.md).
 
-**Stan (2026-11-12): pierwszy pełny pakiet dla tłumacza (`v1`) jest zbudowany
-i przekazany właścicielowi** (`485 047` miejsc `PL:` na `73 373` sceny i `62`
-pliki widoków). Cały obieg po stronie narzędzi (ekstrakcja bazy, budowa
-pakietu, import zwrotki, łatka bazy i warstw `_diff`, audyt aktualizacji
-i pakiet uzupełniający) działa na prawdziwych plikach buildu `25906190` w
-piaskownicy, ale **nie był jeszcze sprawdzony w uruchomionej grze**. Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`),
-bezpieczny instalator/przywracacz łatki dla Windows (`instalator/`) oraz plan
-pierwszej próby UI, napisów prologu i polskich znaków ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Brakuje
-jeszcze pierwszej zwrotki przekładu oraz samego testu na uruchomionej grze. Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
+**Stan (2026-11-12): pierwszy pełny pakiet dla tłumacza (`v1`) oraz pakiet `v3` (`--tylko-z-en`) są zbudowane
+i przekazane właścicielowi**, a cały obieg po stronie narzędzi (ekstrakcja bazy, budowa
+pakietu, trzyplikowe Czytanki, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
+audyt aktualizacji i pakiet uzupełniający) działa na prawdziwych plikach buildu `25906190`.
+**Zweryfikowano w uruchomionej grze (Steam Windows):** mała łatka testowa (`tools/latka_testowa.py` —
+menu, ustawienia i napisy otwierającego prologu) załadowała się w kliencie bez problemu, a czcionki gry
+wyświetliły komplet polskich znaków diakrytycznych (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
+**Wciąż czeka na sprawdzenie:** pełna łatka fabularna (brak jeszcze zwrotki przekładu w `tlumaczenie/`)
+oraz bezpośrednie uruchomienie nowego samowystarczalnego instalatora `patcher_wwm.py` w oknie gry
+(zachowuje sprawdzony format map binarnych i przeszedł testy na Linux + Windows CI). Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`),
+bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
 grze, bez wstrzykiwania i obchodzenia zabezpieczeń; warunków wydawcy nie
 potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 

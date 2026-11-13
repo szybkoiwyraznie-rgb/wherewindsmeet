@@ -2,7 +2,8 @@
 
 Narzędzie `tools/buduj_czytanki.py` (z modułem powiązań `tools/powiazania_czytanek.py`)
 generuje polskie czytanki `.md` oraz deterministyczne archiwum `WWM_CZYTANKI_PL.zip`
-wzorowane na dwuplikowym układzie SRW Y, dopasowanym do korpusu Where Winds Meet.
+wzorowane na układzie SRW Y, rozszerzonym do trzyplikowego zestawu dla pełnego
+korpusu Where Winds Meet (także bez żadnej straty treści spoza scen).
 
 ## Uruchomienie
 
@@ -39,18 +40,20 @@ python3 tools/buduj_czytanki.py \
 Najważniejsze przełączniki:
 - `--zakres przetlumaczone | kompletne-rozdzialy | wszystko` — domyślnie zawiera
   wyłącznie przetłumaczone kwestie, sceny i wpisy; `kompletne-rozdzialy` dopuszcza
-  tylko w 100% ukończone sekcje; `wszystko` buduje pełny szkielet z jawnymi
-  markerami `[Brak polskiego tekstu (...)]`.
+  tylko w 100% ukończone sekcje/wiersze; `wszystko` buduje pełny szkielet z
+  jawnymi markerami `[Brak polskiego tekstu (...)]`.
 - `--plec oba | bohater | bohaterka` — obsługa kwestii zależnych od płci postaci
   gracza (`@id` w dialogach i pary w napisach cutscen; w trybie `oba` identyczne
   kwestie obojga wariantów są scalane w jedną linię).
-- `--tylko-watek-glowny` — ogranicza zestaw do Prologu, Wątku Głównego i całego
-  powiązanego z nimi kontekstu.
+- `--tylko-watek-glowny` — ogranicza `epizody.md` i `kontekst_scen.md` do Prologu
+  i Wątku Głównego (oraz odfiltrowuje zadania poboczne i dialogi scen z `dodatkowe.md`).
 - `--z-otoczeniem` — dołącza rozmowy świata i reakcje poza zadaniami do
-  epizodów i kontekstu.
-- `--podziel-powyzej N` — domyślnie `0` (jednolity zestaw dwuplikowy jak SRW Y);
-  podanie limitu bajtów `> 0` dzieli duże pliki na części (`*_czesc_01.md`, ...)
-  w granicach nagłówków `## `.
+  epizodów i kontekstu (gdy flaga jest wyłączona, nieużyte w `epizody.md` wpisy
+  są zachowane w `dodatkowe.md`).
+- `--podziel-powyzej N` — domyślnie `0` (jednolity zestaw trzyplikowy); podanie
+  limitu bajtów `> 0` dzieli duże pliki na części (`*_czesc_01.md`, ...) w
+  granicach nagłówków `## `, a jeśli pojedynczy dział przekracza limit — także
+  wzdłuż podnagłówków `### ` i wierszy długich list/tabel.
 - `--podglad-en` — jawny tryb podglądu samej formy i układu czytanek na tekstach
   angielskich z `index/` (do oceny przed rozpoczęciem tłumaczenia; domyślnie
   narzędzie działa wyłącznie po polsku).
@@ -86,8 +89,22 @@ Najważniejsze przełączniki:
     opisane:* ...` / `pełna karta przy pierwszym wystąpieniu: Scena E.S`).
   - **Ochrona przed spoilerami:** przy scenie podawany jest wyłącznie pierwszy
     wpis biografii i pierwsza historia relacji (`story_1`); dalsze odblokowywane
-    wpisy oraz pozostałe nieprzypisane hasła ze świata gry znajdują się w
-    sekcjach końcowych `kontekst_scen.md`.
+    wpisy spotkanych bohaterów znajdują się w sekcji końcowej `kontekst_scen.md`.
+- `dodatkowe.md` — cały pozostały materiał ze świata gry spoza scen, sekwencji
+  i przypisanych kart z `kontekst_scen.md`, bez jakichkolwiek luk (`100%`
+  pokrycia pozostałych tekstów z `index/`, w tym z wykluczonych wcześniej tabel
+  technicznych i tekstów bez nazwy tabeli źródłowej). Rozdzielony tematycznie na
+  9 przejrzystych działów z bogatymi kartami/tabelami u góry oraz domykającym
+  przebiegiem zero-luk na końcu każdego działu:
+  1. Bohaterowie, NPC, relacje, bossowie i tytuły
+  2. Zadania, wątki cienia, zakończenia i wskazówki
+  3. Przedmioty, wyposażenie, stroje i budowle
+  4. Encyklopedia świata, historia, księgi, poszlaki i listy
+  5. Świat, regiony, miejsca i lokacje
+  6. Sztuki walki, umiejętności, efekty i przeciwnicy
+  7. Rozmowy, wybory i komunikaty poza scenami
+  8. Osiągnięcia, poradniki, interfejs i systemy gry
+  9. Pozostałe tabele i teksty bez przypisanej tabeli
 
 ## Zasady tekstu i czytelności
 

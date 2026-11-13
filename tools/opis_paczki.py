@@ -248,8 +248,8 @@ def readme(generator, manifest: dict) -> str:
     add("## 4. Polskie znaki i interpunkcja")
     add("")
     add(
-        "Pisz normalną polszczyzną z `ą ć ę ł ń ó ś ź ż`. **Nie sprawdzono jeszcze w grze, czy jej czcionki mają wszystkie "
-        "polskie znaki** — to zadanie dla narzędzi i pierwszego testu w grze, nie dla tłumacza. Chińskie znaki interpunkcyjne "
+        "Pisz normalną polszczyzną z `ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż` — próba w grze (UI i napisy prologu) "
+        "potwierdziła, że czcionki klienta poprawnie wyświetlają komplet polskich znaków. Chińskie znaki interpunkcyjne "
         "(`，。！？“”「」……`) zamieniaj na polskie odpowiedniki; wielokropek `……` to zwykłe `...`."
     )
     add("")

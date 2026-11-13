@@ -25,9 +25,9 @@ README.md + sceny.zip + cutsceny.zip + widoki.zip → tłumacz (Dysk właścicie
         │  zwrotka: te same pliki .md z wypełnionym PL:
         ▼  tools/import_zwrotki.py
 tlumaczenie/  (Git)                     klucz tekstu → przekład
-        │  tools/zbuduj_latke.py + mapy z gry
+        │  tools/one_click_patch.py (standalone z index/) albo zbuduj_latke.py
         ▼
-przepisane mapy tekstów                 → instalacja u właściciela (jeszcze nie sprawdzona w grze)
+plan_latki.json + patcher / mapy        → próba UI+prolog potwierdzona w grze; pełna łatka czeka na zwrotkę
 
 po patchu gry:  nowy wyciąg → tools/audyt_aktualizacji.py → nowe_sloty.txt
                 → tools/buduj_paczke.py --tylko-sloty → pakiet uzupełniający
@@ -290,12 +290,16 @@ poza katalogiem gry i przepisuje je lokalnie. (Do pracy w piaskownicy na
 wskazanych plikach binarnych dostępne jest również niskopoziomowe
 `tools/zbuduj_latke.py` lub opcje `--dane-gry` / `--zh` + `--mapa`.)
 
-Przed pełną łatką warto przeprowadzić małą próbę UI i polskich znaków opisaną
+Przed pełną łatką warto przy każdym nowym trybie instalatora sprawdzić małą próbę UI i prologu opisaną
 w [TEST_W_GRZE.md](TEST_W_GRZE.md) (`python3 tools/latka_testowa.py --wyj-zip dist/WWM_LATKA_TEST_PL.zip`).
 
-**Nie sprawdzono w grze:** czy klient przyjmie zmienione mapy (możliwa kontrola
-plików przy starcie albo aktualizacji), czy czcionki mają polskie znaki, ile
-tekstu mieszczą pola. Nie obiecujemy bezpieczeństwa konta.
+**Stan w grze:** mała łatka testowa (`latka_testowa.py` na mapie angielskiej —
+UI i otwierający prolog) została już uruchomiona w kliencie Steam i potwierdziła,
+że gra przyjmuje przepisane mapy oraz wyświetla komplet polskich znaków
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Nie sprawdzono jeszcze w grze**
+pełnej łatki fabularnej (czeka na zwrotkę tłumacza), limitów szerokości pól
+oraz nowego samowystarczalnego instalatora `patcher_wwm.py` bezpośrednio w
+oknie gry. Nie obiecujemy bezpieczeństwa konta.
 
 ## Aktualizacja gry — co robić krok po kroku
 
@@ -346,4 +350,5 @@ Sprawdzone na prawdziwych danych: wyciąg z samej paczki gry (bez
 | `valid_for_specific_type` + `entity_type` 1/2 toru = wariant bohatera/bohaterki | odczyt z danych (tory animacji `…_male` / `…_female`, różne teksty zwrotów); nie sprawdzony w grze |
 | pominięte identyfikatory tylko chińskie nie są wyświetlane w kliencie zachodnim | **hipoteza** |
 | tabele `__grey` to druga wersja tej samej tabeli | **hipoteza** z nazwy; ich teksty są w pakiecie |
-| łatka działa w grze, polskie znaki się wyświetlają | **nie sprawdzono** |
+| mała łatka (`latka_testowa.py` UI + prolog) przyjmowana przez grę, polskie znaki się wyświetlają | **fakt — potwierdzone w uruchomionej grze Steam (Windows)** |
+| pełne tłumaczenie fabularne i wrapper `patcher_wwm.py` w oknie gry | **jeszcze nie sprawdzone w grze** (czeka na zwrotkę tłumacza; format map identyczny) |

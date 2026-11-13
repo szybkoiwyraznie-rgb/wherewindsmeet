@@ -103,6 +103,6 @@ kompaktowanie skraca tabelę), ale zawartość tak.
 | tabela wpisów, offsety, teksty i warstwy `_diff` | odczytane, testy w `tests/test_locale_records.py` i `test_mapa_tekstow.py` |
 | zapis zwrotny (przepakowanie) | odczytany i sprawdzony na 8549 chunkach |
 | 1 124 787 wpisów mapy EN (baza + 2 warstwy `_diff`) | wyciągnięte, 0 błędów |
-| zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py` i `tools/apply_translation.py`; próba na realnych 3 plikach EN w piaskownicy |
+| zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py` i `tools/apply_translation.py`; mała łatka testowa (`latka_testowa.py` na mapie EN) zweryfikowana w realnej grze Steam (UI + prolog + polskie znaki działają) |
 | mówcy, powiązania tabel, kolejność scen | odczytane z bazy gry ([BAZA_GRY.md](BAZA_GRY.md), [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) |
-| limity pól interfejsu i przyjęcie w grze | **nieznane / nie sprawdzone w grze** (widoki podają długość EN) |
+| limity pól interfejsu i pełna fabuła w grze | **limity szerokości i pełne tłumaczenie nie sprawdzone jeszcze w grze** (widoki podają długość EN; pełna łatka czeka na zwrotkę) |

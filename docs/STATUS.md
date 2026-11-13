@@ -19,9 +19,15 @@ Przygotowano również **tryb cotygodniowej aktualizacji w zbieraczu**
 `tools/build_installer_kit.py`) oraz **plan małej próby UI i polskich znaków**
 ([TEST_W_GRZE.md](TEST_W_GRZE.md), `tools/latka_testowa.py`).
 
-**W grze nie sprawdzono niczego**: ani łatki, ani instalatora na prawdziwej
-instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
-żadnego przekładu (`tlumaczenie/` powstanie przy pierwszej zwrotce).
+**W grze zweryfikowano już pierwszy mały test (`tools/latka_testowa.py`):**
+klient Steam (Windows) przyjął przepisane mapy `translate_words_map_en*`
+w menu głównym, ustawieniach oraz napisach otwierającego prologu, a czcionki gry
+wyświetliły poprawnie wszystkie polskie znaki diakrytyczne
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Nie sprawdzono jeszcze w grze**
+pełnej fabuły (wciąż czekamy na pierwszą zwrotkę przekładu w `tlumaczenie/`),
+zachowania przy dużej aktualizacji Steam ani nowego samowystarczalnego
+wrappera `patcher_wwm.py` uruchomionego bezpośrednio na komputerze z grą
+(generuje ten sam format map binarnych i przeszedł testy Linux + Windows CI).
 
 ## Co wiadomo
 
@@ -68,20 +74,22 @@ instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
 | Repozytorium i workflow | Ponad 349 testów (Linux + Windows CI); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami — odczytane i sprawdzone na całości danych. |
 | Wyciąg i powiązania | `index/` w Git, deterministyczny, ze stałym podziałem plików. |
-| Pakiet tłumacza i Czytanki | Wersja v3 pakietu (`--tylko-z-en`, `index/`) i Czytanki `wwm-czytanki-v2` budują się **100% standalone z `index/`** (zero binarek gry). |
+| Pakiet tłumacza i Czytanki | Wersja v3 pakietu (`--tylko-z-en`, `index/`) i trzyplikowe Czytanki `wwm-czytanki-v2` (`epizody.md`, `kontekst_scen.md`, `dodatkowe.md` — 100% pokrycia) budują się **100% standalone z `index/`** (zero binarek gry). |
 | Import zwrotki | Gotowy i przetestowany (`tools/import_zwrotki.py`); czeka na pierwszą zwrotkę. |
-| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Sprawdzone w testach Linux + Windows CI na fikcyjnej instalacji; **nie sprawdzone w grze**. |
+| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` UI + prolog + polskie znaki) **zweryfikowana w uruchomionej grze Steam**; pełna łatka fabularna i wrapper `patcher_wwm.py` w realnym oknie gry czekają na test po zwrotce. |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
 ## Otwarte ustalenia
 
-1. **Test w grze** — najważniejsza niewiadoma. Mała łatka (kilka widocznych
-   napisów) pokaże, czy klient przyjmuje zmienione mapy, czy czcionki mają
-   polskie znaki i jak zachowuje się przy aktualizacji. Wymaga planu, kopii
-   oryginałów i sprawdzonego przywracania.
+1. **Test pełnej łatki i `patcher_wwm.py` w grze** — mała łatka UI + prolog
+   (`latka_testowa.py`) potwierdziła już przyjmowanie przepisanych map
+   `translate_words_map_en*` i poprawne wyświetlanie wszystkich polskich znaków
+   (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). Nadal czekają na test w oknie gry:
+   pełna fabuła po zwrotce tłumacza, nowy wrapper `patcher_wwm.py` na realnej
+   instalacji oraz zachowanie klienta po cotygodniowej aktualizacji Steam.
 2. **Który język klienta zastępujemy.** Łatka przepisuje pliki podane
-   w `--cel`; dotąd próbowano na mapie angielskiej.
+   w `--cel`; dotąd sprawdzono mapę angielską.
 3. **Chronologia** nie była sprawdzana w grze. 12 303 sceny bez wpisu zadania
    i 25 456 ułożonych według numeru czeka na lepsze źródło (skrypty `*.ets`
    zadań nie leżą w odczytanych tabelach).
@@ -99,9 +107,10 @@ instalacji Steam, ani polskich znaków, ani kolejności scen. Nie ma jeszcze
 
 ## Następny krok
 
-1. Wykonać pierwszy mały test UI i polskich znaków w grze według
-   [TEST_W_GRZE.md](TEST_W_GRZE.md) (przy użyciu `tools/latka_testowa.py`
-   i `instalator/ZAINSTALUJ.bat` / `PRZYWROC.bat`).
-2. Czekać na zwrotkę tłumacza → `tools/import_zwrotki.py` → commit `tlumaczenie/`.
+1. Czekać na zwrotkę tłumacza → `tools/import_zwrotki.py` → commit `tlumaczenie/`
+   → pełne Czytanki (`tools/buduj_czytanki.py`) i paczka standalone
+   (`tools/one_click_patch.py`).
+2. Opcjonalnie potwierdzić także w oknie gry paczkę standalone z
+   `tools/latka_testowa.py` (`patcher_wwm.py`, patrz [TEST_W_GRZE.md](TEST_W_GRZE.md)).
 3. Po każdym cotygodniowym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
