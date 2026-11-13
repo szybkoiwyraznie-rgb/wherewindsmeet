@@ -1,4 +1,4 @@
-﻿# WWM_ZBIERZ_DANE 1.0.0 — Windows PowerShell 5.1; odczyt gry, zapis tylko poza nia.
+﻿# WWM_ZBIERZ_DANE 1.3.0 — Windows PowerShell 5.1; odczyt gry, zapis tylko poza nia.
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)] [string] $GameRoot = '',
@@ -6,6 +6,12 @@ param(
     [string] $SteamRoot = '',
     [long] $PayloadLimitBytes = 94371840,
     [long] $ContextLimitBytes = 20971520,
+    [long] $LimitCzesciBajtow = 0,
+    [string] $KatalogStanu = '',
+    [ValidateSet('rozpoznanie', 'aktualizacja')] [string] $Tryb = 'rozpoznanie',
+    [switch] $BezMapyZh,
+    [switch] $PelnyZrzut,
+    [switch] $BezStanu,
     [switch] $NonInteractive
 )
 
@@ -185,22 +191,70 @@ function Is-PrivateName([string] $Name, [bool] $Directory) {
     return ($lower -match '(^|[._-])(password|passwd|token|cookie|secret|credential|auth|login|account|profile|session|chat|save|screenshot|crash|dump|log)([._-]|$)')
 }
 
+# Blacklista zbędnych plików w trybie aktualizacji (inne języki niż zh_cn/en, warianty mobilne/small,
+# binarki, audio/kamera/bulk_data nieużywane przy indeksowaniu i łatkach tekstowych).
+# Uwaga: pliki index* (index1001, index1200) MUSZĄ zostać — bez nich data* są nieczytelne.
+$script:BlacklistedUpdateSubdirs = @('model', 'bulk_data', 'other', 'shader', 'shaders', 'sound', 'sounds', 'audio', 'texture', 'textures', 'video', 'videos', 'movie', 'movies')
+$script:BlacklistedUpdateNames = @('camerazone.json', 'virtualwindow.json', 'voxel.json', 'audio_area', 'audio_area_bxx', 'audio_area_src', 'model_ppm', 'bulk_data.bin', '501_bulk_data.bin')
+$script:BlacklistedUpdateExtensionsRegex = '\.(exe|dll|so|dylib|sys|pdb|bin|pak|ucas|utoc|pck|mpk|mpkinfo|bnk|wem|sav|save|log|dmp|bak|pem|key|p12|pfx|env|lock|txt|json|db|db-shm|db-wal)$'
+$script:AllowedUpdateLocaleFiles = @('translate_words_map_zh_cn', 'translate_words_map_zh_cn_diff', 'translate_words_map_en', 'translate_words_map_en_diff')
+
+function Is-BlacklistedUpdateSubpath([string] $SubPath) {
+    $low = $SubPath.ToLowerInvariant().Replace('\', '/')
+    $firstSeg = ($low -split '/', 2)[0]
+    if ($script:BlacklistedUpdateSubdirs -contains $firstSeg) { return $true }
+    $leaf = [IO.Path]::GetFileName($low)
+    if ($script:BlacklistedUpdateNames -contains $leaf) { return $true }
+    if ($low -match $script:BlacklistedUpdateExtensionsRegex) { return $true }
+    if ($low -match '^locale/(.+)$') {
+        $locName = $Matches[1]
+        if ($script:AllowedUpdateLocaleFiles -notcontains $locName) { return $true }
+    }
+    return $false
+}
+
 function Candidate-ForFile($Item, [string] $Relative) {
     $name = $Item.Name.ToLowerInvariant()
     $kind = ''
     $priority = 99
-    if ($Item.Directory.Name -ieq 'locale' -and
-        $name -match '^translate_words_map_(en|zh_cn)(?:__small)?(?:_mobile)?(?:_diff)?$') {
-        if ($name -match '^translate_words_map_en') {
-            $kind = 'map_en'
-            if ($name -eq 'translate_words_map_en') { $priority = 0 }
-            elseif ($name -eq 'translate_words_map_en_diff') { $priority = 1 }
-            else { $priority = 2 }
-        } else { $kind = 'map_zh_cn'; $priority = 4 }
-    } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/MANIFEST$') {
-        $kind = 'manifest'; $priority = 3
-    } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/data(3|205)$') {
-        $kind = 'context_candidate'; $priority = 5
+    if ($Tryb -eq 'aktualizacja') {
+        if ($Item.Name -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { return }
+        if ($Relative -match '(?i)^LocalData/Patch/HD/(oversea|v2)/(.+)$') {
+            $sub = $Matches[2].ToLowerInvariant()
+            if (Is-BlacklistedUpdateSubpath $sub) { return }
+            if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 0 }
+            elseif ($sub -match '^locale/translate_words_map_(en|zh_cn)_diff$') { $kind = 'map_diff'; $priority = 0 }
+            elseif ($sub -eq 'locale/translate_words_map_zh_cn' -and (-not $BezMapyZh)) { $kind = 'map_zh_cn'; $priority = 0 }
+            elseif ($sub -eq 'locale/translate_words_map_en') { $kind = 'map_en'; $priority = 2 }
+            elseif ($sub -match '^data[0-9]+$') { $kind = 'db_data'; $priority = 0 }
+            elseif ($sub -match '^index[0-9]+$') { $kind = 'db_index'; $priority = 0 }
+            else { $kind = 'patch_other'; $priority = 1 }
+        } elseif ($Relative -match '(?i)^Package/HD/(oversea|v2)/(.+)$') {
+            $sub = $Matches[2].ToLowerInvariant()
+            if (Is-BlacklistedUpdateSubpath $sub) { return }
+            if ($sub -eq 'manifest') { $kind = 'manifest'; $priority = 1 }
+            elseif ($sub -match '^data(1001|1200)$') { $kind = 'db_data'; $priority = 1 }
+            elseif ($sub -match '^index(1001|1200)$') { $kind = 'db_index'; $priority = 1 }
+            elseif ($sub -match '^locale/translate_words_map_(zh_cn|en)_diff$') { $kind = 'map_diff'; $priority = 1 }
+            elseif ($sub -eq 'locale/translate_words_map_zh_cn' -and (-not $BezMapyZh)) { $kind = 'map_zh_cn'; $priority = 2 }
+            elseif ($sub -eq 'locale/translate_words_map_en') { $kind = 'map_en'; $priority = 2 }
+            elseif ($sub -match '^data[0-9]+$') { $kind = 'db_data'; $priority = 3 }
+            elseif ($sub -match '^index[0-9]+$') { $kind = 'db_index'; $priority = 3 }
+        }
+    } else {
+        if ($Item.Directory.Name -ieq 'locale' -and
+            $name -match '^translate_words_map_(en|zh_cn)(?:__small)?(?:_mobile)?(?:_diff)?$') {
+            if ($name -match '^translate_words_map_en') {
+                $kind = 'map_en'
+                if ($name -eq 'translate_words_map_en') { $priority = 0 }
+                elseif ($name -eq 'translate_words_map_en_diff') { $priority = 1 }
+                else { $priority = 2 }
+            } else { $kind = 'map_zh_cn'; $priority = 4 }
+        } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/MANIFEST$') {
+            $kind = 'manifest'; $priority = 3
+        } elseif ($Relative -match '(?i)^(Package|LocalData/Patch)/HD/(oversea|v2)/data(3|205)$') {
+            $kind = 'context_candidate'; $priority = 5
+        }
     }
     if ($kind) {
         [void] $script:Candidates.Add([pscustomobject]@{
@@ -211,22 +265,41 @@ function Candidate-ForFile($Item, [string] $Relative) {
 }
 
 function Inspect-KnownLocations {
-    foreach ($directory in @('Package/HD/oversea/locale', 'LocalData/Patch/HD/oversea/locale')) {
-        foreach ($name in @('translate_words_map_en', 'translate_words_map_en_diff', 'translate_words_map_en__small', 'translate_words_map_en__small_diff')) {
-            $relative = $directory + '/' + $name
-            $full = Join-Path $script:RootPath ($relative.Replace('/', '\'))
-            $status = 'not_found_or_unavailable'
-            try {
-                $parent = [IO.Path]::GetDirectoryName($full)
-                Assert-NoReparseAncestors $parent
-                $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
-                # Some providers return no item without raising even with -ErrorAction Stop.
-                if ($null -eq $item) { $status = 'not_found_or_unavailable' }
-                elseif (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
-                elseif (-not $item.PSIsContainer) { $status = 'present' }
-            } catch { }
-            [void] $script:Expected.Add([pscustomobject]@{ path = $relative; status = $status })
-        }
+    $targets = if ($Tryb -eq 'aktualizacja') {
+        @(
+            'LocalData/Patch/HD/oversea/MANIFEST',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff',
+            'Package/HD/oversea/MANIFEST',
+            'Package/HD/oversea/locale/translate_words_map_zh_cn',
+            'Package/HD/oversea/locale/translate_words_map_zh_cn_diff',
+            'Package/HD/oversea/locale/translate_words_map_en_diff'
+        )
+    } else {
+        @(
+            'Package/HD/oversea/locale/translate_words_map_en',
+            'Package/HD/oversea/locale/translate_words_map_en_diff',
+            'Package/HD/oversea/locale/translate_words_map_en__small',
+            'Package/HD/oversea/locale/translate_words_map_en__small_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en__small',
+            'LocalData/Patch/HD/oversea/locale/translate_words_map_en__small_diff'
+        )
+    }
+    foreach ($relative in $targets) {
+        $full = Join-Path $script:RootPath ($relative.Replace('/', '\'))
+        $status = 'not_found_or_unavailable'
+        try {
+            $parent = [IO.Path]::GetDirectoryName($full)
+            Assert-NoReparseAncestors $parent
+            $item = Get-Item -LiteralPath $full -Force -ErrorAction Stop
+            # Some providers return no item without raising even with -ErrorAction Stop.
+            if ($null -eq $item) { $status = 'not_found_or_unavailable' }
+            elseif (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { $status = 'reparse_skipped' }
+            elseif (-not $item.PSIsContainer) { $status = 'present' }
+        } catch { }
+        [void] $script:Expected.Add([pscustomobject]@{ path = $relative; status = $status })
     }
 }
 
@@ -327,13 +400,127 @@ function Copy-Verified([string] $Source, [string] $Destination, [long] $Expected
     return $sourceHash
 }
 
+function Write-ZipFromDirectory([string] $SourceDir, [string] $TempPath, [string] $DestPath) {
+    # Build the archive entry by entry so member names always use "/".
+    # .NET Framework (Windows PowerShell 5.1) writes "\\" separators with
+    # CreateFromDirectory, which violates the ZIP spec and breaks readers.
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zipStream = [IO.File]::Open($TempPath, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try {
+        $zip = New-Object System.IO.Compression.ZipArchive($zipStream, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            $dirPrefix = $SourceDir.TrimEnd('\')
+            $stageFiles = @(Get-ChildItem -LiteralPath $dirPrefix -Recurse -File -Force | Sort-Object -Property FullName)
+            foreach ($file in $stageFiles) {
+                $entryName = $file.FullName.Substring($dirPrefix.Length + 1).Replace('\', '/')
+                if ([string]::IsNullOrWhiteSpace($entryName) -or $entryName.StartsWith('/') -or $entryName.Contains('\\') -or $entryName.Contains('..')) {
+                    throw 'Niepoprawna nazwa wpisu w archiwum.'
+                }
+                $entry = $zip.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
+                $entryStream = $entry.Open()
+                try {
+                    $sourceStream = [IO.File]::Open($file.FullName, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+                    try { $sourceStream.CopyTo($entryStream) } finally { $sourceStream.Dispose() }
+                } finally { $entryStream.Dispose() }
+            }
+        } finally { $zip.Dispose() }
+    } finally { $zipStream.Dispose() }
+    Move-Item -LiteralPath $TempPath -Destination $DestPath -ErrorAction Stop
+}
+
+function Assert-StateDirectorySafe([string] $DirPath, [string] $GameRootPath) {
+    $full = [IO.Path]::GetFullPath($DirPath).TrimEnd('\')
+    if ($full -ieq $GameRootPath -or $full.StartsWith($GameRootPath + '\', [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Katalog stanu wyslanych plikow nie moze lezec w katalogu gry.'
+    }
+    $probe = $full
+    while ($probe -and -not (Test-Path -LiteralPath $probe)) {
+        $parent = [IO.Path]::GetDirectoryName($probe)
+        if ($parent -eq $probe) { break }
+        $probe = $parent
+    }
+    if ($probe -and (Test-Path -LiteralPath $probe)) {
+        Assert-NoReparseAncestors $probe
+    }
+    return $full
+}
+
+function Load-SentState([string] $StateFile) {
+    $map = @{}
+    if (-not (Test-Path -LiteralPath $StateFile -PathType Leaf)) { return $map }
+    try {
+        $raw = [IO.File]::ReadAllText($StateFile, [System.Text.Encoding]::UTF8)
+        $parsed = $raw | ConvertFrom-Json -ErrorAction Stop
+        if ($null -ne $parsed -and $parsed.format -eq 'wwm-collector-state-v1' -and $null -ne $parsed.files) {
+            foreach ($prop in $parsed.files.PSObject.Properties) {
+                $entry = $prop.Value
+                if ($null -ne $entry -and $entry.path -and $entry.sha256) {
+                    $map[$prop.Name.ToLowerInvariant()] = [pscustomobject]@{
+                        path = [string] $entry.path
+                        bytes = [long] $entry.bytes
+                        sha256 = ([string] $entry.sha256).ToLowerInvariant()
+                        archive = [string] $entry.archive
+                        updated_utc = [string] $entry.updated_utc
+                    }
+                }
+            }
+        }
+    } catch {
+        Write-Host 'UWAGA: nie udalo sie wczytac poprzedniego pliku stanu; wykonuje pelny zrzut od nowa.'
+        $backup = $StateFile + '.broken_' + [DateTime]::Now.ToString('yyyyMMdd_HHmmss')
+        try { Move-Item -LiteralPath $StateFile -Destination $backup -Force -ErrorAction SilentlyContinue } catch { }
+        $map = @{}
+    }
+    return $map
+}
+
+function Save-SentState([string] $StateDir, [string] $StateFile, [hashtable] $StateMap, [string] $BatchId, [string[]] $Archives) {
+    if (-not (Test-Path -LiteralPath $StateDir)) {
+        [void] [IO.Directory]::CreateDirectory($StateDir)
+    }
+    Assert-NoReparseAncestors $StateDir
+    $orderedFiles = [ordered]@{}
+    foreach ($k in @($StateMap.Keys | Sort-Object)) {
+        $v = $StateMap[$k]
+        $orderedFiles[$k] = [pscustomobject]@{
+            path = $v.path
+            bytes = [long] $v.bytes
+            sha256 = $v.sha256
+            archive = $v.archive
+            updated_utc = $v.updated_utc
+        }
+    }
+    $payload = [ordered]@{
+        format = 'wwm-collector-state-v1'
+        updated_utc = [DateTime]::UtcNow.ToString('o')
+        last_batch_id = $BatchId
+        archives = @($Archives)
+        files = $orderedFiles
+    }
+    $tmpState = Join-Path $StateDir ('stan_wyslanych.json.' + $BatchId + '.tmp')
+    $json = $payload | ConvertTo-Json -Depth 6
+    [IO.File]::WriteAllText($tmpState, $json, $script:Utf8)
+    if (Test-Path -LiteralPath $StateFile -PathType Leaf) {
+        [IO.File]::Delete($StateFile)
+    }
+    Move-Item -LiteralPath $tmpState -Destination $StateFile -ErrorAction Stop
+}
+
 $stage = ''
 $tempZip = ''
+$tempZipList = New-Object 'System.Collections.Generic.List[string]'
 $stageCreated = $false
 try {
     if ($PSVersionTable.PSVersion.Major -lt 5) { throw 'Potrzebny Windows PowerShell 5.1 lub nowszy.' }
-    if ($script:MaxPayload -lt 1 -or $script:MaxPayload -gt 94371840 -or $script:MaxContext -lt 0 -or $script:MaxContext -gt 20971520) {
-        throw 'Niedozwolony limit zbierania.'
+    if ($Tryb -eq 'rozpoznanie') {
+        if ($script:MaxPayload -lt 1 -or $script:MaxPayload -gt 94371840 -or $script:MaxContext -lt 0 -or $script:MaxContext -gt 20971520) {
+            throw 'Niedozwolony limit zbierania.'
+        }
+    } else {
+        if ($script:MaxPayload -lt 1 -or $script:MaxPayload -gt 104857600 -or $LimitCzesciBajtow -lt 0) {
+            throw 'Niedozwolony limit zbierania.'
+        }
     }
     if (-not $GameRoot) { $GameRoot = Choose-GameRoot }
     if (-not (Is-GameRoot $GameRoot)) { throw 'Niepoprawny folder gry. Wskaz glowny folder z Package albo LocalData\Patch.' }
@@ -348,23 +535,317 @@ try {
     if ($output -ieq $script:RootPath -or $output.StartsWith($script:RootPath + '\', [StringComparison]::OrdinalIgnoreCase)) {
         throw 'Folder wynikowy musi znajdowac sie poza instalacja gry.'
     }
+
+    $stateEnabled = ($Tryb -eq 'aktualizacja' -and (-not $BezStanu))
+    $stateDir = ''
+    $stateFile = ''
+    if ($stateEnabled) {
+        if ([string]::IsNullOrWhiteSpace($KatalogStanu)) {
+            $localApp = [Environment]::GetFolderPath('LocalApplicationData')
+            if (-not [string]::IsNullOrWhiteSpace($localApp)) {
+                $KatalogStanu = Join-Path $localApp 'WWM_ZBIERACZ_STAN'
+            } else {
+                $KatalogStanu = Join-Path $PSScriptRoot 'stan'
+            }
+        }
+        $stateDir = Assert-StateDirectorySafe $KatalogStanu $script:RootPath
+        $stateFile = Join-Path $stateDir 'stan_wyslanych.json'
+    }
+
     $stamp = [DateTime]::Now.ToString('yyyyMMdd_HHmmss') + '_' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
+    $prefix = if ($Tryb -eq 'aktualizacja') { 'WWM_AKTUALIZACJA_' } else { 'WWM_DANE_' }
     $stage = Join-Path $output ('.WWM_ZBIERANIE_' + $stamp)
-    $tempZip = Join-Path $output ('WWM_DANE_' + $stamp + '.zip.tmp')
-    $finalZip = Join-Path $output ('WWM_DANE_' + $stamp + '.zip')
-    if ((Test-Path -LiteralPath $stage) -or (Test-Path -LiteralPath $tempZip) -or (Test-Path -LiteralPath $finalZip)) { throw 'Kolizja nazwy wyniku. Uruchom ponownie.' }
+    if (Test-Path -LiteralPath $stage) { throw 'Kolizja nazwy wyniku. Uruchom ponownie.' }
     [void] [IO.Directory]::CreateDirectory($stage)
     $stageCreated = $true
-    [void] [IO.Directory]::CreateDirectory((Join-Path $stage 'pliki'))
+    $inventoryPath = Join-Path $stage 'INWENTARZ.jsonl'
 
-    Write-Host 'Zbieram inwentarz i wybrane pliki. To moze potrwac kilka minut.'
+    Write-Host 'Zbieram inwentarz i sprawdzam wybrane pliki. To moze potrwac chwile.'
     Write-Host 'Gra nie jest modyfikowana. Nie zamykaj tego okna.'
     Inspect-KnownLocations
-    $writer = [IO.StreamWriter]::new((Join-Path $stage 'INWENTARZ.jsonl'), $false, $script:Utf8)
+    $writer = [IO.StreamWriter]::new($inventoryPath, $false, $script:Utf8)
     try {
         Scan-Tree 'Package' $writer
         Scan-Tree 'LocalData/Patch' $writer
     } finally { $writer.Dispose() }
+
+    $unsortedCandidates = $script:Candidates.ToArray()
+    $candidates = @($unsortedCandidates | Sort-Object -Property @('Priority', 'Relative'))
+    $steamBuildId = Read-BuildForGame $script:RootPath
+
+    if ($Tryb -eq 'aktualizacja') {
+        $prevStateMap = if ($stateEnabled) { Load-SentState $stateFile } else { @{} }
+        $toSend = New-Object 'System.Collections.Generic.List[object]'
+        $unchangedRecords = New-Object 'System.Collections.Generic.List[object]'
+        $unchangedBytes = [long] 0
+        $hashErrors = New-Object 'System.Collections.Generic.List[object]'
+        $currentKeySet = @{}
+
+        foreach ($candidate in $candidates) {
+            $relKey = $candidate.Relative.ToLowerInvariant()
+            $currentKeySet[$relKey] = $true
+            try {
+                $hash = Stable-Hash $candidate.FullName $candidate.Size
+            } catch {
+                [void] $hashErrors.Add([pscustomobject]@{
+                    source = $candidate.Relative; kind = $candidate.Kind; bytes = $candidate.Size
+                    status = 'error'; sha256 = $null; stored_as = $null; reason = 'unreadable_or_changed'
+                })
+                continue
+            }
+            $isUnchanged = $false
+            if ($stateEnabled -and (-not $PelnyZrzut) -and $prevStateMap.ContainsKey($relKey)) {
+                $prev = $prevStateMap[$relKey]
+                if ($prev.bytes -eq $candidate.Size -and $prev.sha256 -eq $hash) {
+                    $isUnchanged = $true
+                    $unchangedBytes += $candidate.Size
+                    [void] $unchangedRecords.Add([pscustomobject]@{
+                        source = $candidate.Relative
+                        bytes = $candidate.Size
+                        sha256 = $hash
+                        archive = $prev.archive
+                    })
+                }
+            }
+            if (-not $isUnchanged) {
+                [void] $toSend.Add([pscustomobject]@{
+                    FullName = $candidate.FullName; Relative = $candidate.Relative; Name = $candidate.Name
+                    Size = $candidate.Size; Kind = $candidate.Kind; Priority = $candidate.Priority; Sha256 = $hash
+                })
+            }
+        }
+
+        $removedPaths = New-Object 'System.Collections.Generic.List[string]'
+        $baseArchivesMap = @{}
+        foreach ($u in $unchangedRecords) {
+            if ($u.archive) { $baseArchivesMap[$u.archive] = $true }
+        }
+        $baseArchives = @($baseArchivesMap.Keys | Sort-Object)
+        if ($stateEnabled) {
+            foreach ($k in $prevStateMap.Keys) {
+                if (-not $currentKeySet.ContainsKey($k)) {
+                    if ($BezMapyZh -and $k -match '/locale/translate_words_map_zh_cn$') { continue }
+                    [void] $removedPaths.Add($prevStateMap[$k].path)
+                }
+            }
+        }
+
+        if ($toSend.Count -eq 0) {
+            if ($hashErrors.Count -gt 0 -or $script:Problems.Count -gt 0) {
+                throw 'Wystapily problemy podczas odczytu plikow aktualizacji. Sprawdz czy gra jest zamknieta.'
+            }
+            if ($stateEnabled -and $removedPaths.Count -gt 0 -and (-not $script:InventoryLimited)) {
+                foreach ($rmPath in $removedPaths) {
+                    [void] $prevStateMap.Remove($rmPath.ToLowerInvariant())
+                }
+                Save-SentState $stateDir $stateFile $prevStateMap $stamp @()
+            }
+            Write-Host ''
+            Write-Host ('Brak nowych ani zmienionych plikow od ostatniej wysylki (pominieto {0} niezmienionych plikow).' -f $unchangedRecords.Count)
+            if ($stateEnabled) { Write-Host ('Stan wyslanych: ' + $stateFile) }
+            Write-Host 'Nie utworzono nowego ZIP-a. Aby wymusic pelny zrzut, uruchom z parametrem -PelnyZrzut.'
+            exit 0
+        }
+
+        $seenSendHashes = @{}
+        $uniqueSendBytes = [long] 0
+        foreach ($cand in $toSend) {
+            if (-not $seenSendHashes.ContainsKey($cand.Sha256)) {
+                $seenSendHashes[$cand.Sha256] = $true
+                $uniqueSendBytes += $cand.Size
+            }
+        }
+
+        $singleThreshold = if ($LimitCzesciBajtow -gt 0) { $LimitCzesciBajtow } else { $script:MaxPayload }
+        $partLimit = if ($LimitCzesciBajtow -gt 0) { $LimitCzesciBajtow } else { [Math]::Min($script:MaxPayload, [long]89128960) }
+
+        $partGroups = New-Object 'System.Collections.Generic.List[object]'
+        if ($uniqueSendBytes -le $singleThreshold) {
+            [void] $partGroups.Add([pscustomobject]@{ Items = $toSend.ToArray() })
+        } else {
+            $curItems = New-Object 'System.Collections.Generic.List[object]'
+            $curHashes = @{}
+            $curBytes = [long] 0
+            foreach ($cand in $toSend) {
+                $addBytes = if ($curHashes.ContainsKey($cand.Sha256)) { [long]0 } else { $cand.Size }
+                if ($curItems.Count -gt 0 -and ($curBytes + $addBytes -gt $partLimit)) {
+                    [void] $partGroups.Add([pscustomobject]@{ Items = $curItems.ToArray() })
+                    $curItems = New-Object 'System.Collections.Generic.List[object]'
+                    $curHashes = @{}
+                    $curBytes = [long] 0
+                    $addBytes = $cand.Size
+                }
+                [void] $curItems.Add($cand)
+                $curHashes[$cand.Sha256] = $true
+                $curBytes += $addBytes
+            }
+            if ($curItems.Count -gt 0) {
+                [void] $partGroups.Add([pscustomobject]@{ Items = $curItems.ToArray() })
+            }
+        }
+
+        $totalParts = $partGroups.Count
+        $createdZips = New-Object 'System.Collections.Generic.List[object]'
+        $committedToState = New-Object 'System.Collections.Generic.List[object]'
+        $anyPartial = $false
+
+        for ($pIdx = 0; $pIdx -lt $totalParts; $pIdx++) {
+            $partNo = $pIdx + 1
+            $partItems = $partGroups[$pIdx].Items
+            $partDir = Join-Path $stage ('part_' + $partNo)
+            $partPliki = Join-Path $partDir 'pliki'
+            [void] [IO.Directory]::CreateDirectory($partPliki)
+            Copy-Item -LiteralPath $inventoryPath -Destination (Join-Path $partDir 'INWENTARZ.jsonl') -Force
+
+            $zipName = if ($totalParts -eq 1) { $prefix + $stamp + '.zip' } else { '{0}{1}_czesc{2}.zip' -f $prefix, $stamp, $partNo }
+            $finalPartZip = Join-Path $output $zipName
+            $tempPartZip = Join-Path $output ($zipName + '.tmp')
+            if ((Test-Path -LiteralPath $finalPartZip) -or (Test-Path -LiteralPath $tempPartZip)) { throw 'Kolizja nazwy wyniku. Uruchom ponownie.' }
+            [void] $tempZipList.Add($tempPartZip)
+
+            $partRecords = New-Object 'System.Collections.Generic.List[object]'
+            $partObjects = @{}
+            $partPayloadBytes = [long] 0
+            $partSeq = 0
+
+            foreach ($cand in $partItems) {
+                $partSeq++
+                $rec = [ordered]@{ source = $cand.Relative; kind = $cand.Kind; bytes = $cand.Size; status = ''; sha256 = $null; stored_as = $null; reason = $null }
+                $storedName = ('{0:D6}_{1}' -f $partSeq, $cand.Name)
+                $storedRel = 'pliki/' + $storedName
+                $destFile = Join-Path $partPliki $storedName
+                try {
+                    $hash = Copy-Verified $cand.FullName $destFile $cand.Size
+                    if ($partObjects.ContainsKey($hash)) {
+                        [IO.File]::Delete($destFile)
+                        $rec.status = 'duplicate'; $rec.stored_as = $partObjects[$hash]
+                    } else {
+                        $partObjects[$hash] = $storedRel
+                        $rec.status = 'copied'; $rec.stored_as = $storedRel
+                        $partPayloadBytes += $cand.Size
+                    }
+                    $rec.sha256 = $hash
+                    [void] $committedToState.Add([pscustomobject]@{
+                        path = $cand.Relative; bytes = $cand.Size; sha256 = $hash; archive = $zipName
+                    })
+                } catch {
+                    if (Test-Path -LiteralPath $destFile -PathType Leaf) { [IO.File]::Delete($destFile) }
+                    $rec.status = 'error'; $rec.reason = 'unreadable_or_changed'
+                }
+                [void] $partRecords.Add([pscustomobject] $rec)
+            }
+
+            if ($partNo -eq 1 -and $hashErrors.Count -gt 0) {
+                foreach ($herr in $hashErrors) { [void] $partRecords.Add($herr) }
+            }
+
+            $partCopied = @($partRecords.ToArray() | Where-Object { $_.status -in @('copied', 'duplicate') })
+            $partFailed = @($partRecords.ToArray() | Where-Object { $_.status -in @('error', 'skipped_limit') })
+            $partStatus = if ($script:Problems.Count -gt 0 -or $partFailed.Count -gt 0 -or $partCopied.Count -eq 0) { 'partial' } else { 'collected' }
+            if ($partStatus -eq 'partial') { $anyPartial = $true }
+
+            $limList = @(
+                'Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.',
+                'Update mode tracks previously sent file SHA-256 hashes in local state (unless -BezStanu/-PelnyZrzut) and packs only new or changed allowed files, excluding blacklisted languages (__small/_mobile and non-en/zh_cn) and non-DB assets.',
+                'When changed unique payload exceeds the single-archive threshold, it automatically splits into numbered parts.',
+                'Hashes identify the read bytes, not authenticity or an atomic snapshot.'
+            )
+            $report = [ordered]@{
+                format = 'wwm-collection-v2'; collector_version = '1.3.0'; mode = 'aktualizacja'; created_utc = [DateTime]::UtcNow.ToString('o')
+                status = $partStatus; steam_app_id = '3564740'; steam_build_id = $steamBuildId
+                batch = [ordered]@{ id = $stamp; part = $partNo; parts = $totalParts; split = ($totalParts -gt 1) }
+                state = [ordered]@{
+                    enabled = $stateEnabled; full_snapshot = [bool]$PelnyZrzut; state_path_redacted = $true
+                    sent_files = $toSend.Count; sent_bytes = $uniqueSendBytes
+                    unchanged_files = $unchangedRecords.Count; unchanged_bytes = $unchangedBytes
+                    removed_since_last = @($removedPaths.ToArray()); base_archives = @($baseArchives)
+                    unchanged = @($unchangedRecords.ToArray())
+                }
+                inventory = [ordered]@{ path = 'INWENTARZ.jsonl'; files = $script:InventoryCount; max_entries = $script:MaxEntries; limited = $script:InventoryLimited; skipped_private_directories = $script:SkippedPrivateDirectories; skipped_private_files = $script:SkippedPrivateFiles }
+                scan_roots = @($script:ScannedRoots.ToArray()); expected = @($script:Expected.ToArray())
+                payload_limit_bytes = $partLimit; single_archive_limit_bytes = $singleThreshold; context_limit_bytes = $script:MaxContext; payload_bytes = $partPayloadBytes
+                files = @($partRecords.ToArray()); problems = @($script:Problems.ToArray())
+                limitations = $limList
+            }
+            [IO.File]::WriteAllText((Join-Path $partDir 'RAPORT.json'), ($report | ConvertTo-Json -Depth 8), $script:Utf8)
+            $summary = @(
+                ('Where Winds Meet - wynik zbieracza 1.3.0 (czesc {0}/{1})' -f $partNo, $totalParts),
+                ('Stan: ' + $partStatus),
+                ('Plikow w inwentarzu: ' + $script:InventoryCount),
+                ('Wysylanych w tej czesci: ' + $partRecords.Count + '; pominietych jako niezmienione: ' + $unchangedRecords.Count + '; bledow/pominietych przez limit: ' + $partFailed.Count),
+                ('Problemow odczytu/skanowania: ' + $script:Problems.Count),
+                ('Bajtow unikalnych plikow w tej czesci: ' + $partPayloadBytes),
+                '',
+                'RAPORT.json zawiera liste plikow, SHA-256, powody brakow, odwolania do niezmienionych plikow oraz znane ograniczenia.',
+                'INWENTARZ.jsonl zawiera wzgledne nazwy, rozmiary i daty plikow w skanowanych galeziach.',
+                'Nazwy i zawartosc moga byc prywatne. Przejrzyj je przed udostepnieniem.',
+                'To nie dowod kompletnosci tekstow ani kontekstu. Nie zawiera celowo zapisow gry ani hasel.'
+            ) -join "`r`n"
+            [IO.File]::WriteAllText((Join-Path $partDir 'RAPORT.txt'), $summary + "`r`n", $script:Utf8)
+            Write-ZipFromDirectory $partDir $tempPartZip $finalPartZip
+            $zipItem = Get-Item -LiteralPath $finalPartZip -Force
+            $zipHash = Get-Sha256 $finalPartZip
+            [void] $createdZips.Add([pscustomobject]@{ Path = $finalPartZip; Name = $zipName; Bytes = $zipItem.Length; Sha256 = $zipHash })
+        }
+
+        if ($stateEnabled) {
+            $nowUtc = [DateTime]::UtcNow.ToString('o')
+            $nextStateMap = @{}
+            if (-not $PelnyZrzut) {
+                foreach ($u in $unchangedRecords) {
+                    $k = $u.source.ToLowerInvariant()
+                    if ($prevStateMap.ContainsKey($k)) { $nextStateMap[$k] = $prevStateMap[$k] }
+                }
+                if ($hashErrors.Count -gt 0 -or $script:Problems.Count -gt 0 -or $script:InventoryLimited) {
+                    foreach ($k in $prevStateMap.Keys) {
+                        if (-not $nextStateMap.ContainsKey($k)) { $nextStateMap[$k] = $prevStateMap[$k] }
+                    }
+                }
+            }
+            foreach ($cm in $committedToState) {
+                $k = $cm.path.ToLowerInvariant()
+                $nextStateMap[$k] = [pscustomobject]@{
+                    path = $cm.path; bytes = [long] $cm.bytes; sha256 = $cm.sha256; archive = $cm.archive; updated_utc = $nowUtc
+                }
+            }
+            $archiveNames = @($createdZips.ToArray() | ForEach-Object { $_.Name })
+            Save-SentState $stateDir $stateFile $nextStateMap $stamp $archiveNames
+        }
+
+        Write-Host ''
+        if ($unchangedRecords.Count -gt 0) {
+            Write-Host ('Pominieto niezmienione pliki: {0} ({1:N1} MB)' -f $unchangedRecords.Count, ($unchangedBytes / 1MB))
+        }
+        $oversizeWarning = $false
+        for ($i = 0; $i -lt $createdZips.Count; $i++) {
+            $z = $createdZips[$i]
+            if ($createdZips.Count -eq 1) {
+                Write-Host ('ZIP: ' + $z.Path)
+            } else {
+                Write-Host ('ZIP ({0}/{1}): {2}' -f ($i + 1), $createdZips.Count, $z.Path)
+            }
+            Write-Host ('Bajty: ' + $z.Bytes + '  SHA-256: ' + $z.Sha256)
+            if ($z.Bytes -gt 104857600) { $oversizeWarning = $true }
+        }
+        if ($stateEnabled) { Write-Host ('Stan wyslanych zapisany w: ' + $stateFile) }
+        if ($oversizeWarning) { Write-Host 'UWAGA: ktorys z plikow ZIP przekracza limit pobrania 100 MiB. Napisz o tym przed wyslaniem.' }
+        if ($anyPartial) {
+            Write-Host 'UWAGA: wynik niepelny. Mimo to wyslij ZIP; RAPORT.json pokazuje dlaczego.'
+            exit 2
+        }
+        if ($createdZips.Count -eq 1) {
+            Write-Host 'Gotowe. Wgraj ten jeden ZIP na Dysk Google i napisz, ze jest.'
+        } else {
+            Write-Host ('Gotowe. Powstalo {0} czesci ZIP. Wgraj wszystkie na Dysk Google i napisz, ze sa.' -f $createdZips.Count)
+        }
+        exit 0
+    }
+
+    [void] [IO.Directory]::CreateDirectory((Join-Path $stage 'pliki'))
+    $tempZip = Join-Path $output ($prefix + $stamp + '.zip.tmp')
+    $finalZip = Join-Path $output ($prefix + $stamp + '.zip')
+    if ((Test-Path -LiteralPath $tempZip) -or (Test-Path -LiteralPath $finalZip)) { throw 'Kolizja nazwy wyniku. Uruchom ponownie.' }
+    [void] $tempZipList.Add($tempZip)
 
     $records = New-Object 'System.Collections.Generic.List[object]'
     $objects = @{}
@@ -372,8 +853,6 @@ try {
     $payloadBytes = [long] 0
     $contextBytes = [long] 0
     $sequence = 0
-    $unsortedCandidates = $script:Candidates.ToArray()
-    $candidates = @($unsortedCandidates | Sort-Object -Property @('Priority', 'Relative'))
     foreach ($candidate in $candidates) {
         $sequence++
         $record = [ordered]@{ source = $candidate.Relative; kind = $candidate.Kind; bytes = $candidate.Size; status = ''; sha256 = $null; stored_as = $null; reason = $null }
@@ -416,17 +895,19 @@ try {
         [void] $records.Add([pscustomobject] $record)
     }
 
-    $enMaps = @($records.ToArray() | Where-Object { $_.kind -eq 'map_en' -and $_.status -in @('copied', 'duplicate') })
+    $copiedMaps = @($records.ToArray() | Where-Object { $_.status -in @('copied', 'duplicate') })
+    $enMaps = @($copiedMaps | Where-Object { $_.kind -eq 'map_en' })
     $failed = @($records.ToArray() | Where-Object { $_.status -in @('error', 'skipped_limit') })
     $status = if ($script:Problems.Count -gt 0 -or $failed.Count -gt 0 -or $enMaps.Count -eq 0) { 'partial' } else { 'collected' }
+    $limList = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Only named English/Chinese maps, manifests and bounded data3/data205 candidates are copied.', 'The inventory and named candidates do not establish text or story-context completeness.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
     $report = [ordered]@{
-        format = 'wwm-collection-v1'; collector_version = '1.0.0'; created_utc = [DateTime]::UtcNow.ToString('o')
-        status = $status; steam_app_id = '3564740'; steam_build_id = (Read-BuildForGame $script:RootPath)
+        format = 'wwm-collection-v1'; collector_version = '1.0.0'; mode = $Tryb; created_utc = [DateTime]::UtcNow.ToString('o')
+        status = $status; steam_app_id = '3564740'; steam_build_id = $steamBuildId
         inventory = [ordered]@{ path = 'INWENTARZ.jsonl'; files = $script:InventoryCount; max_entries = $script:MaxEntries; limited = $script:InventoryLimited; skipped_private_directories = $script:SkippedPrivateDirectories; skipped_private_files = $script:SkippedPrivateFiles }
         scan_roots = @($script:ScannedRoots.ToArray()); expected = @($script:Expected.ToArray())
         payload_limit_bytes = $script:MaxPayload; context_limit_bytes = $script:MaxContext; payload_bytes = $payloadBytes
         files = @($records.ToArray()); problems = @($script:Problems.ToArray())
-        limitations = @('Only Package and LocalData/Patch are inventoried, excluding sensitive names and reparse points.', 'Only named English/Chinese maps, manifests and bounded data3/data205 candidates are copied.', 'The inventory and named candidates do not establish text or story-context completeness.', 'Hashes identify the read bytes, not authenticity or an atomic snapshot.')
+        limitations = $limList
     }
     [IO.File]::WriteAllText((Join-Path $stage 'RAPORT.json'), ($report | ConvertTo-Json -Depth 8), $script:Utf8)
     $summary = @(
@@ -443,32 +924,7 @@ try {
         'To nie dowod kompletnosci tekstow ani kontekstu. Nie zawiera celowo zapisow gry ani hasel.'
     ) -join "`r`n"
     [IO.File]::WriteAllText((Join-Path $stage 'RAPORT.txt'), $summary + "`r`n", $script:Utf8)
-    # Build the archive entry by entry so member names always use "/".
-    # .NET Framework (Windows PowerShell 5.1) writes "\\" separators with
-    # CreateFromDirectory, which violates the ZIP spec and breaks readers.
-    Add-Type -AssemblyName System.IO.Compression
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $zipStream = [IO.File]::Open($tempZip, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
-    try {
-        $zip = New-Object System.IO.Compression.ZipArchive($zipStream, [System.IO.Compression.ZipArchiveMode]::Create)
-        try {
-            $stageFiles = @(Get-ChildItem -LiteralPath $stage -Recurse -File -Force | Sort-Object -Property FullName)
-            foreach ($file in $stageFiles) {
-                $entryName = $file.FullName.Substring($stage.Length + 1).Replace('\', '/')
-                if ([string]::IsNullOrWhiteSpace($entryName) -or $entryName.StartsWith('/') -or $entryName.Contains('\\') -or $entryName.Contains('..')) {
-                    throw 'Niepoprawna nazwa wpisu w archiwum.'
-                }
-                $entry = $zip.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
-                $entryStream = $entry.Open()
-                try {
-                    $sourceStream = [IO.File]::Open($file.FullName, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
-                    try { $sourceStream.CopyTo($entryStream) } finally { $sourceStream.Dispose() }
-                } finally { $entryStream.Dispose() }
-            }
-        } finally { $zip.Dispose() }
-    } finally { $zipStream.Dispose() }
-    Move-Item -LiteralPath $tempZip -Destination $finalZip -ErrorAction Stop
-    $tempZip = ''
+    Write-ZipFromDirectory $stage $tempZip $finalZip
     $zipItem = Get-Item -LiteralPath $finalZip -Force
     $zipHash = (Get-Sha256 $finalZip)
     Write-Host ''
@@ -487,7 +943,9 @@ try {
     Write-Host 'Nie wysylaj nieukonczonego wyniku; napisz, jaki blad sie pojawil.'
     exit 1
 } finally {
-    if ($tempZip -and (Test-Path -LiteralPath $tempZip -PathType Leaf)) { Remove-Item -LiteralPath $tempZip -Force -ErrorAction SilentlyContinue }
+    foreach ($tZip in $tempZipList) {
+        if ($tZip -and (Test-Path -LiteralPath $tZip -PathType Leaf)) { Remove-Item -LiteralPath $tZip -Force -ErrorAction SilentlyContinue }
+    }
     if ($stageCreated -and $stage -and (Test-Path -LiteralPath $stage -PathType Container)) {
         $stageItem = Get-Item -LiteralPath $stage -Force -ErrorAction SilentlyContinue
         if ($stageItem -and (($stageItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0)) {

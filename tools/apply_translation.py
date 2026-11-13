@@ -101,18 +101,25 @@ def metadata_size(chunk_count: int) -> int:
 def is_metadata_chunk(chunk: bytes, chunk_count: int) -> bool:
     """The first chunk holds the map index, not a text table.
 
-    Its payload is `u64 total entries | u64 chunk count | u32[chunk_count - 1]`,
-    so its size and first two fields identify it without guessing.
+    Its payload is `u64 total entries | u64 bucket count | u32[bucket count]`.
+    In a base map every bucket has its own chunk, so the bucket count is the
+    chunk count minus one. In a `_diff` layer the bucket count is still the one
+    of the base map, and each u32 names the chunk with that bucket's changes or
+    is 0xFFFFFFFF, so the count is unrelated to the number of chunks.
+
+    The size test cannot match a text table: a table with `n` entries is at
+    least `41 + 17 * n` bytes long and its second field is at most `n`.
     """
+    del chunk_count  # kept for callers; the payload identifies itself
     try:
         kind, payload = split_chunk(chunk)
         table = decompress(kind, payload)
     except PatchError:
         return False
-    if len(table) != metadata_size(chunk_count):
+    if len(table) < 16:
         return False
-    total, count = struct.unpack_from("<QQ", table, 0)
-    return 0 < count <= chunk_count
+    _total, count = struct.unpack_from("<QQ", table, 0)
+    return count > 0 and len(table) == 16 + 4 * count
 
 
 def build_chunk(kind: int, payload: bytes, level: int) -> bytes:

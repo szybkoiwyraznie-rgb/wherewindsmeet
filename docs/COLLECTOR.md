@@ -2,9 +2,10 @@
 
 ## Co to jest
 
-Jednorazowy, odczytowy zestaw do rozpoznania instalacji: rozpakuj ZIP,
-uruchom `URUCHOM.bat`, otrzymaj **jeden** ZIP na Pulpicie i przekaż go
-prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
+Odczytowy zestaw do rozpoznania instalacji i zbierania cotygodniowych
+aktualizacji gry: rozpakuj ZIP, uruchom `URUCHOM.bat` (pierwsze rozpoznanie)
+albo `URUCHOM_AKTUALIZACJE.bat` (pliki po patchu gry), otrzymaj ZIP na
+Pulpicie i przekaż go prywatnie. Windows PowerShell 5.1 jest składnikiem Windows; użytkownik nie
 instaluje Pythona, zależności ani niczego nie pobiera przez skrypt.
 
 Na życzenie właściciela, po tym jak domyślna polityka wykonywania zablokowała
@@ -130,8 +131,9 @@ python tools/build_collector_kit.py --output artifacts/WWM_ZBIERZ_DANE.zip
 python tools/run_tests.py
 ```
 
-Archiwum ma stałe znaczniki czasu, trzy pliki, brak kompresji i jest czytane
-ponownie przy budowie. BAT jest ASCII/CRLF; PowerShell — UTF-8 BOM/CRLF.
+Archiwum ma stałe znaczniki czasu, sześć plików (`CZYTAJ_TO.txt`, `URUCHOM.bat`,
+`URUCHOM_AKTUALIZACJE.bat`, `SPAKUJ_DANE.bat`, `zbierz.ps1`, `spakuj_dane.ps1`), brak kompresji
+i jest czytane ponownie przy budowie. BAT jest ASCII/CRLF; PowerShell — UTF-8 BOM/CRLF.
 Git ignoruje artefakty ZIP. Testy Windows wykonują **rozpakowane** BAT i
 Windows PowerShell na fikcyjnej instalacji, a testy Linux sprawdzają builder,
 kodowanie i walidator. Wynik dla konkretnego commita zob. w dzienniku i CI.
@@ -141,21 +143,57 @@ Nigdy nie nazywaj testów syntetycznych testem rzeczywistej gry.
 
 `zbierz.ps1` ma z założenia limit payloadu 90 MB, więc nie uniesie całego korpusu:
 same dialogi leżą w `Package/HD/oversea/data200`–`data212` (ok. 133 MB), a rejestr
-`MANIFEST` pokazuje **74 951** dialogów, z których `data205` daje tylko 7 571
-(patrz [SCENY_WWM.md](SCENY_WWM.md)).
+`MANIFEST` wymienia 74 950 tabel dialogów (budowa bazy: [BAZA_GRY.md](BAZA_GRY.md)).
 
-Do jednorazowego uzupełnienia służy osobny skrypt, który **tylko czyta** katalog gry:
-kopiuje wskazany zestaw plików do folderu tymczasowego, liczy SHA-256, zapisuje
-`SPIS.json` i pakuje ZIP do wgrania na Dysk.
+Do wszystkich aktualizacji po patchu gry (zarówno małych cotygodniowych,
+jak i dużych patchy) służy **jeden przycisk** `URUCHOM_AKTUALIZACJE.bat`
+(`zbierz.ps1 -Tryb aktualizacja`), format `wwm-collection-v2`:
+
+- **Stan wysłanych plików po SHA-256:** skrypt pamięta w katalogu lokalnym
+  `%LOCALAPPDATA%\WWM_ZBIERACZ_STAN\stan_wyslanych.json` (poza instalacją
+  gry, ścieżka nie trafia do `RAPORT.json`) sumy SHA-256 oraz nazwy archiwów
+  poprzednio spakowanych plików. Dzięki temu przy kolejnym uruchomieniu:
+  - pomija niezmienione pliki (zapisując w `RAPORT.json -> state.unchanged`
+    listę pominiętych plików, ich SHA-256 oraz nazwy wcześniejszych paczek na
+    Dysku),
+  - pakuje **wyłącznie nowe i zmienione** pliki ze zbioru dozwolonych
+    (`LocalData/Patch/HD/oversea/*` oraz `Package/HD/oversea/{MANIFEST, data*,
+    index*, locale/translate_words_map_{zh_cn,en}(_diff)?}`),
+  - jeśli nic się nie zmieniło — nie tworzy pustego ZIP-a i kończy kodem `0`.
+- **Automatyczny wybór 1 ZIP vs podział na części:**
+  - gdy łączny rozmiar unikalnych zmienionych plików mieści się w `<= 90 MiB`,
+    powstaje **jeden** ZIP `WWM_AKTUALIZACJA_<data>_<id>.zip`,
+  - gdy przekracza `90 MiB` (np. pierwszy pełny zrzut albo duży patch bazy),
+    skrypt sam dzieli wynik na ponumerowane części po ok. `85 MiB`
+    (`WWM_AKTUALIZACJA_<data>_<id>_czesc1.zip`, `_czesc2.zip`, ...) — każda
+    część jest samodzielnym archiwum `wwm-collection-v2` przechodzącym
+    `validate_collector_return.py` i mieści się poniżej `100 MiB` Dysku Google.
+- **Przełączniki opcjonalne:** `-PelnyZrzut` (ignoruje pamięć stanu i pakuje
+  pełny zestaw od nowa, aktualizując stan), `-BezStanu` (jednorazowe
+  zbieranie bez czytania/zapisu stanu), `-KatalogStanu <dir>`, `-BezMapyZh`.
+- **Jawna blacklista:** wszystkie inne języki niż `zh_cn` i `en` (`de`, `es`,
+  `fr`, `ja`, `ko`, `pt_br`, `ru`, `th`, `vi`, `zh_tw`), warianty
+  `__small`/`_mobile`, katalogi `model/` i `bulk_data/` oraz pliki
+  binarne/audiowizualne (`.mpk`, `.bin`, `CameraZone.json`,
+  `VirtualWindow.json`, `Audio_Area*`) są odfiltrowywane — natomiast pliki
+  `index*` zostają, bo `baza_gry.py` wymaga ich do dekodowania schematów
+  kolumn i offsetów rekordów w `data*`.
+
+Osobny skrypt `spakuj_dane.ps1` (`SPAKUJ_DANE.bat`) zostaje w pakiecie jako
+narzędzie pomocnicze do ręcznego eksportu wskazanego wycinka (`-Zakres`),
+stosujące tę samą czarną listę zbędnych języków i zasobów:
 
 ```powershell
-# dialogi (data200-data212 bez data205, ~133 MB)
-powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet"
+# duża aktualizacja (domyślne: data*, index*, MANIFEST, mapy zh_cn/en i ich _diff, LocalData/Patch)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres duza_aktualizacja
 
-# kontekst: pozostałe dataN, MANIFEST, CameraZone, Audio_Area, bulk_data (~80 MB)
+# same dialogi (data200-data212 bez data205, ~133 MB w częściach <85 MiB)
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres dialogi
+
+# kontekst: pozostałe dataN, indexN, MANIFEST oraz LocalData/Patch (bez blacklistowanych plików)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres kontekst
 
-# wszystko naraz (~215 MB)
+# wszystko naraz (w częściach po ok. 85 MiB, z pominięciem blacklisty)
 powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "D:\...\Where Winds Meet" -Zakres wszystko
 ```
 

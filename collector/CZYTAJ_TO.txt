@@ -1,44 +1,65 @@
-WHERE WINDS MEET — ZBIERANIE DANYCH (Windows)
-===========================================
+WHERE WINDS MEET — ZBIERANIE DANYCH I AKTUALIZACJI (Windows)
+==========================================================
 
 To nie jest spolszczenie ani instalator. Pakiet tylko odczytuje wybrane
-pliki gry i przygotowuje jeden ZIP do przekazania do dalszej analizy.
+pliki gry i przygotowuje ZIP do przekazania do dalszej analizy.
 Nie zmienia ani nie usuwa plików gry. Nie wysyła danych przez internet.
 Nie trzeba instalować Pythona. Potrzebne są Windows i Windows PowerShell 5.1.
 
-CO ZROBIĆ
+KTÓRY PLIK URUCHOMIĆ
+
+- Każda aktualizacja po patchu gry (zarówno mała, jak i duża): kliknij dwa
+  razy URUCHOM_AKTUALIZACJE.bat.
+  Program pamięta na dysku sumy SHA-256 wcześniej wysłanych plików
+  (%LOCALAPPDATA%\WWM_ZBIERACZ_STAN\stan_wyslanych.json) i zbiera wyłącznie
+  pliki nowe lub zmienione (MANIFEST, data*, index*, zh_cn, en oraz _diff
+  dla zh_cn/en — bez innych języków, __small/_mobile i plików z blacklisty).
+  * Jeśli zmiany mieszczą się w 90 MiB → powstaje jeden ZIP na Pulpicie:
+    WWM_AKTUALIZACJA_<data>_<losowy-id>.zip.
+  * Jeśli zmiany przekraczają 90 MiB (np. pierwszy pełny zrzut albo duży
+    patch) → skrypt automatycznie dzieli wynik na części po ok. 85 MiB:
+    WWM_AKTUALIZACJA_<data>_<losowy-id>_czesc1.zip, _czesc2.zip, ...
+  * Jeśli od ostatniego razu nic się nie zmieniło → nie tworzy pustego ZIP-a.
+  (Jeśli z jakiegoś powodu chcesz pominąć pamięć stanu i wysłać wszystko od
+  zera, uruchom zbierz.ps1 z parametrem -PelnyZrzut albo usuń plik stanu.)
+- Pierwsze szybkie rozpoznanie bez zapisu stanu (do 90 MiB, format v1):
+  kliknij dwa razy URUCHOM.bat → powstanie WWM_DANE_<data>_<losowy-id>.zip.
+- Ręczne pakowanie wybranego zakresu (opcjonalne narzędzie pomocnicze):
+  SPAKUJ_DANE.bat albo spakuj_dane.ps1 z parametrem -Zakres.
+
+CO ZROBIĆ KROK PO KROKU
 
 1. Zamknij grę i poczekaj, aż Steam zakończy aktualizację.
 2. Rozpakuj cały otrzymany ZIP do nowego folderu poza grą, np. na Pulpicie.
-3. Kliknij dwa razy URUCHOM.bat. Program spróbuje znaleźć grę w bibliotekach
-   Steam. Jeśli jest kilka instalacji, wybierz numer; jeśli jej nie znajdzie,
-   otworzy okno wyboru głównego folderu gry (tego z folderem Package).
-   Możesz też przeciągnąć folder gry na URUCHOM.bat.
-4. Poczekaj — skanowanie i kopiowanie mogą potrwać kilka minut. Okno zostanie
-   otwarte. Program pokaże pełną ścieżkę, rozmiar i SHA-256 wynikowego ZIP-a.
-5. Na Pulpicie powstanie jeden plik WWM_DANE_<data>_<losowy-id>.zip.
-   Wgraj go na swój Dysk Google i napisz mi, że jest. Jeżeli napisze UWAGA
-   o niepełnym wyniku, ten ZIP też jest przydatny: wyślij go mimo to.
-   Jeśli ZIP przekracza 100 MiB, napisz mi najpierw — obecne połączenie do
-   Dysku ma limit 100 MiB na pojedyncze pobranie; ustalimy dalszy krok.
+3. Kliknij dwa razy URUCHOM_AKTUALIZACJE.bat (zalecane przy każdym patchu —
+   samo dobiera jeden ZIP albo podział na części). Program spróbuje znaleźć grę
+   w bibliotekach Steam. Jeśli jest kilka instalacji, wybierz numer; jeśli jej
+   nie znajdzie, otworzy okno wyboru głównego folderu gry (tego z folderem Package).
+   Możesz też przeciągnąć folder gry na plik .bat.
+4. Poczekaj — skanowanie i liczenie SHA-256 mogą potrwać chwilę. Okno zostanie
+   otwarte. Program pokaże pełną ścieżkę, rozmiar i SHA-256 wynikowego ZIP-a
+   (lub kolejnych części).
+5. Wgraj powstały ZIP (lub wszystkie części _czesc1, _czesc2...) z Pulpitu
+   na swój Dysk Google i napisz mi, że jest. Nie kasuj z Dysku poprzednich
+   paczek bazowych, bo kolejne małe aktualizacje odnoszą się tylko do zmian.
+   Jeżeli napisze UWAGA o niepełnym wyniku, ten ZIP też jest przydatny:
+   wyślij go mimo to. Jeśli ZIP przekracza 100 MiB, napisz mi najpierw —
+   obecne połączenie do Dysku ma limit 100 MiB na pojedyncze pobranie;
+   ustalimy dalszy krok.
 
 CO ZNAJDUJE SIĘ W WYNIKOWYM ZIP-IE
 
-- RAPORT.txt i RAPORT.json: stan, brakujące kandydackie nazwy, błędy,
-  rozmiary, SHA-256 oraz informacja o świadomych ograniczeniach.
+- RAPORT.txt i RAPORT.json: stan, tryb, brakujące nazwy, błędy, rozmiary,
+  SHA-256, informacja o pominiętych niezmienionych plikach (i nazwach
+  poprzednich archiwów bazowych) oraz o świadomych ograniczeniach.
 - INWENTARZ.jsonl: względne nazwy, rozmiary i daty plików z gałęzi Package
   i LocalData/Patch. Nie ma w nim pełnej ścieżki do katalogu instalacji.
-- pliki/: kopie znalezionych map translate_words_map_en/zh_cn w katalogach
-  locale, kandydackich plików MANIFEST oraz — jeśli mieszczą się w limicie —
-  data3/data205. RAPORT.json wiąże je ze ścieżkami w instalacji. Identyczne
-  bajty mogą być zapisane tylko raz, a raport wskazuje wspólną kopię.
-
-Część data3/data205 to tylko tropy z publicznego opisu innej wersji gry.
-Mapy i manifesty mogą nie wystarczyć do ustalenia mówców, kolejności scen
-ani pełnego kontekstu. Program podaje pominięcia: łączny limit unikalnych
-kopii to 90 MiB, w tym najwyżej 20 MiB na kandydatów data3/data205. Jeżeli
-potrzebne pliki są większe, powiem, co zebrać w następnym kroku. Sam rozmiar
-ZIP-a może różnić się od sumy plików i przekroczyć limit pobierania.
+- pliki/: kopie wyłącznie nowych lub zmienionych plików bazy i map
+  (MANIFEST, data*, index*, zh_cn, en oraz _diff dla zh_cn i en; pozostałe
+  języki, warianty __small/_mobile oraz CameraZone/Audio_Area/bulk_data/model
+  są pomijane przez blacklistę).
+  RAPORT.json wiąże je ze ścieżkami w instalacji. Identyczne bajty mogą
+  być zapisane tylko raz, a raport wskazuje wspólną kopię.
 
 PRYWATNOŚĆ I BEZPIECZEŃSTWO
 
@@ -48,14 +69,14 @@ lokalizacji Steam i numeru builda z manifestu Steam. Część nazw/katalogów
 prywatnych i linki systemu plików są pomijane. Inwentarz i kopie mogą jednak
 zawierać dane gry oraz prywatne nazwy: obejrzyj wynik przed udostępnieniem,
 nie publikuj go i przekazuj tylko osobom, którym ufasz. Nie podawaj haseł.
-URUCHOM.bat uruchamia Windows PowerShell z parametrem -ExecutionPolicy Bypass,
+Pliki .bat uruchamiają Windows PowerShell z parametrem -ExecutionPolicy Bypass,
 tak jak pozostałe paczki tego projektu. Parametr dotyczy wyłącznie tego jednego
 procesu: nie zmienia ustawień systemowych, rejestru ani polityki zapisanej
 w komputerze, nie wymaga uprawnień administratora i nic nie pobiera ani nie
 instaluje. BAT zdejmuje też znacznik „plik pobrany z internetu” (Unblock-File)
-z plików w tym folderze, żeby Windows ich nie blokował. Jeśli mimo tego system
-odmówi uruchomienia, przerwij i prześlij komunikat — nie zmieniaj polityki
-wykonywania na stałe.
+z plików *.ps1 w swoim folderze, żeby Windows ich nie blokował. Jeśli mimo tego
+system odmówi uruchomienia, przerwij i prześlij komunikat — nie zmieniaj
+polityki wykonywania na stałe.
 
 Na Pulpicie powstaje tymczasowy folder roboczy, normalnie usuwany po pracy;
 po awaryjnym zamknięciu może pozostać folder .WWM_ZBIERANIE_... wraz z kopiami.
@@ -70,5 +91,5 @@ W RAZIE PROBLEMU
 - Folder jest linkiem lub punktem reparse: wskaż rzeczywistą lokalizację.
 - Jeżeli ZIP nie powstał, przepisz komunikat z okna; haseł nie wysyłaj.
 
-To wstępny zbieracz do rozpoznania, nie audytor wszystkich linii ani patcher.
+To zbieracz do rozpoznania i aktualizacji, nie instalator ani patcher.
 Nie sprawdza warunków wydawcy i nie gwarantuje bezpieczeństwa konta.

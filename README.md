@@ -1,40 +1,47 @@
 # Where Winds Meet — polska wersja językowa
 
-Nieoficjalny projekt polskiej wersji gry **Where Winds Meet**. Chcemy zbudować
-powtarzalny proces: teksty z gry → pakiet dla tłumacza → sprawdzony import →
-polska wersja w grze. W planie są również czytanka i obsługa aktualizacji gry.
+Nieoficjalny projekt polskiej wersji gry **Where Winds Meet**. Proces:
+pliki gry → wyciąg `index/` → pakiet dla tłumacza → import zwrotki do magazynu
+`tlumaczenie/` → łatka map tekstów (oraz powtarzalny obieg przyrostowy po
+aktualizacjach gry). Cel i kryteria akceptacji opisuje [docs/CEL.md](docs/CEL.md).
 
-**Stan: rozpoznanie i organizacja projektu.** Właściciel zgłosił instalację
-Steam na Windows i podał [oznaczenia wersji oraz buildu](docs/STEAM_REFERENCE.md).
-Nie mamy dostępu do tej instalacji ani nie sprawdziliśmy jej plików.
-Priorytetem jest własne tłumaczenie i natywny tekst w grze, a nakładka jest
-planem awaryjnym. Właściciel wskazał kierunek ograniczony do zmian tekstu przy
-wyłączonej grze; nie potwierdziliśmy niezależnie zakresu dopuszczalnych zmian.
-Powstały prototypy [pakietu i walidacji](docs/TRANSLATION_BUNDLE.md) oraz
-[audytu aktualizacji i modeli przywracania](docs/UPDATES_AND_RESTORE.md) na
-wymyślonych danych. Właściciel wybrał [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md):
-audytor i patcher. Jest ogólny skaner SHA-256 testowany na sztucznych katalogach
-oraz osobny [zbieracz do rozpoznania instalacji](docs/COLLECTOR.md): BAT,
-PowerShell i pojedynczy ZIP z wybranymi plikami. Nie ma jeszcze ekstraktora,
-importera do gry, docelowych archiwów audytora i patchera ani czytanki.
-Naszych narzędzi ani zmian nie testowano na rzeczywistej grze.
+**Stan (2026-11-13): wyciąg `index/` i narzędzia są zaktualizowane do Patcha 2.4 (Steam build `26592996`),**
+a do magazynu **`tlumaczenie/` zaimportowano pierwszą zwrotkę (`WWM_PL1.zip`: `75 685` przekładów, `15,46%` tekstów gry)**.
+Zbudowano i wysłano zregenerowany pełny pakiet **`v4`** (`paczka_dla_tlumacza_wwm_v4.zip`, `422 248` miejsc `PL:`, w tym `75 683` przeniesionych
+jako `PL: tekst` i `346 565` pustych / `253 693` bez tabel UI/meta) wraz z raportami zmian **`rewizje_en.jsonl`** (`899` rewizji EN dla
+przetłumaczonych wpisów) oraz **`usuniete_klucze.jsonl`** (`566` usuniętych kluczy). Cały obieg po stronie narzędzi (ekstrakcja bazy,
+budowa pakietu, trzyplikowe Czytanki z limitem `<5 MB/część`, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
+audyt aktualizacji i pakiet uzupełniający) działa i został przetestowany na prawdziwych plikach Patcha 2.4.
+**Zweryfikowano dotąd w uruchomionej grze (Steam Windows, poprzedni build `25906190`):** mała łatka testowa
+(`tools/latka_testowa.py` w trybie binarnym — menu, ustawienia i napisy otwierającego prologu) załadowała się
+w kliencie bez problemu, a czcionki gry wyświetliły komplet polskich znaków diakrytycznych
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
+**Wciąż czeka na sprawdzenie w oknie gry:** pierwsza łatka `v1` na pełnej bazie `tlumaczenie/` (`75 685` przekładów, m.in. cutsceny i ponad 9,7 tys. kwestii dialogowych),
+zachowanie gry na Patchu 2.4 (`26592996`) oraz bezpośrednie uruchomienie samowystarczalnego instalatora `patcher_wwm.py`
+w oknie gry (na kopii plików `26592996` przeszedł w piaskownicy pełny cykl instalacji i przywrócenia SHA-256).
+Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`, przetestowany
+na 8-częściowej paczce z Patcha 2.4), bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu
+([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
+grze, bez wstrzykiwania i obchodzenia zabezpieczeń; warunków wydawcy nie
+potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 
 ## Od czego zacząć
 
-- [Stan i najbliższy krok](docs/STATUS.md)
-- [Plan etapów](docs/ROADMAP.md), [rozpoznanie gry i ryzyka](docs/FEASIBILITY.md),
-  [wybór wersji Windows i analiza narzędzi](docs/WINDOWS_OPTIONS.md),
-  [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
+- [Stan projektu](docs/STATUS.md) oraz [cel i kryteria akceptacji](docs/CEL.md)
+- [Pakiet dla tłumacza i potok aktualizacji](docs/PAKIET_TLUMACZA.md) — pełna instrukcja obsługi obiegu
+- [Baza danych gry (`MANIFEST` → `indexN` → `dataN`)](docs/BAZA_GRY.md)
+- [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher i one-click ze zwrotki](docs/PATCHER_WWM.md), [czytanki `.md` z fabuły i encyklopedii](docs/CZYTANKI_WWM.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
+- [Dziennik eksperymentów](docs/EXPERIMENT_LOG.md) i [zestawienie dostaw z gry](docs/OVERSEA_INWENTARZ.md)
+- [Plan etapów](docs/ROADMAP.md), [wykonalność i ryzyka](docs/FEASIBILITY.md),
+  [wybór wersji Windows](docs/WINDOWS_OPTIONS.md), [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
   [zgłoszona instalacja Steam](docs/STEAM_REFERENCE.md),
-  [raport metadanych](docs/INVENTORY.md), [prototyp pakietu tłumacza](docs/TRANSLATION_BUNDLE.md),
-  [aktualizacje i cofanie](docs/UPDATES_AND_RESTORE.md),
-  [dwie aplikacje Windows](docs/TWO_APPLICATIONS.md) oraz [sposób pracy](docs/WORKFLOW.md)
+  [zasady pracy z danymi gry](docs/DATA_POLICY.md), [sposób pracy](docs/WORKFLOW.md)
 - [Środowisko i uruchamianie kontroli](ENVIRONMENT.md)
-- [Zasady pracy z danymi gry](docs/DATA_POLICY.md)
 - [Instrukcje dla agentów](AGENTS.md)
 - [Źródła wzorców z projektu SRW](docs/PRIOR_ART.md)
 
-Podstawowe kontrole repozytorium, bez instalowania bibliotek Pythona:
+Podstawowe kontrole repozytorium (bez danych gry; czytanie plików gry wymaga
+dodatkowo `pip install -r requirements-dev.txt`):
 
 ```sh
 python tools/check_repository.py
@@ -44,15 +51,18 @@ python tools/run_tests.py
 ## Układ repozytorium
 
 ```text
-.github/       CI i szablony współpracy
-docs/          status, decyzje, plan i dziennik eksperymentów
-collector/     źródła wstępnego zbieracza Windows (BAT + PowerShell)
-tools/         builder, kontrola zwrotki, raport metadanych i prototypy
-tests/         testy i syntetyczne przykłady bez plików gry
-local/         prywatny katalog roboczy, ignorowany przez Git
-build/         lokalne wyniki, ignorowane przez Git
+.github/       CI (Ubuntu i Windows × Python 3.11/3.12) i szablony współpracy
+collector/     źródła zbieracza Windows (rozpoznanie + cotygodniowe aktualizacje)
+instalator/    bezpieczny instalator Windows z kopią zapasową i przywracaniem
+docs/          status, dokumentacja formatów, potoku, plan testu i dziennik
+index/         wersjonowany wyciąg bazy i tekstów (wwm-indeks-v2)
+paczki/        archiwalne README i manifesty kolejnych wysłanych pakietów
+tools/         czytnik bazy, wyciąg, generator pakietu, importer, łatka, audyt i kontrole
+tests/         testy jednostkowe i integracyjne bez plików gry
+local/         prywatny katalog roboczy z plikami gry, ignorowany przez Git
+build/, dist/  lokalne wyniki (np. zbudowane archiwa ZIP), ignorowane przez Git
 ```
 
-Katalogi źródeł i tłumaczeń powstaną, gdy będzie znany format i zasady
-przechowywania danych. Nie umieszczamy w Git plików binarnych gry ani gotowych
-kopii zmodyfikowanych plików. Projekt nie jest powiązany z twórcami gry.
+Do Git trafiają teksty, wyciąg `index/`, własny kod, narzędzia i dokumentacja
+([DATA_POLICY.md](docs/DATA_POLICY.md)); **wyłącznie binarne pliki gry oraz ich
+zmodyfikowane kopie** zostają poza Git. Projekt nie jest powiązany z twórcami gry.

@@ -1,0 +1,1022 @@
+#!/usr/bin/env python3
+"""Wyciąg z bazy gry do wersjonowanego katalogu `index/` (format `wwm-indeks-v2`).
+
+Jedno przejście po plikach gry (baza `MANIFEST -> indexN -> dataN` oraz mapy
+tekstów) zapisuje w repozytorium wszystko, czego potrzebują dalsze kroki —
+pakiet dla tłumacza, import zwrotu, audyt aktualizacji — tak żeby **nie
+musiały już czytać plików gry**:
+
+    index/manifest.json          liczby, pokrycie, SHA-256 wejść, lista plików
+    index/teksty_X.jsonl         unikalny tekst źródłowy: zh, en, liczba id, główne źródło
+                                 `w` = [numer źródła, klucz wiersza, klucz nazwy wiersza]
+    index/zrodla.json            lista „tabela :: pole” (numer = pierwsza liczba w `w`)
+    index/sceny_N.jsonl          dialog: obsada, elementy, odwołania, miejsca
+    index/warianty.jsonl         kwestie zależne od płci bohatera: id tekstu, klucz, wersja en
+    index/pola_dialogow.json     lista pól wskazujących dialogi (numer = pierwsza liczba w `r`)
+    index/zadania.jsonl          zadania: łańcuch pre/post, grupa, dialogi, teksty
+    index/grupy_zadan.jsonl      grupy zadań (rozdziały wątku głównego, historie poboczne)
+    index/wybory.jsonl           pytania i wybory gracza (`branch_data`) z dialogami
+    index/opcje_npc.jsonl        opcje rozmowy z NPC (`npc_talk_options`)
+    index/postacie.jsonl         byt -> nazwa i tytuł z tabliczki nad głową, opis postaci
+    index/encyklopedia.jsonl     postacie z encyklopedii gry (`world_view_person_*`)
+    index/miejsca.jsonl          przestrzeń -> nazwa
+    index/przerywniki.jsonl      przerywnik filmowy -> tekst planszy i streszczenie
+    index/zamiany_dialogow.jsonl podmiany dialogów (w tym wersje językowe)
+
+Tekst jest zapisany raz, w `teksty_X.jsonl`; wszystkie inne pliki wskazują go
+kluczem (`tools/mapa_tekstow.klucz`: 16 znaków SHA-256 tekstu źródłowego).
+Klucza nie ma w wierszu tekstu — wylicza się go z pola `zh` (albo `en`, gdy
+`zr` = `en`). Pliki dzielone są stałą regułą (pierwszy znak klucza, numer
+dialogu modulo), więc aktualizacja gry zmienia tylko wiersze, które naprawdę
+się zmieniły.
+
+Zakres tekstów: identyfikator jest „w grze”, jeśli ma wersję angielską (klient
+zachodni go zna) albo jeśli wskazuje go tabela lub dialog. Identyfikatory tylko
+z mapy chińskiej, których nic nie wskazuje, są liczone w manifeście i pomijane.
+
+Użycie:
+    python3 tools/wyciag.py --baza KATALOG... --zh MAPA [DIFF...] --en MAPA [DIFF...] --wyj index
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+import time
+from collections import Counter, defaultdict
+from pathlib import Path
+
+try:
+    from tools import baza_gry, mapa_tekstow, sceny_z_bazy, zrodla_tekstow
+    from tools import wypisz
+except ImportError:  # uruchomienie jako skrypt
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from tools import baza_gry, mapa_tekstow, sceny_z_bazy, zrodla_tekstow
+    from tools import wypisz
+
+FORMAT = "wwm-indeks-v2"
+LIMIT_PLIKU = 10 * 1024 * 1024  # limit repozytorium na jeden plik
+CZESCI_SCEN = 8  # sceny_N.jsonl: N = numer dialogu modulo 8
+MAKS_ODWOLAN_SCENY = 4
+PROG_TRAFIEN = 3
+PROG_UDZIALU = 0.5
+
+# Pole (albo tabela) o takiej nazwie może trzymać numer dialogu. O przyjęciu
+# pola decyduje pomiar: co najmniej połowa jego liczb musi być numerami dialogów.
+_SLOWA_DIALOGU = re.compile(r"dialog|talk|say|popo|speech|bubble")
+_PRZESTRZEN = re.compile(r"^spaces\.s(\d+)\.")
+RODZAJ_KOD = {"kwestia": "k", "plansza": "p", "wizytowka_imie": "wi", "wizytowka_tytul": "wt", "inne": "i"}
+_KOPIE_KWESTII = frozenset({"debate_guider_dialog_data"})
+_ZAKRES_CUTSCEN_TM = (590000, 592694)
+_ZAKRES_BOTOW_TM = (3220000, 3269999)
+_INTERPUNKCJA_NORM = re.compile(r"[\s，。？！、：；“”‘’（）()\[\]…—\-,.?!:;'\"]+")
+
+
+def _norm_zh(text: str) -> str:
+    return _INTERPUNKCJA_NORM.sub("", text)
+
+
+def _mowca_z_en(en_text: str) -> str | None:
+    if ":" not in en_text[:40]:
+        return None
+    prefix, _rest = en_text.split(":", 1)
+    prefix = prefix.strip()
+    if 1 <= len(prefix) <= 35 and not re.search(r"[{}\[\]#\d]", prefix):
+        return prefix
+    return None
+
+
+def _liczby(value) -> list[int]:
+    """Wszystkie liczby całkowite z wartości: liczba, napis z cyfr, listy zagnieżdżone."""
+    if isinstance(value, bool):
+        return []
+    if isinstance(value, int):
+        return [value]
+    if isinstance(value, str) and value.isdigit():
+        return [int(value)]
+    if isinstance(value, list):
+        return [number for item in value for number in _liczby(item)]
+    return []
+
+
+class Obserwator:
+    """Zbiera z jednego przejścia bazy tabele powiązań i odwołania do dialogów."""
+
+    def __init__(self, dialogi: set[int]):
+        self.dialogi = dialogi
+        self.zadania: dict[int, dict] = {}
+        self.grupy: dict[int, dict] = {}
+        self.kolejnosc_grup: dict[int, list[int]] = {}
+        self.typy_zadan: dict[int, dict] = {}
+        self.streszczenia: list[dict] = []
+        self.wybory: dict[str, dict] = {}
+        self.nastepstwa: dict[int, list[int]] = {}
+        self.opcje_npc: dict[int, dict] = {}
+        self.tabliczki: dict[int, tuple[int, int]] = {}  # byt -> (id nazwy, id tytułu)
+        self.atrybut_bytu: dict[int, int] = {}  # byt -> wiersz `entity_attr`
+        self.opisy: dict[int, int] = {}  # wiersz `entity_attr` -> id tekstu opisu postaci
+        self.seryjne: dict[int, tuple[int, int]] = {}  # numer seryjny -> (przestrzeń, byt)
+        self.miejsca: dict[int, dict] = {}
+        self.osoby: dict[int, dict] = {}
+        self.wydarzenia_osob: dict[int, dict] = {}
+        self.tozsamosci: list[dict] = []
+        self.zamiany: list[dict] = []
+        self.przerywniki: dict[int, dict] = {}
+        self.sound_data_po_tekscie: dict[str, list[str]] = defaultdict(list)
+        self.text_msg_cutsceny: dict[int, tuple[int, bool]] = {}  # wiersz -> (text_id, czy_grey)
+        self.bot_nick_cids: set[int] = set()
+        self.intro_cutsceny: list[dict] = []
+        self.filmy_napisy: list[dict] = []
+        self.powtorki_cutscen: list[dict] = []
+        # odwołania do dialogów
+        self.pola: list[tuple[str, str]] = []
+        self._numer_pola: dict[tuple[str, str], int] = {}
+        self.trafienia: Counter = Counter()
+        self.liczby: Counter = Counter()
+        self.odwolania: dict[int, list[tuple[int, str]]] = defaultdict(list)
+        self.przestrzenie_dialogu: dict[int, set[int]] = defaultdict(set)
+
+    # ------------------------------------------------------------ odwołania
+
+    def _pole(self, kind: str, path: str) -> int:
+        key = (kind, path)
+        number = self._numer_pola.get(key)
+        if number is None:
+            number = self._numer_pola[key] = len(self.pola)
+            self.pola.append(key)
+        return number
+
+    def _odwolania(self, kind: str, name: str, key, row) -> None:
+        space = _PRZESTRZEN.match(name)
+        space_no = int(space.group(1)) if space else None
+        row_key = str(key) if kind == name else f"{name}#{key}"
+
+        def walk(value, path: str, hot: bool) -> None:
+            if isinstance(value, dict):
+                for item_key, item in value.items():
+                    part = zrodla_tekstow._pole(item_key)
+                    walk(item, f"{path}.{part}" if path else part, hot or bool(_SLOWA_DIALOGU.search(part)))
+            elif isinstance(value, list):
+                for item in value:
+                    walk(item, path + "[]", hot)
+            elif hot and not isinstance(value, bool):
+                if isinstance(value, int):
+                    number = value
+                elif isinstance(value, str) and value.isdigit():
+                    number = int(value)
+                else:
+                    return
+                field = self._pole(kind, path)
+                self.liczby[field] += 1
+                if number in self.dialogi:
+                    self.trafienia[field] += 1
+                    self.odwolania[number].append((field, row_key))
+                    if space_no is not None:
+                        self.przestrzenie_dialogu[number].add(space_no)
+
+        walk(row, "", bool(_SLOWA_DIALOGU.search(kind)))
+
+    def wiarygodne_pola(self) -> set[int]:
+        """Pola, w których co najmniej połowa liczb to numery istniejących dialogów."""
+        return {
+            field
+            for field, hits in self.trafienia.items()
+            if hits >= PROG_TRAFIEN and hits / self.liczby[field] >= PROG_UDZIALU
+        }
+
+    # ------------------------------------------------------- tabele powiązań
+
+    def __call__(self, kind: str, name: str, key, row) -> None:
+        handler = getattr(self, "_t_" + kind.replace(".", "_").replace("*", "x"), None)
+        if handler is not None:
+            handler(name, key, row)
+        self._odwolania(kind, name, key, row)
+
+    def _t_tasks(self, _name, key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        # `process_interact_param` trzyma numer dialogu przy rozmowie z NPC; zostają
+        # tylko liczby będące numerami dialogów, reszta to parametry innych interakcji.
+        talk = [n for n in _liczby(row.get("process_interact_param")) if n in self.dialogi]
+        self.zadania[row.get("no", key)] = {
+            "grupa": row.get("group"),
+            "typ": row.get("task_type"),
+            "pian": row.get("pian_id"),
+            "pre": _liczby(row.get("pre_task")),
+            "post": _liczby(row.get("post_task")),
+            "nazwa": row.get("task_name"),
+            "cel": row.get("task_target_str"),
+            "opis": row.get("task_desc_str"),
+            "przestrzen": row.get("task_space"),
+            "dialogi": {
+                "przyjecie": _liczby(row.get("fetch_play_dialogs")) + _liczby(row.get("fetch_dialogs_id")),
+                "rozmowa": talk,
+                "zakonczenie": _liczby(row.get("finish_play_dialogs")) + _liczby(row.get("finish_dialogs")),
+            },
+            "wybory": _liczby(row.get("finish_choice")) + _liczby(row.get("get_task_choice")),
+            "przerywniki": {
+                "przyjecie": _liczby(row.get("fetch_play_cutscene")),
+                "zakonczenie": _liczby(row.get("finish_play_cutscene")),
+            },
+        }
+
+    def _t_task_group_info(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.grupy[row.get("id", key)] = {
+                "nazwa": row.get("group_name"),
+                "numer_tytulu": row.get("title_no"),
+                "tytul": row.get("title_name"),
+                "kolejnosc": row.get("group_sort"),
+                "start": row.get("start_task"),
+                "koniec": _liczby(row.get("end_task")),
+                "przestrzen": row.get("space_no"),
+            }
+
+    def _t_group_tasks(self, _name, key, row) -> None:
+        self.kolejnosc_grup[key] = _liczby(row)
+
+    def _t_task_types(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.typy_zadan[row.get("id", key)] = {"nazwa": row.get("type_name"), "kolejnosc": row.get("show_order")}
+
+    def _t_plot_recap_data(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.streszczenia.append(
+                {
+                    "id": row.get("id", key),
+                    "grupa": row.get("group_id"),
+                    "tekst": row.get("synopsis_text"),
+                    "pierwsze": row.get("first_task"),
+                    "ostatnie": _liczby(row.get("last_task")),
+                }
+            )
+
+    def _t_branch_data(self, _name, key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        choices = []
+        for field, value in row.items():
+            if not isinstance(field, str) or not field.startswith("choice_") or not field[7:].isdigit():
+                continue
+            number = field[7:]
+            choices.append(
+                {
+                    "nr": int(number),
+                    "tekst": value,
+                    "dialogi": _liczby(row.get("choice_dialogs_" + number)),
+                    "typ": row.get("type_" + number),
+                    "parametry": row.get("param_" + number),
+                }
+            )
+        self.wybory[str(key)] = {
+            "pytanie": row.get("ques_argue_no"),
+            "krok": row.get("ques_each_no"),
+            "tytul": row.get("main_title"),
+            "po_dialogach": _liczby(row.get("ques_stop_dialogs")) + _liczby(row.get("first_ques_stop_dialogs")),
+            "wybory": sorted(choices, key=lambda choice: choice["nr"]),
+        }
+
+    def _t_branch_dialog_subsequent(self, _name, key, row) -> None:
+        self.nastepstwa[key] = _liczby(row)
+
+    def _t_npc_talk_options(self, _name, key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        items = []
+        for field, value in row.items():
+            if isinstance(field, str) and field.startswith("dialog_item_") and field[12:].isdigit():
+                number = field[12:]
+                items.append(
+                    {
+                        "nr": int(number),
+                        "tekst": value,
+                        "typ": row.get("dialog_item_type_" + number),
+                        "parametr": row.get("dialog_item_pram_" + number),
+                    }
+                )
+        self.opcje_npc[row.get("no", key)] = {
+            "dialogi": _liczby(row.get("dialog_id")),
+            "opcje": sorted(items, key=lambda item: item["nr"]),
+        }
+
+    def _t_entity_init_data(self, _name, key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        board = row.get("billboard_data")
+        if isinstance(board, dict) and (board.get("name") or board.get("title")):
+            self.tabliczki[row.get("id", key)] = (board.get("name") or 0, board.get("title") or 0)
+        if isinstance(row.get("attr_id"), int):
+            self.atrybut_bytu[row.get("id", key)] = row["attr_id"]
+
+    def _t_entity_attr(self, _name, key, row) -> None:
+        if isinstance(row, dict) and row.get("introduction"):
+            self.opisy[row.get("id", key)] = row["introduction"]
+
+    def opis_bytu(self, byt: int) -> int:
+        """Id tekstu opisu postaci (`entity_attr.introduction`) albo 0."""
+        return self.opisy.get(self.atrybut_bytu.get(byt, byt), 0)
+
+    def _t_spaces_x_entity(self, name, key, row) -> None:
+        space = _PRZESTRZEN.match(name)
+        if space and isinstance(row, dict) and isinstance(row.get("npc_no"), int) and isinstance(key, int):
+            self.seryjne[key] = (int(space.group(1)), row["npc_no"])
+
+    def _t_space_info(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.miejsca[key] = {"nazwa": row.get("name"), "robocza": row.get("fb_name")}
+
+    def _t_world_view_person_info(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.osoby[row.get("id", key)] = {
+                "nazwa": row.get("name"),
+                "inna_nazwa": row.get("name_change"),
+                "urodziny": row.get("birthday"),
+                "historie": _liczby(row.get("story")),
+                "kolejnosc": row.get("show_order"),
+            }
+
+    def _t_world_view_person_event(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.wydarzenia_osob[row.get("id", key)] = {"tytul": row.get("title"), "opis": row.get("description")}
+
+    def _t_world_view_people_identity(self, _name, _key, row) -> None:
+        if isinstance(row, dict):
+            self.tozsamosci.append({"osoba": row.get("people_link"), "tekst": row.get("people_identity")})
+
+    def _t_cutscenes(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.przerywniki[row.get("no", key)] = {
+                "tekst": row.get("content"),
+                "streszczenie": row.get("synopsis_text_pc") or row.get("synopsis_text_mobile"),
+            }
+
+    def _t_dialog_replace(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.zamiany.append(
+                {"dialog": row.get("no", key), "na": _liczby(row.get("new_dialog")), "typ": row.get("type"), "parametr": row.get("param")}
+            )
+
+    def _t_dialog_replace_by_language(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.zamiany.append({"dialog": row.get("no", key), "na": _liczby(row.get("en")), "typ": "jezyk_en"})
+
+    def _t_sound_data(self, _name, _key, row) -> None:
+        if not isinstance(row, dict):
+            return
+        text, audio = row.get("text"), row.get("audio_name")
+        if isinstance(text, str) and isinstance(audio, str) and audio:
+            norm = _norm_zh(text)
+            if len(norm) >= 4 and audio not in self.sound_data_po_tekscie[norm]:
+                self.sound_data_po_tekscie[norm].append(audio)
+
+    def _zbierz_text_msg(self, key, row, *, grey: bool) -> None:
+        if not isinstance(key, int) or not isinstance(row, dict):
+            return
+        cid = row.get("content")
+        if not isinstance(cid, int) or isinstance(cid, bool):
+            return
+        if _ZAKRES_CUTSCEN_TM[0] <= key <= _ZAKRES_CUTSCEN_TM[1]:
+            prev = self.text_msg_cutsceny.get(key)
+            if prev is None or (prev[1] and not grey):
+                self.text_msg_cutsceny[key] = (cid, grey)
+        elif _ZAKRES_BOTOW_TM[0] <= key <= _ZAKRES_BOTOW_TM[1]:
+            self.bot_nick_cids.add(cid)
+
+    def _t_text_msg(self, _name, key, row) -> None:
+        self._zbierz_text_msg(key, row, grey=False)
+
+    def _t_text_msg__grey(self, _name, key, row) -> None:
+        self._zbierz_text_msg(key, row, grey=True)
+
+    def _t_wds_oneday_intro_cutscene_data(self, _name, key, row) -> None:
+        if isinstance(row, dict) and isinstance(row.get("text"), int):
+            self.intro_cutsceny.append(
+                {
+                    "id": row.get("id", key),
+                    "czas": row.get("time", 0.0),
+                    "trwanie": row.get("duration", 0.0),
+                    "mowca": row.get("speaker"),
+                    "text_id": row["text"],
+                }
+            )
+
+    def _t_entry_collect_movie_subtitle_data(self, _name, key, row) -> None:
+        if not isinstance(row, list):
+            return
+        for item in row:
+            if isinstance(item, dict) and isinstance(item.get("text"), int):
+                self.filmy_napisy.append(
+                    {
+                        "film": item.get("dialog_no", key),
+                        "id": item.get("id"),
+                        "czas": item.get("time", 0.0),
+                        "trwanie": item.get("duration", 0.0),
+                        "text_id": item["text"],
+                    }
+                )
+
+    def _t_task_cutscene_replay(self, _name, key, row) -> None:
+        if isinstance(row, dict):
+            self.powtorki_cutscen.append(
+                {
+                    "no": row.get("no", key),
+                    "task_no": row.get("task_no"),
+                    "finish_task": row.get("finish_task"),
+                    "grupa": row.get("group"),
+                    "przestrzen": row.get("space_no"),
+                    "nazwa_id": row.get("name"),
+                    "rozdzial_id": row.get("chapter_name"),
+                    "streszczenie_id": row.get("synopsis_text") or row.get("synopsis_text_mobile"),
+                }
+            )
+
+
+class Podzial:
+    """Zapis JSONL w plikach o stałej regule podziału (`nazwa_<część>.jsonl`).
+
+    Część wiersza wynika z jego treści (znak klucza, numer modulo), a nie
+    z rozmiaru pliku, więc dopisanie wiersza nie przesuwa pozostałych.
+    """
+
+    def __init__(self, katalog: Path, nazwa: str, czesci: list[str]):
+        self.katalog, self.nazwa = katalog, nazwa
+        self.wiersze: dict[str, list[str]] = {part: [] for part in czesci}
+
+    def dodaj(self, czesc: str, row) -> None:
+        self.wiersze[czesc].append(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+    def koniec(self) -> list[dict]:
+        files = []
+        for part, lines in self.wiersze.items():
+            path = self.katalog / f"{self.nazwa}_{part}.jsonl"
+            with path.open("w", encoding="utf-8", newline="\n") as handle:
+                handle.writelines(lines)
+            size = path.stat().st_size
+            if size > LIMIT_PLIKU:
+                raise ValueError(f"{path.name}: {size} B przekracza limit pliku; zwiększ liczbę części")
+            files.append({"plik": path.name, "wierszy": len(lines), "bajtow": size, "sha256": mapa_tekstow.sha256_pliku(path)})
+        return files
+
+
+def zapisz_jsonl(path: Path, rows) -> dict:
+    count = 0
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
+            count += 1
+    return {"plik": path.name, "wierszy": count, "bajtow": path.stat().st_size, "sha256": mapa_tekstow.sha256_pliku(path)}
+
+
+def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Path, wejscia: dict, log=print) -> dict:
+    """Zbuduj wyciąg w katalogu `wyj` i zwróć manifest."""
+    start = time.time()
+    wyj.mkdir(parents=True, exist_ok=True)
+    for old in wyj.glob("*.jsonl"):
+        old.unlink()
+
+    def czy_tekst(text_id: int) -> bool:
+        return text_id in zh or text_id in en
+
+    # 1. sceny z tabel dialog_timelines.<numer>
+    numery = sceny_z_bazy.numery_dialogow(baza.tabele)
+    sceny: dict[int, dict] = {}
+    bledy_scen: dict[int, str] = {}
+    for numer in numery:
+        try:
+            wiersze = dict(baza.wiersze(f"dialog_timelines.{numer}"))
+            sceny[numer] = sceny_z_bazy.scena_z_tabeli(numer, wiersze, czy_tekst)
+        except (baza_gry.BazaError, ValueError) as error:
+            bledy_scen[numer] = str(error)[:200]
+    log(f"sceny: {len(sceny)} ({time.time() - start:.0f} s)")
+
+    # 2. jedno przejście po pozostałych tabelach
+    obserwator = Obserwator(set(sceny))
+    zrodla = zrodla_tekstow.zbierz(baza, czy_tekst, pomin_rodziny=("dialog_timelines",), obserwator=obserwator)
+    log(f"tabele: {sum(zrodla.wiersze.values())} wierszy, {len(zrodla.wystapienia)} id z tabel ({time.time() - start:.0f} s)")
+
+    # 3. zakres tekstów i klucze (deterministycznie, z priorytetem źródeł i rozdzieleniem kolizji fabularnych)
+    wskazane: set[int] = set(zrodla.wystapienia)
+    scene_cids: set[int] = set()
+    for scena in sceny.values():
+        for element in scena["elementy"]:
+            wskazane.add(element["text_id"])
+            scene_cids.add(element["text_id"])
+            if element["nazwa"]:
+                wskazane.add(element["nazwa"])
+        for osoba in scena["obsada"]:
+            if osoba["nazwa"]:
+                wskazane.add(osoba["nazwa"])
+
+    cut_cids: set[int] = {cid for cid, _grey in obserwator.text_msg_cutsceny.values()}
+    cut_cids |= {item["text_id"] for item in obserwator.intro_cutsceny}
+    cut_cids |= {item["text_id"] for item in obserwator.filmy_napisy}
+    story_cids = scene_cids | cut_cids
+    bot_cids = obserwator.bot_nick_cids - story_cids
+
+    w_zakresie = sorted(set(en) | wskazane)
+
+    def _priorytet_w(pochodzenie: int, wiersz: str, text_id: int) -> tuple:
+        kind = zrodla.pochodzenia[pochodzenie][0]
+        is_grey = kind.endswith("__grey")
+        base = kind.removesuffix("__grey")
+        is_copy = base in _KOPIE_KWESTII
+        _tbl, _, row_key = wiersz.rpartition("#")
+        is_cut_tm = base == "text_msg" and row_key.isdigit() and _ZAKRES_CUTSCEN_TM[0] <= int(row_key) <= _ZAKRES_CUTSCEN_TM[1]
+        nat = (0, int(row_key), "") if row_key.lstrip("-").isdigit() else (1, 0, row_key)
+        return (is_grey, is_copy, not is_cut_tm, pochodzenie, nat, text_id)
+
+    # Grupuj identyfikatory po tekście źródłowym, żeby wykryć kolizje znaczeniowe
+    # między strefą fabuły (dialogi/cutsceny) a pozostałymi tabelami gry.
+    grupy_zh: dict[str, list[int]] = defaultdict(list)
+    klucz_id: dict[int, str] = {}
+    z_en_tids: dict[str, tuple[str, list[int]]] = {}
+    for text_id in w_zakresie:
+        zrodlowy = zh.get(text_id)
+        if zrodlowy is None:
+            source_en = en[text_id]
+            key = mapa_tekstow.klucz(source_en)
+            klucz_id[text_id] = key
+            pair = z_en_tids.get(key)
+            if pair is None:
+                z_en_tids[key] = (source_en, [text_id])
+            else:
+                pair[1].append(text_id)
+        else:
+            grupy_zh[zrodlowy].append(text_id)
+
+    kolizje: list[dict] = []
+    teksty: dict[str, dict] = {}
+    for key, (zr_en, tids) in z_en_tids.items():
+        teksty[key] = {"zr": zr_en, "z_en": True, "n": 0, "en": Counter(), "w": None, "_tids": tids}
+
+    for zrodlowy, tids in grupy_zh.items():
+        base_key = mapa_tekstow.klucz(zrodlowy)
+        story_en = Counter(en[tid] for tid in tids if tid in story_cids and tid in en)
+        other_en = Counter(en[tid] for tid in tids if tid not in story_cids and tid not in bot_cids and tid in en)
+        podzial_kluczy = False
+        if story_en and other_en:
+            top_story = story_en.most_common(1)[0][0]
+            top_other = other_en.most_common(1)[0][0]
+            if mapa_tekstow.podobienstwo_en(top_story, top_other) < 0.5:
+                podzial_kluczy = True
+                # Liczniejszy kontekst zachowuje główny klucz `klucz(zh)`, rzadszy dostaje
+                # osobny klucz wariantu. Przy remisie fabuła dostaje wariant, a reszta główny.
+                story_total = sum(1 for tid in tids if tid in story_cids)
+                other_total = sum(1 for tid in tids if tid not in story_cids and tid not in bot_cids)
+                if story_total > other_total:
+                    story_key = base_key
+                    other_key = mapa_tekstow.klucz_wariantu(zrodlowy, top_other)
+                else:
+                    other_key = base_key
+                    story_key = mapa_tekstow.klucz_wariantu(zrodlowy, top_story)
+                if story_key == other_key:
+                    podzial_kluczy = False
+                else:
+                    kolizje.append({"zh": zrodlowy, "w": [[other_key, top_other], [story_key, top_story]]})
+                    for tid in tids:
+                        if tid in story_cids:
+                            tid_en = en.get(tid)
+                            if tid_en and mapa_tekstow.podobienstwo_en(tid_en, top_other) > mapa_tekstow.podobienstwo_en(tid_en, top_story):
+                                tid_key = other_key
+                            else:
+                                tid_key = story_key
+                        else:
+                            tid_en = en.get(tid)
+                            if tid_en and mapa_tekstow.podobienstwo_en(tid_en, top_story) > mapa_tekstow.podobienstwo_en(tid_en, top_other):
+                                tid_key = story_key
+                            else:
+                                tid_key = other_key
+                        klucz_id[tid] = tid_key
+                        if tid_key not in teksty:
+                            teksty[tid_key] = {"zr": zrodlowy, "z_en": False, "n": 0, "en": Counter(), "w": None, "_tids": []}
+                        teksty[tid_key]["_tids"].append(tid)
+        if not podzial_kluczy:
+            teksty[base_key] = {"zr": zrodlowy, "z_en": False, "n": 0, "en": Counter(), "w": None, "_tids": tids}
+            for tid in tids:
+                klucz_id[tid] = base_key
+
+    for text_id in w_zakresie:
+        key = klucz_id[text_id]
+        entry = teksty[key]
+        entry["n"] += 1
+        angielski = en.get(text_id)
+        if angielski is not None and not entry["z_en"]:
+            entry["en"][angielski] += 1
+
+    for entry in teksty.values():
+        best_choice = None
+        for tid in entry["_tids"]:
+            for pochodzenie, wiersz, etykieta in zrodla.wystapienia.get(tid, ()):
+                prio = _priorytet_w(pochodzenie, wiersz, tid)
+                if best_choice is None or prio < best_choice[0]:
+                    best_choice = (prio, [pochodzenie, wiersz, etykieta if etykieta != tid else 0])
+        if best_choice is not None:
+            entry["w"] = best_choice[1]
+
+    def k(text_id) -> str | None:
+        return klucz_id.get(text_id) if isinstance(text_id, int) and not isinstance(text_id, bool) else None
+
+    pliki: dict[str, object] = {}
+    podzial = Podzial(wyj, "teksty", list("0123456789abcdef"))
+    for key in sorted(teksty):
+        entry = teksty[key]
+        if entry["z_en"]:
+            # Brak wersji chińskiej: najnowsze teksty mają tylko warstwę języka gry.
+            row = {"en": entry["zr"], "zr": "en"}
+        else:
+            row = {"zh": entry["zr"]}
+            if entry["en"]:
+                row["en"] = entry["en"].most_common(1)[0][0]
+            if key != mapa_tekstow.klucz(entry["zr"]):
+                row["k"] = key
+        if entry["n"] > 1:
+            row["n"] = entry["n"]
+        if entry["w"]:
+            etykieta = k(entry["w"][2])
+            row["w"] = entry["w"][:2] + ([etykieta] if etykieta and etykieta != key else [])
+        podzial.dodaj(key[0], row)
+    pliki["teksty"] = podzial.koniec()
+    pliki["kolizje"] = zapisz_jsonl(wyj / "kolizje.jsonl", sorted(kolizje, key=lambda item: item["zh"]))
+    (wyj / "zrodla.json").write_text(
+        json.dumps(
+            [[kind, path, zrodla.liczba[index]] for index, (kind, path) in enumerate(zrodla.pochodzenia)],
+            ensure_ascii=False,
+            indent=0,
+        )
+        + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    log(f"teksty: {len(teksty)} unikalnych, {len(w_zakresie)} id w zakresie ({time.time() - start:.0f} s)")
+
+    # 4. sceny z rozwiązanymi nazwami mówców, odwołaniami i miejscami
+    wiarygodne = obserwator.wiarygodne_pola()
+    numer_pola = {field: number for number, field in enumerate(sorted(wiarygodne, key=lambda f: obserwator.pola[f]))}
+    (wyj / "pola_dialogow.json").write_text(
+        json.dumps(
+            [
+                [*obserwator.pola[field], obserwator.trafienia[field], obserwator.liczby[field]]
+                for field in sorted(wiarygodne, key=lambda f: obserwator.pola[f])
+            ],
+            ensure_ascii=False,
+            indent=0,
+        )
+        + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    podzial = Podzial(wyj, "sceny", [str(part) for part in range(CZESCI_SCEN)])
+    mowcy = Counter()
+    warianty: dict[int, tuple] = {}
+    for numer in sorted(sceny):
+        scena = sceny[numer]
+        miejsca = set(obserwator.przestrzenie_dialogu.get(numer, ()))
+        obsada = []
+        for osoba in scena["obsada"]:
+            nazwa, tytul, byt = osoba["nazwa"], 0, osoba["entity_no"]
+            seryjny = obserwator.seryjne.get(byt)
+            if seryjny is not None:
+                miejsca.add(seryjny[0])
+                byt = seryjny[1]
+            tabliczka = obserwator.tabliczki.get(byt)
+            if tabliczka is not None:
+                nazwa = nazwa or tabliczka[0]
+                tytul = tabliczka[1]
+            # [etykieta robocza, typ, numer bytu, klucz nazwy, klucz tytułu, klucz opisu postaci]
+            wpis = [osoba["tag"], osoba["typ"], osoba["entity_no"], k(nazwa), k(tytul), k(obserwator.opis_bytu(byt)) if byt else None]
+            while wpis[-1] is None and len(wpis) > 3:
+                wpis.pop()
+            obsada.append(wpis)
+            if osoba["kwestii"]:
+                if osoba["typ"] == sceny_z_bazy.TYP_GRACZ:
+                    mowcy["gracz"] += osoba["kwestii"]
+                elif k(nazwa):
+                    mowcy["nazwa_z_gry"] += osoba["kwestii"]
+                elif osoba["tag"]:
+                    mowcy["etykieta_robocza"] += osoba["kwestii"]
+                else:
+                    mowcy["bez_nazwy"] += osoba["kwestii"]
+        elementy = []
+        for e in scena["elementy"]:
+            # [rodzaj, mówca, klucz, wariant, id (tylko wariant płci), klucz podmienionej nazwy]
+            element = [
+                RODZAJ_KOD[e["rodzaj"]],
+                e["mowca"] if e["mowca"] is not None else -1,
+                k(e["text_id"]),
+                e["wariant"],
+                f"{e['text_id']:016x}" if e["wariant"] else None,
+                k(e["nazwa"]),
+            ]
+            while element[-1] in (None, 0) and len(element) > 3:
+                element.pop()
+            elementy.append(element)
+            if e["wariant"]:
+                warianty[e["text_id"]] = (k(e["text_id"]), e["wariant"], en.get(e["text_id"]))
+        row = {"d": numer, "o": obsada, "e": elementy}
+        if scena["projekt"]:
+            row["p"] = scena["projekt"]
+        if scena["nazwa"]:
+            row["n"] = scena["nazwa"]
+        if scena["ui_type"] is not None:
+            row["u"] = scena["ui_type"]
+        if scena["konfiguracja"]:
+            row["c"] = scena["konfiguracja"]
+        if scena["banki"]:
+            row["b"] = sorted({bank.rsplit("/", 1)[-1].removesuffix(".bnk") for bank in scena["banki"]})
+        odwolania = []
+        for field, row_key in obserwator.odwolania.get(numer, ()):
+            if field in wiarygodne:
+                pair = [numer_pola[field], row_key]
+                if pair not in odwolania:
+                    odwolania.append(pair)
+        if odwolania:
+            row["r"] = odwolania[:MAKS_ODWOLAN_SCENY]
+            if len(odwolania) > MAKS_ODWOLAN_SCENY:
+                row["rn"] = len(odwolania)
+        if miejsca:
+            row["m"] = sorted(miejsca)
+        if numer in obserwator.nastepstwa:
+            row["x"] = obserwator.nastepstwa[numer]
+        podzial.dodaj(str(numer % CZESCI_SCEN), row)
+    pliki["sceny"] = podzial.koniec()
+    # Kwestie zależne od płci bohatera mają własne identyfikatory tekstu; zapisujemy
+    # je razem z angielską wersją tego właśnie identyfikatora.
+    pliki["warianty"] = zapisz_jsonl(
+        wyj / "warianty.jsonl",
+        (
+            {"id": f"{text_id:016x}", "k": key, "w": wariant, **({"en": angielski} if angielski else {})}
+            for text_id, (key, wariant, angielski) in sorted(warianty.items())
+        ),
+    )
+
+    # 6. tabele powiązań
+    def klucze(row: dict, pola: tuple[str, ...]) -> dict:
+        """Wiersz bez pustych pól; pola tekstowe zamienione z id na klucz tekstu."""
+        out = {}
+        for name, value in row.items():
+            if name in pola:
+                key = k(value)
+                if key:
+                    out[name] = key
+            elif isinstance(value, dict):
+                inner = {item: content for item, content in value.items() if content}
+                if inner:
+                    out[name] = inner
+            elif value not in (None, [], "", 0):
+                out[name] = value
+        return out
+
+    pliki["zadania"] = zapisz_jsonl(
+        wyj / "zadania.jsonl",
+        ({"no": no, **klucze(row, ("nazwa", "cel", "opis"))} for no, row in sorted(obserwator.zadania.items())),
+    )
+    pliki["grupy_zadan"] = zapisz_jsonl(
+        wyj / "grupy_zadan.jsonl",
+        (
+            {"id": no, **klucze(row, ("nazwa", "numer_tytulu", "tytul")), "zadania": obserwator.kolejnosc_grup.get(no, [])}
+            for no, row in sorted(obserwator.grupy.items())
+        ),
+    )
+    pliki["typy_zadan"] = zapisz_jsonl(
+        wyj / "typy_zadan.jsonl",
+        ({"id": no, **klucze(row, ("nazwa",))} for no, row in sorted(obserwator.typy_zadan.items())),
+    )
+    pliki["streszczenia"] = zapisz_jsonl(
+        wyj / "streszczenia.jsonl",
+        (klucze(row, ("tekst",)) for row in sorted(obserwator.streszczenia, key=lambda row: row["id"])),
+    )
+    pliki["wybory"] = zapisz_jsonl(
+        wyj / "wybory.jsonl",
+        (
+            {
+                "q": key,
+                **klucze({name: row[name] for name in ("pytanie", "krok", "tytul", "po_dialogach")}, ("tytul",)),
+                "wybory": [klucze(choice, ("tekst",)) for choice in row["wybory"] if k(choice["tekst"])],
+            }
+            for key, row in sorted(obserwator.wybory.items())
+        ),
+    )
+    pliki["opcje_npc"] = zapisz_jsonl(
+        wyj / "opcje_npc.jsonl",
+        (
+            {"no": no, "dialogi": row["dialogi"], "opcje": [klucze(item, ("tekst",)) for item in row["opcje"] if k(item["tekst"])]}
+            for no, row in sorted(obserwator.opcje_npc.items())
+        ),
+    )
+    def postac(no: int) -> dict:
+        nazwa, tytul = obserwator.tabliczki.get(no, (0, 0))
+        row = {"no": no, "n": k(nazwa), "t": k(tytul), "o": k(obserwator.opis_bytu(no))}
+        return {name: value for name, value in row.items() if value is not None}
+
+    pliki["postacie"] = zapisz_jsonl(
+        wyj / "postacie.jsonl",
+        (
+            row
+            for row in (postac(no) for no in sorted(set(obserwator.tabliczki) | set(obserwator.atrybut_bytu)))
+            if len(row) > 1
+        ),
+    )
+    tozsamosci = defaultdict(list)
+    for row in obserwator.tozsamosci:
+        if k(row["tekst"]):
+            tozsamosci[row["osoba"]].append(k(row["tekst"]))
+    pliki["encyklopedia"] = zapisz_jsonl(
+        wyj / "encyklopedia.jsonl",
+        (
+            {
+                "id": no,
+                **klucze({name: row[name] for name in ("nazwa", "inna_nazwa", "urodziny", "kolejnosc")}, ("nazwa", "inna_nazwa", "urodziny")),
+                "tozsamosc": tozsamosci.get(no, []),
+                "historie": [
+                    [k(obserwator.wydarzenia_osob[number]["tytul"]), k(obserwator.wydarzenia_osob[number]["opis"])]
+                    for number in row["historie"]
+                    if number in obserwator.wydarzenia_osob
+                ],
+            }
+            for no, row in sorted(obserwator.osoby.items())
+        ),
+    )
+    pliki["miejsca"] = zapisz_jsonl(
+        wyj / "miejsca.jsonl",
+        ({"no": no, **klucze(row, ("nazwa",))} for no, row in sorted(obserwator.miejsca.items(), key=lambda item: str(item[0]))),
+    )
+    pliki["przerywniki"] = zapisz_jsonl(
+        wyj / "przerywniki.jsonl",
+        (
+            {"no": no, **klucze(row, ("tekst", "streszczenie"))}
+            for no, row in sorted(obserwator.przerywniki.items(), key=lambda item: str(item[0]))
+            if k(row["tekst"]) or k(row["streszczenie"])
+        ),
+    )
+    pliki["zamiany_dialogow"] = zapisz_jsonl(
+        wyj / "zamiany_dialogow.jsonl",
+        sorted(obserwator.zamiany, key=lambda row: (str(row["typ"]), str(row["dialog"]))),
+    )
+
+    # Kontekst dla osobnej sekcji cutscen: napisy text_msg 590000..592694 z audio sound_data
+    # i podpowiedzią mówcy, plus intro/filmy z czasami oraz replay z powiązaniem do zadań.
+    def _cut_audio(text_id: int) -> str | None:
+        zs = zh.get(text_id)
+        if not zs:
+            return None
+        hits = obserwator.sound_data_po_tekscie.get(_norm_zh(zs))
+        if not hits and " " in zs.strip():
+            hits = obserwator.sound_data_po_tekscie.get(_norm_zh(zs.strip().split(" ", 1)[1]))
+        return hits[0] if hits else None
+
+    def _cut_mowca_en(text_id: int) -> str | None:
+        zs = zh.get(text_id)
+        if not zs:
+            return None
+        own_en = en.get(text_id) or ""
+        if _mowca_z_en(own_en):
+            return None
+        for other_tid in grupy_zh.get(zs, ()):
+            if other_tid == text_id:
+                continue
+            sp = _mowca_z_en(en.get(other_tid) or "")
+            if sp:
+                return sp
+        return None
+
+    cut_rows: list[dict] = []
+    for row_no in sorted(obserwator.text_msg_cutsceny):
+        cid, _grey = obserwator.text_msg_cutsceny[row_no]
+        key = k(cid)
+        if not key:
+            continue
+        item = {"typ": "napis", "wiersz": row_no, "k": key}
+        audio = _cut_audio(cid)
+        if audio:
+            item["audio"] = audio
+        mowca_en = _cut_mowca_en(cid)
+        if mowca_en:
+            item["mowca_en"] = mowca_en
+        cut_rows.append(item)
+    for item in sorted(obserwator.intro_cutsceny, key=lambda r: (r["czas"], r["id"])):
+        key = k(item["text_id"])
+        if key:
+            cut_rows.append(
+                {"typ": "intro", "id": item["id"], "czas": item["czas"], "trwanie": item["trwanie"], "mowca": item["mowca"], "k": key}
+            )
+    for item in sorted(obserwator.filmy_napisy, key=lambda r: (r["film"], r["czas"], r["id"])):
+        key = k(item["text_id"])
+        if key:
+            cut_rows.append(
+                {"typ": "film", "film": item["film"], "id": item["id"], "czas": item["czas"], "trwanie": item["trwanie"], "k": key}
+            )
+    for item in sorted(obserwator.powtorki_cutscen, key=lambda r: r["no"]):
+        row = {"typ": "powtorka", "no": item["no"]}
+        for field in ("task_no", "finish_task", "grupa", "przestrzen"):
+            if item[field] not in (None, 0):
+                row[field] = item[field]
+        for src_field, dst_field in (("nazwa_id", "nazwa"), ("rozdzial_id", "rozdzial"), ("streszczenie_id", "streszczenie")):
+            key = k(item[src_field])
+            if key:
+                row[dst_field] = key
+        if any(f in row for f in ("nazwa", "rozdzial", "streszczenie")):
+            cut_rows.append(row)
+    pliki["cutsceny_kontekst"] = zapisz_jsonl(wyj / "cutsceny_kontekst.jsonl", cut_rows)
+
+    # 7. manifest z liczbami i pokryciem
+    elementy_scen = sum(len(scena["elementy"]) for scena in sceny.values())
+    kwestii = sum(1 for scena in sceny.values() for e in scena["elementy"] if e["rodzaj"] == "kwestia")
+    bez_grupy = sum(1 for scena in sceny.values() for e in scena["elementy"] if e["rodzaj"] == "kwestia" and e["mowca"] is None)
+    id_scen = {e["text_id"] for scena in sceny.values() for e in scena["elementy"]}
+    en_ids = set(en)
+    en_wskazane = len(en_ids & wskazane)
+    tylko_zh = set(zh) - en_ids
+    manifest = {
+        "format": FORMAT,
+        "wejscia": wejscia,
+        "liczby": {
+            "id_w_mapie_zh": len(zh),
+            "id_w_mapie_en": len(en),
+            "id_w_zakresie": len(w_zakresie),
+            "unikalnych_tekstow_w_zakresie": len(teksty),
+            "tekstow_bez_wersji_zh": sum(1 for entry in teksty.values() if entry["z_en"]),
+            "id_tylko_zh_niewskazane_pominiete": len(tylko_zh - wskazane),
+            "id_tylko_zh_wskazane": len(tylko_zh & wskazane),
+            "scen": len(sceny),
+            "scen_bez_tekstu": sum(1 for scena in sceny.values() if not scena["elementy"]),
+            "elementow_scen": elementy_scen,
+            "kwestii": kwestii,
+            "kwestii_zaleznych_od_plci_bohatera": len(warianty),
+            "kolizji_znaczeniowych": len(kolizje),
+            "zadan": len(obserwator.zadania),
+            "grup_zadan": len(obserwator.grupy),
+            "pytan_z_wyborami": len(obserwator.wybory),
+            "bytow_z_nazwa_tytulem_lub_opisem": pliki["postacie"]["wierszy"],
+            "postaci_w_encyklopedii": len(obserwator.osoby),
+            "miejsc": len(obserwator.miejsca),
+        },
+        "pokrycie": {
+            "id_en_wskazane_przez_tabele_lub_sceny": en_wskazane,
+            "id_en_bez_zrodla": len(en_ids) - en_wskazane,
+            "procent_id_en_ze_zrodlem": round(100 * en_wskazane / len(en_ids), 2) if en_ids else 0,
+            "id_w_scenach": len(id_scen),
+            "kwestii_bez_grupy_mowcy": bez_grupy,
+            "kwestie_wg_nazwy_mowcy": dict(mowcy),
+            "scen_z_odwolaniem": sum(1 for numer in sceny if any(field in wiarygodne for field, _ in obserwator.odwolania.get(numer, ()))),
+            "pol_wskazujacych_dialogi": len(wiarygodne),
+        },
+        "bledy": {
+            "tabele": zrodla.bledy,
+            "sceny": {str(numer): text for numer, text in bledy_scen.items()},
+        },
+        "pliki": pliki,
+    }
+    (wyj / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    log(f"gotowe ({time.time() - start:.0f} s)")
+    return manifest
+
+
+def opis_wejsc(katalogi: list[str], zh: list[str], en: list[str], baza: baza_gry.Baza, opis: str = "") -> dict:
+    """Inwentarz plików wejściowych: nazwy bez ścieżek, rozmiary i SHA-256."""
+
+    def plik(path) -> dict:
+        path = Path(path)
+        return {"plik": path.name, "bajtow": path.stat().st_size, "sha256": mapa_tekstow.sha256_pliku(path)}
+
+    return {
+        "opis": opis,
+        "mapa_zh": [plik(path) for path in zh],
+        "mapa_en": [plik(path) for path in en],
+        "manifest_bazy": plik(baza.sciezka_manifestu),
+        "pliki_bazy": len(baza.pliki),
+        "tabel": len(baza.tabele),
+    }
+
+
+def main(argv=None) -> int:
+    wypisz.utf8()
+    parser = argparse.ArgumentParser(description="Wyciąg z bazy gry do katalogu index/ (wwm-indeks-v2).")
+    parser.add_argument("--baza", nargs="+", required=True, help="katalogi z MANIFEST, indexN, dataN (późniejszy przykrywa)")
+    parser.add_argument("--manifest", help="plik MANIFEST, jeśli nie ten z ostatniego katalogu")
+    parser.add_argument("--zh", nargs="+", required=True, help="mapa zh_cn i jej warstwy _diff, w kolejności nakładania")
+    parser.add_argument("--en", nargs="+", required=True, help="mapa en i jej warstwy _diff, w kolejności nakładania")
+    parser.add_argument("--wyj", default="index")
+    parser.add_argument("--opis", default="", help="opis wersji gry do manifestu, np. numer buildu i data")
+    arguments = parser.parse_args(argv)
+
+    try:
+        baza = baza_gry.Baza(arguments.baza, arguments.manifest, pamiec_chunkow=8192)
+        zh_paths = mapa_tekstow.wybierz_warstwy_gry(arguments.zh)
+        en_paths = mapa_tekstow.wybierz_warstwy_gry(arguments.en)
+        zh = mapa_tekstow.zloz(zh_paths)
+        en = mapa_tekstow.zloz(en_paths)
+    except (baza_gry.BazaError, mapa_tekstow.MapaError) as error:
+        print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
+        return 1
+    manifest = zbuduj(
+        baza, zh, en, Path(arguments.wyj), opis_wejsc(arguments.baza, [str(p) for p in zh_paths], [str(p) for p in en_paths], baza, arguments.opis),
+        log=lambda text: print(text, file=sys.stderr),
+    )
+    print(json.dumps({"ok": True, "liczby": manifest["liczby"], "pokrycie": manifest["pokrycie"]}, ensure_ascii=False, indent=1))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
