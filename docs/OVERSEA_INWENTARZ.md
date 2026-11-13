@@ -69,3 +69,21 @@ scen następnych (stąd pozorne „5 859 braków”). Aktualny odczyt całej baz
 (`MANIFEST` → `indexN` → `dataN`) oraz wiązania scen opisują
 [BAZA_GRY.md](BAZA_GRY.md) i [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md); trwałe
 skróty wejść stoją w `index/manifest.json`.
+
+## Trzecia dostawa — Patch 2.4 (`2026-11-13`, build `26592996`)
+
+Zebrana narzędziem `collector` `1.3.0` (`WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`,
+8 części po ok. 64 MB, łącznie 516 MB, `637` pozycji inwentarza, `60` unikalnych
+plików sprawdzonych przez `tools/validate_collector_return.py`):
+
+- **`Package/HD/oversea/` (~377 MB):** kompletny `MANIFEST`, `CameraZone.json`,
+  `VirtualWindow.json`, `Voxel.json`, `Audio_Area*`, `bulk_data/`, `data1..11`,
+  `data200..212`, `data1001`, `data1200`, `index1..4`, `index200..204`,
+  `index1001`, `index1200`, mapy językowe `translate_words_map_{en,zh_cn}`
+  oraz `translate_words_map_{en,zh_cn}_diff`.
+- **`LocalData/Patch/HD/oversea/` (~5,6 MB):** `MANIFEST`, `index1001`, `index1200`,
+  `data1005`, `data1201`, `translate_words_map_en_diff` (19 326 459 B — zastępuje
+  warstwę `_diff` EN z `Package/`) oraz 7 binarnych plików `formula/*.ft`
+  (w tej dostawie brak `LocalData/Patch/.../translate_words_map_zh_cn_diff`).
+- **Wyciąg `index/` w repozytorium** został zaktualizowany do tej dostawy (szczegóły
+  i liczby w [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).

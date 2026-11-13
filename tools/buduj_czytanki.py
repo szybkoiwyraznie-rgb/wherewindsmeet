@@ -3275,27 +3275,44 @@ def _podziel_sekcje_po_podnaglowku(sekcja: list[str], limit_czysty: int) -> list
                 start_idx = 4
             prefix = [nagl_h2, *wstep_h2, nagl_h3, "", *tab_header]
             prefix_b = sum(len(l.encode("utf-8")) + 1 for l in prefix)
-            czesci: list[list[str]] = []
-            cur_sub: list[str] = list(prefix)
-            cur_b = prefix_b
+            # Zgrupuj wiersze w atomowe rekordy (wiersz tabeli lub pozycja listy `- **...**` z podpunktami),
+            # aby żaden podział nie dokładał kolejnego rekordu ponad `limit_czysty`.
+            rekordy: list[list[str]] = []
+            cur_rek: list[str] = []
             for line in sub[start_idx:]:
-                lb = len(line.encode("utf-8")) + 1
                 is_tab_row_start = bool(
                     tab_header
                     and line.startswith("| ")
                     and line.split("|", 2)[1].strip()
                 )
-                mozna_ciac = line.startswith("- **") or is_tab_row_start or (
-                    not tab_header and not line.strip() and len(cur_sub) > len(prefix)
+                rozpoczyna_nowy = bool(cur_rek) and (
+                    line.startswith("- **")
+                    or line.startswith("#### ")
+                    or is_tab_row_start
+                    or (not tab_header and not line.strip() and not cur_rek[0].startswith("- **"))
                 )
-                if len(cur_sub) > len(prefix) and cur_b + lb > limit_czysty and mozna_ciac:
+                if rozpoczyna_nowy:
+                    rekordy.append(cur_rek)
+                    cur_rek = [line]
+                else:
+                    cur_rek.append(line)
+            if cur_rek:
+                rekordy.append(cur_rek)
+
+            czesci: list[list[str]] = []
+            cur_sub: list[str] = list(prefix)
+            cur_b = prefix_b
+            pad_b = 1 if tab_header else 0
+            for rek in rekordy:
+                rek_b = sum(len(l.encode("utf-8")) + 1 for l in rek)
+                if len(cur_sub) > len(prefix) and cur_b + rek_b + pad_b > limit_czysty:
                     if tab_header:
                         cur_sub.append("")
                     czesci.append(cur_sub)
                     cur_sub = list(prefix)
                     cur_b = prefix_b
-                cur_sub.append(line)
-                cur_b += lb
+                cur_sub.extend(rek)
+                cur_b += rek_b
             if len(cur_sub) > len(prefix):
                 czesci.append(cur_sub)
             if len(czesci) > 1:
@@ -3352,7 +3369,10 @@ def _podziel_na_czesci(plik: ZbudowanyPlik, limit_bajtow: int) -> list[tuple[str
     if not surowe_sekcje:
         return [(plik.nazwa, [pelny_tekst], plik.statystyka)]
 
-    intro_b = sum(len(l.encode("utf-8")) + 1 for l in intro) + 64
+    # Uwzględnij dłuższy tytuł z sufiksowanym numerem części (`— część 9999/9999`), żeby żaden
+    # chunk po złożeniu nie przekroczył `limit_bajtow`.
+    intro_max = [f"# {plik.tytul} — część 9999/9999", *intro[1:]]
+    intro_b = sum(len(l.encode("utf-8")) + 1 for l in intro_max) + 2
     limit_sekcji = max(limit_bajtow - intro_b, max(limit_bajtow // 2, 1024))
     sekcje: list[list[str]] = []
     for sec in surowe_sekcje:
@@ -3363,13 +3383,13 @@ def _podziel_na_czesci(plik: ZbudowanyPlik, limit_bajtow: int) -> list[tuple[str
 
     czesc_grupy: list[list[list[str]]] = []
     cur: list[list[str]] = []
-    cur_bytes = sum(len(l.encode("utf-8")) + 1 for l in intro)
+    cur_bytes = intro_b
     for sec in sekcje:
         sec_bytes = sum(len(l.encode("utf-8")) + 1 for l in sec)
         if cur and cur_bytes + sec_bytes > limit_bajtow:
             czesc_grupy.append(cur)
             cur = [sec]
-            cur_bytes = sum(len(l.encode("utf-8")) + 1 for l in intro) + sec_bytes
+            cur_bytes = intro_b + sec_bytes
         else:
             cur.append(sec)
             cur_bytes += sec_bytes

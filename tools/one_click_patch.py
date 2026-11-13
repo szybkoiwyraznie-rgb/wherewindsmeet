@@ -139,7 +139,7 @@ def _wykryj_z_raportu(raport_path: Path, jezyk_celu: str) -> tuple[list[tuple[st
 def _wykryj_z_katalogu(katalog: Path, jezyk_celu: str) -> tuple[list[tuple[str, Path]], list[tuple[str, Path]], str]:
     raport = katalog / "RAPORT.json"
     if not raport.is_file():
-        raport = next(sorted(katalog.rglob("RAPORT.json")), None)
+        raport = next(iter(sorted(katalog.rglob("RAPORT.json"))), None)
     if raport is not None and raport.is_file():
         return _wykryj_z_raportu(raport, jezyk_celu)
 
@@ -219,7 +219,9 @@ def odkryj_mapy(
         if build_part:
             detected_build = build_part
 
-    zh_sorted = sorted(zh_by_rel.values(), key=lambda item: _priorytet_warstwy_zh(item[0]))
+    zh_sorted = mapa_tekstow.filtruj_zastapione_diffy(
+        sorted(zh_by_rel.values(), key=lambda item: _priorytet_warstwy_zh(item[0]))
+    )
     dedup_zh = [path for _, path in zh_sorted]
     pairs = [by_game_rel[k] for k in sorted(by_game_rel)]
     return dedup_zh, pairs, detected_build

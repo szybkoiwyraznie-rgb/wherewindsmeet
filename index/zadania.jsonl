@@ -2054,6 +2054,17 @@
 {"no":380329,"grupa":5391,"typ":8,"pre":[380305],"post":[380330],"nazwa":"995b9c47c6df0ae6","cel":"b58c18997a964aab","opis":"0a8535133cd25fac","przestrzen":36506,"dialogi":{"przyjecie":[2560439]}}
 {"no":380330,"grupa":5391,"typ":8,"pre":[380329],"post":[380308],"nazwa":"995b9c47c6df0ae6","cel":"ebeec884cb827fa2","opis":"0a8535133cd25fac","przestrzen":36506}
 {"no":380331,"grupa":5391,"typ":8,"pre":[380310],"nazwa":"995b9c47c6df0ae6","cel":"1353af1159b29e5f","opis":"a7de1b3b288e983d","przestrzen":36506,"dialogi":{"zakonczenie":[2560438]}}
+{"no":380361,"grupa":5586,"typ":15,"pre":[380370],"post":[380362],"nazwa":"7d56fd42bc88da30","cel":"1e76b8738a9b917e","opis":"7504b8de1a5588cc","przestrzen":501}
+{"no":380362,"grupa":5586,"typ":15,"pre":[380361],"post":[380363],"nazwa":"7d56fd42bc88da30","cel":"4420608f6a6f7a20","opis":"2d05980b569a72c5","przestrzen":501}
+{"no":380363,"grupa":5586,"typ":15,"pre":[380362],"post":[380364],"nazwa":"7d56fd42bc88da30","cel":"0db5356e2b4b4738","opis":"14a862e54958611c","przestrzen":501}
+{"no":380364,"grupa":5586,"typ":15,"pre":[380363],"post":[380365],"nazwa":"7d56fd42bc88da30","cel":"014e8e9118a48624","opis":"41b1ccf0dfc49eb8","przestrzen":9999,"dialogi":{"przyjecie":[4110066],"zakonczenie":[4110066]}}
+{"no":380365,"grupa":5586,"typ":15,"pre":[380364],"post":[380366],"nazwa":"7d56fd42bc88da30","cel":"b434c2b937259753","opis":"41b1ccf0dfc49eb8","przestrzen":9999}
+{"no":380366,"grupa":5586,"typ":15,"pre":[380365],"post":[380367],"nazwa":"7d56fd42bc88da30","cel":"6524ae93f641f476","opis":"41b1ccf0dfc49eb8","przestrzen":9999,"dialogi":{"rozmowa":[4110068],"zakonczenie":[4110068]}}
+{"no":380367,"grupa":5586,"typ":15,"pre":[380366],"post":[380368],"nazwa":"7d56fd42bc88da30","cel":"4ac240680e5af6fe","opis":"41b1ccf0dfc49eb8","przestrzen":9999}
+{"no":380368,"grupa":5586,"typ":15,"pre":[380367],"post":[380369],"nazwa":"7d56fd42bc88da30","cel":"17c280670b42787a","opis":"41b1ccf0dfc49eb8","przestrzen":9999}
+{"no":380369,"grupa":5586,"typ":15,"pre":[380368],"post":[380380],"nazwa":"7d56fd42bc88da30","cel":"e7c536279a49585f","opis":"41b1ccf0dfc49eb8","przestrzen":9999,"wybory":[2586,2586]}
+{"no":380370,"grupa":5586,"typ":15,"nazwa":"7d56fd42bc88da30","cel":"1e76b8738a9b917e","opis":"7504b8de1a5588cc","przestrzen":63488}
+{"no":380371,"grupa":5586,"typ":15,"pre":[380370],"post":[380372],"nazwa":"7d56fd42bc88da30","cel":"1e76b8738a9b917e","opis":"7504b8de1a5588cc","przestrzen":501}
 {"no":380372,"grupa":5586,"typ":15,"pre":[380371],"post":[380373],"nazwa":"7d56fd42bc88da30","cel":"4420608f6a6f7a20","opis":"2d05980b569a72c5","przestrzen":501}
 {"no":380373,"grupa":5586,"typ":15,"pre":[380372],"post":[380374],"nazwa":"7d56fd42bc88da30","cel":"0db5356e2b4b4738","opis":"14a862e54958611c","przestrzen":501}
 {"no":380374,"grupa":5586,"typ":15,"pre":[380373],"post":[380375],"nazwa":"7d56fd42bc88da30","cel":"014e8e9118a48624","opis":"41b1ccf0dfc49eb8","przestrzen":501,"dialogi":{"przyjecie":[4110066],"zakonczenie":[4110066]}}
@@ -2062,7 +2073,7 @@
 {"no":380377,"grupa":5586,"typ":15,"pre":[380376],"post":[380378],"nazwa":"7d56fd42bc88da30","cel":"4ac240680e5af6fe","opis":"41b1ccf0dfc49eb8","przestrzen":501}
 {"no":380378,"grupa":5586,"typ":15,"pre":[380377],"post":[380379],"nazwa":"7d56fd42bc88da30","cel":"17c280670b42787a","opis":"41b1ccf0dfc49eb8","przestrzen":501}
 {"no":380379,"grupa":5586,"typ":15,"pre":[380378],"post":[380380],"nazwa":"7d56fd42bc88da30","cel":"e7c536279a49585f","opis":"41b1ccf0dfc49eb8","przestrzen":501,"wybory":[2586,2586]}
-{"no":380380,"grupa":5586,"typ":15,"pre":[380379],"post":[380384],"nazwa":"7d56fd42bc88da30","cel":"5a096e518b70661c","opis":"e9e2bfdf0c7b5b90","przestrzen":504,"przerywniki":{"przyjecie":[32167]}}
+{"no":380380,"grupa":5586,"typ":15,"pre":[380369,380379],"post":[380384],"nazwa":"7d56fd42bc88da30","cel":"5a096e518b70661c","opis":"e9e2bfdf0c7b5b90","przestrzen":504,"przerywniki":{"przyjecie":[32167]}}
 {"no":380381,"grupa":5586,"typ":15,"pre":[380384],"post":[380382],"nazwa":"7d56fd42bc88da30","cel":"0bde093b25f8be1e","opis":"8fad1394fc8200bf","przestrzen":504}
 {"no":380382,"grupa":5586,"typ":15,"pre":[380381],"post":[380383],"nazwa":"7d56fd42bc88da30","cel":"729d811700cbdf95","opis":"84f79124a0460eaf","przestrzen":504,"przerywniki":{"przyjecie":[32168]}}
 {"no":380383,"grupa":5586,"typ":15,"pre":[380382],"post":[380385],"nazwa":"7d56fd42bc88da30","cel":"90ec81a163d2b307","opis":"54a935001948afd0","przestrzen":504,"dialogi":{"zakonczenie":[4110071]}}
@@ -2507,6 +2518,7 @@
 {"no":450168,"typ":13,"pre":[450167],"post":[450169],"nazwa":"a4a3c9954f34ce59","cel":"2af75c015a07903e","przestrzen":501}
 {"no":450169,"typ":13,"pre":[450168],"post":[450170],"nazwa":"a4a3c9954f34ce59","cel":"0c8f67ed801d2aa8","przestrzen":501,"dialogi":{"przyjecie":[23900262],"zakonczenie":[23900262]}}
 {"no":450170,"typ":13,"pre":[450169],"nazwa":"a4a3c9954f34ce59","cel":"392e34b344a718c8","przestrzen":501,"dialogi":{"rozmowa":[23900263],"zakonczenie":[23900263]}}
+{"no":450175,"grupa":5917,"typ":13,"post":[450176],"nazwa":"d024846e19f29cc2","cel":"0801ee488cc218f9","opis":"536328b240b5dbf0","przestrzen":501,"dialogi":{"rozmowa":[23900266],"zakonczenie":[23900266]}}
 {"no":450176,"grupa":5917,"typ":13,"pre":[450175],"post":[450177],"nazwa":"d024846e19f29cc2","cel":"9c52325df73e0126","opis":"536328b240b5dbf0","przestrzen":501}
 {"no":450177,"grupa":5917,"typ":13,"pre":[450176],"nazwa":"d024846e19f29cc2","cel":"9c52325df73e0126","opis":"536328b240b5dbf0","przestrzen":501,"dialogi":{"przyjecie":[23900267],"zakonczenie":[23900267]}}
 {"no":450180,"typ":13,"post":[450181],"nazwa":"8c7e85fe819bcd9e","cel":"e20ffe3c0a1340ec","przestrzen":501,"dialogi":{"zakonczenie":[23900273]}}
@@ -8512,7 +8524,7 @@
 {"no":1201076,"grupa":5732,"typ":3,"pre":[1201075],"post":[1201077],"nazwa":"82164c2795ee3df0","cel":"a1152c446340962d","opis":"b480cb1237b5783b","przestrzen":501}
 {"no":1201077,"grupa":5732,"typ":3,"pre":[1201076],"post":[1201078],"nazwa":"82164c2795ee3df0","cel":"86997c1655b547da","opis":"b480cb1237b5783b","przestrzen":501}
 {"no":1201078,"grupa":5732,"typ":3,"pre":[1201077],"post":[1201079],"nazwa":"82164c2795ee3df0","cel":"86997c1655b547da","opis":"b480cb1237b5783b","przestrzen":501,"dialogi":{"przyjecie":[23300084],"zakonczenie":[23300084]}}
-{"no":1201079,"grupa":5732,"typ":3,"pre":[1201078],"nazwa":"82164c2795ee3df0","cel":"a5bf3226a7d483b5","opis":"b480cb1237b5783b","przestrzen":501,"wybory":[215012]}
+{"no":1201079,"grupa":5732,"typ":3,"pre":[1201078],"nazwa":"82164c2795ee3df0","cel":"a5bf3226a7d483b5","opis":"b07b8d4cdf80700f","przestrzen":501,"wybory":[215012]}
 {"no":1201080,"grupa":5732,"typ":3,"post":[1201059],"nazwa":"82164c2795ee3df0","cel":"5c62b7e93a2a9f59","opis":"b480cb1237b5783b","przestrzen":501}
 {"no":1201081,"grupa":5732,"typ":3,"post":[1201052],"nazwa":"82164c2795ee3df0","cel":"313fab1e168443e5","przestrzen":501}
 {"no":1201082,"grupa":5732,"typ":3,"post":[1201084],"nazwa":"82164c2795ee3df0","cel":"313fab1e168443e5","opis":"b480cb1237b5783b","przestrzen":501}
@@ -11364,7 +11376,7 @@
 {"no":1530003,"grupa":5475,"typ":16,"pre":[1530002],"nazwa":"5c8208ff63ce58bb","cel":"632430422efb8429","opis":"0cc8a0a19dcb4687","przestrzen":501,"dialogi":{"rozmowa":[3090000001],"zakonczenie":[3090000001]}}
 {"no":1530004,"grupa":5475,"typ":16,"pre":[1530003],"post":[1530005],"nazwa":"5c8208ff63ce58bb","cel":"407cd2912b2daadf","opis":"0cc8a0a19dcb4687","przestrzen":501,"dialogi":{"rozmowa":[3090000002],"zakonczenie":[3090000002]}}
 {"no":1530005,"grupa":5475,"typ":16,"pre":[1530004],"post":[1530006],"nazwa":"5c8208ff63ce58bb","cel":"5c0d1770f3634179","opis":"0cc8a0a19dcb4687","przestrzen":501,"dialogi":{"rozmowa":[3090000003],"zakonczenie":[3090000003]}}
-{"no":1530006,"grupa":5475,"typ":16,"pre":[1530005,1530021],"post":[1530007],"nazwa":"5c8208ff63ce58bb","cel":"7fcca14461a31d9d","opis":"0cc8a0a19dcb4687","przestrzen":501}
+{"no":1530006,"grupa":5475,"typ":16,"pre":[1530005,1530021],"post":[1530007],"nazwa":"5c8208ff63ce58bb","cel":"dc5318aae39990b6","opis":"0cc8a0a19dcb4687","przestrzen":501}
 {"no":1530007,"grupa":5475,"typ":16,"pre":[1530006],"post":[1530008,1530010],"nazwa":"5c8208ff63ce58bb","cel":"6f6e267b98f70048","opis":"0cc8a0a19dcb4687","przestrzen":501}
 {"no":1530008,"grupa":5475,"typ":16,"pre":[1530007],"post":[1530009],"nazwa":"5c8208ff63ce58bb","cel":"ac7f53b96407ebe5","opis":"0cc8a0a19dcb4687","przestrzen":501}
 {"no":1530009,"grupa":5475,"typ":16,"pre":[1530008],"nazwa":"5c8208ff63ce58bb","cel":"61ae86e4ed3991c9","opis":"0cc8a0a19dcb4687","przestrzen":501,"dialogi":{"przyjecie":[3090000004],"zakonczenie":[3090000004]}}
@@ -17624,6 +17636,14 @@
 {"no":1001900033,"typ":2,"nazwa":"e667d9daf43b9462","cel":"e667d9daf43b9462","przestrzen":501}
 {"no":1001900034,"typ":2,"nazwa":"88b8a69399e12da6","cel":"88b8a69399e12da6","przestrzen":501}
 {"no":1001900035,"typ":2,"pre":[1001900025],"nazwa":"d071626a6c78990f","cel":"d071626a6c78990f","przestrzen":501}
+{"no":1001900036,"typ":2,"nazwa":"66306ecb7002a545","cel":"66306ecb7002a545","przestrzen":504}
+{"no":1001900037,"typ":2,"nazwa":"7270f8716ec46f0e","cel":"7270f8716ec46f0e","przestrzen":504}
+{"no":1001900038,"typ":2,"nazwa":"5acef00dbf182dc3","cel":"5acef00dbf182dc3","przestrzen":504}
+{"no":1001900039,"typ":2,"nazwa":"555ccb37b9a132ef","cel":"555ccb37b9a132ef","przestrzen":504}
+{"no":1001900040,"typ":2,"nazwa":"26b9e54ab8c4d3dc","cel":"26b9e54ab8c4d3dc","przestrzen":504}
+{"no":1001900041,"typ":2,"nazwa":"cc202f243ca6cae1","cel":"cc202f243ca6cae1","przestrzen":504}
+{"no":1001900042,"typ":2,"nazwa":"5223b7bc6c378548","cel":"5223b7bc6c378548","przestrzen":504}
+{"no":1001900043,"typ":2,"nazwa":"09cb8b8a943e90f7","cel":"09cb8b8a943e90f7","przestrzen":504}
 {"no":10000170017,"grupa":5920,"typ":3,"post":[10000170018],"nazwa":"ad680b87b3bebd89","cel":"679c13f2fd8a830a","opis":"fafbfecf8d0d3b60","przestrzen":701,"dialogi":{"rozmowa":[32900026],"zakonczenie":[32900026]}}
 {"no":10000170018,"grupa":5920,"typ":3,"pre":[10000170017],"post":[10000170019],"nazwa":"ad680b87b3bebd89","cel":"64326b8dbf8e1efd","opis":"fafbfecf8d0d3b60","przestrzen":701,"dialogi":{"przyjecie":[32900027],"zakonczenie":[32900027]}}
 {"no":10000170019,"grupa":5920,"typ":3,"pre":[10000170018],"post":[10000170020],"nazwa":"ad680b87b3bebd89","cel":"178519a30eed67cd","opis":"fafbfecf8d0d3b60","przestrzen":701,"dialogi":{"rozmowa":[32900029],"zakonczenie":[32900030,32900029]}}
@@ -21342,7 +21362,7 @@
 {"no":10001201076,"grupa":5732,"typ":3,"pre":[10001201075],"post":[10001201077],"nazwa":"82164c2795ee3df0","cel":"a1152c446340962d","opis":"b480cb1237b5783b","przestrzen":701}
 {"no":10001201077,"grupa":5732,"typ":3,"pre":[10001201076],"post":[10001201078],"nazwa":"82164c2795ee3df0","cel":"86997c1655b547da","opis":"b480cb1237b5783b","przestrzen":701}
 {"no":10001201078,"grupa":5732,"typ":3,"pre":[10001201077],"post":[10001201079],"nazwa":"82164c2795ee3df0","cel":"86997c1655b547da","opis":"b480cb1237b5783b","przestrzen":701,"dialogi":{"przyjecie":[23300084],"zakonczenie":[23300084]}}
-{"no":10001201079,"grupa":5732,"typ":3,"pre":[10001201078],"nazwa":"82164c2795ee3df0","cel":"a5bf3226a7d483b5","opis":"b480cb1237b5783b","przestrzen":701,"wybory":[215012]}
+{"no":10001201079,"grupa":5732,"typ":3,"pre":[10001201078],"nazwa":"82164c2795ee3df0","cel":"a5bf3226a7d483b5","opis":"b07b8d4cdf80700f","przestrzen":701,"wybory":[215012]}
 {"no":10001201080,"grupa":5732,"typ":3,"post":[10001201059],"nazwa":"82164c2795ee3df0","cel":"5c62b7e93a2a9f59","opis":"b480cb1237b5783b","przestrzen":701}
 {"no":10001201081,"grupa":5732,"typ":3,"post":[10001201052],"nazwa":"82164c2795ee3df0","cel":"313fab1e168443e5","przestrzen":701}
 {"no":10001201082,"grupa":5732,"typ":3,"post":[10001201084],"nazwa":"82164c2795ee3df0","cel":"313fab1e168443e5","opis":"b480cb1237b5783b","przestrzen":701}

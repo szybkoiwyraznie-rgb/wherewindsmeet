@@ -5,17 +5,21 @@ pliki gry → wyciąg `index/` → pakiet dla tłumacza → import zwrotki do ma
 `tlumaczenie/` → łatka map tekstów (oraz powtarzalny obieg przyrostowy po
 aktualizacjach gry). Cel i kryteria akceptacji opisuje [docs/CEL.md](docs/CEL.md).
 
-**Stan (2026-11-12): pierwszy pełny pakiet dla tłumacza (`v1`) oraz pakiet `v3` (`--tylko-z-en`) są zbudowane
-i przekazane właścicielowi**, a cały obieg po stronie narzędzi (ekstrakcja bazy, budowa
-pakietu, trzyplikowe Czytanki, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
-audyt aktualizacji i pakiet uzupełniający) działa na prawdziwych plikach buildu `25906190`.
-**Zweryfikowano w uruchomionej grze (Steam Windows):** mała łatka testowa (`tools/latka_testowa.py` —
-menu, ustawienia i napisy otwierającego prologu) załadowała się w kliencie bez problemu, a czcionki gry
-wyświetliły komplet polskich znaków diakrytycznych (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
-**Wciąż czeka na sprawdzenie:** pełna łatka fabularna (brak jeszcze zwrotki przekładu w `tlumaczenie/`)
-oraz bezpośrednie uruchomienie nowego samowystarczalnego instalatora `patcher_wwm.py` w oknie gry
-(zachowuje sprawdzony format map binarnych i przeszedł testy na Linux + Windows CI). Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`),
-bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
+**Stan (2026-11-13): wyciąg `index/` i narzędzia są zaktualizowane do Patcha 2.4 (Steam build `26592996`),**
+gotowy jest audyt różnicy oraz paczka uzupełniająca (`4 010` nowych miejsc `PL:` względem przekazanego
+wcześniej pakietu `v3` z buildu `25906190` / `--tylko-z-en`). Cały obieg po stronie narzędzi (ekstrakcja bazy,
+budowa pakietu, trzyplikowe Czytanki z limitem `<5 MB/część`, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
+audyt aktualizacji i pakiet uzupełniający) działa i został przetestowany na prawdziwych plikach Patcha 2.4.
+**Zweryfikowano dotąd w uruchomionej grze (Steam Windows, poprzedni build `25906190`):** mała łatka testowa
+(`tools/latka_testowa.py` w trybie binarnym — menu, ustawienia i napisy otwierającego prologu) załadowała się
+w kliencie bez problemu, a czcionki gry wyświetliły komplet polskich znaków diakrytycznych
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
+**Wciąż czeka na sprawdzenie w oknie gry:** pełna łatka fabularna (brak jeszcze zwrotki przekładu w `tlumaczenie/`),
+zachowanie gry na Patchu 2.4 (`26592996`) oraz bezpośrednie uruchomienie samowystarczalnego instalatora `patcher_wwm.py`
+w oknie gry (na kopii plików `26592996` przeszedł w piaskownicy pełny cykl instalacji i przywrócenia SHA-256).
+Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`, przetestowany
+na 8-częściowej paczce z Patcha 2.4), bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu
+([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
 grze, bez wstrzykiwania i obchodzenia zabezpieczeń; warunków wydawcy nie
 potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 

@@ -491,6 +491,59 @@ class OneClickPatchTests(unittest.TestCase):
             self.assertEqual(plan["format"], "wwm-plan-latki-v1")
             self.assertGreaterEqual(len(plan["po_kluczu"]), 3)
 
+    def test_patcher_and_one_click_replace_package_diff_with_localdata_patch_diff(self):
+        # Gdy w grze istnieją zarówno Package/.../zh_cn_diff, jak i LocalData/Patch/.../zh_cn_diff,
+        # nowszy _diff z LocalData/Patch musi zastąpić ten z Package (także dla wycofanych kluczy).
+        game = self.root / "game_diff_replace"
+        backup = self.root / "backup_diff_replace"
+        (game / "Package/HD/oversea/locale").mkdir(parents=True, exist_ok=True)
+        (game / "LocalData/Patch/HD/oversea/locale").mkdir(parents=True, exist_ok=True)
+
+        zh_base = container([table([(T + 1, ZH[T + 1].encode("utf-8"))])], with_metadata=True)
+        # Starszy pkg_diff zmieniał T+1 na nieaktualne ZH[T+20] ("Miecz"), a nowszy patch_diff go wycofał (pusty / inny klucz).
+        zh_pkg_diff = diff_container([0], 1, [table([(T + 1, ZH[T + 20].encode("utf-8"))])])
+        zh_patch_diff = diff_container([0], 1, [table([(T + 2, ZH[T + 2].encode("utf-8"))])])
+        en_base = container([table([(T + 1, b"smith line"), (T + 2, b"second line")])], with_metadata=True)
+
+        (game / "Package/HD/oversea/locale/translate_words_map_zh_cn").write_bytes(zh_base)
+        (game / "Package/HD/oversea/locale/translate_words_map_zh_cn_diff").write_bytes(zh_pkg_diff)
+        (game / "LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff").write_bytes(zh_patch_diff)
+        (game / "Package/HD/oversea/locale/translate_words_map_en").write_bytes(en_base)
+
+        dedup_zh, pairs, _ = one_click_patch.odkryj_mapy([game], self.root / "odkryj_tmp")
+        self.assertEqual(
+            [p.relative_to(game).as_posix() for p in dedup_zh],
+            [
+                "Package/HD/oversea/locale/translate_words_map_zh_cn",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff",
+            ],
+        )
+        self.assertEqual(len(pairs), 1)
+
+        # W magazynie tłumaczenie istnieje wyłącznie dla prawdziwego bazowego klucza T+1 (kwestia kowala), NIE dla T+20 ("Miecz"):
+        store_dir = self.root / "store_diff_replace"
+        store = tlumaczenie.Magazyn()
+        store.ustaw(K("kwestia kowala"), "kwestia kowala po polsku")
+        store.ustaw(K("Miecz"), "Błędny Miecz PL")
+        tlumaczenie.zapisz(store_dir, store)
+
+        out_zip = self.root / "WWM_DIFF_REPLACE.zip"
+        rc = one_click_patch.main(["--tylko-magazyn", "--magazyn", str(store_dir), "--indeks", str(self.root / "index"), "--wyj-zip", str(out_zip)])
+        self.assertEqual(rc, 0)
+        unpack = self.root / "unpack_diff_replace"
+        with zipfile.ZipFile(out_zip) as zf:
+            zf.extractall(unpack)
+        res = subprocess.run(
+            [sys.executable, "patcher_wwm.py", "--akcja", "instaluj", "--plan", "plan_latki.json", "--game", str(game), "--backup-dir", str(backup), "--non-interactive"],
+            cwd=str(unpack / "narzedzia"),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(res.returncode, 0, res.stderr or res.stdout)
+        patched_en = {e["id"]: e["text"].decode("utf-8") for e in apply_translation.iter_all_entries((game / "Package/HD/oversea/locale/translate_words_map_en").read_bytes())}
+        self.assertEqual(patched_en[T + 1], "kwestia kowala po polsku")
+
 
 if __name__ == "__main__":
     unittest.main()

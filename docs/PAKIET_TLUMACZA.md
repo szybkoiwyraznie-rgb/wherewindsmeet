@@ -60,17 +60,22 @@ Zapis: `tools/wyciag.py`, odczyt: `tools/indeks.py`, kontrola spójności:
 
 ```sh
 python3 tools/wyciag.py \
-  --baza local/oversea_oversea local/oversea_oversea2 local/oversea_oversea3 \
-         local/idx/index local/idx/index2 local/patch/oversea \
-  --zh google_drive/translate_words_map_zh_cn local/zbieracz/pliki/000007_translate_words_map_zh_cn_diff \
-  --en local/zbieracz/pliki/000001_translate_words_map_en \
-       local/zbieracz/pliki/000003_translate_words_map_en_diff \
-       local/zbieracz/pliki/000002_translate_words_map_en_diff \
-  --opis "Steam 3564740, build 25906190, pliki z 2026-11-11" --wyj index
+  --baza local/patch24/Package/HD/oversea local/patch24/LocalData/Patch/HD/oversea \
+  --zh local/patch24/Package/HD/oversea/locale/translate_words_map_zh_cn \
+       local/patch24/Package/HD/oversea/locale/translate_words_map_zh_cn_diff \
+  --en local/patch24/Package/HD/oversea/locale/translate_words_map_en \
+       local/patch24/Package/HD/oversea/locale/translate_words_map_en_diff \
+       local/patch24/LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff \
+  --opis "Steam 3564740, build 26592996, Patch 2.4, pliki z 2026-11-13" --wyj index
 ```
 
 Kolejność katalogów `--baza` i plików map: późniejszy przykrywa wcześniejszy
 (paczka → `LocalData/Patch`). Katalog z `MANIFEST` z patcha musi być ostatni.
+Dla warstw `_diff` tego samego języka funkcja `tools/mapa_tekstow.wybierz_warstwy_gry`
+(wywoływana automatycznie również przez `wyciag.py` oraz `patcher_wwm.py`)
+odrzuca starsze `Package/.../_diff`, jeśli istnieje odpowiadający im plik
+`LocalData/Patch/.../_diff` — tak aby składanie dokładnie odpowiadało regule klienta
+z Patcha 2.4 ([LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)).
 Wynik jest deterministyczny: te same wejścia dają bajt w bajt te same pliki.
 
 | plik | zawartość |
@@ -86,71 +91,74 @@ Wynik jest deterministyczny: te same wejścia dają bajt w bajt te same pliki.
 | `postacie.jsonl`, `encyklopedia.jsonl` | byt → nazwa, tytuł, opis; osoby z encyklopedii gry |
 | `miejsca.jsonl`, `przerywniki.jsonl`, `zamiany_dialogow.jsonl` | przestrzenie, plansze przerywników, podmiany dialogów |
 
-### Liczby (build 25906190, pliki z 2026-11-11)
+### Liczby (Patch 2.4, build 26592996, pliki z 2026-11-13)
 
 | miara | wartość |
 |---|---:|
-| identyfikatorów w mapie chińskiej / angielskiej | 1 818 900 / 1 124 787 |
-| identyfikatorów w zakresie pakietu | 1 128 714 |
-| **unikalnych tekstów w zakresie** | **483 190** |
-| w tym bez wersji chińskiej (źródłem angielski) | 5 824 |
-| identyfikatorów tylko chińskich, których nic nie wskazuje (pominięte) | 700 766 |
-| dialogów (scen) / bez żadnego tekstu | 74 950 / 1 577 |
-| kwestii / elementów scen razem | 186 025 / 187 330 |
+| identyfikatorów w mapie chińskiej / angielskiej | 1 832 734 / 1 136 704 |
+| identyfikatorów w zakresie pakietu | 1 140 673 |
+| **unikalnych tekstów w zakresie** | **487 684** |
+| w tym bez wersji chińskiej (źródłem angielski) | 5 754 |
+| identyfikatorów tylko chińskich, których nic nie wskazuje (pominięte) | 702 513 |
+| dialogów (scen) / bez żadnego tekstu | 75 007 / 1 577 |
+| kwestii / elementów scen razem | 186 288 / 187 598 |
 | kwestii zależnych od płci bohatera | 1 860 |
 | kwestii bez grupy mówcy | **0** |
-| zadań / grup zadań / pytań z wyborami | 24 733 / 1 077 / 15 027 |
-| identyfikatorów angielskich ze wskazanym źródłem (tabela lub scena) | 1 052 649 (93,59%) |
+| zadań / grup zadań / pytań z wyborami | 24 753 / 1 077 / 15 036 |
+| identyfikatorów angielskich ze wskazanym źródłem (tabela lub scena) | 1 063 774 (93,58%) |
 
-**Zakres i zasada źródeł.** W danych buildu `25906190` mapa `zh_cn` ma
-`1 818 900` identyfikatorów, a `en` — `1 124 787` (czyli **38,16%**
+**Zakres i zasada źródeł.** W danych buildu `26592996` (Patch 2.4) mapa `zh_cn` ma
+`1 832 734` identyfikatorów, a `en` — `1 136 704` (czyli **37,98%**
 identyfikatorów z `zh_cn` nie ma w mapie angielskiej).
 
-- `700 766` identyfikatorów wyłącznie chińskich bez wskazania z tabel ani
+- `702 513` identyfikatorów wyłącznie chińskich bez wskazania z tabel ani
   scen zostało już pominiętych przy budowie `index/`.
-- Z pozostałych `1 128 714` identyfikatorów w `index/` (`483 190` unikalnych
+- Z pozostałych `1 140 673` identyfikatorów w `index/` (`487 684` unikalnych
   tekstów):
-  - `476 071` ma i `ZH`, i `EN` (`1 114 265` ID),
-  - `5 824` ma tylko `EN` (`10 577` ID — źródłem jest angielski),
-  - `1 295` ma tylko `ZH` (`3 872` ID — w `paczka v1` weszły do pakietu, ale
-    **935 z nich, czyli 72,2%**, to etykiety testowe, zaślepki i wpisy wycofane
-    typu `测试`, `废弃`, `占坑`, `活动说明活动说明…`, `数据加载中…`, a reszta to
-    treści niewydane w wersji globalnej).
+  - `480 636` ma i `ZH`, i `EN` (`1 126 127` ID),
+  - `5 754` ma tylko `EN` (`10 577` ID — źródłem jest angielski),
+  - `1 294` ma tylko `ZH` (`3 969` ID — w `paczka v1` weszły do pakietu, ale
+    ponad 70% to etykiety testowe, zaślepki i wpisy wycofane typu `测试`,
+    `废弃`, `占坑`, a reszta to treści niewydane w wersji globalnej).
 - **Przyjęta zasada zakresu:** tłumaczeniu w wersji polskiej podlegają wyłącznie
   wpisy mające odpowiednik angielski w kliencie globalnym (`EN` wyznacza
   zakres „co jest wydane w grze”, a `ZH` pozostaje głównym tekstem źródłowym,
-  z `EN` jako odniesieniem; dla `5 824` wpisów wyłącznie EN źródłem jest `EN`).
+  z `EN` jako odniesieniem; dla `5 754` wpisów wyłącznie EN źródłem jest `EN`).
   Wiersze wyłącznie chińskie czekają, aż trafią do globalnego wydania — wtedy
   kolejny audyt wyłapie je jako aktualizację („patch tłumaczenia”). Od strony
   narzędzi obsługuje to flaga `--tylko-z-en` w `tools/buduj_paczke.py` (na
-  bieżącym `index/` ogranicza pakiet z `485 047` do `483 752` miejsc `PL:`)
-  oraz w `tools/audyt_aktualizacji.py`.
+  bieżącym `index/` ogranicza pakiet z `423 197` do `422 248` miejsc `PL:`,
+  a w całym słowniku `index/` z `487 684` do `486 390` tekstów) oraz w
+  `tools/audyt_aktualizacji.py`.
 
 **Mówcy.** Kwestia leży w torze `EntityTextTrack` wewnątrz grupy
 `EntityTrackGroup`, więc mówca wynika z budowy danych. Nazwa mówcy:
-111 398 kwestii ma nazwę z gry (pole sceny albo tabliczka bytu), 37 407 to
-gracz, 37 168 ma tylko roboczą etykietę twórców (`entity_tag`), 52 nic.
+111 975 kwestii ma nazwę z gry (pole sceny albo tabliczka bytu), 37 458 to
+gracz, 36 803 ma tylko roboczą etykietę twórców (`entity_tag`), 52 nic.
 
-## Pakiet (`wwm-paczka-v1`, aktualnie wersja 3 z `--tylko-z-en`)
+## Pakiet (`wwm-paczka-v1`, wysłana wersja `v3` + gotowy wyciąg pod `v4` / `patch24`)
 
 ```sh
-python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v3 --wersja 3 --data 2026-11-12 --tylko-z-en
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v4 --wersja 4 --data 2026-11-13 --tylko-z-en
 ```
 
 Wynik: `README.md`, `sceny/`, `cutsceny/`, `widoki/`, `sceny.zip`,
-`cutsceny.zip`, `widoki.zip`, `paczka_dla_tlumacza_wwm_v3.zip` (cztery
+`cutsceny.zip`, `widoki.zip`, `paczka_dla_tlumacza_wwm_v4.zip` (cztery
 poprzednie w jednym pliku) i `paczka.json` (manifest z liczbami, listą plików
 i wynikiem kontroli). Archiwa są powtarzalne: ta sama zawartość daje ten sam
-SHA-256. Kopia `README.md` i `paczka.json` każdej wysłanej wersji leży w
+SHA-256. Kopia `README.md` i `paczka.json` każdej **wysłanej** wersji leży w
 `paczki/`.
 
 Kontekst cutscen i mówców między `tools/buduj_paczke.py` i
 `tools/buduj_czytanki.py` jest współdzielony w module
-`tools/kontekst_cutscen.py`. W wersji `v3` (`--tylko-z-en`) pakiet zawiera
-**418 773** miejsc `PL:` (`168 157` w `sceny.zip`, `4 116` w `cutsceny.zip`,
-`246 500` w `widoki.zip`), `0` powtórzonych i `0` brakujących; postać gracza
-w przebraniu oznaczana jest jako `gracz (przebranie/rola: …)`, a zadania z
-powiązaną powtórką w dzienniku dostają w nagłówku wpis `- powiązana cutscena
+`tools/kontekst_cutscen.py`. W wysłanej wersji `v3` (`25906190`, `--tylko-z-en`)
+pakiet zawierał **418 773** miejsc `PL:`; po aktualizacji `index/` do Patcha 2.4
+(`26592996`) pełny `v4` ma **422 248** miejsc `PL:` (`168 191` w `sceny.zip`,
+`4 116` w `cutsceny.zip`, `249 941` w `widoki.zip`), `0` powtórzonych i `0`
+brakujących, a pakiet uzupełniający różnicy `25906190 → 26592996` ma **4 010**
+miejsc `PL:` (`42` w `sceny.zip`, `6` w `cutsceny.zip`, `3 962` w `widoki.zip`).
+Postać gracza w przebraniu oznaczana jest jako `gracz (przebranie/rola: …)`,
+a zadania z powiązaną powtórką w dzienniku dostają w nagłówku wpis `- powiązana cutscena
 w dzienniku: #…`.
 
 Element (pełny opis dla tłumacza jest w `README.md` pakietu):
@@ -335,15 +343,19 @@ oknie gry. Nie obiecujemy bezpieczeństwa konta.
 6. Po zwrotce: import (jak wyżej), commit `tlumaczenie/`, nowa samowystarczalna łatka
    przez `tools/one_click_patch.py` (z samego repozytorium, bez pobierania map z Dysku).
 
-Sprawdzone na prawdziwych danych: wyciąg z samej paczki gry (bez
-`LocalData/Patch`) porównany z pełnym — 387 nowych tekstów, 64 usunięte,
-0 zmienionych scen; audyt 9 s; pakiet uzupełniający z 387 miejscami `PL:`.
+Sprawdzone na prawdziwych danych aktualizacji:
+- wcześniejszy skok między paczką bazową a `LocalData/Patch` w buildzie `25906190`:
+  `387` nowych tekstów, `64` usunięte, `0` zmienionych scen;
+- aktualizacja do Patcha 2.4 (`25906190 → 26592996`, `2026-11-13`): `+4 171` nowych
+  tekstów w zakresie `--tylko-z-en`, `566` usuniętych, `57` nowych i `21` zmienionych
+  scen (`49` nowych tekstów w scenach); pakiet uzupełniający ma `4 010` miejsc `PL:`
+  (`42` w `sceny.zip`, `6` w `cutsceny.zip`, `3 962` w `widoki.zip`, ZIP `364 KB`).
 
 ## Co jest hipotezą, a co faktem
 
 | twierdzenie | status |
 |---|---|
-| numer dialogu, mówca, kolejność kwestii w scenie | fakt z budowy danych, sprawdzony na wszystkich 74 950 dialogach |
+| numer dialogu, mówca, kolejność kwestii w scenie | fakt z budowy danych, sprawdzony na wszystkich 75 007 dialogach |
 | powiązanie sceny z zadaniem przez pola tabel zadań i wyborów | fakt z danych |
 | kolejność zadań w grupie | łańcuch z danych; nie sprawdzona w grze |
 | scena „według numeru” należy do sąsiedniego zadania | **hipoteza**, tak oznaczona w pakiecie |

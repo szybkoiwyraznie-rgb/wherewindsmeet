@@ -65,6 +65,31 @@ class TextMapTests(unittest.TestCase):
         second = self.write("d2", diff_container([1], 1, [table([(1, b"b")])]))
         self.assertEqual(mapa_tekstow.zloz([base, first, second]), {1: "b"})
 
+    def test_wybierz_warstwy_gry_replaces_package_diff_when_localdata_patch_diff_exists(self):
+        pkg_dir = self.root / "Package/HD/oversea/locale"
+        patch_dir = self.root / "LocalData/Patch/HD/oversea/locale"
+        pkg_dir.mkdir(parents=True)
+        patch_dir.mkdir(parents=True)
+        base_en = pkg_dir / "translate_words_map_en"
+        pkg_diff_en = pkg_dir / "translate_words_map_en_diff"
+        patch_diff_en = patch_dir / "translate_words_map_en_diff"
+        base_zh = pkg_dir / "translate_words_map_zh_cn"
+        pkg_diff_zh = pkg_dir / "translate_words_map_zh_cn_diff"
+
+        base_en.write_bytes(container([table([(1, b"base-1"), (2, b"base-2")])], with_metadata=True))
+        # Starszy _diff paczki zmieniał wpis 2, a nowszy Patch 2.4 cofnął go do bazy (brak wpisu 2 w patch_diff_en).
+        pkg_diff_en.write_bytes(diff_container([0], 2, [table([(2, b"old-pkg-diff-2")])]))
+        patch_diff_en.write_bytes(diff_container([0], 3, [table([(3, b"patch-3")])]))
+        base_zh.write_bytes(container([table([(1, b"z1")])], with_metadata=True))
+        pkg_diff_zh.write_bytes(diff_container([0], 2, [table([(2, b"z2")])]))
+
+        selected_en = mapa_tekstow.wybierz_warstwy_gry([base_en, pkg_diff_en, patch_diff_en])
+        self.assertEqual(selected_en, [base_en, patch_diff_en])
+        self.assertEqual(mapa_tekstow.zloz(selected_en), {1: "base-1", 2: "base-2", 3: "patch-3"})
+
+        selected_zh = mapa_tekstow.wybierz_warstwy_gry([base_zh, pkg_diff_zh])
+        self.assertEqual(selected_zh, [base_zh, pkg_diff_zh])
+
     def test_unreadable_file_raises_map_error(self):
         broken = self.write("zepsuta", b"\x00" * 40)
         with self.assertRaises(mapa_tekstow.MapaError):

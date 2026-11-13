@@ -136,6 +136,14 @@ wierszy i 113 792 tabele czyste. Po uwzględnieniu chunków poprawek i kolumn
 dopisanych liczba wierszy zgadza się z `MANIFEST` w każdej tabeli — to jest
 dowód, że opis warstwy aktualizacji powyżej jest poprawny.
 
+### Aktualizacja po Patchu 2.4 (`2026-11-13`, build `26592996`)
+
+Na pełnej paczce z Collector `1.3.0` (60 plików `Package/HD/oversea/` + `LocalData/Patch/HD/oversea/`):
+- **114 925** tabel ma niepuste rekordy (w tym 3 nowe tabele mapy `maps.world_zizouqi_01_m.*` w patchu, a 1 stara `wuxue_fx_collect_reward` obecna tylko w pakiecie bazowym);
+- **114 904** tabel czyta się bez błędu (0 nieznanych tagów);
+- **21** pustych/wyzerowanych tabel rozmieszczeń `spaces.*` (8-bajtowe ładunki zerowe) zgłasza `nieznany typ 0x00` i jest odnotowanych wyłącznie w `manifest.json -> bledy` bez wpływu na teksty ani sceny;
+- pojawiło się także 7 binarnych plików formuł RPG w `LocalData/Patch/HD/oversea/formula/*.ft` (brak napisów do tłumaczenia).
+
 ## Dialog = cztery pola jednej tabeli
 
 Każdy dialog to tabela `dialog_timelines.<numer>` z czterema wierszami:

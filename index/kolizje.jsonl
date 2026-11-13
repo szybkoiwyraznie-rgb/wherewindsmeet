@@ -6,7 +6,6 @@
 {"zh":"“文士”营生的能力是什么？","w":[["20c248d511de57df","What is the Scholar Profession's ability?"],["53fe499305dc03e4","What ability does the \"Scholar\" profession have?"]]}
 {"zh":"“沏香舞雩   水云间 焦尾一曲道相思 ”","w":[["e4acdcf638323d66","\"Dance amidst the... fragrance brew; the scorched-tail guqin plays a longing melody.\""],["dc74b5ada359930d","\"Incense drifts as rain falls and dancers move. Amid mist and clouds, a single melody on the zither whispers of longing.\""]]}
 {"zh":"“燕北旧盟”","w":[["4e5abc43d058e561","The Northern Vow..."],["e212a85fbeeede6c","The Yanbei Old Alliance..."]]}
-{"zh":"“识得北斗，天下好走。”我就说嘛，我才不会迷路……","w":[["332634e4989eb20b","\"Know the Northern Dipper, and the world is yours to roam.\" I told you... I wouldn't get lost..."],["724bece3716b7d7d","If you know the North Star, you can travel anywhere with ease. I won't lose my way…"]]}
 {"zh":"……中！","w":[["36d5cbd9cae21a3e","...Good!"],["f7c7cc6d01113efb","...Fair enough!"]]}
 {"zh":"……你说什么？","w":[["44d4b36884bd6ac9","...What did you just say?"],["a728e67c4f014b5d","...What?"]]}
 {"zh":"……嗯？","w":[["8cf0d59d644531db","...Hm?"],["114157f91b7c7f92","...Hmm?"]]}
@@ -38,6 +37,8 @@
 {"zh":"不是 老赵 你  ","w":[["603b4bd58b017f88","Wait, Big Zhao, you..."],["7ebb7f5314106662","Hold on. Zhao, you...  "]]}
 {"zh":"不是吧 难道我的心上人有了心上人 ","w":[["eefb44d2f443056d","No way... Don't tell me the one I love already loves another?"],["acce6110bcde4683","No way... Has my love fallen for someone else? "]]}
 {"zh":"不是要烧灰吗","w":[["d8f1918bb4ca11e0","Aren't you going to burn it?"],["a08bac09231e873e","Didn't you want it as ashes?"]]}
+{"zh":"不是说好一起去将军祠吗","w":[["f944d490af82c8e7","We were supposed to go to the General's Shrine together."],["29abde1a67237b41","You promised we'd go to the General's Shrine!"]]}
+{"zh":"不然我不理你了","w":[["c02ad5628dcaf7b3","Or I'm not talking to you."],["8dd627d77e4ee532","I won't talk to you again!"]]}
 {"zh":"不知七夕的鹊儿，会向月亮许什么愿望？","w":[["f74b575936c6fac9","When the magpies bridge the sky on Qixi night, what secret do they murmur to the moon?"],["6ccbf9c18e9ed12f","I wonder what wishes the magpies make on the night they build their bridge."]]}
 {"zh":"不知我这梦中犹自沉吟的师兄，可愿看在圣人的份上，原谅猫的主人，帮忙送她的魂回来呢？","w":[["7d994a0277acce05","Senior Brother, brooding even in your dreams, please, for the Sage's sake, forgive the cat's owner and guide her soul back."],["10b11a17bd97dde9","Senior Brother, I know I shouldn't bother you while you're still half-asleep, but could you forgive the cat's owner and help bring her soul back?"]]}
 {"zh":"不知是什么事绊住了代掌门","w":[["2d2f5d9bea335924","I wonder what business has detained the Acting Master..."],["d79d50d785dd23e3","May I ask what is keeping you"]]}
@@ -60,7 +61,6 @@
 {"zh":"也好 兵来将挡水来土掩 我就拿它试试太极奇术 ","w":[["02622873018c4476","Just as well. Gotta roll with the punches. It'll be a good chance to try this newly learned Qiankun Shift!"],["9bf9435b47a50b2f","Sounds good. Cross that bridge when you come to it. I'll take this chance to test out the Tai Chi Mystic Skill. "]]}
 {"zh":"也没有带走物件","w":[["4e19596389bcacc0","It didn't take anything you can carry."],["778e44e60f8c086e","Not objects"]]}
 {"zh":"乡间野酿，小酌片刻，尽兴而归。\n三人倾盏，纵有江湖风雨，亦可偷闲半晌。","w":[["b9e97959c5e23448","A jug of rustic homebrew, a quiet toast among three.\nEven with the storms of jianghu ever at their heels, there is still time to steal one easy, carefree moment."],["8f356fc61331cd00","A rustic brew, a quiet cup, then homeward, warm and light.\nThree friends, three jars, and the storms of the road can spare a stolen night."]]}
-{"zh":"书以载道，道以育人，人复著述，述又成书。传书，便是传火——","w":[["9c6ebebeaded1f33","Books carry the Dao; the Dao nurtures the soul. Mankind writes to preserve the Dao, and their writings become books once more. To pass on books is to pass on the flame..."],["804602b293bdb6de","Books carry the truth. Truth shapes people. People write it down again, and their words become new books. To pass on a book is to pass on a flame."]]}
 {"zh":"乾坤倒转......","w":[["41ba2b7922604f4d","Cosmic Reversal"],["f708a6d5f1345e02","Turn the world..."]]}
 {"zh":"二人执手相看泪眼，竟……","w":[["4b13b5775ef2f148","Hand in hand, they met each other’s tearful gaze..."],["65b9ddc70dbad791","The two held hands and gazed into each other's tearful eyes, and then..."]]}
 {"zh":"二刻钟过去……","w":[["b26a4b53b69f9271","Half an hour later..."],["21d4654cab57413e","Two quarters of an hour passed..."]]}
@@ -146,6 +146,7 @@
 {"zh":"你们想要学飞天，可知道这第一件要学的事是什么？","w":[["803d05ce01be9779","So, you want to learn to fly. Do you know what the very first step is?"],["e9a646381fe3453c","Do you know the first thing you must learn about flying?"]]}
 {"zh":"你先去等我下 我还要去小屋里看看 ","w":[["1442a1c4870dcd9c","You go ahead and wait for me. I need to check the cottage first."],["29f987ee72751ffb","You wait for me. I still need to check the little hut. "]]}
 {"zh":"你别过来 别过来","w":[["6c6794093decfb01","Stay away! Stay away from me!"],["ec94b1cf331a4f7b","Don't come any closer! Stay back!"]]}
+{"zh":"你到底有没有在听我说话啊","w":[["49d76385aafb67d8","Were you listening to me at all?"],["b39762fc88f70c22","Are you even listening?"]]}
 {"zh":"你加入队伍，等啊等……终于轮到了你。","w":[["20d15558b21e19e3","You join the queue and wait... and wait... until it's finally your turn."],["9803502b073608e9","You join the line. After what feels like forever, it's finally your turn."]]}
 {"zh":"你变了很多 ","w":[["fecf90ce6fed1325","You have changed a lot."],["676aabc627c2d4dc","You've changed a lot. "]]}
 {"zh":"你可推出，殿里的和尚是谁杀的？","w":[["507f129da2ad077c","Can you deduce who killed the monks in the hall?"],["5b120f39daf9c8ba","Have you figured out who killed the monks?"]]}
@@ -155,7 +156,6 @@
 {"zh":"你当真 ","w":[["8eebb6b4fcecb140","Are you serious?"],["8457c151b70cbd76","Seriously? "]]}
 {"zh":"你快想想","w":[["e4a3c9d6b9eecdc1","Think quickly!"],["c42ffe764c9c6206","Think about it."]]}
 {"zh":"你快想想 ","w":[["b53c9c76e14d98d2","Think quickly!"],["02098b5db9dbe91c","Think about it. "]]}
-{"zh":"你怎么知道？","w":[["1f948874d1a82cc4","How’d you know?"],["5ed44a1f9b821447","How can you tell?"]]}
 {"zh":"你想入江湖？","w":[["bef87ea1ccd783e1","You wish to enter the Jianghu?"],["b43526f84235cf44","The jianghu?"]]}
 {"zh":"你是兵 我们的——","w":[["2f834f356286359f","Are you a soldier… from our side?"],["12e4f2301b8387e7","You are a soldier—one of ours—"]]}
 {"zh":"你有什么办法 被两个小鬼追着要说法 ","w":[["55862ce19bf8fe8c","What way? Being chased by two brats demanding answers?"],["4dd6a621ff5b1de6","What choice did you have? Those two kids were chasing you down, demanding justice. "]]}
@@ -175,6 +175,7 @@
 {"zh":"你说那蚩尤多威风，头上长角！要是能像蚩尤一样……说不定能混成个内等子。","w":[["e55f0efeb53815fc","That Chi You is a mighty one with horns! If I were like him, I might make the Imperial Guard!"],["aab86eaa883954b1","Chi You, with his impressive horns, is my idol! Maybe being like him will earn me a place with the Palace Guards..."]]}
 {"zh":"你还说","w":[["485a839bba0b82d1","Stop that."],["1ad17f2a5137993a","You said"]]}
 {"zh":"你这浑身上下怎么就没点好东西","w":[["388a55273e5b3ded","…But why's there nothing of worth on you?"],["997f3ec82b0550da","Why don't you have anything good on you?"]]}
+{"zh":"你都不醒","w":[["a0478dad8a69a511","And you just... wouldn't."],["1f48d1a460876f0b","but you wouldn't budge!"]]}
 {"zh":"你醒了吗 让我看看你身体如何 ","w":[["b3a6f071388d26a3","Are you awake? Let me check on your condition."],["afbcb7721e4310b3","Have you awakened? Let me see how you are doing."]]}
 {"zh":"便能到长安吗？","w":[["22a5082fe418a32b","Will that take me to Chang'an?"],["be9818491d255447","Will I reach Chang'an?"]]}
 {"zh":"俺自有办法 下车 ","w":[["49bdcd5994d87f96","I can handle it! Go!"],["6e16f9d9cb22b4a1","Don't worry. I've got this. Just go! "]]}
@@ -197,7 +198,6 @@
 {"zh":"凉州要完了！","w":[["6f2f07b027427048","Liangzhou's over!"],["d3cd92bf272c5438","Liangzhou is done for!"]]}
 {"zh":"出发！","w":[["663f67e6d36e1623","Let's go!"],["aa328a6957b59c22","Move out!"]]}
 {"zh":"出来！","w":[["cc7c2d6508738de2","Show yourself!"],["6174b7b723836c0f","Come out!"]]}
-{"zh":"刀子……是啊，我的父兄，也曾是刀子……","w":[["fdfa45efc99437ac","Blades... indeed. My father and brother, too, were once but blades..."],["7fe1c963c28288ab","Weapons… yeah. My father and brother were used the same way."]]}
 {"zh":"刀架脖子了还要梗着头去","w":[["1a29561e893fdde5","Blade to the neck, yet they still stick their necks out."],["1e7794636425ba93","They still refuse to give in, even when facing death with a knife to their throats."]]}
 {"zh":"刘三儿！来帮忙！","w":[["b70ce3957daa0723","Liu San'er! Help me!"],["a06bd35b34a54aa6","Liu San! Come help!"]]}
 {"zh":"刘大娘 作孽哦 我只是这边买坛酒  道长 你们这个玄  啊教要如何信奉啊 ","w":[["13ccf2e2c7bcdcf7","Aunt Liu: What a sin... I just came to buy a jar of wine. Daoist Master, how exactly do I believe in this... Xuan... uh, Cult?"],["cb11737db6de9ed4","That's sinful talk. I was only over there buying a jar of wine. Daoist, how can I join your Xuan something cult? "]]}
@@ -208,6 +208,7 @@
 {"zh":"别摸","w":[["58ca4000bb371323","No touching."],["c8c460d4bf6c0390","Don't touch"]]}
 {"zh":"别有意趣啊","w":[["ad70b6e4d240bed3","so beautifully together..."],["34751b712aaa12b4","Quite intriguing"]]}
 {"zh":"别生气","w":[["8e447a56e0af15f5","A'ruan."],["2104f7519a76cc3f","Don't be angry"]]}
+{"zh":"别跑","w":[["1c2f084f0ba7be29","Hold still!"],["168b3e7a31102c77","Get back here!"]]}
 {"zh":"到了，不知可否请游侠搭把手，一道将御酒搬回馆中？","w":[["56c47809acfd91df","We've arrived. Could I trouble you to lend a hand and help carry the imperial wine back to the academy?"],["0c741ae7f6009042","Here we are. Would you mind lending a hand? Let's carry the wine back inside."]]}
 {"zh":"到底回到哪里去呢","w":[["3086654f513b6034","was it going back to?"],["7de3db4aad2be8df","Where should it return to?"]]}
 {"zh":"制香师受不了他的纠缠","w":[["43ae9296832eaa2c","Soon, the incense maker got tired of his questions."],["1a60163562264fa7","The perfumer couldn't bear his pestering"]]}
@@ -285,6 +286,7 @@
 {"zh":"哈哈哈咳咳  我也没有满盘皆输  ","w":[["d1c45cf0bac50b34","Haha cough... I haven't lost everything yet."],["27e12c443e47f135","*laughs, coughs* Well, I didn't lose everything after all.  "]]}
 {"zh":"哈哈哈哈哈 ","w":[["f57a01437aec218f","Haha!"],["fcbf64e47f262aea","HAHAHAHA! "]]}
 {"zh":"哈哈哈哈哈哈","w":[["28f935ebaf0ac08f","Hahahahahaha"],["dbe02614c0fec58d","Hahahaha...."]]}
+{"zh":"哎 你刚说什么黑衣人啊 在哪里啊","w":[["9666571848faed1d","Oh, you said a man in black? Where is he?"],["9573880663d98769","You said there was a man in black."]]}
 {"zh":"哎 又要抄书 ","w":[["3047b1415c87334e","Ugh, copying books again..."],["015818f0612c5008","Ugh, more book raids. "]]}
 {"zh":"哎 怎么不能是 一张纸当然没什么 重要的是上面写了什么 ","w":[["74c42449a163b2ca","Hey, why can't it be? A piece of paper is nothing, sure, but what's written on it is what matters."],["4e95259f76d42d5f","Why can't it just be a plain piece of paper? That wouldn't be a big deal. What really matters is what's written on it. "]]}
 {"zh":"哎 让少侠见笑了","w":[["4c93d3c4a2fe27e4","Sigh. I apologize for letting you witness such a scene, Young Wanderer."],["a1046a471d45ebc0","Ah, sorry to cause a fuss, Young Hero."]]}
@@ -317,7 +319,6 @@
 {"zh":"嗨 这不是赶巧了嘛 ","w":[["d70a93477e5388e3","It all just worked out that way..."],["4fab11454fd5179d","Hey, it was just a stroke of luck. That's all! "]]}
 {"zh":"嗯","w":[["8fb68441838359fe","Mmm!"],["821ea6fd74a74c12","Umm... "]]}
 {"zh":"嗯...这不羡仙里，总飘着几缕勾人馋虫的香气。不知今天后厨又在做什么好东西？","w":[["7706fbfcfd6f1b1c","Mmm... There's always a mouth-watering scent drifting through Blissful Retreat. What's cooking today?"],["144fb1f7e1c36086","Hmm... this place always smells so good. What's the kitchen making today?"]]}
-{"zh":"嗯嗯，芦花一个人，也好好吃饭，好好睡觉！","w":[["1cf4ad8fc5c46fd5","Yes, I will eat well and sleep well, even all by myself!"],["731d53df8388b3d3","I eat my meals and I sleep well, all on my own!"]]}
 {"zh":"嗯？醒了好像也没那么痛了……","w":[["9a01e818eef385a2","Hmm? Waking up, it doesn't hurt that much anymore..."],["7907829b961a728d","Hm? Now that I'm sober, it doesn't hurt so bad..."]]}
 {"zh":"嘻嘻  ","w":[["99e4369451233389","Hee-hee!"],["f728af9dc9534f68","Hehe.  "]]}
 {"zh":"噗  老赵你别吹了 说得跟你亲眼看见了似的 ","w":[["4e4ca763b0730787","Oh, give it a rest, Old Zhao. You talk as if you were there."],["6ef36a2134d0ba73","Pfft, Old Zhao, quit bragging and talking like you saw it all personally. "]]}
@@ -422,6 +423,7 @@
 {"zh":"对了 你那《木经》怎么办 ","w":[["9fe2ff678ade0f81","By the way, what about your Timberwork Classic?"],["97e7c5b6ff7a0936","Oh right, what about your Timberwork Manual? "]]}
 {"zh":"将军白发征夫泪","w":[["12fdca4ac02b02e8","When Iron Goes Silent"],["ce8d96d4bfc6eac1","White-haired generals, weeping soldiers."]]}
 {"zh":"将军还能死两次不成 ","w":[["aa94f96cebd9c806","The General can die twice now?"],["03dbc553b6fc2e99","Can he really die twice? "]]}
+{"zh":"将军！","w":[["d237bf6f9bd93d28","Checkmate!"],["ec2baa791d77fdd6","General!"]]}
 {"zh":"小姐别出来！小姐——","w":[["e3c56d4fbf34edc3","Stay inside, young lady! Young lady—"],["2ab2718cf5147078","Miss, stay inside! Miss—"]]}
 {"zh":"小姑娘上马车 ","w":[["9f5dbe6ee2abbd73","Get in, lass!"],["003d4cc7cd226f6a","Get in the wagon, girl! "]]}
 {"zh":"小心点 这可是块会杀人的招牌 ","w":[["41fc6b297967b9b5","Watch out! This signboard can kill."],["298c53457d9054e0","But be careful. This signboard can get people killed. "]]}
@@ -457,7 +459,6 @@
 {"zh":"得的赏赐怕是","w":[["f907976e0f93c20e","the rewards could be..."],["58d57b30957b720b","The rewards we receive might"]]}
 {"zh":"心烦意乱？","w":[["17bf70e28a2c7239","Disturbed in mind?"],["cfeaa397b221a733","A little worked up?"]]}
 {"zh":"快","w":[["2846d63055754517","Hurry!"],["e11da4a6d762f2d3","Go!"]]}
-{"zh":"快别贪玩了！大家都在里头等你吃年夜饭呐！","w":[["b102ad87aafb81e3","Stop playing around! Everyone's waiting inside for the New Year's Eve dinner!"],["0e0ec463bb860194","Come on, no more running off! Everyone's inside waiting for the New Year's feast!"]]}
 {"zh":"快回快回！被抓住谁都说不清！","w":[["193a12facd56e4a9","Let's go! Go! If they catch you, you'll never clear your name!"],["a8dafaabd0c022bb","Hurry back! If caught, no one can explain!"]]}
 {"zh":"快来 快来","w":[["8b1fd02d39ca3aa0","Come on!"],["f319201d94c56e91","Hurry, hurry"]]}
 {"zh":"快看是钱","w":[["1e36de487768f99b","Look! So much money!"],["03cb34dacafed934","Look—coins!"]]}
@@ -571,6 +572,7 @@
 {"zh":"是死人开口说话了","w":[["5a3d4846a4ffeae0","I'm a dead man who speaks."],["bafb34bf343c4132","A corpse speaking"]]}
 {"zh":"是统率他们的命定之人","w":[["bad74b52cdd63c75","Would be their destined leader."],["41a49f634ee0e748","Was the chosen one destined to lead them"]]}
 {"zh":"是院子里的鼓吗","w":[["e70a83b833c6239a","Is it like the one in the yard?"],["472da2f6af3fe3d1","Was it the drum in the courtyard?"]]}
+{"zh":"是！","w":[["77907cf4029bbee2","Yes!"],["92c7c80d421e17e0","Aye, sir!"]]}
 {"zh":"曲少 要不还是算了吧 好马有的是 我陪您再去别处看看 ","w":[["858585b655ade1d3","Young Master Qu, maybe we should let it go? There are plenty of good horses. I'll accompany you to look elsewhere."],["fae10c27cc92c369","Maybe we should just call it quits. There are plenty of good horses. Let me take you somewhere else to have a look. "]]}
 {"zh":"更深露重，男女有别，寝界莫逾。","w":[["f05c73968569771e","The night is deep, and the dew hangs heavy. Men and women are bound by propriety. As we sleep, this boundary must not be crossed."],["41a40a81b2afceaa","The night grows deep and the dew heavy; men and women must keep their distance. The bounds of one's chamber shall not be crossed."]]}
 {"zh":"曾有一名动江湖的大侠","w":[["8e312a220ed8dc6d","There once was a great hero"],["f22ad6d07a3037bf","A renowned hero once had"]]}
@@ -581,7 +583,6 @@
 {"zh":"月亮能叫你快活 我把它摘给你","w":[["5873d9ff16515f1a","If the moon can make you happy, then I'll pluck it down for you."],["cd446f6252c59d27","If the moon brings you joy, I'll pluck it for you"]]}
 {"zh":"月儿升 月儿沉 我家有个聚宝盆 孩儿莫哭快快睡哟 睡着宝盆生金银 眼儿沉 梦儿深 孩儿但睡莫相问 待到晨星换了月 醒来好梦都成真 ","w":[["5b3d56aea58cba76","The moon will rise, the moon will set...  Little baby don't you cry, sleep in the treasure basin so tight. The night's gonna bring you silver and gold, close your eyes let dreams unfold..."],["9733651f07c6aef9","The moon will rise, and the moon will set. At home, a treasure basin is kept. Don't cry, my dear, just close your eyes. While you sleep, treasures multiply. Heavy eyes and dreams so deep. Rest now, my child, drift off to sleep. When morning stars outshine the blue, you'll wake to find your dreams come true. "]]}
 {"zh":"月儿升......","w":[["a3950b250a7c4a10","The moon will rise..."],["d4aee19fc1ce2f4b","The moon is rising..."]]}
-{"zh":"月映万川，其真在天……唯有天上月，皎皎驱长夜……","w":[["95e8e7a59d84ae05","The moon is reflected in rivers, yet its essence abides in heaven... Only the celestial moon shines bright enough to dispel the long night..."],["86d83badffb136cb","Lying below the water, yet hanging in the sky... Only the moon itself can drive out the night..."]]}
 {"zh":"有一个人","w":[["d567dcc93f31ab61","There was a man."],["6ec3ff8fbf2bbd34","One man"]]}
 {"zh":"有人在找一颗能种在月亮上的种子","w":[["946c1f0f5f7e61b6","People were looking for a seed like that."],["6066e4431d8be990","Someone searched for a seed that could grow on the moon"]]}
 {"zh":"有人用她的魂魄做了香料","w":[["e1b67d9e8f1d11a3","Someone made incense from it."],["6a5b13e88e9b1288","Someone used her soul to make incense"]]}
@@ -630,6 +631,7 @@
 {"zh":"江晏 我怎么没听说 水月还有好酒之人 ","w":[["b51e1a42a00ea109","Jiang Yan: I never heard that Moonstream had anyone fond of fine wine."],["b6267311fec7ea6e","I've never heard that Moonstream is known for good wine. "]]}
 {"zh":"江晏 这孩子你带走吧 ","w":[["5a6f6ed994919add","Jiang Yan: Take this child with you."],["231ee493e9fb7486","Take this kid away. "]]}
 {"zh":"江湖人","w":[["933460e1b5efdd99","Swordsman"],["cb73df3a019cd4f8","like you."]]}
+{"zh":"江湖双侠！江湖双侠！","w":[["7b4c77b42e62a255","We'll become the Twin Wanderers!"],["a74ddaa14af03df7","Twin Wanderers! Help the weak!"]]}
 {"zh":"江湖同游 ","w":[["48e4d8b5f54c3665","We'll roam the jianghu together!"],["c7b11a582b379d77","Shared Journey"]]}
 {"zh":"汪 ","w":[["8a6b74f086309e2f","Du"],["650bb68ebb25b875","Woof. "]]}
 {"zh":"沉疴久矣，命数所尽，天难救我，唯有三问不明。","w":[["26c66f990e97ffe3","I have long been stricken, my fate nearing its twilight, too late for heaven's mercy. Yet three questions haunt my soul."],["4960744161743809","My long illness will soon claim me, beyond even heaven's saving. Yet three questions still puzzle me."]]}
@@ -703,6 +705,7 @@
 {"zh":"老……老大？","w":[["ba77242498e01b04","Bo... boss?"],["106f9144433c2efa","B.....Boss?"]]}
 {"zh":"老大","w":[["8845f57949dc5378","Hey!"],["b0eff636079107ee","Boss"]]}
 {"zh":"老大 你要怎么办","w":[["214a27f3cdc43f2a","What do we do now?"],["7d7b9f0a5ef50e8d","How will you get over here?"]]}
+{"zh":"老大 老大","w":[["be1734105ee5a184","Come on... Come on!"],["7c351f452293c05c","Hey! Hey,you! Come on! Wake up!"]]}
 {"zh":"老大回来了！","w":[["d551738bf558d483","The chief's back! "],["bd9860c8405a5b82","The boss is back!"]]}
 {"zh":"老天爷不叫我们回去啊 陈哥","w":[["78d2af95b75d26e9","Heaven doesn't want us going home, Brother Chen."],["0a2df42703455cfd","The heavens won't let us return, Brother Chen"]]}
 {"zh":"老天爷不给活路啊 ","w":[["e13933d4c98dd90b","Heaven won't let us live."],["811ea266edd13163","The heavens give no way out"]]}
@@ -721,14 +724,12 @@
 {"zh":"背书我不行，钓鱼第一名……","w":[["c91c2d780be520d7","I might fail at reciting texts, but I'm number one at fishing!"],["102499043e35bc68","I'm terrible at memorizing lessons, but I'm number one at fishing!"]]}
 {"zh":"能回去","w":[["6f2140bdd513d4f3","We'll make it back."],["5609e444cec9a023","We can return..."]]}
 {"zh":"能敲响那琉璃鼓的","w":[["cc9a799a39bdbb56","Only Guanyin's tears..."],["e13234b24e38e628","Make the glass drum sound"]]}
-{"zh":"腊月初十 日暮\n院主“千机万象”一说，我心知为假。前日问他，他笑答：亦假亦真，只盼用不上。\n至今日，终是用了。\n此最后一记。","w":[["ea8987638cb53a5b","The 10th of the 12th lunar month - Dusk\nI know the Academy Head's claim of \"Myriad Mechanisms\" is a lie. When I asked him the other day, he smiled and said: \"It is both false and true. I only hope we never have to use it.\"\nToday, it is finally being used.\nThis is my final entry."],["0b007318d30e8ea6","Tenth day of the Twelfth Month, dusk.\nI always knew the Dean's claim of a 'Thousand Mechanisms' was a bluff. When I asked him two days ago, he smiled and said: half bluff, half truth, and I pray we never find out which.\nToday, we found out.\nThis is my last entry."]]}
+{"zh":"腊月初十 日暮\n院主“千机万象”一说，我心知为假。前日问他，他笑答：亦假亦真，只盼用不上。\n至今日，终是用了。\n此最后一记。","w":[["ea8987638cb53a5b","The 10th of the 12th lunar month - Dusk\nI know the Academy Head's claim of \"Myriad Mechanisms\" is a lie. When I asked him the other day, he smiled and said: \"It is both false and true. I only hope we never have to use it.\"\nToday, it is finally being used.\nThis is my final entry."],["34730cbecf047c05","Month Twelve, Day Ten, Dusk. \nI always suspected the Dean's \"Thousand Mechanisms\" were a bluff. When I asked him, he smiled and said: half bluff, half truth. I pray we never find out which. Today, we found out.\nThis is my final entry."]]}
 {"zh":"自然是强者为主 先来试试我新铸的兵甲 ","w":[["6959907987966af7","Naturally, it belongs to the strong! Come and test my newly-forged armor first!"],["9aa324e2659f4d96","In the end, might makes right. Why don't you test my new armor? "]]}
-{"zh":"舆图给了你，我就算还了那人的情。就此别过。","w":[["4713960c940ac172","You've got the map. My debt is paid. Farewell."],["a284a37e783f1f66","Map's yours. Debt's clean. Farewell."]]}
 {"zh":"芝兰玉树生于庭阶本是好事","w":[["72dba851ab98cb07","Twin talents blooming in one home should bring joy."],["3e65d53fc633dd91","Orchids and jade trees in the courtyard—a fine sight"]]}
 {"zh":"若不是你有意提点 恐怕他早就闹出更大的乱子 ","w":[["002a30a7ddad1c9c","If not for your subtle guidance, he would have caused much greater trouble long ago."],["f9c45800a9253dcd","If you hadn't warned him, he probably would have caused even bigger trouble. "]]}
 {"zh":"若拿完本献给少主","w":[["8782f01bb540ecbc","Once the lady sees the complete version,"],["766d4df132eaab46","If we offer the complete version to the young master"]]}
 {"zh":"英雄何须显，燕影自逍遥。","w":[["2146741c93a5bdc2","Heroes need not seek recognition."],["b8554823a67f048d","Heroes need not show, the swallow freely flows."]]}
-{"zh":"藏月岗一别之后，不知怎地，竟觉得这世间别有妙趣。","w":[["03d1f2d6bc159192","Ever since that parting at Moonlit Knoll, the world has seemed somehow more interesting than before."],["044eab51d3f10d05","After we parted ways at Hidden Moon Ridge, something changed. The world seemed... worth lingering in."]]}
 {"zh":"虽说你总给我添麻烦","w":[["3272303449bc84e3","you're always making trouble for me,"],["db49ff725d8bdf96","Though you often trouble me"]]}
 {"zh":"行~","w":[["6530ebad947d94e4","Deal."],["3be8dae2e77b8770","Alright."]]}
 {"zh":"行不得也  哥哥 ","w":[["f99555d76ddba1b9","It is not to be, Brother!"],["65e6ac4f0409527b","Even if we can't—brother! "]]}
@@ -800,7 +801,6 @@
 {"zh":"这……","w":[["8768e61868fb94eb","I..."],["86e37279b7566a3c","Uh..."]]}
 {"zh":"这不是救着呢","w":[["63149b3df766e106","I'm saving you now."],["f45bfb207f1ad357","I am doing it"]]}
 {"zh":"这世上","w":[["1e76fcfc00034b82","In this world..."],["a40d142afe2810a1","No one waits around for anyone"]]}
-{"zh":"这个啊，谁都不给。","w":[["fa49a2b4ef4c0122","This? I'm not giving it to anyone."],["b8eec388ad2c48c5","This one's mine. Nobody gets a bite."]]}
 {"zh":"这个石惊天，遇见了什么麻烦，怎么也不在信里说清楚。","w":[["f2763f6f5b3b3193","What trouble did this Shi Jingtian run into? He didn't even explain clearly in the letter."],["18e78ba0b8a3c0e7","Shi Jingtian... what mess did you step in? Why so cagey?"]]}
 {"zh":"这个香料的味道好得很","w":[["84fdd52ac16e8d94","The scent is wonderful."],["d3768541f61cb8e0","Exquisite when unopened"]]}
 {"zh":"这么些天 走了这么些天……","w":[["32a36c9ef4b2b8cc","All these days… we kept on traveling…"],["d22308e3ad9436e3","So many days, so far walked..."]]}
@@ -815,6 +815,7 @@
 {"zh":"这是 ","w":[["726a536d32d4f1ad","This is..."],["c3a813f58d1b1b26","It's a...\n"]]}
 {"zh":"这是……","w":[["32d130c128413266","What's this..."],["7776e9f5239ae307","Is this..."]]}
 {"zh":"这是……旄节？","w":[["41e8feb6c9987904","What's this... an imperial scepter?"],["142fe57d0323e127","Is this... Maojie?"]]}
+{"zh":"这是在……？","w":[["af21b5eb4376bb21","What are you up to?"],["ebf93f36d7be9ce7","What is this...?"]]}
 {"zh":"这是在忙什么？","w":[["3a0b541522177ed4","What's keeping you busy?"],["f066c015b3171fe2","What's going on here?"]]}
 {"zh":"这是复原一半了","w":[["e0e88d92a019a5c8","halfway done. Remarkable!"],["f7fc44c6b5dd779c","It's halfway recovered now"]]}
 {"zh":"这样，你爹娘才能放心。","w":[["6555af5970f8d69d","That way, your parents can rest assured."],["14b157a51008a78e","That's how you put their hearts at ease."]]}
@@ -873,7 +874,6 @@
 {"zh":"陈子奚 我倒要看看 水月请人喝酒 谁敢来找麻烦 ","w":[["1982bd3dd0bf1606","Chen Zixi: I'd like to see who dares cause trouble when Moonstream invites a guest for a drink."],["9d5ed210cc84fdc5","I want to see who'd dare stir up trouble at Moonstream's banquet. "]]}
 {"zh":"陈子奚 这下有趣了 你选哪边 ","w":[["074c96824f4f1d85","Chen Zixi: Now this is interesting. Which side do you choose?"],["78effc04fafdf218","Now things are getting interesting. Which side will you pick? "]]}
 {"zh":"陈子奚 这孩子又是怎么回事 ","w":[["8eb497eb1989eaaf","Chen Zixi: What is the story with this child?"],["f18524e57cabf382","What's the matter with this kid? "]]}
-{"zh":"青，好名字。象物之生时色也，又作青云之志解。我是苏启蛰，这位是张万师师兄。","w":[["1cf9e79f12fef893","Halcyon. A noble name. It is the azure spark of life at its first quickening; it speaks of restless ambitions, the sapphire flash that bridges the stream and the sky. I am Su Qizhe, and this is my senior brother, Zhang Wanshi."],["a9d7a1fedd332a84","Halcyon. That's a beautiful name. Nature, life, and the open sky. I am Su Qizhe, and this is Zhang Wanshi."]]}
 {"zh":"风、雅、颂出自哪里？","w":[["22e844786bf983ca","From which work do Feng, Ya, and Song originate?"],["293d283b9a087f8c","Where do the terms \"Feng,\" \"Ya,\" and \"Song\" come from?"]]}
 {"zh":"风不遇偷学刀法被门规处置 是咎由自取 ","w":[["afe8b2c807d6525a","Feng Buyu stole blade techniques and was punished according to sect rules. He brought it upon himself."],["c98378b6e2a9c2de","Feng Buyu was punished for stealing sword techniques. He has only himself to blame. "]]}
 {"zh":"风雪要来了","w":[["8c7e3cdad9209839","There's a snowstorm coming."],["0f60b8481ec862a3","A storm is coming"]]}

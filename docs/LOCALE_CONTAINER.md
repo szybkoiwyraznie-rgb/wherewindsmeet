@@ -78,9 +78,17 @@ Warstwy poprawek (`*_diff`) używają tego samego kontenera i układu tabel:
 - **Pozostałe chunki** to tabele tekstów o tym samym układzie co warstwa 3
   powyżej; zawierają wpisy dopisane, zmienione i usunięte (tekst o wartości
   zaczynającej się od `0xFF`).
-- Klient czyta warstwy po kolei: najpierw mapa bazowa z `Package/HD/oversea/locale/`,
-  potem `_diff` z `Package`, na końcu `_diff` z `LocalData/Patch/HD/oversea/locale/`.
-  Czytnik warstwowy: `tools/mapa_tekstow.py`.
+- Klient nakłada warstwę różnicową dla danego języka względem pliku bazowego:
+  najpierw mapa bazowa z `Package/HD/oversea/locale/`, potem aktualniejsza
+  warstwa `_diff`. W danych z Patcha 2.4 (`build 26592996`, `2026-11-13`) plik
+  `LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff` jest wyliczony
+  od zera względem bazy w `Package/` i **zastępuje** starszy plik `_diff`
+  z `Package/` (złożenie `Package` + `LocalData/Patch` daje dokładnie deklarowaną
+  w nagłówku sumę `1 136 704` wpisów i m.in. cofa 34 wcześniejsze różnicowe klucze).
+  Czytnik warstwowy `tools/mapa_tekstow.py` (`wybierz_warstwy_gry` /
+  `filtruj_zastapione_diffy`) automatycznie wybiera aktywną warstwę `_diff`,
+  natomiast patcher (`tools/patcher_wwm.py`) nadpisuje na dysku oba pliki
+  niezależnie, utrzymując ich spójność.
 
 ## Zapisywanie (patche)
 
@@ -102,7 +110,7 @@ kompaktowanie skraca tabelę), ale zawartość tak.
 | kontener, chunki, zstd | odczytane, testy w `tests/test_locale_container.py` |
 | tabela wpisów, offsety, teksty i warstwy `_diff` | odczytane, testy w `tests/test_locale_records.py` i `test_mapa_tekstow.py` |
 | zapis zwrotny (przepakowanie) | odczytany i sprawdzony na 8549 chunkach |
-| 1 124 787 wpisów mapy EN (baza + 2 warstwy `_diff`) | wyciągnięte, 0 błędów |
-| zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py` i `tools/apply_translation.py`; mała łatka testowa (`latka_testowa.py` na mapie EN) zweryfikowana w realnej grze Steam (UI + prolog + polskie znaki działają) |
+| 1 136 704 wpisów mapy EN (baza + `LocalData/Patch/_diff` w Patchu 2.4) | wyciągnięte, 0 błędów (poprzednio 1 124 787 w buildzie 25906190) |
+| zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py`, `tools/patcher_wwm.py` i `tools/apply_translation.py`; mała łatka testowa (`latka_testowa.py` na mapie EN) zweryfikowana w realnej grze Steam (UI + prolog + polskie znaki działają); symulacja obu patcherów sprawdzona na kopiach binarek Patcha 2.4 (`26592996`) |
 | mówcy, powiązania tabel, kolejność scen | odczytane z bazy gry ([BAZA_GRY.md](BAZA_GRY.md), [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) |
 | limity pól interfejsu i pełna fabuła w grze | **limity szerokości i pełne tłumaczenie nie sprawdzone jeszcze w grze** (widoki podają długość EN; pełna łatka czeka na zwrotkę) |

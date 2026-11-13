@@ -327,6 +327,11 @@ class V2CutscenesAndExclusionsTests(unittest.TestCase):
             self.assertTrue(manifest_all["kontrola"]["zgodne"])
             self.assertEqual(manifest_all["wykluczenia"], {})
 
+            # tylko_sloty podane jako lista z Pythona nie może rzucać TypeError przy kontroli
+            manifest_list = buduj_paczke.zbuduj(ix, root / "out_list", wersja="2", data="2026-11-11", tylko_sloty=[K("Osiągnięcie gracza")], zip_=False)
+            self.assertTrue(manifest_list["kontrola"]["zgodne"])
+            self.assertEqual(manifest_list["kontrola"]["miejsc_pl"], 1)
+
 
 class V3CutsceneAndDisguiseContextTests(unittest.TestCase):
     def test_v3_cutscene_context_wvpv_collision_replay_and_disguise_clarity(self):

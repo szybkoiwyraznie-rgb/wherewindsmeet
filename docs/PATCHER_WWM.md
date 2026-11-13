@@ -43,7 +43,7 @@ Skrypt w jednym przebiegu (tryb domyślny — **standalone**):
 - `ZAINSTALUJ.bat` uruchamia `narzedzia/patcher_wwm.py` (używa zainstalowanego Pythona 3.10+ z `zstandard` albo automatycznie tworzy osobne środowisko `narzedzia\.venv` i instaluje `zstandard`),
 - automatycznie wykrywa instalację Steam gry (`3564740`, przez rejestr, `libraryfolders.vdf` i `appmanifest_3564740.acf`) — albo przyjmuje ścieżkę przez przeciągnięcie folderu gry na `.bat`,
 - sprawdza brak uruchomionej gry oraz brak punktów reparse/symlinków,
-- odczytuje zainstalowane mapy `translate_words_map_zh_cn*` i `translate_words_map_en*` z `Package/HD/oversea/locale/` oraz `LocalData/Patch/HD/oversea/locale/`,
+- odczytuje zainstalowane mapy `translate_words_map_zh_cn*` i `translate_words_map_en*` z `Package/HD/oversea/locale/` oraz `LocalData/Patch/HD/oversea/locale/` (dla odczytu warstwy źródeł `zh_cn` korzysta z `wybierz_warstwy_gry`, odrzucając starsze `Package/.../_diff`, jeśli istnieje `LocalData/Patch/.../_diff`, a przy zapisie nadpisuje oba pliki docelowe niezależnie, utrzymując ich spójność nawet po aktualizacjach gry),
 - kopiuje oryginały poza katalog gry do `%LOCALAPPDATA%\WhereWindsMeetPL\kopia_standalone_<hash>\` (z pełną weryfikacją SHA-256) i nie nadpisuje zachowanego oryginału przy aktualizacjach łatki `v1 -> v2` (a po aktualizacji gry przez Steam automatycznie zachowuje nową wersję oryginału przed nałożeniem przekładów),
 - przepisuje mapy lokalnie na maszynie gracza, weryfikuje każdy zmieniony wpis i wgrywa transakcyjnie (z pełnym rollbackiem przy błędzie).
 - `PRZYWROC.bat` przywraca oryginały (i blokuje nadpisanie, jeśli plik w grze zmienił się z zewnątrz np. przez Steam, chyba że użyto `--wymus`), a `SPRAWDZ_STAN.bat` odczytuje bieżący stan plików i kopii bez zmian na dysku.
@@ -139,6 +139,10 @@ Próba na 3 prawdziwych mapach EN z buildu `25906190` i sztucznym magazynie
 19 630 przekładów (23 s): przepisano 95 471 wpisów mapy bazowej oraz 847 i 1 060
 w dwóch warstwach `_diff`; po złożeniu warstw zmienionych 96 019 z 1 124 787
 wpisów, zbiór identyfikatorów niezmieniony, read-back przeszedł bez rozjazdów.
+Na prawdziwej kopii 60 plików z Patcha 2.4 (`build 26592996`, `2026-11-13`)
+zweryfikowano także w piaskownicy pełny cykl `latka_testowa.py` + `patcher_wwm.py`
+(`instaluj` → `stan` → `przywroc` z dokładnym odtworzeniem SHA-256 oryginałów,
+przepisując mapę bazową i obie warstwy `Package/.../_diff` oraz `LocalData/Patch/.../_diff`).
 Wcześniejsza próba jednostkowa `apply_translation.py` (200 tekstów → 41 962
 podmiany przez dziedziczenie, 11–13 s) również przeszła read-back i
 `tools/locale_container.py`.

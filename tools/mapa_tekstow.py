@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Mapy tekstów gry jako `id -> tekst`, razem z warstwami `_diff`.
 
-Klient trzyma teksty jednego języka w kilku plikach i czyta je po kolei —
-późniejszy plik przykrywa wcześniejszy:
+Klient trzyma teksty jednego języka w pliku bazowym oraz warstwie `_diff`:
 
-    Package/HD/oversea/locale/translate_words_map_<język>          baza
-    Package/HD/oversea/locale/translate_words_map_<język>_diff     poprawki z paczki
-    LocalData/Patch/HD/oversea/locale/translate_words_map_<język>_diff   poprawki pobrane
+    Package/HD/oversea/locale/translate_words_map_<język>                 baza
+    Package/HD/oversea/locale/translate_words_map_<język>_diff            poprawki z paczki
+    LocalData/Patch/HD/oversea/locale/translate_words_map_<język>_diff    poprawki pobrane
+
+Uwaga: jak wykazała analiza Patcha 2.4, plik `_diff` z `LocalData/Patch/` jest
+liczony od zera względem bazy z `Package/` i **zastępuje** starszy `_diff`
+z `Package/` (potrafi m.in. wycofać starsze wpisy z powrotem do wartości bazy
+albo je skasować). Dlatego przy odczycie stanu gry warstwa `LocalData/Patch/.../_diff`
+zastępuje `Package/.../_diff` tego samego wariantu i języka (`wybierz_warstwy_gry`).
 
 Plik `_diff` ma ten sam kontener co baza (docs/LOCALE_CONTAINER.md). Jego
 pierwszy chunk to `u64 liczba wpisów po zmianie, u64 liczba kubełków bazy,
@@ -27,7 +32,7 @@ from __future__ import annotations
 import hashlib
 import re
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, TypeVar
 
 try:
     from tools import apply_translation as patcher
@@ -40,8 +45,13 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import locale_records as records
 
 DLUGOSC_KLUCZA = 16
+_T = TypeVar("_T")
 _SLOWO_EN = re.compile(r"[a-z0-9']+")
 _STOP_EN = frozenset({"a", "an", "the", "to", "of", "in", "on", "at", "for", "and", "or", "is", "are", "be", "with", "by", "from", "as", "that", "this", "it"})
+_DIFF_LAYER_RE = re.compile(
+    r"(?:^|/)(package|localdata/patch)/(.+/locale)/((?:\d+_)?translate_words_map_[a-z0-9_]+)_diff$",
+    re.IGNORECASE,
+)
 
 
 class MapaError(Exception):
@@ -108,12 +118,12 @@ def wczytaj(path) -> dict[int, str]:
 
 
 def zloz(paths: Iterable) -> dict[int, str]:
-    """Złóż warstwy w podanej kolejności: baza, potem kolejne `_diff`.
+    """Złóż warstwy dokładnie w podanej kolejności: baza, potem kolejne `_diff`.
 
-    Warstwa dopisuje i podmienia teksty oraz kasuje identyfikatory. Każda
-    warstwa `_diff` jest liczona względem bazy (jej nagłówek podaje liczbę
-    wpisów równą `baza + nowe - skasowane`), a nowsza zawiera zmiany starszej,
-    więc złożenie „baza, diff z paczki, diff pobrany” daje stan widziany w grze.
+    Warstwa dopisuje i podmienia teksty oraz kasuje identyfikatory. Uwaga:
+    w danych gry warstwa `_diff` z `LocalData/Patch/` jest liczona od zera
+    względem bazy i **zastępuje** starsze `_diff` z `Package/` — przed złożeniem
+    ścieżek ze źródeł gry użyj `wybierz_warstwy_gry(paths)`.
     """
     texts: dict[int, str] = {}
     for path in paths:
@@ -122,6 +132,36 @@ def zloz(paths: Iterable) -> dict[int, str]:
             texts.pop(ident, None)
         texts.update(layer)
     return texts
+
+
+def filtruj_zastapione_diffy(entries: Iterable[tuple[str, _T]]) -> list[tuple[str, _T]]:
+    """Pomiń `Package/.../_diff`, jeśli dla tego samego wariantu i mapy istnieje `LocalData/Patch/.../_diff`."""
+    items = list(entries)
+    patch_diffs: set[tuple[str, str]] = set()
+    for rel, _value in items:
+        norm = rel.replace("\\", "/").casefold()
+        match = _DIFF_LAYER_RE.search(norm)
+        if match and match.group(1) == "localdata/patch":
+            base_name = re.sub(r"^\d+_", "", match.group(3))
+            patch_diffs.add((match.group(2), base_name))
+    if not patch_diffs:
+        return items
+    filtered: list[tuple[str, _T]] = []
+    for rel, value in items:
+        norm = rel.replace("\\", "/").casefold()
+        match = _DIFF_LAYER_RE.search(norm)
+        if match and match.group(1) == "package":
+            base_name = re.sub(r"^\d+_", "", match.group(3))
+            if (match.group(2), base_name) in patch_diffs:
+                continue
+        filtered.append((rel, value))
+    return filtered
+
+
+def wybierz_warstwy_gry(paths: Iterable) -> list[Path]:
+    """Odfiltruj warstwy `Package/.../_diff` zastąpione przez `LocalData/Patch/.../_diff`."""
+    entries = [(str(p), Path(p)) for p in paths]
+    return [path for _rel, path in filtruj_zastapione_diffy(entries)]
 
 
 def sha256_pliku(path) -> str:

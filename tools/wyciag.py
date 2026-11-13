@@ -1003,13 +1003,15 @@ def main(argv=None) -> int:
 
     try:
         baza = baza_gry.Baza(arguments.baza, arguments.manifest, pamiec_chunkow=8192)
-        zh = mapa_tekstow.zloz(arguments.zh)
-        en = mapa_tekstow.zloz(arguments.en)
+        zh_paths = mapa_tekstow.wybierz_warstwy_gry(arguments.zh)
+        en_paths = mapa_tekstow.wybierz_warstwy_gry(arguments.en)
+        zh = mapa_tekstow.zloz(zh_paths)
+        en = mapa_tekstow.zloz(en_paths)
     except (baza_gry.BazaError, mapa_tekstow.MapaError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
     manifest = zbuduj(
-        baza, zh, en, Path(arguments.wyj), opis_wejsc(arguments.baza, arguments.zh, arguments.en, baza, arguments.opis),
+        baza, zh, en, Path(arguments.wyj), opis_wejsc(arguments.baza, [str(p) for p in zh_paths], [str(p) for p in en_paths], baza, arguments.opis),
         log=lambda text: print(text, file=sys.stderr),
     )
     print(json.dumps({"ok": True, "liczby": manifest["liczby"], "pokrycie": manifest["pokrycie"]}, ensure_ascii=False, indent=1))

@@ -925,10 +925,28 @@ class CzytankiTests(unittest.TestCase):
         dod_all = "\n".join(next(p for p in pliki_all if p.nazwa == "dodatkowe.md").linie)
         self.assertIn(f"[Brak polskiego tekstu: {K(zh[Q + 9])}]", dod_all)
 
-        # 5. Podział `_podziel_na_czesci` z małym limitem tnie także po `### ` i dużych tabelach w `dodatkowe.md`
+        # 5. Podział `_podziel_na_czesci` z limitem tnie także po `### ` i dużych tabelach w `dodatkowe.md`,
+        # a żadna część zawierająca rekordy poniżej limitu nie przekracza zadanego progu bajtów.
         czesci = buduj_czytanki._podziel_na_czesci(pliki[2], 700)
         self.assertGreaterEqual(len(czesci), 3)
         self.assertEqual(czesci[0][0], "dodatkowe_czesc_01.md")
+
+        duza_sekcja = ["## 2. Test limitu", "", "### Długa lista (`test`, 40/40)", ""]
+        for idx_r in range(1, 41):
+            duza_sekcja.append(f"- **Pozycja nr {idx_r}**")
+            duza_sekcja.append(f"  - *Opis:* Dłuższy opis kontrolny pozycji numer {idx_r} dla weryfikacji budżetu bajtów.")
+            duza_sekcja.append("")
+        duzy_plik = buduj_czytanki.ZbudowanyPlik(
+            nazwa="dodatkowe.md",
+            tytul="Materiał dodatkowy spoza scen",
+            opis="Test podziału.",
+            linie=["# Materiał dodatkowy spoza scen", "", "Krótki wstęp.", "", *duza_sekcja],
+            statystyka={"przetlumaczono": 40, "wszystkich": 40},
+        )
+        czesci_limit = buduj_czytanki._podziel_na_czesci(duzy_plik, 1400)
+        self.assertGreaterEqual(len(czesci_limit), 4)
+        for cz_name, cz_texts, _ in czesci_limit:
+            self.assertLessEqual(len("".join(cz_texts).encode("utf-8")), 1400, cz_name)
 
 
 if __name__ == "__main__":

@@ -32,6 +32,7 @@ import re
 import sys
 import zipfile
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from pathlib import Path
 
 try:
@@ -294,14 +295,14 @@ class Generator:
         self,
         ix,
         magazyn=None,
-        tylko_sloty: set[str] | None = None,
+        tylko_sloty: Iterable[str] | None = None,
         *,
         tylko_z_en: bool = False,
         wszystko: bool = False,
     ):
         self.ix = ix
         self.magazyn = magazyn or magazyn_mod.Magazyn()
-        self.tylko = tylko_sloty  # None = pakiet pełny; zbiór = pakiet uzupełniający
+        self.tylko = set(tylko_sloty) if tylko_sloty is not None else None  # None = pakiet pełny; zbiór = pakiet uzupełniający
         self.tylko_z_en = tylko_z_en
         self.wszystko = wszystko
         self.sloty: dict[str, tuple[str, str]] = {}  # slot -> (plik, opis miejsca)
@@ -1327,7 +1328,7 @@ def zbuduj(
     wersja: str,
     data: str,
     magazyn=None,
-    tylko_sloty: set[str] | None = None,
+    tylko_sloty: Iterable[str] | None = None,
     tylko_z_en: bool = False,
     wszystko: bool = False,
     zip_: bool = True,

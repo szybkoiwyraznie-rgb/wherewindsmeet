@@ -606,8 +606,9 @@ def run_patcher(
         raise PatcherError(f"Nie znaleziono map języka '{jezyk_celu}' w folderze gry: {game_root}")
 
     if zh_layers:
-        zh_map = mapa_tekstow.zloz([path for _, path in zh_layers])
-        print(f"Wczytano warstwy źródłowe zh_cn z gry: {len(zh_layers)} plików ({len(zh_map)} wpisów).")
+        active_zh_layers = mapa_tekstow.filtruj_zastapione_diffy(zh_layers)
+        zh_map = mapa_tekstow.zloz([path for _, path in active_zh_layers])
+        print(f"Wczytano warstwy źródłowe zh_cn z gry: {len(active_zh_layers)} plików ({len(zh_map)} wpisów).")
     else:
         zh_map = {}
         print("UWAGA: brak plików translate_words_map_zh_cn w grze — dopasowanie użyje tylko ID i jednoznacznych tekstów EN.")
