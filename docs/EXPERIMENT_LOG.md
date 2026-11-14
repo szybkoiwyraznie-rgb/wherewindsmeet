@@ -1160,3 +1160,12 @@ cudzego kodu ani nie wymagają tej procedury.
   z transkrypcją właściciela) ani czy napisy filmów 2–3 pochodzą z
   `entry_collect_movie_subtitle_data`, czy z tych samych scen. Sprawdzenie
   wymaga nowej łatki u właściciela.
+- **Wydanie `v0.2.0` zbudowane i wysłane:** `python3 tools/one_click_patch.py
+  --tylko-magazyn --indeks index --magazyn tlumaczenie --wydanie v0.2.0
+  --wyj-zip dist/WWM_Spolszczenie_PL_v0.2.0.zip` →
+  `4 467 759 B`, `12` plików, SHA-256
+  `a0f12fdce98d5bb0eccbda39ea0a489973e5f83906aec8d94a10f9d35d6b12bc`,
+  `75 916` przekładów w planie (`po_kluczu 75 834`, `po_id 82`, `735`
+  kolizji, `70 097` dopasowań po EN). Kopia w `paczki/`, wysłana na Dysk Google
+  (folder pakietów) jako `WWM_Spolszczenie_PL_v0.2.0.zip`. **Łatka nie była
+  uruchomiona w grze** — to zwrotka i plan, nie potwierdzenie działania.

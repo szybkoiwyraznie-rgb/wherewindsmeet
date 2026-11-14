@@ -157,11 +157,11 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-1. **Zbudować i wysłać łatkę ze zwrotką prologu, potem sprawdzić ją w grze.**
-   W magazynie są już wszystkie napisy prologu (`zwrotki/2026-11-14_prolog_pl.md`,
-   `232` klucze); potrzebna jest nowa łatka
-   (`python3 tools/one_click_patch.py --tylko-magazyn --wydanie <wersja>
-   --wyj-zip dist/...`) i jedno uruchomienie gry — dopiero ono powie, czy
+1. **Uruchomić w grze gotową łatkę `v0.2.0` i sprawdzić prolog.** Wysłana na
+   Dysk Google `WWM_Spolszczenie_PL_v0.2.0.zip` (`4 467 759 B`, SHA-256
+   `a0f12fdc…d6b12bc`, `75 916` przekładów, kopia w `paczki/`) zawiera już
+   wszystkie napisy prologu z `zwrotki/2026-11-14_prolog_pl.md` (`232` klucze).
+   Jedno uruchomienie gry — najlepiej od nowej postaci do kreacji — powie, czy
    prolog jest polski i czy napisy filmów 2–3 idą z tej samej treści.
    **Do tego czasu nie twierdzimy, że cinematic jest już polski w grze.**
    Przed każdą diagnozą „coś jest po angielsku” uruchomić
