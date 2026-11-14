@@ -106,7 +106,16 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Otwarte ustalenia
 
-1. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
+1. **Bloker: możliwe przywracanie `translate_words_map_en_diff` przez Steam.**
+   Doniesienia społeczności nie są jeszcze naszym testem na instalacji
+   właściciela. Nie będziemy obchodzić weryfikacji/naprawy Steam ani automatycznie
+   nadpisywać pliku po jej wykonaniu. Dozwolony następny krok to wyłącznie
+   odczytowy pomiar metadanych/hashy przed i po zwykłej weryfikacji (gra i
+   launcher zamknięte), zgodnie z [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md).
+   Jeśli Steam przywraca plik, natywna łatka tej warstwy pozostaje wstrzymana,
+   dopóki nie będzie oficjalnie wspieranego punktu rozszerzeń; alternatywą
+   bez modyfikacji plików jest osobno zaprojektowana nakładka OCR.
+2. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
    mała łatka UI + prolog (`latka_testowa.py`) potwierdziła już na buildzie
    `25906190` przyjmowanie przepisanych map `translate_words_map_en*` i poprawne
    wyświetlanie wszystkich polskich znaków (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).

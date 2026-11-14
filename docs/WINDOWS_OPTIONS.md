@@ -24,6 +24,42 @@ Aktualizacje gry i weryfikacja mogą zmieniać pliki; nie planujemy omijać
 kontroli integralności. Dostępne są różne katalogi bibliotek Steam — przykład
 ścieżki instalatora nie wystarcza do niezawodnego wykrywania.
 
+## Bloker: Steam przywraca `translate_words_map_en_diff`
+
+Jeżeli Steam (lub launcher gry) przywraca zarządzany plik `_diff`, nie należy
+próbować utrwalać patcha przez podmianę w trakcie startu, obserwowanie procesu,
+automatyczne ponawianie zapisu, wyłączenie/obejście weryfikacji ani manipulację
+manifestem klienta. To byłoby obchodzenie mechanizmu integralności, poza
+przyjętym zakresem projektu. Samo ponowne zapisanie pliku po weryfikacji nie
+rozwiązuje problemu w sposób trwały ani wspierany i nie jest tu proponowaną
+„sztuczką”.
+
+Dopuszczalny plan rozpoznania i decyzji:
+
+1. Przy zamkniętej grze i launcherze zebrać wyłącznie odczytowe metadane przed
+i po zwykłej weryfikacji/aktualizacji (nazwę, rozmiar, SHA-256, czas oraz
+wersję/build, bez udostępniania zawartości). Ustalić, czy źródłem przywrócenia
+jest Steam, launcher gry, czy lokalny plik w `LocalData/Patch`; nie uznawać
+samego podobieństwa nazw za dowód.
+2. Jeśli mechanizm platformy przywraca plik, pozostawić plik w stanie
+zarządzanym przez platformę i wstrzymać natywną łatkę dla tej warstwy. Nie
+instalować starego backupu po aktualizacji ani automatycznie przepisywać pliku.
+3. Natywne patchowanie `_diff` można wznowić wyłącznie po znalezieniu
+udokumentowanego, dozwolonego przez wydawcę punktu rozszerzeń/modowania albo
+oficjalnym potwierdzeniu, że taka zmiana jest wspierana. Nie zakładamy, że
+zmiana launchera rozwiąże problem.
+4. Bez takiego punktu rozszerzeń wariantem niewymagającym modyfikacji plików
+gry jest osobny lokalny słownik/nakładka OCR poza klientem. To odrębny zakres,
+nie obejście Steam: wymaga oceny zasad gry, prywatności, jakości OCR i
+pokrycia, i nie daje gwarancji bezpieczeństwa konta.
+
+Obecny materiał opisuje przywracanie `_diff` przez Steam jako doniesienie
+społeczności, nie wynik naszego testu na instalacji właściciela. Zanim
+nazwiemy to potwierdzonym zachowaniem konkretnego buildu, potrzebny jest
+odczytowy raport porównawczy. Nie uruchamiać testu przez patchowanie plików ani
+nie wysyłać zawartości gry; metadane/hashy wystarczą do wykrycia zmiany, ale
+same nie dowodzą, kto ją wykonał.
+
 [Oficjalny poradnik łączenia kont](https://www.wherewindsmeetgame.com/news/official/GlobalLaunch/CrossPlatform.html)
 opisuje cross-progression między Steam, Epic i launcherem. Przy przenoszeniu
 istniejącej postaci trzeba połączyć konta **przed utworzeniem nowej postaci na
