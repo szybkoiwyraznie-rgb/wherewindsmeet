@@ -43,26 +43,35 @@ uzgodnić przechowywanie i świadomie zrewidować tę regułę; nie omijać jej 
 `git add -f`. Submoduły także wymagają osobnego przeglądu i są na razie
 odrzucane przez kontrolę indeksu.
 
-## Decyzja właściciela z 2026-11-11: indeks korpusu w repozytorium
+## Decyzja właściciela z 2026-11-11: teksty i wyciąg z gry w repozytorium
 
-Właściciel zdecydował, że **chińskie teksty źródłowe i indeks korpusu scen mają
-być wersjonowane w repozytorium**, ponieważ wyniki ekstrakcji żyły tylko w
-ignorowanym `local/`, które jest regularnie czyszczone, a patcher i skrypty
-budujące paczki nie mogą zależeć ani od `local/`, ani od plików przesyłanych
-prywatnym kanałem. Wykonano to bez omijania reguły rozmiaru:
+Właściciel zdecydował, że do Git trafiają **teksty, indeksy, powiązania,
+wnioski i dokumentacja, a poza Git zostają wyłącznie binarne pliki gry**
+([CEL.md](CEL.md)). Powód: wyniki ekstrakcji żyły tylko w ignorowanym `local/`,
+które jest regularnie czyszczone, a skrypty budujące paczki nie mogą zależeć
+ani od `local/`, ani od plików przesyłanych prywatnym kanałem.
 
-- `index/manifest.json` — liczby, pokrycie rejestru, inwentarz SHA-256 źródeł,
-  lista shardów; `index/sceny_NNN.jsonl` — sceny z liniami (linia trzyma
-  `text_id`, nie tekst); `index/teksty_NNN.jsonl` — unikalne `text_id` → tekst.
-- Każdy plik jest mniejszy niż 10 MiB (limit repozytorium), podział robi
-  `tools/buduj_indeks.py`; żaden plik nie jest dodawany przez `git add -f`.
-- Tekst występuje **raz** na unikalny `text_id`, nie przy każdej kwestii.
+Stan od wersji `wwm-indeks-v2` (katalog `index/`, zapisuje go
+`tools/wyciag.py`, czyta `tools/indeks.py`):
 
-Zapiszany szczery warunek: **warunków wydawcy nie zweryfikowaliśmy
-niezależnie**, a decyzja o publikacji tekstu gry należy do właściciela. Jeśli
-okaże się, że publikacji nie można utrzymać, indeks gry usuwa się z repozytorium
-jednym commitem, a narzędzia (`tools/sceny_z_indeksu.py`) dają się uruchomić
-z kopii poza repozytorium — format jest zapisany w `index/manifest.json`.
+- `index/teksty_X.jsonl` — każdy unikalny tekst źródłowy **raz**: chiński
+  oryginał i pomocnicza wersja angielska z gry; wszystkie inne pliki wskazują
+  tekst kluczem (16 znaków SHA-256 tekstu źródłowego).
+- `index/sceny_N.jsonl`, `zadania.jsonl`, `wybory.jsonl`, `postacie.jsonl`,
+  `encyklopedia.jsonl`, `miejsca.jsonl` i pozostałe — sceny i powiązania.
+- Każdy plik jest mniejszy niż 10 MiB (limit repozytorium); podział jest stały
+  (pierwszy znak klucza, numer dialogu modulo 8), więc aktualizacja gry zmienia
+  tylko wiersze, które się zmieniły. Żaden plik nie jest dodawany przez
+  `git add -f`.
+- Poprzedni indeks `wwm-indeks-v1` (same teksty chińskie, numer dialogu
+  przesunięty o jedną scenę) został zastąpiony w całości.
+
+Zapisany szczery warunek: **warunków wydawcy nie zweryfikowaliśmy
+niezależnie**, a decyzja o publikacji tekstu gry (chińskiego i angielskiego)
+należy do właściciela. Jeśli okaże się, że publikacji nie można utrzymać,
+katalog `index/` usuwa się z repozytorium jednym commitem; narzędzia czytają
+wyciąg z dowolnego katalogu (`--indeks`), więc działają także na kopii poza
+repozytorium.
 
 ## Katalogi i wymiana
 

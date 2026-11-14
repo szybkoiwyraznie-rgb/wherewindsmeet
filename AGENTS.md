@@ -1,19 +1,18 @@
 # Instrukcje dla agentów — Where Winds Meet PL
 
-To osobny projekt polskiej wersji **Where Winds Meet**, na bardzo wczesnym
-etapie. Nie przenoś ustaleń o silniku, formatach, platformie ani języku
-źródłowym SRW Y na tę grę. Wskazówki poniżej adaptują sposób pracy z
-[`mtgcrawler`](docs/PRIOR_ART.md), nie jego dane ani kod patchera.
+To projekt polskiej wersji **Where Winds Meet**. Nie przenoś ustaleń o silniku,
+formatach, platformie ani języku źródłowym SRW Y na tę grę. Wskazówki poniżej
+adaptują sposób pracy z [`mtgcrawler`](docs/PRIOR_ART.md), nie jego dane ani
+kod patchera.
 
 ## Początek każdej sesji
 
-1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/STATUS.md`,
-   `docs/ROADMAP.md`, `docs/FEASIBILITY.md`, `docs/WINDOWS_OPTIONS.md`,
-   `docs/STEAM_REFERENCE.md`, `docs/COLLECTOR.md`, `docs/UPDATES_AND_RESTORE.md`,
-   `docs/TWO_APPLICATIONS.md`, `docs/WORKFLOW.md`, `docs/DATA_POLICY.md` oraz ostatnie wpisy w
-   `docs/EXPERIMENT_LOG.md`.
-   Zajrzyj do `docs/PRIOR_ART.md` przed
-   ponownym badaniem problemów już opisanych w źródłach.
+1. Przeczytaj `README.md`, `ENVIRONMENT.md`, `docs/CEL.md`, `docs/STATUS.md`,
+   `docs/PAKIET_TLUMACZA.md`, `docs/BAZA_GRY.md`, `docs/LOCALE_CONTAINER.md`,
+   `docs/DATA_POLICY.md`, `docs/WORKFLOW.md`, `docs/COLLECTOR.md` oraz ostatnie
+   wpisy w `docs/EXPERIMENT_LOG.md`. Zajrzyj do `docs/PRIOR_ART.md` przed
+   ponownym badaniem problemów już opisanych w źródłach. Nie pytaj właściciela
+   o rzeczy już ustalone w `docs/CEL.md`.
 2. Sprawdź bieżącą gałąź, `git status` i istniejący otwarty PR. Nie nadpisuj
    cudzych lub niezacommitowanych zmian. W Arena pracuj i wypychaj **wyłącznie
    na gałęzi przydzielonej bieżącej sesji**, nie na `main`; nie przełączaj jej

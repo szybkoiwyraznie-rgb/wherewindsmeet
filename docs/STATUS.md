@@ -1,153 +1,143 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-11**. Jest to punkt wejścia dla kolejnej sesji; historię
-szczegółowych prób zapisuj w [dzienniku](EXPERIMENT_LOG.md), nie w nieskończenie
-rosnącym `AGENTS.md`.
+Aktualizacja: **2026-11-13**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+## Gdzie jesteśmy
+
+**Wyciąg `index/` w repozytorium jest już zaktualizowany do Patcha 2.4
+(`build 26592996`, dane z `2026-11-13`), do `tlumaczenie/` zaimportowano pierwszą
+zwrotkę tłumacza (`WWM_PL1.zip`: `75 685` przekładów = `15,46%` gry), a na Dysk
+Google wysłano zregenerowany pakiet `v4`** (`paczka_dla_tlumacza_wwm_v4.zip`,
+`422 248` miejsc `PL:`, w tym `75 683` przeniesionych jako aktywne `PL: tekst`,
+`346 565` pustych `PL:` — albo `253 693` po pominięciu tabel UI/meta — oraz
+dodatkowe listy `rewizje_en.jsonl` [`899` pozycji] i `usuniete_klucze.jsonl`
+[`566` pozycji]). Cały obieg — wyciąg z plików gry, pakiet (także `--wypelnij-pl`
+i `--dodatek`), Czytanki `v2`, import zwrotki, łatka map tekstów (także
+standalone `patcher_wwm.py`), audyt aktualizacji i pakiet uzupełniający —
+działa i jest przetestowany na prawdziwych plikach Patcha 2.4 **w piaskownicy**.
+Opis i polecenia: [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
+
+Przygotowano również **tryb cotygodniowej aktualizacji w zbieraczu `1.3.0`**
+(`collector/URUCHOM_AKTUALIZACJE.bat` + dzielenie dużych paczek w `spakuj_dane.ps1`
+— przetestowane na 8-częściowej paczce 516 MB z Patcha 2.4), **bezpieczny
+instalator Windows z kopią zapasową i przywracaniem** (`patcher_wwm.py` w trybie
+standalone oraz `instalator/` w trybie binarnym) oraz **plan małej próby UI
+i polskich znaków** ([TEST_W_GRZE.md](TEST_W_GRZE.md), `tools/latka_testowa.py`).
+
+**W grze zweryfikowano dotąd pierwszy mały test na poprzednim buildzie `25906190`
+(`tools/latka_testowa.py` w trybie binarnym):** klient Steam (Windows) przyjął
+przepisane mapy `translate_words_map_en*` w menu głównym, ustawieniach oraz
+napisach otwierającego prologu, a czcionki gry wyświetliły poprawnie wszystkie
+polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
+**Nie sprawdzono jeszcze w oknie gry:** zachowania klienta na nowym Patchu 2.4
+(`26592996`), nowego samowystarczalnego wrappera `patcher_wwm.py` uruchomionego
+bezpośrednio na komputerze z grą (na kopii plików `26592996` w piaskownicy
+przeszedł pełny cykl `instaluj → stan → przywroc` z dokładnym odtworzeniem
+SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
+(`75 685` przekładów w `tlumaczenie/`).
 
 ## Co wiadomo
 
-- Właściciel rozpoczyna nieoficjalną polską wersję *Where Winds Meet*. Chce
-  procesu analogicznego do SRW Y: ekstrakcja → tłumacz → import i instalacja,
-  później czytanka i obsługa aktualizacji. Zgłosił instalację Steam na Windows:
-  App ID `3564740`, Build ID `25906190`, `1.1.0.63833` na ekranie logowania i
-  `1.0.332.63833` po załadowaniu. Są to [odrębne oznaczenia](STEAM_REFERENCE.md),
-  nie dowód autentyczności plików ani ich zgodności z narzędziami.
-- Preferuje własne tłumaczenie z dobrym modelem oraz tekst natywnie w grze;
-  nakładka to plan awaryjny. Nie wykorzystujemy gotowego polskiego tłumaczenia
-  Arimy ani innych niezweryfikowanych gotowych zwrotek.
-- Właściciel poinformował, że według jego sprawdzenia zmiany czystego tekstu
-  są dozwolone, i wybrał wyłącznie zmiany wartości tekstowych przy wyłączonej
-  grze. Nie potwierdziliśmy niezależnie wyjątku w warunkach wydawcy; brak
-  gwarancji bezpieczeństwa konta. Bez wstrzykiwania, zmian pamięci/kodu,
-  podmiany podczas startu/gry ani obchodzenia zabezpieczeń.
-- Jest [prototyp pakietu tłumacza](TRANSLATION_BUNDLE.md): szablon i walidacja
-  fikcyjnych rekordów w wymyślonym JSON. Nie obsługuje formatu plików gry ani
-  nie wykonuje importu; wykrywa wyłącznie jawnie zadeklarowane literały.
-- Właściciel określił [dwie aplikacje Windows](TWO_APPLICATIONS.md): audytor
-  wszystkich plików z kolejką nowych/zmienionych linii i patcher z jedną
-  aktualną kopią na plik. Jest ogólny odczytowy skaner plików, testowany na
-  sztucznych katalogach, oraz syntetyczne modele linii, cofania i rotacji kopii.
-  Żaden nie został uruchomiony na grze ani nie potwierdza buildu, założeń o ID
-  i zakresie czy autentyczności referencji. Brak gotowych ZIP-ów audytora i
-  patchera; osobny [zbieracz](COLLECTOR.md) służy tylko rozpoznaniu.
-- Na życzenie właściciela przygotowano [zbieracz Windows](COLLECTOR.md):
-  instrukcja, BAT i PowerShell tworzą jeden ZIP z inwentarzem oraz wybranymi
-  kopiami map i kandydatów kontekstu. Ręczne oględziny zostały odrzucone.
-  Kompletność tekstów/kontekstu, aktualna instalacja i prawa pozostają nieznane.
-  Po błędzie `running scripts is disabled` na komputerze właściciela BAT znów
-  uruchamia PowerShell z `-ExecutionPolicy Bypass` (tylko dla tego procesu,
-  bez zmian w systemie) i wykonuje `Unblock-File` na swoich `*.ps1`.
-  Zmiana przeszła CI na Linux/Windows × Python 3.11/3.12; nie testowano jej
-  na komputerze właściciela ani na instalacji gry.
-- Punktem odniesienia jest `mtgcrawler` w wersji opisanej w
-  [PRIOR_ART.md](PRIOR_ART.md); odtworzono również ZIP z generatora
-  `build_kod_kit.py`. Jego ustalenia o SRW nie są ustaleniami o WWM.
-- **2026-11-11 odebrano wynik zbieracza** (`WWM_DANE_20261111_181913_13ff7ac1.zip`,
-  72 995 594 B, prywatnie w `local/`). Stan `partial` z powodu pominięcia mapy
-  `zh_cn` (69 470 988 B) przez limit 90 MiB; 0 problemów odczytu, build
-  `25906190` zgodny ze zgłoszonym. Inwentarz 640 plików w `Package`
-  i `LocalData/Patch`. Mapy EN: główna 50 550 179 B plus dwa `_diff`
-  (1 122 346 B z `LocalData/Patch`, 751 922 B z `Package`), `MANIFEST` ×2,
-  `data3` 10 829 572 B, `data205` 7 564 939 B.
-- **Rozpoznano kontener map** (szczegóły i liczby w
-  [LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)): `0xDEADBEEF`, wersja 1, liczba
-  chunków, tabela offsetów, chunki w zstd; po dekompresji jawny tekst z markupem
-  gry. Zweryfikowano dekompresję 4386/4386 chunków mapy EN. Nie znamy jeszcze
-  wiązania łańcuchów z kluczami ani zapisu zwrotnego.
-- **Błąd zbieracza wykryty na realnym wyniku:** `CreateFromDirectory`
-  w Windows PowerShell 5.1 zapisał nazwy wpisów z `\`, sprzecznie ze
-  specyfikacją ZIP; walidator odrzucił archiwum (`unsafe archive member path`).
-  Zamieniono na ręczne wpisy `ZipArchive` z `/` oraz dodano wyraźny komunikat
-  walidatora. Dane w odebranym ZIP-ie były kompletne i zostały przeanalizowane.
-  Wyjaśniono też, dlaczego test tej ścieżki padał **tylko** na Windows:
-  `zipfile` podmienia `\` na `/` w nazwach wpisów przy zapisie i odczycie, więc
-  walidator nie widzi tam separatora — paczkę i tak odrzuca, a wieloplatformową
-  bramką są pola raportu `source`/`stored_as` czytane z JSON.
-- **2026-11-11 odebrano dostawę `oversea` z Dysku Google** (4 pliki, największy
-  96 942 617 B; inwentarz z SHA-256 w [OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md)):
-  `oversea.zip`, `oversea2.zip`, `patch.zip`, `translate_words_map_zh_cn`.
-  Wypakowanie do ignorowanego `local/`. Przyszły `data200`–`204` i `206`;
-  `data200` nie ma `TimelinePObject`, a `data205` mamy z wcześniejszego
-  zbieracza. Nadal **brakuje `data207`–`data212`**.
-- **Nowe sceny:** 47 548 scen i 114 592 kwestii z `data201`–`206`
-  (`tools/timeline.py`; wszystkie `text_id` unikalne, 12 920 różnych `entity_tag`).
-  Rejestr `MANIFEST` z patcha ma 74 951 `dialog_timelines`; nowe sceny pokrywają
-  **58,5%** (43 828 z `dialog_no`; wcześniej 10,1%), **brakuje 31 123 dialogów**.
-- **Mapa źródłowa `zh_cn` rozpoznana:** ten sam kontener `0xDEADBEEF` co mapa EN
-  (7097 chunków, zstd) — **1 816 408 niepustych** par `id → chiński tekst`
-  (3 581 256 wpisów w nagłówkach). Nie same dialogi: także miejsca, imiona,
-  przedmioty, interfejs, encyklopedia. Na 50 000 `text_id` ze scen **100%
-  występuje w mapie**, 42 208 tekstów identycznych, 7 006 różni się tylko
-  łamaniami wiersza.
-- **Dopisek sceniczny w nawiasach (nowe):** 1 863 z 50 000 (3,7%) różni się
-  treścią — mapa trzyma pełną linię z dopiskiem, scena tylko wypowiadany
-  fragment: `（正声）咳咳，…` (1 055, sposób mówienia przed kwestią) oraz
-  `喵喵喵喵！（…）` (322, myśl po kwestii). Który wariant renderuje klient —
-  **do sprawdzenia w grze**.
-- **2026-11-11 druga dostawa z Dysku** (`oversea3.zip`, `index.zip`,
-  `index2.zip`): przyszły brakujące `data205`, `data207`–`data212` oraz indeksy.
-  Skan `tools/skan_timeline.py`: sceny mają tylko `data205` (8 484), `data207`
-  (11 847) i `data208` (7 042); `data209`–`data212` i wszystkie indeksy nie mają
-  ani jednego obiektu sceny.
-- **Korpus zamknięty w 92,2%:** 74 979 scen, 178 572 kwestii, 176 146 unikalnych
-  tekstów, 17 492 mówców; rejestr pokryty w 69 092 z 74 951 `dialog_timelines`.
-  **Brakuje 5 859 dialogów** — a nie został już nieprzesłany żaden plik `data*`.
-- **`dialog_no` to grupa dialogowa, nie pojedynczy timeline:** ten sam numer
-  występuje w dwóch plikach z inną treścią i innymi mówcami (10 takich grup).
-  Scalanie po `dialog_no` gubi treść — robimy sumę, nie różnicę.
-- **Trwały indeks w repo** (decyzja właściciela, patrz
-  [DATA_POLICY.md](DATA_POLICY.md)): `index/` — manifest, 5 shardów scen i 3
-  shardy tekstów, każdy < 10 MiB. Tekst jest raz na unikalny `text_id`.
-  `tools/sceny_z_indeksu.py` odtwarza z niego sceny i listy tekstów **bez
-  `local/` i bez plików z Dysku**; round-trip zweryfikowany polem do pola.
-  To odpowiedź na to, że `local/` jest regularnie czyszczone — w trakcie tej
-  pracy `local/`, `google_drive/` i `.venv` faktycznie zniknęły.
-- **Tekst źródłowy do tłumaczenia:** 25 258 z 176 146 (14,3%) ma w mapie `zh_cn`
-  dłuższą wersję z dopiskiem scenicznym w nawiasach; tłumaczy się wersję z mapy.
-- **Format dla tłumacza** gotowy: [format_tlumacza.md](format_tlumacza.md)
-  (kolumny, przykłady z prawdziwych danych, zasada „tłumaczyć pełny tekst
-  z mapy, nie zgadywać"). Język źródłowy decyzją właściciela: chiński.
-- Przygotowano dokumentację, ochronę danych, kontrole i konfigurację CI.
-  Publiczny [przegląd wykonalności](FEASIBILITY.md) wskazuje istniejące
-  narzędzia oraz ograniczenia oficjalnych warunków gry. Nie badano jeszcze
-  wydania właściciela; w repozytorium nie ma danych gry ani tłumaczenia.
+- **Baza gry odczytana w całości** ([BAZA_GRY.md](BAZA_GRY.md)): `MANIFEST` →
+  `indexN` → `dataN`, z warstwą aktualizacji (`index1001`/`1200`). W Patchu 2.4
+  (`26592996`) `114 904` z `114 925` tabel czyta się bez błędu (0 nieznanych
+  tagów), a `21` pustych tabel `spaces.*` (`0x00`, bez tekstów) zapisuje się w
+  `manifest.json`. Narzędzie: `tools/baza_gry.py`.
+- **Mapy tekstów z warstwami `_diff`** ([LOCALE_CONTAINER.md](LOCALE_CONTAINER.md)):
+  `LocalData/Patch/HD/oversea/locale/*_diff` liczy się od zera względem
+  bazy `Package/` i **zastępuje** starszą warstwę `Package/.../_diff` tego
+  samego języka (`wybierz_warstwy_gry` w `tools/mapa_tekstow.py`; w Patchu 2.4
+  ujawniły się 34 starsze klucze z `Package/_diff`, które patch wycofał).
+  Patcher nadpisuje na dysku oba pliki docelowe niezależnie.
+- **Wyciąg `index/` (`wwm-indeks-v2`, Patch 2.4 `26592996`)** w repozytorium:
+  487 684 unikalnych tekstów (chiński + angielski), 75 007 dialogów ze 186 288
+  kwestiami — każda w grupie mówcy — 24 753 zadania, wybory, postacie z opisami,
+  encyklopedia, miejsca. 93,58% identyfikatorów mapy angielskiej ma wskazane
+  źródło (tabelę albo scenę).
+- **Poprzedni indeks (`wwm-indeks-v1`) był błędny** i został usunięty 2026-11-12:
+  stary parser przypisywał scenie numer i projekt sceny następnej („5 859
+  brakujących dialogów” było artefaktem).
+- **Pakiety `v1`/`v3`/`v4` i magazyn `tlumaczenie/`**: wysłany `v1` miał
+  `485 047` miejsc `PL:`, wysłany `v3` (`--tylko-z-en`, build `25906190`)
+  `418 773` miejsc `PL:`. Z pierwszej zwrotki (`WWM_PL1.zip`) zaimportowano
+  **`75 685` przekładów** (`82` warianty płci + `75 603` po kluczu = `15,46%`
+  tekstów gry) do `tlumaczenie/`. Po aktualizacji `index/` do Patcha 2.4
+  wysłano zregenerowany pełny pakiet **`v4`** (`--wypelnij-pl`): `422 248` miejsc
+  `PL:` (`75 683` przeniesionych jako aktywne `PL: tekst`, `346 565` pustych
+  `PL:` lub **`253 693` po odjęciu tabel UI/meta**), uzupełniony o
+  `rewizje_en.jsonl` (`899`) i `usuniete_klucze.jsonl` (`566`). Pakiet
+  uzupełniający różnicy `25906190 → 26592996` ma `4 010` miejsc `PL:` (`677`
+  bez UI/meta). Każdy tekst ma dokładnie jedno `PL:`.
+- **Kolejność scen** pochodzi z danych (dla `index/` Patcha 2.4 w pełnym `v4`):
+  34 491 scen uporządkowanych w zadaniach (w tym 25 434 „według numeracji” za
+  taką sceną — oznaczone w nagłówku jako kolejność z numeracji, nie powiązanie),
+  12 341 według projektu i 26 562 rozmów tła według miejsca.
+- **Płeć bohatera**: 1 860 kwestii ma osobne identyfikatory dla bohatera
+  i bohaterki; w pakiecie mają osobne `PL:`.
+- **Aktualizacja przyrostowa sprawdzona na danych**: najpierw między paczką
+  gry a jej `LocalData/Patch` w `25906190` (`387` nowych tekstów), a następnie
+  między `25906190` i Patch 2.4 `26592996` (`+4 171` nowych tekstów z EN,
+  `-566` usuniętych, `57` nowych scen, `4 010` miejsc `PL:` w pakiecie
+  uzupełniającym).
+- Decyzje właściciela: język źródłowy chiński, angielski pomocniczo;
+  **zakres tłumaczenia wyznacza obecność wersji angielskiej (`EN`)** — wpisy
+  wyłącznie chińskie czekają do momentu wydania w wersji globalnej jako
+  „patch tłumaczenia” (`--tylko-z-en` w `buduj_paczke.py` i
+  `audyt_aktualizacji.py`); własny przekład, bez cudzych polonizacji; tylko
+  zmiany tekstu przy wyłączonej grze, bez wstrzykiwania i obchodzenia
+  zabezpieczeń; teksty i indeksy w Git, poza Git tylko binarne pliki gry
+  ([DATA_POLICY.md](DATA_POLICY.md)). Instalacja odniesienia: Steam, Windows,
+  App ID `3564740`, bieżący wyciąg z buildu `26592996` (poprzednio `25906190`,
+  [STEAM_REFERENCE.md](STEAM_REFERENCE.md)).
+  Warunków wydawcy nie potwierdziliśmy niezależnie; nie obiecujemy bezpieczeństwa
+  konta.
 
 | Obszar | Stan |
 |---|---|
-| Repozytorium i workflow | 258 testów; `check_repository.py` i `git diff --check` czyste. CI **4/4 zielone** (Ubuntu i Windows × Python 3.11/3.12); [dziennik](EXPERIMENT_LOG.md). |
-| Rozpoznanie wersji, formatów, zasad gry i ryzyka | Zgłoszono Steam na Windows oraz oznaczenia wersji. Faktycznych plików, formatu, warstw, zakresu warunków i zgodności narzędzi nie sprawdzono; jest [zbieracz](COLLECTOR.md). |
-| Ekstrakcja i zakres tekstów | Kontener map rozpoznany, parser par `id → tekst` działa (`tools/locale_records.py`): mapa EN 1 122 784 wpisy, mapa źródłowa `zh_cn` 1 816 408 niepustych. Sceny i mówce odczytane z `data201`–`206`. Nieznany jest zapis zwrotny do plików gry ani weryfikacja w grze. |
-| Pakiet tłumacza i import | Format tabeli dla tłumacza gotowy (kolumny, kontekst sceny, zasada pełnego tekstu z mapy). Prototyp szablonu/walidacji wymyślonego JSON; brak ekstrakcji pełnej paczki, importu i integracji z grą. |
-| Patcher, instalacja i przywracanie | Nie powstały; są jedynie syntetyczne modele cofania i rotacji kopii, bez zapisu. `runtime_tested: false`. |
-| Aktualizacje gry | Skaner ogólnych plików oraz syntetyczny audyt i wybór linii; brak pamięci tłumaczeń, ekstrakcji i obsługi aktualizacji WWM. |
-| Aplikacje Windows i czytanka | Docelowe ZIP-y audytora i patchera oraz czytanka są planowane; wstępny ZIP zbieracza jest osobnym narzędziem. |
+| Repozytorium i workflow | Ponad 352 testy (Linux + Windows CI); `check_repository.py` i `git diff --check` czyste; CI na Ubuntu i Windows × Python 3.11/3.12. |
+| Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami (z obsługą zastępowania `Package/.../_diff` przez `LocalData/Patch/.../_diff`) — sprawdzone na Patchu 2.4 (`26592996`). |
+| Wyciąg i powiązania | `index/` w Git (`wwm-indeks-v2`, Patch 2.4 `26592996`), deterministyczny, ze stałym podziałem plików. |
+| Pakiet tłumacza i Czytanki | Pakiety (`--tylko-z-en`, w tym paczki uzupełniające `--tylko-sloty`) i trzyplikowe Czytanki `wwm-czytanki-v2` (`epizody.md`, `kontekst_scen.md`, `dodatkowe.md` pod limitem `<5 MB/część`, 100% pokrycia) budują się **100% standalone z `index/`** (zero binarek gry). |
+| Import zwrotki | Gotowy i zweryfikowany produkcyjnie na `WWM_PL1.zip` (`tools/import_zwrotki.py`: `75 685` zaimportowanych przekładów w `tlumaczenie/`, `0` błędów formatu/tokenów, `21` kluczy odrzuconych z powodu usunięcia w Patchu 2.4). |
+| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` na `25906190`) **zweryfikowana w uruchomionej grze Steam**; pełna łatka fabularna i test `patcher_wwm.py` na Patchu 2.4 (`26592996`) w realnym oknie gry czekają na sprawdzenie. |
+| Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`, przetestowany 8-częściowy zrzut 516 MB z Patcha 2.4), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
+| Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
 ## Otwarte ustalenia
 
-1. Region, ustawiony język, istnienie kandydackich katalogów i plików oraz
-   zakres planowanych testów dla zgłoszonej instalacji Steam. Build ID i numery
-   ekranów są zapisane jako zgłoszone, nie jako weryfikacja plików.
-2. Język źródłowy/referencyjny (decyzja właściciela: **chiński**, mapa `zh_cn`;
-   angielski tylko pomocniczo), wybór modelu, koszty, prawo i warunki
-   przetwarzania oraz publikacji tekstu gry. Nie używamy cudzej gotowej
-   polonizacji jako źródła tłumaczenia.
-3. Wpływ warunków gry i zabezpieczeń na wybraną edycję oraz techniczna
-   wykonalność zmian wyłącznie tekstowych; ustalenie właściciela nie zostało
-   przez nas niezależnie potwierdzone. Patrz [FEASIBILITY.md](FEASIBILITY.md).
-4. Formaty w wydaniu właściciela, aktywne warstwy, powierzchnie tekstowe,
-   polskie glify i ograniczenia interfejsu — raporty społeczności wymagają
-   weryfikacji.
-5. Licencja własnego kodu, dokumentacji i tłumaczeń. Nie wybrano jej i nie
-   dodano pliku `LICENSE`.
+1. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
+   mała łatka UI + prolog (`latka_testowa.py`) potwierdziła już na buildzie
+   `25906190` przyjmowanie przepisanych map `translate_words_map_en*` i poprawne
+   wyświetlanie wszystkich polskich znaków (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
+   Nadal czekają na test w oknie gry: powtórzenie próby na Patchu 2.4 (`26592996`)
+   z nowym wrapperem `patcher_wwm.py` oraz pełna fabuła po zwrotce tłumacza.
+2. **Który język klienta zastępujemy.** Łatka przepisuje pliki podane
+   w `--cel`; dotąd sprawdzono mapę angielską.
+3. **Chronologia** nie była sprawdzana w grze. 12 341 scen bez wpisu zadania
+   i 25 434 ułożonych według numeru czeka na lepsze źródło (skrypty `*.ets`
+   zadań nie leżą w odczytanych tabelach).
+4. **Teksty bez źródła w mapie EN** — ~18 tys. wpisów jest w mapie, nie
+   wskazuje ich żadna odczytana tabela (prawdopodobnie interfejs zaszyty
+   w skryptach klienta).
+5. **Limity pól** — nieznane; pakiet podaje długości wersji angielskiej.
+6. **Zakres `EN` vs `ZH`:** w Patchu 2.4 mapa chińska ma `1 832 734` ID wobec
+   `1 136 704` ID w angielskiej (`37,98%` różnicy); `702 513` niewskazanych ID
+   odcięto w `index/`, a wśród pozostałych `1 294` tekstów bez `EN` ponad 70%
+   to etykiety testowe, zaślepki i wpisy wycofane (`测试`, `废弃`, `占坑`).
+   Zakres tłumaczenia wyznacza `--tylko-z-en` (patrz [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
+7. `21` pustych tabel rozmieszczeń `spaces.*` z Patcha 2.4 (`0x00`) jest bez
+   tekstów i trafia do rejestru błędów w `index/manifest.json`.
+8. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.
 
 ## Następny krok
 
-Format jest odczytany w obie strony i **potwierdzony na realnej mapie**:
-1 122 784 wpisy, `tools/apply_translation.py` podmienia teksty o dowolnej
-długości, weryfikuje wynik i zapisuje nową mapę (200 podmian w 11 s).
-
-Dalej: **domknąć 5 859 brakujących dialogów** — nie zostały nieprzesłane pliki
-`data*`, więc sprawdzić, czy rejestr zawiera grupy bez timeline'u, czy treść
-siedzi w innym pliku. Potem **sprawdzić w grze**, który wariant linii z
-dopiskiem w nawiasach renderuje klient, **limity pól interfejsu** oraz
-**skrypt instalacyjny** dla użytkownika (kopiowanie, backup, przywracanie).
+1. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
+   pierwsze wydanie samowystarczalnego spolszczenia **`WWM_Spolszczenie_PL_v0.1.0.zip`**
+   (`75 685` przekładów z `tlumaczenie/`, ok. `4,3 MB`, `tools/one_click_patch.py
+   --tylko-magazyn --wydanie v0.1.0 --wyj-zip dist/WWM_Spolszczenie_PL_v0.1.0.zip`).
+2. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
+   → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
+   Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
+3. Po każdym kolejnym patchu gry: właściciel klika
+   `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).

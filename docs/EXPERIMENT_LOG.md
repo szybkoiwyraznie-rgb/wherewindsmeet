@@ -652,8 +652,8 @@ cudzego kodu ani nie wymagają tej procedury.
   (10 plików); element ma nagłówek `[Dialog - mówca]`, `limit:` oraz linie
   `EN:` i `PL:`; kontekst sceny to `## Scena N/M — id`, `grupa`, `pliki`,
   `misja`, `uczestnicy`.
-- **Dokument docelowy:** [TRANSLATOR_PACKAGE_WWM.md](TRANSLATOR_PACKAGE_WWM.md)
-  opisuje mapowanie SRW→WWM (źródłem jest EN z gry), szkic elementu, proces
+- **Dokument docelowy:** `TRANSLATOR_PACKAGE_WWM.md` (usunięty 2026-11-12,
+  zastąpiony przez [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) opisywał mapowanie SRW→WWM (źródłem jest EN z gry), szkic elementu, proces
   i **cztery blokady**: nieodczytany indeks kluczy, brak atrybucji mówcy/scen,
   niezmierzone limity i niesprawdzony zapis zwrotny.
 - **Parser:** dodano `tools/locale_container.py` (sam nagłówek i tabela
@@ -817,7 +817,8 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Mówcy:** większość `entity_tag` to imiona postaci, ale trafiają się generyki
   (`玩家`, `主角`, `player`, `player_1/2`, `我`, `你` = postać gracza) i grupy
   techniczne (`Entity轨道组`, pusty tag) — nie są osobami.
-- **Format dla tłumacza:** [format_tlumacza.md](format_tlumacza.md) — kolumny
+- **Format dla tłumacza:** `format_tlumacza.md` (usunięty 2026-11-12,
+  zastąpiony przez [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) — kolumny
   `dialog_no`, projekt, czas, mówca, `text_id`, chińskie źródło z mapy, pusta
   kolumna na przekład, uwagi; przykłady z prawdziwych danych, w tym oba wzorce
   z dopiskiem.
@@ -904,3 +905,120 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Następne:** domknąć 5 859 brakujących dialogów (nie ma już nieprzesłanych
   plików `data*`, więc albo rejestr zawiera grupy bez timeline'u, albo treść
   jest w innym pliku), a potem ograniczenia pól interfejsu i skrypt instalacyjny.
+
+## 2026-11-11 — odczyt całej bazy gry (`MANIFEST` → `indexN` → `dataN`)
+
+- **Wejście:** `manifest.zip` (1 560 318 B, bazowy `MANIFEST`), `oversea*.zip`,
+  `index*.zip`, `patch.zip` (razem 42 pliki bazy po wypakowaniu) oraz bazowa
+  i patchowe mapy `zh_cn`/`en` ([OVERSEA_INWENTARZ.md](OVERSEA_INWENTARZ.md),
+  `index/manifest.json`).
+- **Odkrycie budowy bazy i warstwy aktualizacji:** `tools/baza_gry.py` czyta
+  każdy rekord tabeli bezpośrednio po nazwie i kluczu, nakładając chunki
+  poprawek i dopisane kolumny z `index1001`/`1200` i `data1001`/`1200`
+  ([BAZA_GRY.md](BAZA_GRY.md)).
+- **Sprawdzenie całości (`python3 tools/baza_gry.py … --sprawdz`):** odczytano
+  **114 169 z 114 171** tabel i **10 077 465 wierszy**, **0** niezgodności
+  liczby wierszy z `MANIFEST`, **0** nieznanych tagów wartości. Dwie tabele
+  rozmieszczenia (`spaces.s66027.spawn.spawn_sw_default_0` i `…_usual_0`) mają
+  `0x00` w miejscu tagu; nie zawierają tekstów.
+- **Wyjaśnienie rzekomych „5 859 brakujących dialogów”:** poprzedni parser
+  (`tools/timeline.py`, usunięty) ciął surowe bajty między wystąpieniami
+  `TimelinePObject`, przez co brał `dialog_config` następnego dialogu (62 726
+  z 62 746 par zgodnych z następną sceną, 0 z własną). Właściwa tabela to
+  `dialog_timelines.<numer>`, gdzie wszystkie 74 950 dialogów ma jednoznaczny
+  numer, projekt, obsadę i kwestie.
+
+## 2026-11-12 — wyciąg `wwm-indeks-v2`, pakiet v1 i próby potoku na realnych plikach
+
+- **Wyciąg (`tools/wyciag.py`, format `wwm-indeks-v2`):** zastąpił `wwm-indeks-v1`,
+  `analiza/` oraz 6 starych narzędzi (usunięte z repo). Rozszerza też
+  `tools/apply_translation.py` (`is_metadata_chunk` dopasowane do nagłówka
+  `_diff` o długości `16 + 4 × liczba_kubełków_bazy`).
+- **Wyniki wyciągu na buildzie `25906190`:**
+  - warstwy map: `zh_cn` 1 818 900 id, `en` 1 124 787 id;
+  - zakres pakietu: **1 128 714 id** → **483 190 unikalnych tekstów** (5 824
+    ma wyłącznie wersję EN; 700 766 id wyłącznie w `zh_cn` bez wskazania z tabel
+    lub scen pominięto jako hipotezę tekstów nieużywanych przez klienta
+    zachodniego);
+  - **74 950 dialogów** (1 577 bez tekstu), **186 025 kwestii** (wszystkie
+    wewnątrz grupy mówcy; 111 398 z nazwą z gry, 37 407 gracz, 37 168 tylko
+    etykieta robocza, 52 bez nazwy; **1 860** kwestii zależnych od płci
+    bohatera z `valid_for_specific_type`);
+  - 93,59% id EN (1 052 649 z 1 124 787) ma znane źródło w tabeli albo scenie;
+    72 138 id bez źródła;
+  - 24 733 zadań, 1 077 grup zadań, 15 027 pytań z wyborami, 172 postacie
+    w encyklopedii, 2 330 miejsc, 42 236 bytów z nazwą, tytułem lub opisem.
+- **Pakiet dla tłumacza v1 (`tools/buduj_paczke.py`):**
+  - zbudowano `paczka_dla_tlumacza_wwm_v1.zip` (**44 362 422 B**, SHA-256
+    `c25ddd2da73d5ef78b5e211b3dfb01d65c85702174fca25e3c82e1f1b376ecb0`),
+    składający się z `README.md`, `sceny.zip` (19 783 943 B, SHA-256
+    `1a528501…efdb`) i `widoki.zip` (24 567 169 B, SHA-256 `fc0532a6…8daf`),
+    oraz przekazano go właścicielowi przez Dysk Google; kopia `README.md`
+    i `paczka.json` w `paczki/v1/`;
+  - liczby pakietu: **73 373 sceny**, **528 249 elementów** (203 943 w scenach,
+    324 306 w widokach), **485 047 miejsc `PL:`** (168 183 w scenach, 316 864
+    w widokach), 43 199 powtórzeń z odwołaniem, 3 puste teksty bez `PL:`;
+  - kontrola własna (`kontrola()`): 485 047 miejsc `PL:`, 0 powtórzonych,
+    0 nieznanych, 0 brakujących;
+  - kolejność scen: 8 971 z wpisu zadań, 89 jako następstwo, 25 456 według
+    numeracji sąsiedztwa (oznaczone w nagłówku sceny), 12 303 według projektu,
+    26 554 rozmowy tła według miejsca; w całej grze przerwano 36 cykli
+    łańcucha zadań (`0` w wątku głównym — 2 445 scen w 4 rozdziałach).
+- **Próby potoku przyrostowego w piaskownicy (poza Git):**
+  - **Audyt aktualizacji (`tools/audyt_aktualizacji.py`):** porównanie wyciągu
+    z samej paczki (bez `LocalData/Patch`, 482 867 tekstów) z bieżącym `index/`
+    (483 190 tekstów): **387** nowych tekstów, **64** usunięte, 482 803 bez
+    zmian, **0** zmienionych scen; wygenerowany pakiet uzupełniający ma
+    dokładnie **387** miejsc `PL:`.
+  - **Import zwrotki i łatka (`tools/import_zwrotki.py`, `tools/zbuduj_latke.py`):**
+    sztuczna zwrotka na 19 630 miejsc (4 pliki): 0 odrzuconych; zbudowana
+    łatka na 3 prawdziwych plikach EN przepisała 95 471 / 1 122 784 wpisów
+    bazy oraz 847 / 6 775 i 1 060 / 11 015 w warstwach `_diff`, przechodząc
+    kontrolę wpis po wpisie.
+- **Poprawka CI na Windows (`tools/wypisz.py`):** 2 testy łatki rzuciły
+  `UnicodeEncodeError` w `windows-latest` (przekierowane wyjście ma stronę
+  kodową bez polskich liter); dodano przełączenie `stdout`/`stderr` na UTF-8
+  na starcie każdego narzędzia oraz test z `PYTHONIOENCODING=cp1252`.
+- **Ograniczenia:** żadnych testów w uruchomionej grze ani na instalacji
+  właściciela; nie sprawdzono przyjmowania przepisanych map przez klienta,
+  polskich glifów, limitów szerokości pól ani kolejności fabularnej.
+
+- **Zbieracz aktualizacji, instalator Windows z kopią/przywracaniem i plan testu UI (po `9f04ed6`):**
+  - **Zbieracz v2 (`collector/URUCHOM_AKTUALIZACJE.bat`, `zbierz.ps1 -Tryb aktualizacja`, `spakuj_dane.ps1`, `validate_collector_return.py`):**
+    dodano tryb jednego kliknięcia zbierający `LocalData/Patch/HD/oversea/*`,
+    `Package/HD/oversea/{MANIFEST,data1001,data1200,index1001,index1200}`,
+    wszystkie mapy `*_diff` oraz `translate_words_map_zh_cn` w jednym archiwum
+    < 90 MiB (format `wwm-collection-v2`); przepisano `spakuj_dane.ps1`
+    na `.NET SHA256`/`ZipArchive` z dzieleniem dużych paczek <= 85 MiB i
+    zachowaniem pełnych ścieżek względnych. Zweryfikowano w Windows PowerShell 5.1 CI.
+  - **Instalator Windows i wsparcie identycznych nazw w łatce (`tools/zbuduj_latke.py`, `instalator/`, `tools/build_installer_kit.py`):**
+    dodano `--mapa SCIEZKA_W_GRZE PLIK` i `--build-gry` w `tools/zbuduj_latke.py`
+    (rozróżnianie identycznych nazw bazowych między `Package/` i `LocalData/Patch/`);
+    utworzono zestaw `instalator/` (`ZAINSTALUJ.bat`, `PRZYWROC.bat`, `SPRAWDZ_STAN.bat`,
+    `instaluj_latke.ps1`) z kopią oryginałów poza folderem gry, weryfikacją
+    SHA-256 i buildu Steam przed zmianą, transakcyjnym zapisem z cofnięciem
+    błędu i ochroną przed nadpisaniem nowszego patcha Steam przy przywracaniu.
+    Zweryfikowano na fikcyjnej instalacji w Windows CI (`tests/test_installer_windows.py`).
+  - **Mała łatka testowa UI, prologu i polskich znaków (`tools/latka_testowa.py`, `docs/TEST_W_GRZE.md`):**
+    przygotowano izolowany generator paczki testowej dla etykiet menu/ustawień
+    oraz otwierających napisów prologu (`text_msg` / `text_msg__grey`, wiersze
+    `590336–590351`, m.in. *Even at the end of the road, / a drink to wet your throat.*)
+    z kompletem znaków `ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`; **sam test w
+    uruchomionej grze nadal pozostaje po stronie właściciela na Windows**.
+- **Weryfikacja prologu i zakresu `ZH` vs `EN` w `index/` (build `25906190`):**
+  - **Lokalizacja prologu:** kwestie otwierającej cutscenki (*Jiang Yan*, *Chen Zixi*)
+    leżą w `text_msg` / `text_msg__grey` (w `paczka_dla_tlumacza_wwm_v1.zip`:
+    `widoki/07_komunikaty_04.md` i `07_komunikaty_12.md`); grywalny wątek
+    główny po obudzeniu zaczyna się w `sceny/01_watek-glowny_rozdzial-1_01.md`
+    (zadania `220001`–`220003`, dialog `4700001`).
+  - **Różnica `ZH` vs `EN`:** `zh_cn` zawiera `1 818 900` ID, a `en` — `1 124 787`
+    ID (`38,16%` różnicy); poza `700 766` niewskazanymi ID pominiętymi już przy
+    ekstrakcji, wśród `1 295` tekstów wyłącznie chińskich w `index/` aż `935`
+    (**72,2%**) to komunikaty testowe, zaślepki i wpisy wycofane (`测试`, `废弃`,
+    `占坑`), a z `483 190` tekstów indeksu `476 071` ma parę `ZH + EN`,
+    `5 824` ma tylko `EN` (`z_en=True`), `690` tekstów `EN` zawiera resztki CJK,
+    a `48` wykazuje różnice w argumentach formatowania `{}` / `%s`.
+  - **Narzędzia zakresu (`--tylko-z-en`):** w `tools/buduj_paczke.py`
+    (przetestowane na `index/`: `483 752` miejsc `PL:`, `kontrola()` 100%
+    zgodna) oraz `tools/audyt_aktualizacji.py` (wykrywa jako nowość wpisy,
+    które w kolejnym patchu globalnym uzyskały wersję `EN`).

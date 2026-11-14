@@ -72,8 +72,8 @@ if os.name == "nt":
             errors = [line.strip() for line in text.splitlines() if "BLAD:" in line]
             return (errors[0] if errors else repr(text))[:700]
 
-        def collection(self):
-            paths = list(self.out.glob("WWM_DANE_*.zip"))
+        def collection(self, pattern="WWM_DANE_*.zip"):
+            paths = list(self.out.glob(pattern))
             self.assertEqual(len(paths), 1, paths)
             verified = validate(paths[0])
             self.assertEqual(verified["validation"], "passed")
@@ -87,13 +87,15 @@ if os.name == "nt":
             return report, inventory, payload, summary
 
         def test_real_windows_powershell_parser(self):
-            path = str(self.kit / "zbierz.ps1").replace("'", "''")
-            command = ("$tok=$null; $err=$null; "
-                       f"$null=[System.Management.Automation.Language.Parser]::ParseFile('{path}',[ref]$tok,[ref]$err); "
-                       "if ($err.Count) {$err | ForEach-Object {Write-Host $_}; exit 1}; exit 0")
-            result = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
-                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
-            self.assertEqual(result.returncode, 0, self.detail(result))
+            for script_name in ("zbierz.ps1", "spakuj_dane.ps1"):
+                with self.subTest(script=script_name):
+                    path = str(self.kit / script_name).replace("'", "''")
+                    command = ("$tok=$null; $err=$null; "
+                               f"$null=[System.Management.Automation.Language.Parser]::ParseFile('{path}',[ref]$tok,[ref]$err); "
+                               "if ($err.Count) {$err | ForEach-Object {Write-Host $_}; exit 1}; exit 0")
+                    result = subprocess.run([str(self.ps), "-NoProfile", "-NonInteractive", "-Command", command],
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60, check=False)
+                    self.assertEqual(result.returncode, 0, self.detail(result))
 
         def test_collects_maps_context_and_inventory_without_private_files(self):
             result = self.run_ps("-GameRoot", self.game, "-OutputDirectory", self.out, "-NonInteractive")
@@ -248,6 +250,266 @@ if os.name == "nt":
             self.assertTrue(any(row["reason"] == "reparse_skipped" for row in report["problems"]))
             self.assertFalse(any("should_not_enter" in row["path"] for row in inventory))
             self.assertEqual((outside / "should_not_enter.txt").read_text(encoding="utf-8"), "synthetic outside")
+
+
+        def test_update_mode_collects_allowed_files_and_skips_blacklisted_files(self):
+            self.write("Package/HD/oversea/MANIFEST", b"synthetic package manifest")
+            self.write("Package/HD/oversea/data1001", b"synthetic package data1001")
+            self.write("Package/HD/oversea/index1001", b"synthetic package index1001")
+            self.write("Package/HD/oversea/locale/translate_words_map_en_diff", b"synthetic en diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_zh_cn_diff", b"synthetic zh diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_fr_diff", b"ignored fr diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_vi_diff", b"ignored vi diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_en__small_diff", b"ignored small diff")
+            self.write("Package/HD/oversea/CameraZone.json", b"{}")
+            self.write("Package/HD/oversea/Audio_Area", b"ignored audio area")
+            self.write("Package/HD/oversea/bulk_data/bulk_data.bin", b"ignored bulk bin")
+            self.write("LocalData/Patch/HD/oversea/MANIFEST", b"synthetic patch manifest")
+            self.write("LocalData/Patch/HD/oversea/data1001", b"synthetic data1001")
+            self.write("LocalData/Patch/HD/oversea/index1001", b"synthetic index1001")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"synthetic patch en diff")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff", b"synthetic patch zh diff")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_de_diff", b"ignored patch de diff")
+            self.write("LocalData/Patch/HD/oversea/CameraZone.json", b"{}")
+            self.write("LocalData/Patch/HD/oversea/Audio_Area", b"ignored patch audio")
+            self.write("LocalData/Patch/HD/oversea/bulk_data/501_bulk_data.bin", b"ignored patch bulk")
+            self.write("LocalData/Patch/HD/oversea/model/face.bin", b"ignored model bin")
+            self.original = self.game_files()
+            state_dir = self.root / "stan_test1"
+
+            bat = self.kit / "URUCHOM_AKTUALIZACJE.bat"
+            command = f'"{bat}" "{self.game}" -OutputDirectory "{self.out}" -KatalogStanu "{state_dir}" -NonInteractive'
+            result = subprocess.run(command, shell=True, input=b"\r\n", stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, timeout=180, check=False)
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            report, _, payload, summary = self.collection("WWM_AKTUALIZACJA_*.zip")
+            self.assertEqual(report["format"], "wwm-collection-v2")
+            self.assertEqual(report["mode"], "aktualizacja")
+            self.assertEqual(report["status"], "collected")
+            self.assertEqual(report["batch"]["parts"], 1)
+            self.assertFalse(report["batch"]["split"])
+            self.assertTrue(report["state"]["enabled"])
+            self.assertNotIn("stan_test1", json.dumps(report, ensure_ascii=False))
+            self.assertNotIn("stan_test1", summary)
+            sources = {row["source"]: row for row in report["files"]}
+            for required in (
+                "LocalData/Patch/HD/oversea/MANIFEST",
+                "LocalData/Patch/HD/oversea/data1001",
+                "LocalData/Patch/HD/oversea/index1001",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_zh_cn_diff",
+                "Package/HD/oversea/MANIFEST",
+                "Package/HD/oversea/data3",
+                "Package/HD/oversea/index7",
+                "Package/HD/oversea/data1001",
+                "Package/HD/oversea/index1001",
+                "Package/HD/oversea/locale/translate_words_map_en",
+                "Package/HD/oversea/locale/translate_words_map_en_diff",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn_diff",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn",
+            ):
+                self.assertIn(required, sources)
+            for excluded in (
+                "Package/HD/oversea/locale/translate_words_map_fr_diff",
+                "Package/HD/oversea/locale/translate_words_map_vi_diff",
+                "Package/HD/oversea/locale/translate_words_map_en__small_diff",
+                "Package/HD/oversea/CameraZone.json",
+                "Package/HD/oversea/Audio_Area",
+                "Package/HD/oversea/bulk_data/bulk_data.bin",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_de_diff",
+                "LocalData/Patch/HD/oversea/CameraZone.json",
+                "LocalData/Patch/HD/oversea/Audio_Area",
+                "LocalData/Patch/HD/oversea/bulk_data/501_bulk_data.bin",
+                "LocalData/Patch/HD/oversea/model/face.bin",
+            ):
+                self.assertNotIn(excluded, sources)
+            self.assertEqual(len(payload), len({row["stored_as"] for row in report["files"] if row["stored_as"]}))
+            self.assertEqual(self.original, self.game_files())
+
+        def test_update_mode_incremental_state_skips_unchanged_and_handles_no_changes(self):
+            self.write("Package/HD/oversea/data200", b"base data200 content")
+            self.write("Package/HD/oversea/index200", b"base index200 content")
+            state_dir = self.root / "stan_inc"
+
+            # Run 1: initial full collection creates one ZIP and populates stan_wyslanych.json.
+            r1 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", self.out, "-KatalogStanu", state_dir, "-NonInteractive")
+            self.assertEqual(r1.returncode, 0, self.detail(r1))
+            zips1 = sorted(self.out.glob("WWM_AKTUALIZACJA_*.zip"))
+            self.assertEqual(len(zips1), 1)
+            first_zip = zips1[0]
+            self.assertTrue((state_dir / "stan_wyslanych.json").is_file())
+
+            # Run 2: nothing changed -> no new ZIP created.
+            r2 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", self.out, "-KatalogStanu", state_dir, "-NonInteractive")
+            self.assertEqual(r2.returncode, 0, self.detail(r2))
+            self.assertEqual(sorted(self.out.glob("WWM_AKTUALIZACJA_*.zip")), [first_zip])
+
+            # Run 3: modify 1 existing file and add 1 new patch file -> only those 2 are packed.
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"updated patch diff bytes")
+            self.write("LocalData/Patch/HD/oversea/data1200", b"new patch data1200")
+            r3 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", self.out, "-KatalogStanu", state_dir, "-NonInteractive")
+            self.assertEqual(r3.returncode, 0, self.detail(r3))
+            zips3 = sorted(self.out.glob("WWM_AKTUALIZACJA_*.zip"))
+            self.assertEqual(len(zips3), 2)
+            second_zip = [p for p in zips3 if p != first_zip][0]
+            verified = validate(second_zip)
+            self.assertEqual(verified["validation"], "passed")
+            with ZipFile(second_zip) as archive:
+                report2 = json.loads(archive.read("RAPORT.json").decode("utf-8-sig"))
+            packed_sources = {row["source"] for row in report2["files"]}
+            self.assertEqual(packed_sources, {
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+                "LocalData/Patch/HD/oversea/data1200",
+            })
+            unchanged_sources = {row["source"]: row for row in report2["state"]["unchanged"]}
+            self.assertIn("Package/HD/oversea/data200", unchanged_sources)
+            self.assertIn("Package/HD/oversea/index200", unchanged_sources)
+            self.assertEqual(unchanged_sources["Package/HD/oversea/data200"]["archive"], first_zip.name)
+
+            # Run 4: -PelnyZrzut ignores previous state and packs everything again.
+            r4 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", self.out, "-KatalogStanu", state_dir, "-PelnyZrzut", "-NonInteractive")
+            self.assertEqual(r4.returncode, 0, self.detail(r4))
+            zips4 = sorted(self.out.glob("WWM_AKTUALIZACJA_*.zip"))
+            self.assertEqual(len(zips4), 3)
+            third_zip = [p for p in zips4 if p not in (first_zip, second_zip)][0]
+            with ZipFile(third_zip) as archive:
+                report3 = json.loads(archive.read("RAPORT.json").decode("utf-8-sig"))
+            self.assertTrue(report3["state"]["full_snapshot"])
+            self.assertEqual(report3["state"]["unchanged_files"], 0)
+            self.assertIn("Package/HD/oversea/data200", {row["source"] for row in report3["files"]})
+
+        def test_update_mode_automatically_splits_above_limit_and_stays_single_below(self):
+            state_dir = self.root / "stan_split"
+            out_split = self.root / "out_split"
+            out_split.mkdir()
+            # Total allowed bytes from setUp() exceed 45 bytes -> must auto-split into >=2 valid parts.
+            r1 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", out_split, "-KatalogStanu", state_dir,
+                             "-LimitCzesciBajtow", "45", "-NonInteractive")
+            self.assertEqual(r1.returncode, 0, self.detail(r1))
+            parts = sorted(out_split.glob("WWM_AKTUALIZACJA_*_czesc*.zip"))
+            self.assertGreaterEqual(len(parts), 2)
+            all_packed = set()
+            for idx, part in enumerate(parts, start=1):
+                checked = validate(part)
+                self.assertEqual(checked["validation"], "passed")
+                self.assertEqual(checked["part"], idx)
+                self.assertEqual(checked["parts"], len(parts))
+                with ZipFile(part) as archive:
+                    rep = json.loads(archive.read("RAPORT.json").decode("utf-8-sig"))
+                self.assertTrue(rep["batch"]["split"])
+                for row in rep["files"]:
+                    all_packed.add(row["source"])
+            self.assertIn("Package/HD/oversea/MANIFEST", all_packed)
+            self.assertIn("Package/HD/oversea/locale/translate_words_map_en", all_packed)
+            self.assertIn("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", all_packed)
+
+            # Now change only one tiny file (12 bytes <= 45 bytes) -> auto-switches to single ZIP.
+            out_single = self.root / "out_single"
+            out_single.mkdir()
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"tiny 12 byte")
+            r2 = self.run_ps("-Tryb", "aktualizacja", "-GameRoot", self.game,
+                             "-OutputDirectory", out_single, "-KatalogStanu", state_dir,
+                             "-LimitCzesciBajtow", "45", "-NonInteractive")
+            self.assertEqual(r2.returncode, 0, self.detail(r2))
+            singles = sorted(out_single.glob("WWM_AKTUALIZACJA_*.zip"))
+            self.assertEqual(len(singles), 1)
+            self.assertNotIn("_czesc", singles[0].name)
+            checked_single = validate(singles[0])
+            self.assertEqual(checked_single["parts"], 1)
+            with ZipFile(singles[0]) as archive:
+                rep_single = json.loads(archive.read("RAPORT.json").decode("utf-8-sig"))
+            self.assertFalse(rep_single["batch"]["split"])
+            self.assertEqual([row["source"] for row in rep_single["files"]],
+                             ["LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff"])
+
+        def test_spakuj_dane_splits_parts_and_applies_blacklist(self):
+            self.write("Package/HD/oversea/index1", b"package index1 bytes")
+            self.write("Package/HD/oversea/CameraZone.json", b"{}")
+            self.write("Package/HD/oversea/VirtualWindow.json", b"{}")
+            self.write("Package/HD/oversea/Audio_Area", b"ignored audio")
+            self.write("Package/HD/oversea/bulk_data/bulk_data.bin", b"ignored bulk")
+            self.write("Package/HD/oversea/locale/translate_words_map_fr_diff", b"ignored fr diff")
+            self.write("Package/HD/oversea/locale/translate_words_map_en__small_diff", b"ignored small diff")
+            self.write("LocalData/Patch/HD/oversea/MANIFEST", b"patch manifest bytes")
+            self.write("LocalData/Patch/HD/oversea/data1001", b"patch data1001 bytes")
+            self.write("LocalData/Patch/HD/oversea/index1001", b"patch index1001 bytes")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff", b"patch en diff bytes")
+            self.write("LocalData/Patch/HD/oversea/locale/translate_words_map_vi_diff", b"ignored vi diff")
+            self.write("LocalData/Patch/HD/oversea/model/face.bin", b"ignored model")
+            self.original = self.game_files()
+            dest = self.root / "Uzupelnienie"
+            result = subprocess.run(
+                [str(self.ps), "-NoLogo", "-NoProfile", "-NonInteractive",
+                 "-File", str(self.kit / "spakuj_dane.ps1"),
+                 "-Gra", str(self.game), "-Wyjscie", str(dest),
+                 "-Zakres", "duza_aktualizacja", "-LimitCzesciBajtow", "40"],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180, check=False,
+            )
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            parts = sorted(self.root.glob("Uzupelnienie_czesc*.zip"))
+            self.assertGreaterEqual(len(parts), 2)
+            seen_sources = set()
+            for part in parts:
+                with ZipFile(part) as archive:
+                    self.assertIsNone(archive.testzip())
+                    self.assertFalse(any("\\" in name for name in archive.namelist()))
+                    manifest = json.loads(archive.read("SPIS.json").decode("utf-8-sig"))
+                    for row in manifest["files"]:
+                        seen_sources.add(row["path"])
+                        self.assertEqual(archive.read(row["stored_as"]), (self.game / row["path"]).read_bytes())
+            for required in (
+                "Package/HD/oversea/MANIFEST",
+                "Package/HD/oversea/index1",
+                "Package/HD/oversea/locale/translate_words_map_en",
+                "Package/HD/oversea/locale/translate_words_map_zh_cn",
+                "LocalData/Patch/HD/oversea/MANIFEST",
+                "LocalData/Patch/HD/oversea/data1001",
+                "LocalData/Patch/HD/oversea/index1001",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+            ):
+                self.assertIn(required, seen_sources)
+            for excluded in (
+                "Package/HD/oversea/CameraZone.json",
+                "Package/HD/oversea/VirtualWindow.json",
+                "Package/HD/oversea/Audio_Area",
+                "Package/HD/oversea/bulk_data/bulk_data.bin",
+                "Package/HD/oversea/locale/translate_words_map_fr_diff",
+                "Package/HD/oversea/locale/translate_words_map_en__small_diff",
+                "LocalData/Patch/HD/oversea/locale/translate_words_map_vi_diff",
+                "LocalData/Patch/HD/oversea/model/face.bin",
+            ):
+                self.assertNotIn(excluded, seen_sources)
+            self.assertEqual(self.original, self.game_files())
+
+        def test_spakuj_dane_bat_autodetects_steam_and_runs_without_args(self):
+            self.write("LocalData/Patch/HD/oversea/MANIFEST", b"patch manifest bytes")
+            self.write("LocalData/Patch/HD/oversea/data1001", b"patch data1001 bytes")
+            steam = self.root / "SteamSplit"
+            (steam / "steamapps").mkdir(parents=True)
+            library = self.game.parent.parent.parent
+            (steam / "steamapps" / "libraryfolders.vdf").write_text(
+                f'"libraryfolders"\n{{\n\t"1"\t"{str(library).replace(chr(92), chr(92) * 2)}"\n}}\n',
+                encoding="utf-8",
+            )
+            (library / "steamapps" / "appmanifest_3564740.acf").write_text(
+                '"AppState"\n{\n\t"installdir"\t"Where Winds Meet"\n\t"buildid"\t"25906190"\n}\n',
+                encoding="utf-8",
+            )
+            self.original = self.game_files()
+            dest = self.root / "UzupelnienieBat"
+            bat = self.kit / "SPAKUJ_DANE.bat"
+            command = f'"{bat}" -SteamRoot "{steam}" -Wyjscie "{dest}" -LimitCzesciBajtow 40 -NonInteractive'
+            result = subprocess.run(command, shell=True, input=b"\r\n", stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, timeout=180, check=False)
+            self.assertEqual(result.returncode, 0, self.detail(result))
+            parts = sorted(self.root.glob("UzupelnienieBat_czesc*.zip"))
+            self.assertGreaterEqual(len(parts), 2)
+            self.assertEqual(self.original, self.game_files())
 
 
 if __name__ == "__main__":

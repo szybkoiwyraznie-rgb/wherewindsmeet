@@ -1,0 +1,1089 @@
+{
+ "format": "wwm-paczka-v1",
+ "wersja": "3",
+ "data": "2026-11-12",
+ "rodzaj": "pełny",
+ "tylko_z_en": true,
+ "wszystko": false,
+ "indeks": {
+  "format": "wwm-indeks-v2",
+  "opis": "Steam 3564740, build 25906190, pliki z 2026-11-11",
+  "liczby": {
+   "unikalnych_tekstow_w_zakresie": 484080,
+   "scen": 74950,
+   "kwestii": 186025
+  }
+ },
+ "liczby": {
+  "elementow": 461809,
+  "do_wpisania": 418773,
+  "przerywnikow": 446,
+  "scen": 73337,
+  "powtorzen": 43011,
+  "pominietych_bez_en": 22,
+  "pustych": 3
+ },
+ "liczby_sceny": {
+  "elementow": 203897,
+  "do_wpisania": 168157,
+  "przerywnikow": 446,
+  "scen": 73337,
+  "powtorzen": 35718,
+  "pominietych_bez_en": 22
+ },
+ "liczby_cutsceny": {
+  "elementow": 4532,
+  "do_wpisania": 4116,
+  "powtorzen": 416
+ },
+ "liczby_widoki": {
+  "elementow": 253380,
+  "do_wpisania": 246500,
+  "powtorzen": 6877,
+  "pustych": 3
+ },
+ "wykluczenia": {
+  "boty_nicki": 49906,
+  "tabele_meta": 15189,
+  "stare_grey_cutsceny": 671,
+  "bledy_sieciowe": 38,
+  "promo_beta_cn": 23,
+  "placeholdery_testy": 77
+ },
+ "uklad": {
+  "scen_w_zadaniach": 34494,
+  "w_tym_wg_numeracji": 25438,
+  "scen_wg_projektow": 12289,
+  "scen_tla": 26554,
+  "przerwanych_cykli_lancucha_zadan": 36
+ },
+ "sceny": [
+  {
+   "baza": "01_watek-glowny_rozdzial-1",
+   "tytul": "Wątek główny — 第一章 (Chapter One) · 踏莎行 (Across the Meadow) · 神仙不渡 (Heaven Has No Pier)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "01_watek-glowny_rozdzial-1_01.md",
+     "scen": 387,
+     "elementow": 1383,
+     "do_wpisania": 1239
+    }
+   ]
+  },
+  {
+   "baza": "02_watek-glowny_rozdzial-2",
+   "tytul": "Wątek główny — 第二章 (Chapter Two) · 西江月 (West River Moon) · 天地熔炉 (Universal Furnace)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "02_watek-glowny_rozdzial-2_01.md",
+     "scen": 952,
+     "elementow": 5209,
+     "do_wpisania": 4350
+    },
+    {
+     "plik": "02_watek-glowny_rozdzial-2_02.md",
+     "scen": 113,
+     "elementow": 306,
+     "do_wpisania": 241
+    }
+   ]
+  },
+  {
+   "baza": "03_watek-glowny_rozdzial-3",
+   "tytul": "Wątek główny — 第三章 (Chapter Three) · 长相思 (Deep Longing) · 问月长安 (A Lonely Moon Over Chang'an)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "03_watek-glowny_rozdzial-3_01.md",
+     "scen": 476,
+     "elementow": 2385,
+     "do_wpisania": 2022
+    }
+   ]
+  },
+  {
+   "baza": "04_watek-glowny_rozdzial-4",
+   "tytul": "Wątek główny — 第四章 (Chapter Four) · 鹧鸪天 (Partridge Sky) · 金乌衔枝 (Bringer of Embers)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "04_watek-glowny_rozdzial-4_01.md",
+     "scen": 451,
+     "elementow": 3428,
+     "do_wpisania": 3054
+    }
+   ]
+  },
+  {
+   "baza": "05_watek-glowny_grupa-8",
+   "tytul": "Wątek główny — grupa 8",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "05_watek-glowny_grupa-8_01.md",
+     "scen": 39,
+     "elementow": 245,
+     "do_wpisania": 236
+    }
+   ]
+  },
+  {
+   "baza": "06_watek-glowny_grupa-5370",
+   "tytul": "Wątek główny — grupa 5370",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "06_watek-glowny_grupa-5370_01.md",
+     "scen": 2,
+     "elementow": 13,
+     "do_wpisania": 7
+    }
+   ]
+  },
+  {
+   "baza": "07_watek-glowny_bez-grupy",
+   "tytul": "Wątek główny — zadania bez grupy",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "07_watek-glowny_bez-grupy_01.md",
+     "scen": 25,
+     "elementow": 97,
+     "do_wpisania": 61
+    }
+   ]
+  },
+  {
+   "baza": "08_campaign",
+   "tytul": "Zadania: 镇守 (Campaign)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "08_campaign_01.md",
+     "scen": 1097,
+     "elementow": 4588,
+     "do_wpisania": 3704
+    },
+    {
+     "plik": "08_campaign_02.md",
+     "scen": 1274,
+     "elementow": 4071,
+     "do_wpisania": 3678
+    },
+    {
+     "plik": "08_campaign_03.md",
+     "scen": 134,
+     "elementow": 535,
+     "do_wpisania": 457
+    }
+   ]
+  },
+  {
+   "baza": "09_festival",
+   "tytul": "Zadania: 节庆 (Festival)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "09_festival_01.md",
+     "scen": 912,
+     "elementow": 4158,
+     "do_wpisania": 3612
+    },
+    {
+     "plik": "09_festival_02.md",
+     "scen": 256,
+     "elementow": 675,
+     "do_wpisania": 580
+    }
+   ]
+  },
+  {
+   "baza": "10_encounter-prerequisite",
+   "tytul": "Zadania: 奇遇前置 (Encounter Prerequisite)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "10_encounter-prerequisite_01.md",
+     "scen": 213,
+     "elementow": 944,
+     "do_wpisania": 886
+    }
+   ]
+  },
+  {
+   "baza": "11_encounter",
+   "tytul": "Zadania: 奇遇 (Encounter)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "11_encounter_01.md",
+     "scen": 1109,
+     "elementow": 4162,
+     "do_wpisania": 3654
+    },
+    {
+     "plik": "11_encounter_02.md",
+     "scen": 999,
+     "elementow": 3938,
+     "do_wpisania": 3505
+    },
+    {
+     "plik": "11_encounter_03.md",
+     "scen": 982,
+     "elementow": 4365,
+     "do_wpisania": 3755
+    },
+    {
+     "plik": "11_encounter_04.md",
+     "scen": 1001,
+     "elementow": 4116,
+     "do_wpisania": 3735
+    },
+    {
+     "plik": "11_encounter_05.md",
+     "scen": 789,
+     "elementow": 3911,
+     "do_wpisania": 3505
+    },
+    {
+     "plik": "11_encounter_06.md",
+     "scen": 927,
+     "elementow": 4133,
+     "do_wpisania": 3707
+    },
+    {
+     "plik": "11_encounter_07.md",
+     "scen": 814,
+     "elementow": 3362,
+     "do_wpisania": 3018
+    }
+   ]
+  },
+  {
+   "baza": "12_jianghu-legacy",
+   "tytul": "Zadania: 侠迹 (Jianghu Legacy)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "12_jianghu-legacy_01.md",
+     "scen": 1327,
+     "elementow": 4157,
+     "do_wpisania": 3740
+    },
+    {
+     "plik": "12_jianghu-legacy_02.md",
+     "scen": 1317,
+     "elementow": 4078,
+     "do_wpisania": 3381
+    },
+    {
+     "plik": "12_jianghu-legacy_03.md",
+     "scen": 887,
+     "elementow": 3023,
+     "do_wpisania": 2288
+    }
+   ]
+  },
+  {
+   "baza": "13_injustice-quest-11",
+   "tytul": "Zadania: 不平事 (Injustice Quest)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "13_injustice-quest-11_01.md",
+     "scen": 1090,
+     "elementow": 3691,
+     "do_wpisania": 3233
+    },
+    {
+     "plik": "13_injustice-quest-11_02.md",
+     "scen": 1228,
+     "elementow": 4165,
+     "do_wpisania": 3381
+    },
+    {
+     "plik": "13_injustice-quest-11_03.md",
+     "scen": 1153,
+     "elementow": 3770,
+     "do_wpisania": 3166
+    },
+    {
+     "plik": "13_injustice-quest-11_04.md",
+     "scen": 758,
+     "elementow": 2908,
+     "do_wpisania": 2371
+    }
+   ]
+  },
+  {
+   "baza": "14_injustice-quest-14",
+   "tytul": "Zadania: 不平事 (Injustice Quest)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "14_injustice-quest-14_01.md",
+     "scen": 973,
+     "elementow": 3065,
+     "do_wpisania": 2704
+    }
+   ]
+  },
+  {
+   "baza": "15_commission",
+   "tytul": "Zadania: 委托 (Commission)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "15_commission_01.md",
+     "scen": 68,
+     "elementow": 282,
+     "do_wpisania": 265
+    }
+   ]
+  },
+  {
+   "baza": "16_worldly-affairs",
+   "tytul": "Zadania: 世情 (Worldly Affairs)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "16_worldly-affairs_01.md",
+     "scen": 1076,
+     "elementow": 4443,
+     "do_wpisania": 3858
+    },
+    {
+     "plik": "16_worldly-affairs_02.md",
+     "scen": 742,
+     "elementow": 4192,
+     "do_wpisania": 3667
+    },
+    {
+     "plik": "16_worldly-affairs_03.md",
+     "scen": 580,
+     "elementow": 2050,
+     "do_wpisania": 1752
+    }
+   ]
+  },
+  {
+   "baza": "17_exploration",
+   "tytul": "Zadania: 游历 (Exploration)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "17_exploration_01.md",
+     "scen": 1169,
+     "elementow": 4128,
+     "do_wpisania": 3274
+    },
+    {
+     "plik": "17_exploration_02.md",
+     "scen": 1040,
+     "elementow": 4012,
+     "do_wpisania": 3459
+    },
+    {
+     "plik": "17_exploration_03.md",
+     "scen": 1056,
+     "elementow": 3870,
+     "do_wpisania": 3295
+    },
+    {
+     "plik": "17_exploration_04.md",
+     "scen": 1136,
+     "elementow": 4201,
+     "do_wpisania": 3607
+    },
+    {
+     "plik": "17_exploration_05.md",
+     "scen": 1122,
+     "elementow": 4060,
+     "do_wpisania": 3341
+    },
+    {
+     "plik": "17_exploration_06.md",
+     "scen": 39,
+     "elementow": 132,
+     "do_wpisania": 97
+    }
+   ]
+  },
+  {
+   "baza": "18_guidance",
+   "tytul": "Zadania: 指引 (Guidance)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "18_guidance_01.md",
+     "scen": 1099,
+     "elementow": 4506,
+     "do_wpisania": 3520
+    },
+    {
+     "plik": "18_guidance_02.md",
+     "scen": 1001,
+     "elementow": 4108,
+     "do_wpisania": 3301
+    },
+    {
+     "plik": "18_guidance_03.md",
+     "scen": 936,
+     "elementow": 2799,
+     "do_wpisania": 2151
+    }
+   ]
+  },
+  {
+   "baza": "19_homestead",
+   "tytul": "Zadania: 家业 (Homestead)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "19_homestead_01.md",
+     "scen": 635,
+     "elementow": 2717,
+     "do_wpisania": 2221
+    }
+   ]
+  },
+  {
+   "baza": "20_companion",
+   "tytul": "Zadania: 伙伴 (Companion)",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "20_companion_01.md",
+     "scen": 188,
+     "elementow": 1133,
+     "do_wpisania": 900
+    }
+   ]
+  },
+  {
+   "baza": "21_typ-21",
+   "tytul": "Zadania: typ 21",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "21_typ-21_01.md",
+     "scen": 292,
+     "elementow": 931,
+     "do_wpisania": 769
+    }
+   ]
+  },
+  {
+   "baza": "22_bez-typu",
+   "tytul": "Zadania: zadania bez typu",
+   "opis": "sceny według zadań",
+   "pliki": [
+    {
+     "plik": "22_bez-typu_01.md",
+     "scen": 630,
+     "elementow": 2134,
+     "do_wpisania": 1913
+    }
+   ]
+  },
+  {
+   "baza": "80_dialogi-wg-projektow",
+   "tytul": "Dialogi bez wpisu w tabelach zadań — według projektu i numeru",
+   "opis": "dialogi według projektu",
+   "pliki": [
+    {
+     "plik": "80_dialogi-wg-projektow_01.md",
+     "scen": 2045,
+     "elementow": 5169,
+     "do_wpisania": 3560
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_02.md",
+     "scen": 1716,
+     "elementow": 5150,
+     "do_wpisania": 3489
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_03.md",
+     "scen": 1359,
+     "elementow": 4396,
+     "do_wpisania": 3426
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_04.md",
+     "scen": 1734,
+     "elementow": 4735,
+     "do_wpisania": 3804
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_05.md",
+     "scen": 1764,
+     "elementow": 5314,
+     "do_wpisania": 3428
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_06.md",
+     "scen": 1435,
+     "elementow": 4228,
+     "do_wpisania": 3100
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_07.md",
+     "scen": 1183,
+     "elementow": 5433,
+     "do_wpisania": 2335
+    },
+    {
+     "plik": "80_dialogi-wg-projektow_08.md",
+     "scen": 1053,
+     "elementow": 2725,
+     "do_wpisania": 1766
+    }
+   ]
+  },
+  {
+   "baza": "90_rozmowy-tla",
+   "tytul": "Rozmowy tła: kwestie NPC rozmieszczonych w świecie — według miejsca",
+   "opis": "rozmowy tła według miejsca",
+   "pliki": [
+    {
+     "plik": "90_rozmowy-tla_01.md",
+     "scen": 2079,
+     "elementow": 2885,
+     "do_wpisania": 2420
+    },
+    {
+     "plik": "90_rozmowy-tla_02.md",
+     "scen": 1878,
+     "elementow": 2669,
+     "do_wpisania": 2324
+    },
+    {
+     "plik": "90_rozmowy-tla_03.md",
+     "scen": 1936,
+     "elementow": 2771,
+     "do_wpisania": 2318
+    },
+    {
+     "plik": "90_rozmowy-tla_04.md",
+     "scen": 1576,
+     "elementow": 2390,
+     "do_wpisania": 2011
+    },
+    {
+     "plik": "90_rozmowy-tla_05.md",
+     "scen": 1455,
+     "elementow": 2251,
+     "do_wpisania": 2107
+    },
+    {
+     "plik": "90_rozmowy-tla_06.md",
+     "scen": 1735,
+     "elementow": 2366,
+     "do_wpisania": 2010
+    },
+    {
+     "plik": "90_rozmowy-tla_07.md",
+     "scen": 1955,
+     "elementow": 2614,
+     "do_wpisania": 2383
+    },
+    {
+     "plik": "90_rozmowy-tla_08.md",
+     "scen": 3902,
+     "elementow": 4079,
+     "do_wpisania": 3554
+    },
+    {
+     "plik": "90_rozmowy-tla_09.md",
+     "scen": 4067,
+     "elementow": 4067,
+     "do_wpisania": 3867
+    },
+    {
+     "plik": "90_rozmowy-tla_10.md",
+     "scen": 4005,
+     "elementow": 4100,
+     "do_wpisania": 3758
+    },
+    {
+     "plik": "90_rozmowy-tla_11.md",
+     "scen": 1966,
+     "elementow": 1976,
+     "do_wpisania": 1837
+    }
+   ]
+  }
+ ],
+ "cutsceny": [
+  {
+   "baza": "01_napisy_cutscen",
+   "tytul": "Napisy cutscen (`text_msg` 590000–592694)",
+   "opis": "cutsceny",
+   "pliki": [
+    {
+     "plik": "01_napisy_cutscen_01.md",
+     "scen": 0,
+     "elementow": 2688,
+     "do_wpisania": 2602
+    }
+   ]
+  },
+  {
+   "baza": "02_intro_i_filmy",
+   "tytul": "Intro i napisy filmowe",
+   "opis": "cutsceny",
+   "pliki": [
+    {
+     "plik": "02_intro_i_filmy_01.md",
+     "scen": 0,
+     "elementow": 56,
+     "do_wpisania": 20
+    }
+   ]
+  },
+  {
+   "baza": "03_plansze_i_streszczenia",
+   "tytul": "Plansze przerywników i powtórki w dzienniku",
+   "opis": "cutsceny",
+   "pliki": [
+    {
+     "plik": "03_plansze_i_streszczenia_01.md",
+     "scen": 0,
+     "elementow": 1788,
+     "do_wpisania": 1494
+    }
+   ]
+  }
+ ],
+ "widoki": [
+  {
+   "baza": "00_postacie",
+   "tytul": "Postacie: imiona, tytuły, opisy, encyklopedia osób",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "00_postacie_01.md",
+     "scen": 0,
+     "elementow": 5641,
+     "do_wpisania": 5639
+    },
+    {
+     "plik": "00_postacie_02.md",
+     "scen": 0,
+     "elementow": 9090,
+     "do_wpisania": 9077
+    },
+    {
+     "plik": "00_postacie_03.md",
+     "scen": 0,
+     "elementow": 8466,
+     "do_wpisania": 8462
+    },
+    {
+     "plik": "00_postacie_04.md",
+     "scen": 0,
+     "elementow": 1671,
+     "do_wpisania": 1671
+    },
+    {
+     "plik": "00_postacie_05.md",
+     "scen": 0,
+     "elementow": 610,
+     "do_wpisania": 535
+    }
+   ]
+  },
+  {
+   "baza": "01_zadania",
+   "tytul": "Zadania: nazwy, cele, opisy i podsumowania",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "01_zadania_01.md",
+     "scen": 0,
+     "elementow": 4760,
+     "do_wpisania": 4750
+    },
+    {
+     "plik": "01_zadania_02.md",
+     "scen": 0,
+     "elementow": 5953,
+     "do_wpisania": 5947
+    },
+    {
+     "plik": "01_zadania_03.md",
+     "scen": 0,
+     "elementow": 5714,
+     "do_wpisania": 5710
+    },
+    {
+     "plik": "01_zadania_04.md",
+     "scen": 0,
+     "elementow": 267,
+     "do_wpisania": 266
+    }
+   ]
+  },
+  {
+   "baza": "02_wybory_i_rozmowy",
+   "tytul": "Wybory gracza i teksty rozmów spoza scen",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "02_wybory_i_rozmowy_01.md",
+     "scen": 0,
+     "elementow": 7774,
+     "do_wpisania": 4913
+    },
+    {
+     "plik": "02_wybory_i_rozmowy_02.md",
+     "scen": 0,
+     "elementow": 7358,
+     "do_wpisania": 4069
+    },
+    {
+     "plik": "02_wybory_i_rozmowy_03.md",
+     "scen": 0,
+     "elementow": 3082,
+     "do_wpisania": 3062
+    }
+   ]
+  },
+  {
+   "baza": "03_przedmioty",
+   "tytul": "Przedmioty, wyposażenie, stroje, budowle",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "03_przedmioty_01.md",
+     "scen": 0,
+     "elementow": 6478,
+     "do_wpisania": 6475
+    },
+    {
+     "plik": "03_przedmioty_02.md",
+     "scen": 0,
+     "elementow": 6077,
+     "do_wpisania": 6070
+    },
+    {
+     "plik": "03_przedmioty_03.md",
+     "scen": 0,
+     "elementow": 5693,
+     "do_wpisania": 5691
+    },
+    {
+     "plik": "03_przedmioty_04.md",
+     "scen": 0,
+     "elementow": 4864,
+     "do_wpisania": 4862
+    },
+    {
+     "plik": "03_przedmioty_05.md",
+     "scen": 0,
+     "elementow": 5404,
+     "do_wpisania": 5404
+    },
+    {
+     "plik": "03_przedmioty_06.md",
+     "scen": 0,
+     "elementow": 4957,
+     "do_wpisania": 4957
+    },
+    {
+     "plik": "03_przedmioty_07.md",
+     "scen": 0,
+     "elementow": 1313,
+     "do_wpisania": 1313
+    }
+   ]
+  },
+  {
+   "baza": "04_walka_i_umiejetnosci",
+   "tytul": "Walka: umiejętności, efekty, talenty, przeciwnicy",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "04_walka_i_umiejetnosci_01.md",
+     "scen": 0,
+     "elementow": 6575,
+     "do_wpisania": 6567
+    },
+    {
+     "plik": "04_walka_i_umiejetnosci_02.md",
+     "scen": 0,
+     "elementow": 4437,
+     "do_wpisania": 4436
+    },
+    {
+     "plik": "04_walka_i_umiejetnosci_03.md",
+     "scen": 0,
+     "elementow": 5094,
+     "do_wpisania": 5093
+    },
+    {
+     "plik": "04_walka_i_umiejetnosci_04.md",
+     "scen": 0,
+     "elementow": 4814,
+     "do_wpisania": 4813
+    },
+    {
+     "plik": "04_walka_i_umiejetnosci_05.md",
+     "scen": 0,
+     "elementow": 1627,
+     "do_wpisania": 1627
+    }
+   ]
+  },
+  {
+   "baza": "05_swiat_i_miejsca",
+   "tytul": "Świat: miejsca, regiony, mapy, obiekty",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "05_swiat_i_miejsca_01.md",
+     "scen": 0,
+     "elementow": 5954,
+     "do_wpisania": 5949
+    },
+    {
+     "plik": "05_swiat_i_miejsca_02.md",
+     "scen": 0,
+     "elementow": 6778,
+     "do_wpisania": 6778
+    },
+    {
+     "plik": "05_swiat_i_miejsca_03.md",
+     "scen": 0,
+     "elementow": 206,
+     "do_wpisania": 206
+    }
+   ]
+  },
+  {
+   "baza": "06_encyklopedia_i_ksiegi",
+   "tytul": "Encyklopedia, księgi, zapiski, listy",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "06_encyklopedia_i_ksiegi_01.md",
+     "scen": 0,
+     "elementow": 1065,
+     "do_wpisania": 1063
+    },
+    {
+     "plik": "06_encyklopedia_i_ksiegi_02.md",
+     "scen": 0,
+     "elementow": 2998,
+     "do_wpisania": 2998
+    },
+    {
+     "plik": "06_encyklopedia_i_ksiegi_03.md",
+     "scen": 0,
+     "elementow": 4251,
+     "do_wpisania": 4246
+    },
+    {
+     "plik": "06_encyklopedia_i_ksiegi_04.md",
+     "scen": 0,
+     "elementow": 2338,
+     "do_wpisania": 2337
+    },
+    {
+     "plik": "06_encyklopedia_i_ksiegi_05.md",
+     "scen": 0,
+     "elementow": 3698,
+     "do_wpisania": 3696
+    },
+    {
+     "plik": "06_encyklopedia_i_ksiegi_06.md",
+     "scen": 0,
+     "elementow": 1729,
+     "do_wpisania": 1722
+    }
+   ]
+  },
+  {
+   "baza": "07_komunikaty",
+   "tytul": "Komunikaty i dymki (text_msg i pokrewne)",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "07_komunikaty_01.md",
+     "scen": 0,
+     "elementow": 5507,
+     "do_wpisania": 5494
+    },
+    {
+     "plik": "07_komunikaty_02.md",
+     "scen": 0,
+     "elementow": 5328,
+     "do_wpisania": 5325
+    },
+    {
+     "plik": "07_komunikaty_03.md",
+     "scen": 0,
+     "elementow": 5799,
+     "do_wpisania": 5796
+    },
+    {
+     "plik": "07_komunikaty_04.md",
+     "scen": 0,
+     "elementow": 4817,
+     "do_wpisania": 4612
+    },
+    {
+     "plik": "07_komunikaty_05.md",
+     "scen": 0,
+     "elementow": 5835,
+     "do_wpisania": 5809
+    },
+    {
+     "plik": "07_komunikaty_06.md",
+     "scen": 0,
+     "elementow": 5232,
+     "do_wpisania": 5209
+    },
+    {
+     "plik": "07_komunikaty_07.md",
+     "scen": 0,
+     "elementow": 5135,
+     "do_wpisania": 5112
+    },
+    {
+     "plik": "07_komunikaty_08.md",
+     "scen": 0,
+     "elementow": 4956,
+     "do_wpisania": 4943
+    },
+    {
+     "plik": "07_komunikaty_09.md",
+     "scen": 0,
+     "elementow": 5169,
+     "do_wpisania": 5155
+    },
+    {
+     "plik": "07_komunikaty_10.md",
+     "scen": 0,
+     "elementow": 5100,
+     "do_wpisania": 5091
+    },
+    {
+     "plik": "07_komunikaty_11.md",
+     "scen": 0,
+     "elementow": 2809,
+     "do_wpisania": 2804
+    }
+   ]
+  },
+  {
+   "baza": "08_interfejs_i_systemy",
+   "tytul": "Interfejs i systemy gry",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "08_interfejs_i_systemy_01.md",
+     "scen": 0,
+     "elementow": 5355,
+     "do_wpisania": 5330
+    },
+    {
+     "plik": "08_interfejs_i_systemy_02.md",
+     "scen": 0,
+     "elementow": 5877,
+     "do_wpisania": 5874
+    },
+    {
+     "plik": "08_interfejs_i_systemy_03.md",
+     "scen": 0,
+     "elementow": 5666,
+     "do_wpisania": 5661
+    },
+    {
+     "plik": "08_interfejs_i_systemy_04.md",
+     "scen": 0,
+     "elementow": 195,
+     "do_wpisania": 195
+    }
+   ]
+  },
+  {
+   "baza": "09_pozostale",
+   "tytul": "Pozostałe tabele",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "09_pozostale_01.md",
+     "scen": 0,
+     "elementow": 6360,
+     "do_wpisania": 6265
+    },
+    {
+     "plik": "09_pozostale_02.md",
+     "scen": 0,
+     "elementow": 6077,
+     "do_wpisania": 6001
+    },
+    {
+     "plik": "09_pozostale_03.md",
+     "scen": 0,
+     "elementow": 3239,
+     "do_wpisania": 3235
+    }
+   ]
+  },
+  {
+   "baza": "10_bez_zrodla",
+   "tytul": "Teksty, których nie wskazuje żadna tabela ani scena",
+   "opis": "widok",
+   "pliki": [
+    {
+     "plik": "10_bez_zrodla_01.md",
+     "scen": 0,
+     "elementow": 6394,
+     "do_wpisania": 6391
+    },
+    {
+     "plik": "10_bez_zrodla_02.md",
+     "scen": 0,
+     "elementow": 2898,
+     "do_wpisania": 2898
+    },
+    {
+     "plik": "10_bez_zrodla_03.md",
+     "scen": 0,
+     "elementow": 8896,
+     "do_wpisania": 8896
+    }
+   ]
+  }
+ ],
+ "kontrola": {
+  "miejsc_pl": 418773,
+  "powtorzonych": 0,
+  "nieznanych": 0,
+  "brakujacych": 0,
+  "zgodne": true
+ },
+ "archiwa": {
+  "sceny.zip": {
+   "bajtow": 19793485,
+   "sha256": "d28b7e5c4062e8c7df15dc2bcda069251e6842ea3a4e0bd72961ebdb62ac6779"
+  },
+  "cutsceny.zip": {
+   "bajtow": 365120,
+   "sha256": "2fb1aaace2944dcdfd86492577c9d6b49ba7a9d8cbf777edc93590b859d63d5e"
+  },
+  "widoki.zip": {
+   "bajtow": 20615687,
+   "sha256": "af116c75513b17a2d189907576654be591e4b01048633ee6fb4a210c2eb1ab07"
+  },
+  "paczka_dla_tlumacza_wwm_v3.zip": {
+   "bajtow": 40788005,
+   "sha256": "eec45119f45659e7747d444c85bf3ab8387747421b365411943581ddbf2592e4"
+  }
+ }
+}

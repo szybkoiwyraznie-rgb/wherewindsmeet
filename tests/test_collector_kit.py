@@ -11,7 +11,7 @@ from tools import build_collector_kit as kit
 
 
 class CollectorKitTests(unittest.TestCase):
-    def test_reproducible_zip_contains_only_three_tools_and_readme(self):
+    def test_reproducible_zip_contains_all_collector_tools_and_readme(self):
         first = kit.build_bytes()
         self.assertEqual(first, kit.build_bytes())
         with ZipFile(io.BytesIO(first)) as archive:
@@ -25,9 +25,14 @@ class CollectorKitTests(unittest.TestCase):
     def test_windows_encoding_and_line_endings_are_preserved(self):
         files = kit.kit_files()
         self.assertTrue(files["zbierz.ps1"].startswith(b"\xef\xbb\xbf"))
+        self.assertTrue(files["spakuj_dane.ps1"].startswith(b"\xef\xbb\xbf"))
         self.assertTrue(files["CZYTAJ_TO.txt"].startswith(b"\xef\xbb\xbf"))
         self.assertFalse(files["URUCHOM.bat"].startswith(b"\xef\xbb\xbf"))
+        self.assertFalse(files["URUCHOM_AKTUALIZACJE.bat"].startswith(b"\xef\xbb\xbf"))
+        self.assertFalse(files["SPAKUJ_DANE.bat"].startswith(b"\xef\xbb\xbf"))
         files["URUCHOM.bat"].decode("ascii")
+        files["URUCHOM_AKTUALIZACJE.bat"].decode("ascii")
+        files["SPAKUJ_DANE.bat"].decode("ascii")
         for name, data in files.items():
             with self.subTest(name=name):
                 self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
@@ -66,6 +71,22 @@ class CollectorKitTests(unittest.TestCase):
         self.assertNotIn("Set-ExecutionPolicy", launcher)
         self.assertNotIn("Unrestricted", launcher)
 
+    def test_update_launcher_runs_update_mode_without_permanent_changes(self):
+        launcher = kit.kit_files()["URUCHOM_AKTUALIZACJE.bat"].decode("ascii")
+        self.assertIn("-ExecutionPolicy Bypass", launcher)
+        self.assertIn('-File "%~dp0zbierz.ps1" -Tryb aktualizacja %*', launcher)
+        self.assertIn("Unblock-File", launcher)
+        self.assertNotIn("Set-ExecutionPolicy", launcher)
+
+    def test_split_pack_launcher_runs_spakuj_dane_without_permanent_changes(self):
+        launcher = kit.kit_files()["SPAKUJ_DANE.bat"].decode("ascii")
+        self.assertIn("-ExecutionPolicy Bypass", launcher)
+        self.assertIn('-File "%~dp0spakuj_dane.ps1" %*', launcher)
+        self.assertIn("Unblock-File", launcher)
+        self.assertIn("pause", launcher)
+        self.assertNotIn("Set-ExecutionPolicy", launcher)
+        self.assertNotIn("python.exe", launcher.lower())
+
     def test_launcher_bypasses_policy_only_for_its_own_process(self):
         launcher = kit.kit_files()["URUCHOM.bat"].decode("ascii")
         # Bypass is passed on the command line of one child process, never stored.
@@ -92,6 +113,27 @@ class CollectorKitTests(unittest.TestCase):
         self.assertIn("-ExecutionPolicy", readme)
         self.assertIn("Unblock-File", readme)
         self.assertIn("nie zmienia ustawień systemowych", readme)
+
+    def test_collectors_define_explicit_blacklist_and_keep_index_tables(self):
+        files = kit.kit_files()
+        zbierz = files["zbierz.ps1"].decode("utf-8-sig")
+        spakuj = files["spakuj_dane.ps1"].decode("utf-8-sig")
+        for script in (zbierz, spakuj):
+            self.assertIn("camerazone.json", script)
+            self.assertIn("audio_area", script)
+            self.assertIn("bulk_data", script)
+            self.assertIn("translate_words_map_zh_cn", script)
+            self.assertIn("translate_words_map_en_diff", script)
+            self.assertIn("index", script)
+        self.assertIn("Is-BlacklistedUpdateSubpath", zbierz)
+        self.assertIn("Load-SentState", zbierz)
+        self.assertIn("Save-SentState", zbierz)
+        self.assertIn("stan_wyslanych.json", zbierz)
+        self.assertIn("LimitCzesciBajtow", zbierz)
+        self.assertIn("Is-BlacklistedFile", spakuj)
+        self.assertNotIn("'Package/HD/oversea/CameraZone.json'", spakuj)
+        self.assertNotIn("'Package/HD/oversea/Audio_Area'", spakuj)
+        self.assertNotIn("'Package/HD/oversea/bulk_data/bulk_data.bin'", spakuj)
 
 
 if __name__ == "__main__":

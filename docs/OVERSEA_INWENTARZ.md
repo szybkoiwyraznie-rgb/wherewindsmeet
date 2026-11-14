@@ -55,30 +55,35 @@ Nadchodzić mogą jeszcze: `data207`, `208`, `209`, `210`, `211`, `212` — nie 
 
 | paczka | rozmiar | zawartość |
 |---|---|---|
-| `oversea3.zip` | 76 372 696 B | `data205`, `data207`, `data208`, `data209`, `data210`, `data211`, `data212` |
-| `index.zip` | 90 717 968 B | `index1`, `index2`, `index3`, `index4` |
-| `index2.zip` | 33 917 240 B | `index1001`, `index1200`, `index200`, `index201`, `index202`, `index203`, `index204` |
+| `oversea3.zip` | 76 372 696 B | `9549f06bb6aa50548262a0c047937ff1fcdd9f1e6ec9317d5e1b081dca8e4eea` | `data205`, `data207`–`data212` |
+| `index.zip` | 90 717 968 B | `169f9fbeef6404382a259fc798d51f765f8def57b58d7ec710e20e4bce394c98` | `index1`–`index4` |
+| `index2.zip` | 33 917 240 B | `853e38da543c1db4fd892502a69ab9cd6ef6072cdebf76baa543b59147381a7b` | `index1001`, `index1200`, `index200`–`index204` |
+| `manifest.zip` | 1 560 318 B | `b7b2e349fe6190e4903f1eb939299d2eb2fb9f15fcd8299e5cc09cef505ce1af` | bazowy `MANIFEST`, `CameraZone.json`, `VirtualWindow.json`, `Voxel.json`, `model_ppm` |
 
-Skróty samych archiwów ZIP nie zostały obliczone (pliki pośrednie zniknęły przy
-czyszczeniu piaskownicy); trwałe skróty są w `index/manifest.json` dla
-**wypakowanych** danych: mapy `zh_cn`, rejestru `MANIFEST` i każdego pliku scen.
+### Sprostowanie z 2026-11-12
 
-### Które pliki mają sceny (`tools/skan_timeline.py`)
+Narzędzia `tools/manifest_keys.py`, `tools/skan_timeline.py` i `tools/timeline.py`
+opisane wyżej w zapisie z dnia dostawy zostały **usunięte**, ponieważ cięły
+pliki `data*` po znaczniku `TimelinePObject` i przypisywały każdej scenie numer
+scen następnych (stąd pozorne „5 859 braków”). Aktualny odczyt całej bazy
+(`MANIFEST` → `indexN` → `dataN`) oraz wiązania scen opisują
+[BAZA_GRY.md](BAZA_GRY.md) i [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md); trwałe
+skróty wejść stoją w `index/manifest.json`.
 
-| plik | obiekty `TimelinePObject` | scen | kwestii |
-|---|---|---|---|
-| `data207` | 11 847 | 11 847 | 32 015 |
-| `data205` | 8 484 | 8 484 | 17 268 |
-| `data208` | 7 042 | 7 042 | 14 471 |
-| `data209`, `data210`, `data211`, `data212` | **0** | 0 | 0 |
-| `index1`–`index4`, `index1001`, `index1200`, `index200`–`index204` | **0** | 0 | 0 |
+## Trzecia dostawa — Patch 2.4 (`2026-11-13`, build `26592996`)
 
-Razem z pierwszą dostawą: **75 006 obiektów scen** w 8 plikach
-(`data201`, `202`, `203`, `204`, `206`, `205`, `207`, `208`) plus `data3` (25)
-i `data1200` (27 + 33 z patcha). Pokrycie rejestru: **92,2%** (69 092 z 74 951),
-brakuje **5 859** dialogów — i nie został już nieprzesłany żaden plik `data*`.
+Zebrana narzędziem `collector` `1.3.0` (`WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`,
+8 części po ok. 64 MB, łącznie 516 MB, `637` pozycji inwentarza, `60` unikalnych
+plików sprawdzonych przez `tools/validate_collector_return.py`):
 
-### `data1200` z patcha jest nadzbiorem wersji z `oversea`
-
-Wszystkie 158 `text_id` z `oversea/data1200` występuje w `patch/oversea/data1200`
-plus 25 nowych (33 sceny vs 27). Do korpusu brana jest wyłącznie wersja z patcha.
+- **`Package/HD/oversea/` (~377 MB):** kompletny `MANIFEST`, `CameraZone.json`,
+  `VirtualWindow.json`, `Voxel.json`, `Audio_Area*`, `bulk_data/`, `data1..11`,
+  `data200..212`, `data1001`, `data1200`, `index1..4`, `index200..204`,
+  `index1001`, `index1200`, mapy językowe `translate_words_map_{en,zh_cn}`
+  oraz `translate_words_map_{en,zh_cn}_diff`.
+- **`LocalData/Patch/HD/oversea/` (~5,6 MB):** `MANIFEST`, `index1001`, `index1200`,
+  `data1005`, `data1201`, `translate_words_map_en_diff` (19 326 459 B — zastępuje
+  warstwę `_diff` EN z `Package/`) oraz 7 binarnych plików `formula/*.ft`
+  (w tej dostawie brak `LocalData/Patch/.../translate_words_map_zh_cn_diff`).
+- **Wyciąg `index/` w repozytorium** został zaktualizowany do tej dostawy (szczegóły
+  i liczby w [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
