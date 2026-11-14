@@ -53,12 +53,25 @@ gry jest osobny lokalny słownik/nakładka OCR poza klientem. To odrębny zakres
 nie obejście Steam: wymaga oceny zasad gry, prywatności, jakości OCR i
 pokrycia, i nie daje gwarancji bezpieczeństwa konta.
 
-Obecny materiał opisuje przywracanie `_diff` przez Steam jako doniesienie
-społeczności, nie wynik naszego testu na instalacji właściciela. Zanim
-nazwiemy to potwierdzonym zachowaniem konkretnego buildu, potrzebny jest
-odczytowy raport porównawczy. Nie uruchamiać testu przez patchowanie plików ani
-nie wysyłać zawartości gry; metadane/hashy wystarczą do wykrycia zmiany, ale
-same nie dowodzą, kto ją wykonał.
+**Potwierdzenie właściciela (2026-11-14):** plik przywrócony przez Steam na
+Dysku Google jest bajt-w-bajt równy plikowi po patchu gry, lecz sprzed
+polonizacji. Właściciel zaobserwował, że przywrócenie następuje przy starcie.
+Metadane artefaktu na Dysku: 19 326 459 bajtów, SHA-256
+`b25ce2a3e256368bc88119a21e3a251199b00e5152dbbf7b14312099e1fa6d45`.
+To potwierdza, że Steam odtwarza oryginalny `LocalData/Patch/.../translate_words_map_en_diff`
+i tym samym usuwa zmiany w nim. Nie ustala jednak, czy odtworzenie zachodzi
+przed uruchomieniem procesu gry, przez launcher, czy inną ścieżką; nie należy
+na tej podstawie projektować hooka ani wrappera.
+
+Wniosek: podmiana „on-the-fly” po inicjalizacji, wrapper maskujący plik lub
+blokada pliku na czas uruchomienia/aktualizacji to sposoby na pokonanie
+przywracania/integralności, a nie wspierany punkt rozszerzeń. Nie projektujemy
+ich ani nie podajemy instrukcji ich wdrożenia. Dalsza natywna ścieżka wymaga
+oficjalnego, wspieranego mechanizmu/mod API albo zgody wydawcy obejmującej ten
+sposób ładowania. Zanim to nastąpi, pozostają: odłożyć natywną polonizację
+klienta Steam lub opracować odrębny wariant bez zapisu do plików gry (np.
+nakładkę, mimo jej ograniczeń). Nie zakładamy, że inny launcher ani inna
+warstwa plików rozwiąże problem bez analogicznej kontroli.
 
 [Oficjalny poradnik łączenia kont](https://www.wherewindsmeetgame.com/news/official/GlobalLaunch/CrossPlatform.html)
 opisuje cross-progression między Steam, Epic i launcherem. Przy przenoszeniu

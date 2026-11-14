@@ -106,15 +106,14 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Otwarte ustalenia
 
-1. **Bloker: możliwe przywracanie `translate_words_map_en_diff` przez Steam.**
-   Doniesienia społeczności nie są jeszcze naszym testem na instalacji
-   właściciela. Nie będziemy obchodzić weryfikacji/naprawy Steam ani automatycznie
-   nadpisywać pliku po jej wykonaniu. Dozwolony następny krok to wyłącznie
-   odczytowy pomiar metadanych/hashy przed i po zwykłej weryfikacji (gra i
-   launcher zamknięte), zgodnie z [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md).
-   Jeśli Steam przywraca plik, natywna łatka tej warstwy pozostaje wstrzymana,
-   dopóki nie będzie oficjalnie wspieranego punktu rozszerzeń; alternatywą
-   bez modyfikacji plików jest osobno zaprojektowana nakładka OCR.
+1. **Potwierdzony bloker: Steam przywraca `translate_words_map_en_diff` przy
+   starcie.** Właściciel porównał artefakt z Dysku Google bajt-w-bajt z plikiem
+   po patchu, sprzed polonizacji; szczegóły i SHA-256 zapisano w
+   [WINDOWS_OPTIONS.md](WINDOWS_OPTIONS.md). Natywna łatka tej warstwy jest
+   wstrzymana. Nie projektujemy podmiany on-the-fly, wrappera maskującego
+   przywracanie ani blokowania pliku. Wznowienie wymaga wspieranego mechanizmu
+   modowania lub zgody wydawcy. OCR/overlay pozostaje wariantem rezerwowym, nie
+   preferowanym rozwiązaniem.
 2. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
    mała łatka UI + prolog (`latka_testowa.py`) potwierdziła już na buildzie
    `25906190` przyjmowanie przepisanych map `translate_words_map_en*` i poprawne
