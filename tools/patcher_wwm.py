@@ -340,19 +340,38 @@ def load_plan(plan_path: Path) -> dict:
     return plan
 
 
-def _dopasuj_kolizje(warianty_zh: list[list[str]], current: str, po_kluczu: dict[str, str]) -> str | None:
+def _dopasuj_kolizje(
+    warianty_zh: list[list[str]], current: str, po_kluczu: dict[str, str]
+) -> tuple[str | None, str]:
+    """(przekład, skąd) dla tekstu `zh`, który w EN ma kilka różnych znaczeń.
+
+    Warianty to np. ta sama chińska linia w `text_msg` i w `text_msg__grey` z innym
+    angielskim. Kolejność wyboru:
+
+    1. `dokladne` — wariant o tym samym angielskim, który **ma** przekład;
+    2. `podobne` — wariant z EN podobnym co najmniej w połowie (parafraza tej samej linii).
+
+    Gdy żaden przetłumaczony wariant nie jest podobny, zwracamy `None`: znaczenia są różne,
+    więc podstawienie cudzego przekładu byłoby zgadywaniem. Takie linie czekają na własne
+    tłumaczenie (lista: `tools/pokrycie_tlumaczenia.py --arkusz`).
+    """
     for key, rep_en in warianty_zh:
         if rep_en == current:
-            return po_kluczu.get(key)
+            text = po_kluczu.get(key)
+            if text is not None:
+                return text, "dokladne"
+            break  # trafienie bez przekładu: szukaj bliźniaka z przekładem
     best_key: str | None = None
     best_sim = 0.0
     for key, rep_en in warianty_zh:
+        if key not in po_kluczu:
+            continue
         score = mapa_tekstow.podobienstwo_en(current, rep_en)
         if score > best_sim:
             best_key, best_sim = key, score
     if best_key is not None and best_sim >= 0.5:
-        return po_kluczu.get(best_key)
-    return None
+        return po_kluczu.get(best_key), "podobne"
+    return None, ""
 
 
 def compute_wanted_for_map(
@@ -375,7 +394,9 @@ def compute_wanted_for_map(
         elif ident in zh:
             zh_text = zh[ident]
             if zh_text in kolizje:
-                text = _dopasuj_kolizje(kolizje[zh_text], current, po_kluczu)
+                text, pochodzenie = _dopasuj_kolizje(kolizje[zh_text], current, po_kluczu)
+                if pochodzenie:
+                    stats["po_kolizji_" + pochodzenie] = stats.get("po_kolizji_" + pochodzenie, 0) + 1
             else:
                 text = po_kluczu.get(mapa_tekstow.klucz(zh_text))
             if text is not None:

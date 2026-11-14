@@ -44,6 +44,7 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import wypisz
 
 TYPY_KINOWE = ("napis", "intro", "film")
+SEKCJA_PRZERYWNIKI = "sceny przerywników (timeline, `ui_type` 10)"
 OPIS_TYPU = {
     "napis": "napisy cutscen (text_msg 590000–592694)",
     "intro": "intro (wds_oneday_intro_cutscene_data)",
@@ -90,6 +91,7 @@ def sekcje(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, sceny: bool =
         dodaj(f"  film {numer}", wedlug_filmow[numer])
 
     if sceny:
+        dodaj(SEKCJA_PRZERYWNIKI, (slot for _numer, sloty in sceny_przerywnikow(ix) for slot in sloty))
         dodaj(
             "sceny — dialogi i plansze z timeline'ów",
             (slot_elementu(element) for scena in ix.sceny.values() for element in scena.get("e", ())),
@@ -97,6 +99,121 @@ def sekcje(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, sceny: bool =
 
     dodaj("wszystkie unikalne teksty wyciągu", ix.teksty.keys())
     return wynik
+
+
+def sceny_przerywnikow(ix: indeks_mod.Indeks) -> list[tuple[int, list[str]]]:
+    """(numer sceny, sloty jej elementów) dla scen odtwarzanych jako przerywniki."""
+    wynik: list[tuple[int, list[str]]] = []
+    for numer in sorted(ix.sceny):
+        scena = ix.sceny[numer]
+        if scena.get("u") not in indeks_mod.UI_TYPY_PRZERYWNIKA:
+            continue
+        wynik.append((numer, [slot_elementu(element) for element in scena.get("e", ())]))
+    return wynik
+
+
+def braki_przerywnikow(
+    ix: indeks_mod.Indeks,
+    magazyn: magazyn_mod.Magazyn,
+    *,
+    od: int | None = None,
+    do: int | None = None,
+) -> list[dict]:
+    """Wiersze scen przerywników (timeline) bez przekładu — to one zostają po angielsku."""
+    wynik: list[dict] = []
+    for numer, sloty in sceny_przerywnikow(ix):
+        if od is not None and numer < od:
+            continue
+        if do is not None and numer > do:
+            continue
+        scena = ix.sceny[numer]
+        for element, slot in zip(scena.get("e", ()), sloty):
+            if magazyn.przeklad(slot):
+                continue
+            tekst = ix.teksty.get(slot[1:]) if slot.startswith("@") else ix.teksty.get(slot)
+            if tekst is None:
+                continue
+            if slot.startswith("@"):
+                wariant = ix.warianty.get(slot[1:], {})
+                en = wariant.get("en")
+            else:
+                en = tekst.en
+            wynik.append(
+                {
+                    "scena": numer,
+                    "dialog": scena.get("d"),
+                    "projekt": scena.get("p"),
+                    "klucz": slot,
+                    "zh": None if tekst.z_en else tekst.zrodlo,
+                    "en": en,
+                    "zrodlo": list(ix.zrodlo(tekst) or ()),
+                }
+            )
+    return wynik
+
+
+def arkusz(
+    ix: indeks_mod.Indeks,
+    magazyn: magazyn_mod.Magazyn,
+    *,
+    kinowe: bool = True,
+    przerywniki: bool = True,
+    od: int | None = None,
+    do: int | None = None,
+) -> str:
+    """Arkusz braków w formacie pakietu (`klucz:` / `PL:`) gotowy do wczytania zwrotką."""
+    czesci = [
+        "# Arkusz uzupełnienia przekładu",
+        "",
+        "Wiersze, które w grze zostają po angielsku. Polski tekst wpisz w jednej linii po `PL:`,",
+        "a plik oddaj przez `python3 tools/import_zwrotki.py ARKUSZ --indeks index --magazyn tlumaczenie`.",
+        "",
+    ]
+    if kinowe:
+        rows = braki_kinowe(ix, magazyn)
+        if rows:
+            czesci += [f"## Napisy cutscen, intro i filmów — {len(rows)} wierszy", ""]
+            licznik = 0
+            for typ in TYPY_KINOWE:
+                grupa = [row for row in rows if row["typ"] == typ]
+                if not grupa:
+                    continue
+                czesci += [f"### {OPIS_TYPU[typ]}", ""]
+                for row in grupa:
+                    licznik += 1
+                    if typ == "film":
+                        gdzie = f"film {row.get('film')} · id {row.get('id')}"
+                    elif typ == "napis":
+                        gdzie = f"text_msg {row.get('wiersz')}"
+                    else:
+                        gdzie = f"id {row.get('id')}"
+                    czesci.append(f"{licznik}. [{gdzie}] {row.get('zh') or ''}".rstrip())
+                    czesci.append(f"   klucz: {row['klucz']}")
+                    czesci.append(f"   EN: {_tekst_na_jedna_linie(row.get('en'))}")
+                    czesci.append("   PL:")
+                    czesci.append("")
+    if przerywniki:
+        rows = braki_przerywnikow(ix, magazyn, od=od, do=do)
+        if rows:
+            zakres = "" if od is None and do is None else f" (sceny {od if od is not None else '…'}–{do if do is not None else '…'})"
+            czesci += [f"## Sceny przerywników (timeline){zakres} — {len(rows)} wierszy", ""]
+            poprzednia = None
+            licznik = 0
+            for row in rows:
+                if row["scena"] != poprzednia:
+                    poprzednia = row["scena"]
+                    licznik = 0
+                    naglowek = f"### Scena {row['scena']} — dialog {row['dialog']}"
+                    if row.get("projekt"):
+                        naglowek += f" — projekt {row['projekt']}"
+                    czesci += [naglowek, ""]
+                licznik += 1
+                czesci.append(f"{licznik}. [Kwestia] {row.get('zh') or ''}".rstrip())
+                czesci.append(f"   klucz: {row['klucz']}")
+                czesci.append(f"   EN: {_tekst_na_jedna_linie(row.get('en'))}")
+                czesci.append("   PL:")
+                czesci.append("")
+    return "\n".join(czesci).rstrip() + "\n"
 
 
 def braki_kinowe(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, typy=TYPY_KINOWE) -> list[dict]:
@@ -254,6 +371,30 @@ def _wypisz_braki(rows: list[dict]) -> None:
         print()
 
 
+def _wypisz_braki_przerywnikow(rows: list[dict], limit: int = 12) -> None:
+    if not rows:
+        print("Brak braków: wszystkie wiersze scen przerywników mają przekład.")
+        return
+    wedlug_sceny: dict[int, list[dict]] = {}
+    for row in rows:
+        wedlug_sceny.setdefault(row["scena"], []).append(row)
+    print(f"SCENY PRZERYWNIKÓW BEZ PRZEKŁADU: {_liczba(len(rows))} wierszy w {_liczba(len(wedlug_sceny))} scenach")
+    print("(klient pokazuje te wiersze jako napisy cutsceny; pełna lista: `--arkusz PLIK`)")
+    print()
+    for numer, grupa in list(wedlug_sceny.items())[:limit]:
+        pierwszy = grupa[0]
+        naglowek = f"scena {numer} (dialog {pierwszy.get('dialog')}"
+        if pierwszy.get("projekt"):
+            naglowek += f", projekt {pierwszy['projekt']}"
+        print(f"- {naglowek}): {_liczba(len(grupa))} braków")
+        for row in grupa[:3]:
+            print(f"    [{row['klucz']}] {_skroc(row.get('en'), 90)}")
+        if len(grupa) > 3:
+            print(f"    … i {_liczba(len(grupa) - 3)} więcej")
+    if len(wedlug_sceny) > limit:
+        print(f"… i {_liczba(len(wedlug_sceny) - limit)} kolejnych scen (pełna lista w arkuszu)")
+
+
 def _wypisz_szukanie(fraza: str, rows: list[dict], *, pelny: bool = False) -> None:
     if not rows:
         print(f"Nie znaleziono tekstu zawierającego: {fraza!r}")
@@ -281,8 +422,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--indeks", default="index", help="katalog wyciągu (domyślnie index)")
     parser.add_argument("--magazyn", default="tlumaczenie", help="katalog magazynu przekładów (domyślnie tlumaczenie)")
     parser.add_argument("--brak", action="store_true", help="wypisz napisy cutscen, intro i filmów bez przekładu")
+    parser.add_argument("--brak-przerywnikow", action="store_true", help="wypisz sceny przerywników (timeline) bez przekładu")
+    parser.add_argument("--arkusz", help="zapisz plik .md z brakami w formacie pakietu (`klucz:` / `PL:`) do uzupełnienia")
+    parser.add_argument(
+        "--arkusz-tylko",
+        choices=("wszystko", "kinowe", "przerywniki"),
+        default="wszystko",
+        help="co ma zawierać arkusz: napisy cutscen i filmów, sceny przerywników albo oba (domyślnie)",
+    )
     parser.add_argument("--szukaj", help="znajdź tekst po fragmencie EN, ZH albo PL i pokaż, czy ma przekład")
     parser.add_argument("--bez-scen", action="store_true", help="pomiń sekcję scen (szybsze, bez wczytywania timeline'ów)")
+    parser.add_argument("--sceny-od", type=int, help="przy `--arkusz`/`--brak-przerywnikow`: najniższy numer sceny")
+    parser.add_argument("--sceny-do", type=int, help="przy `--arkusz`/`--brak-przerywnikow`: najwyższy numer sceny")
     parser.add_argument("--pelny", action="store_true", help="przy `--szukaj` pokaż pełne teksty zamiast skróconych")
     parser.add_argument("--json", action="store_true", help="wynik jako JSON")
     arguments = parser.parse_args(argv)
@@ -304,6 +455,34 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"ok": True, "fraza": arguments.szukaj, "trafienia": rows}, ensure_ascii=False, indent=1))
         else:
             _wypisz_szukanie(arguments.szukaj, rows, pelny=arguments.pelny)
+        return 0
+
+    if arguments.arkusz:
+        tresc = arkusz(
+            ix,
+            magazyn,
+            kinowe=arguments.arkusz_tylko in ("wszystko", "kinowe"),
+            przerywniki=arguments.arkusz_tylko in ("wszystko", "przerywniki"),
+            od=arguments.sceny_od,
+            do=arguments.sceny_do,
+        )
+        cel = Path(arguments.arkusz)
+        cel.parent.mkdir(parents=True, exist_ok=True)
+        cel.write_text(tresc, encoding="utf-8", newline="\n")
+        puste = tresc.count("\n   PL:\n")
+        if arguments.json:
+            print(json.dumps({"ok": True, "arkusz": str(cel), "miejsc": puste}, ensure_ascii=False))
+        else:
+            print(f"Zapisano arkusz: {cel} — miejsc do wypełnienia: {_liczba(puste)}")
+            print("Po wypełnieniu: python3 tools/import_zwrotki.py " + str(cel) + " --indeks " + arguments.indeks + " --magazyn " + arguments.magazyn)
+        return 0
+
+    if arguments.brak_przerywnikow:
+        rows = braki_przerywnikow(ix, magazyn, od=arguments.sceny_od, do=arguments.sceny_do)
+        if arguments.json:
+            print(json.dumps({"ok": True, "braki_przerywnikow": rows}, ensure_ascii=False, indent=1))
+        else:
+            _wypisz_braki_przerywnikow(rows)
         return 0
 
     if arguments.brak:

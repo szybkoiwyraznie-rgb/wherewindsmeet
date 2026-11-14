@@ -583,3 +583,74 @@ class V4RegenerationAndMetricsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+T_CIN = T + 300
+
+
+def cinematic_scene(text_ids, dialog_no):
+    data = rows([group("gwardzista", 3, 0, "", [text_track([span(tid, float(n), n) for n, tid in enumerate(text_ids)])])])
+    data["timeline"]["ui_type"] = indeks.UI_TYPY_PRZERYWNIKA[0]
+    data["dialog_config"]["dialog_no"] = dialog_no
+    return list(data.items())
+
+
+def cinematic_world() -> dict:
+    data = tables()
+    data["dialog_timelines.900"] = cinematic_scene([T_CIN, T_CIN + 1], 900)
+    data["dialog_timelines.901"] = cinematic_scene([T_CIN, T_CIN + 2], 901)
+    return data
+
+
+class CinematicSceneSectionTests(unittest.TestCase):
+    """Sceny przerywników (`ui_type` 10) muszą mieć własną sekcję cutscen, nie plik scen."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory(prefix="wwm-paczka-cut-")
+        root = Path(cls.temp.name)
+        zh = {**ZH, **ZH_EXTRA, T_CIN: "kwestia przerywnika", T_CIN + 1: "druga kwestia przerywnika", T_CIN + 2: "trzecia kwestia przerywnika"}
+        en = {**EN, **EN_EXTRA, T_CIN: "cutscene line", T_CIN + 1: "second cutscene line", T_CIN + 2: "third cutscene line"}
+        wyciag.zbuduj(FakeBaza(cinematic_world()), zh, en, root / "index", {"opis": "dane wymyślone"}, log=lambda _text: None)
+        cls.ix = indeks.wczytaj(root / "index")
+        cls.out = root / "paczka"
+        cls.manifest = buduj_paczke.zbuduj(cls.ix, cls.out, wersja="1", data="2026-01-01")
+        cls.cutsceny = {path.name: path.read_text(encoding="utf-8") for path in (cls.out / "cutsceny").glob("*.md")}
+        cls.sceny = {path.name: path.read_text(encoding="utf-8") for path in (cls.out / "sceny").glob("*.md")}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp.cleanup()
+
+    def test_cinematic_scenes_land_in_dedicated_cutscene_section(self):
+        plik = self.cutsceny["04_sceny_cinematiczne_01.md"]
+        self.assertIn("## Scena 900 — dialog 900", plik)
+        self.assertIn("## Scena 901 — dialog 901", plik)
+        self.assertIn(f"klucz: {K('kwestia przerywnika')}", plik)
+        self.assertIn("EN: cutscene line", plik)
+
+    def test_cinematic_section_owns_the_translation_slot(self):
+        wpisy = [entry for text in self.cutsceny.values() for entry in format_paczki.czytaj_wpisy(text)]
+        sloty = Counter(entry.klucz for entry in wpisy)
+        # powtórzenia dostają odsyłacz „tłumaczysz raz”, więc klucz pojawia się raz
+        self.assertEqual(sloty[K("kwestia przerywnika")], 1)
+        otwarte = [entry for entry in wpisy if entry.klucz == K("kwestia przerywnika") and not entry.pl]
+        self.assertEqual(len(otwarte), 1)
+
+    def test_story_scenes_refer_to_the_cutscene_section(self):
+        tekst = "\n".join(self.sceny.values())
+        self.assertIn("tłumaczysz raz: 04_sceny_cinematiczne_01.md", tekst)
+
+    def test_manifest_separates_cinematic_numbers(self):
+        self.assertEqual(self.manifest["liczby_cinematiczne"]["elementow"], 4)
+        self.assertEqual(self.manifest["liczby_cinematiczne"]["do_wpisania"], 3)
+        self.assertEqual(
+            self.manifest["liczby_cutsceny"]["elementow"],
+            self.manifest["liczby_cinematiczne"]["elementow"],  # brak sekcji text_msg w danych testowych
+        )
+        self.assertIn("04_sceny_cinematiczne", {serie["baza"] for serie in self.manifest["cutsceny"]})
+
+    def test_repeated_line_inside_cinematics_is_opened_only_once(self):
+        tekst = self.cutsceny["04_sceny_cinematiczne_01.md"]
+        self.assertEqual(tekst.count("   PL:\n"), 3)
+        self.assertIn("powtórzenie", tekst)

@@ -40,7 +40,10 @@ def indeks_testowy() -> indeks.Indeks:
     ix.sceny = {
         10: {"d": 10, "e": [["k", 0, K("kwestia sceny")], ["p", -1, K("plansza")]]},
         11: {"d": 11, "e": [["k", 0, K("linia prologu"), True, "00000000000000a1"]]},
+        20: {"d": 20, "u": 10, "p": "对话-qiancen", "e": [["k", 0, K("kwestia sceny")]]},
+        21: {"d": 21, "u": 10, "p": "对话-qiancen", "e": [["k", 0, K("wpis intro")], ["k", 0, K("linia prologu")]]},
     }
+    ix.teksty[K("kwestia sceny")] = tekst("kwestia sceny", "scene line")
     return ix
 
 
@@ -83,6 +86,54 @@ class SekcjeTests(unittest.TestCase):
         row = pokrycie_tlumaczenia.sekcje(indeks_testowy(), magazyn_testowy(), sceny=False)
         self.assertFalse(any(item["sekcja"].startswith("sceny") for item in row))
         self.assertEqual(row[-1]["sekcja"], "wszystkie unikalne teksty wyciągu")
+
+
+class PrzerywnikiTests(unittest.TestCase):
+    def test_sekcja_przerywnikow_liczy_tylko_sceny_ui_typu_przerywnika(self):
+        rows = pokrycie_tlumaczenia.sekcje(indeks_testowy(), magazyn_testowy())
+        sekcja = next(row for row in rows if row["sekcja"].startswith("sceny przerywników"))
+        # scena 20 (1 wpis bez PL) + scena 21 (2 wpisy: 1 bez PL, 1 z PL); scena 10/11 nie należą do sekcji
+        self.assertEqual((sekcja["elementy"], sekcja["przetlumaczone"]), (3, 1))
+
+    def test_braki_przerywnikow_niosa_numer_sceny_i_tekst(self):
+        rows = pokrycie_tlumaczenia.braki_przerywnikow(indeks_testowy(), magazyn_testowy())
+        self.assertEqual({row["scena"] for row in rows}, {20, 21})
+        intro = next(row for row in rows if row["klucz"] == K("wpis intro"))
+        self.assertEqual(intro["en"], "intro line")
+        self.assertEqual(intro["projekt"], "对话-qiancen")
+
+    def test_zakres_scen_ogranicza_braki(self):
+        ix, mag = indeks_testowy(), magazyn_testowy()
+        self.assertEqual({row["scena"] for row in pokrycie_tlumaczenia.braki_przerywnikow(ix, mag, od=21)}, {21})
+        self.assertEqual({row["scena"] for row in pokrycie_tlumaczenia.braki_przerywnikow(ix, mag, do=20)}, {20})
+        self.assertEqual(pokrycie_tlumaczenia.braki_przerywnikow(ix, mag, od=30), [])
+
+    def test_sceny_przerywnikow_sortowane_po_numerze(self):
+        numery = [numer for numer, _sloty in pokrycie_tlumaczenia.sceny_przerywnikow(indeks_testowy())]
+        self.assertEqual(numery, [20, 21])
+
+
+class ArkuszTests(unittest.TestCase):
+    def test_arkusz_ma_format_pakietu_i_wszystkie_braki(self):
+        tresc = pokrycie_tlumaczenia.arkusz(indeks_testowy(), magazyn_testowy())
+        self.assertIn("klucz:", tresc)
+        self.assertIn("   PL:", tresc)
+        self.assertIn("## Sceny przerywników", tresc)
+        self.assertIn("## Napisy cutscen", tresc)
+        # każdy brak z obu sekcji ma dokładnie jedno miejsce na PL
+        ix, mag = indeks_testowy(), magazyn_testowy()
+        oczekiwane = len(pokrycie_tlumaczenia.braki_kinowe(ix, mag)) + len(pokrycie_tlumaczenia.braki_przerywnikow(ix, mag))
+        self.assertEqual(tresc.count("\n   PL:\n"), oczekiwane)
+
+    def test_arkusz_moze_objac_tylko_przerywniki(self):
+        tresc = pokrycie_tlumaczenia.arkusz(indeks_testowy(), magazyn_testowy(), kinowe=False)
+        self.assertNotIn("## Napisy cutscen", tresc)
+        self.assertIn("## Sceny przerywników", tresc)
+
+    def test_arkusz_moze_objac_tylko_kinowe(self):
+        tresc = pokrycie_tlumaczenia.arkusz(indeks_testowy(), magazyn_testowy(), przerywniki=False)
+        self.assertIn("## Napisy cutscen", tresc)
+        self.assertNotIn("## Sceny przerywników", tresc)
 
 
 class BrakiTests(unittest.TestCase):

@@ -36,6 +36,11 @@ except ImportError:  # uruchomienie jako skrypt
 
 FORMAT = "wwm-indeks-v2"
 
+# `ui_type` scen odtwarzanych jako przerywnik. W danych tworzą m.in. ciągły blok prologu
+# (`dialog_timelines` 10094–10188), a ich tekst zgadza się co do znaku z napisami
+# widocznymi na ekranie — klient pokazuje je bez okna dialogowego.
+UI_TYPY_PRZERYWNIKA = (10,)
+
 
 class IndeksError(Exception):
     """Katalog nie zawiera czytelnego wyciągu w oczekiwanym formacie."""
