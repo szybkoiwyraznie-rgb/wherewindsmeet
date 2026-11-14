@@ -65,6 +65,17 @@ def _wiersze(path: Path) -> Iterator[dict]:
                 raise IndeksError(f"{path.name}:{number}: {error}") from error
 
 
+def znormalizowany(tekst: str) -> str:
+    """Tekst źródłowy bez różnic w białych znakach.
+
+    Ten sam chiński tekst bywa zapisany w kilku tabelach z inną liczbą spacji
+    (np. `text_msg` i `text_msg__grey`), a klucz przekładu to SHA-256 dokładnej
+    treści — więc te same zdania dostają różne klucze i trzeba by je tłumaczyć
+    dwa razy. Do łączenia takich bliźniaków używamy porównania po normalizacji.
+    """
+    return " ".join(tekst.split())
+
+
 @dataclass
 class Indeks:
     katalog: Path

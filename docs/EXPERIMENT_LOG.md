@@ -1169,3 +1169,53 @@ cudzego kodu ani nie wymagają tej procedury.
   kolizji, `70 097` dopasowań po EN). Kopia w `paczki/`, wysłana na Dysk Google
   (folder pakietów) jako `WWM_Spolszczenie_PL_v0.2.0.zip`. **Łatka nie była
   uruchomiona w grze** — to zwrotka i plan, nie potwierdzenie działania.
+
+## 2026-11-14 (3) — druga warstwa napisów (`text_msg__grey`) i domknięcie cytatów właściciela
+
+- **Zgłoszenie właściciela:** sześć linii z transkrypcji prologu nadal po
+  angielsku (`a drink to wet your throat.`, `Well? How is it?`, dwie kwestie
+  Chen Zixi o „wpadaniu na ostrza” i o dzbanie `丰和春` oraz
+  `We'll roam the jianghu together!`).
+- **Fakt — cztery z nich to inna warstwa tej samej tabeli:** `text_msg__grey`,
+  gdzie mówca jest wpisany w treść (`师父 …`, EN `Master: …`). Ten sam wiersz
+  `text_msg` (np. `590339`) ma wersję główną i „szarą” — z innymi odstępami
+  w chińskim tekście, więc **inny SHA-256 i osobny, pusty klucz**. Przekład
+  wersji głównej istniał, ale nie był widoczny dla wersji szarej, a narzędzie
+  pokrycia liczyło tylko wiersze główne — stąd fałszywe `100%` napisów cutscen.
+  Skala: w zakresie `590000–592694` jest **`675` takich wierszy i żaden nie miał
+  przekładu**; w całej warstwie `1 203` wiersze (`528` nadal bez przekładu poza
+  zakresem cutscen).
+- **Zmiana — łączenie bliźniaków:** `tools/tlumaczenie.py: doloz_blizniaki()`
+  dobiera przekład z tego **samego wiersza tej samej tabeli** (rodzina
+  `text_msg` obejmuje `text_msg__grey`) po treści znormalizowanej białymi
+  znakami (`indeks.znormalizowany`). Wpięte w `one_click_patch.py`,
+  `buduj_paczke.py` (`--wypelnij-pl`), `zbuduj_latke.py` i
+  `pokrycie_tlumaczenia.py`, **tylko w pamięci** — do `tlumaczenie/pl_*.jsonl`
+  trafiają wyłącznie przekłady ludzi. Efekt na danych: `675` uzupełnionych
+  wierszy, `przekladow_po 76 595` w raporcie patchera.
+- **Czego świadomie nie robimy:** nie łączymy tekstów o **różnych numerach
+  wierszy**, nawet gdy chiński zapis jest identyczny — to kolizje znaczeń i tam
+  zostaje angielski do czasu własnego tłumaczenia. Pilnują tego testy
+  `tests/test_kolizje_wariantow.py` i `tests/test_blizniaki_warstw.py`
+  (`5` testów: dziedziczenie z `__grey`, brak dziedziczenia z innego wiersza,
+  brak nadpisywania istniejącego przekładu, brak łączenia różnych treści).
+- **Nowa sekcja pomiaru:** `pokrycie_tlumaczenia.py` ma teraz wiersz
+  `napisy — warstwa text_msg__grey`: `675`/`1 203` (`56,1%`).
+- **Dwie kwestie Chen Zixi to osobna sprawa:** leżą w scenach przerywników
+  `3900065` i `3900066` (projekt `对话-longsiyu`), czyli poza blokiem
+  `10094–10188`, i nie miały żadnego przekładu. Przetłumaczone w
+  `zwrotki/2026-11-14_prolog_2_pl.md` razem z pytaniem o wiersz (scena
+  `17200703`) i linią istniejącą tylko po angielsku (`48e4d8b5f54c3665`,
+  brak źródła chińskiego). Import: `4` wpisy, `0` odrzuconych.
+- **Testy:** `402` (cały zestaw zielony).
+- **Wydanie `v0.3.0`:** `dist/WWM_Spolszczenie_PL_v0.3.0.zip`,
+  `4 506 590 B`, `12` plików, SHA-256
+  `2ba67551fd7d0c9736c780f34edb36050e331e1c1a2543340671290181713016`,
+  `76 595` przekładów w magazynie, `675` bliźniaków w planie. Sprawdzone:
+  w planie są wszystkie sześć kluczy z cytatów właściciela. **Nie testowano
+  w grze.**
+- **Co jeszcze w prologu zostaje:** projekty poboczne i questowe wokół prologu
+  (`对话-longsiyu`/`longsiyu.dialog`: `68` scen, `353` elementy bez przekładu —
+  to nie jest sam prolog, a łańcuch o zbieraniu nauk dla 奇物监) oraz `528`
+  wierszy szarej warstwy poza zakresem cutscen. Nie wiadomo, czy klient rysuje
+  napisy z warstwy głównej czy szarej — tłumaczone są obie.

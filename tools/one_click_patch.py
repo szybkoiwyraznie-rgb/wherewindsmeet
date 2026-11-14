@@ -285,6 +285,10 @@ def zbuduj_ze_zwrotki(
             raise OneClickError("nie podano ścieżki --magazyn do zapisu")
         magazyn_mod.zapisz(magazyn_dir, magazyn)
 
+    # Ten sam chiński tekst bywa zapisany pod kilkoma kluczami (różne białe znaki),
+    # więc dobieramy przekład bliźniaka — inaczej część linii zostawała po angielsku.
+    blizniaki = magazyn_mod.doloz_blizniaki(magazyn, ix)
+
     out_zip = Path(wyj_zip)
     use_binary_inputs = bool(dane_gry or zh_paths or mapa_pairs or cel_paths)
 
@@ -310,6 +314,7 @@ def zbuduj_ze_zwrotki(
             "magazyn_zapisany": bool(zapisz_magazyn),
             "przekladow_przed": przekladow_przed,
             "przekladow_po": len(magazyn),
+            "blizniaki": blizniaki,
             "plan": {
                 "po_id": len(plan["po_id"]),
                 "po_kluczu": len(plan["po_kluczu"]),
@@ -389,6 +394,7 @@ def zbuduj_ze_zwrotki(
         "magazyn_zapisany": bool(zapisz_magazyn),
         "przekladow_przed": przekladow_przed,
         "przekladow_po": len(magazyn),
+        "blizniaki": blizniaki,
         "import": (
             {
                 "plikow": import_raport["plikow"],

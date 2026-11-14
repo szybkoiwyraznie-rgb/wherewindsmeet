@@ -86,7 +86,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
   filmowe `47`/`47` (w tym film 2 `钗头凤` `13`/`13` i film 3 `中渡桥之战`
   `21`/`21`), **blok prologu `10094–10188` bez braków**, sceny przerywników
   `1 382`/`11 678` (`11,8%`), zwykłe dialogi scen `13 880`/`187 598` (`7,4%`),
-  cały wyciąg `75 834`/`487 684` (`15,5%`). Wcześniejsze napisy po angielsku
+  cały wyciąg `75 834`/`487 684` (`15,5%`). Druga warstwa napisów
+  (`text_msg__grey`, mówca wpisany w treść) ma `675`/`1 203` — brakujące wiersze
+  cutscen dziedziczą przekład z wiersza głównego o tym samym numerze
+  (`tlumaczenie.doloz_blizniaki`, tylko w pamięci). Wcześniejsze napisy po angielsku
   wynikały **z braków w magazynie, nie z podmiany pliku przez łatkę**; hipotezę
   „kolizje wariantów” sprawdzono i odrzucono (`0` przypadków w danych — patrz
   dziennik).
@@ -157,10 +160,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-1. **Uruchomić w grze gotową łatkę `v0.2.0` i sprawdzić prolog.** Wysłana na
-   Dysk Google `WWM_Spolszczenie_PL_v0.2.0.zip` (`4 467 759 B`, SHA-256
-   `a0f12fdc…d6b12bc`, `75 916` przekładów, kopia w `paczki/`) zawiera już
-   wszystkie napisy prologu z `zwrotki/2026-11-14_prolog_pl.md` (`232` klucze).
+1. **Uruchomić w grze gotową łatkę `v0.3.0` i sprawdzić prolog.** Wysłana na
+   Dysk Google `WWM_Spolszczenie_PL_v0.3.0.zip` (`4 506 590 B`, SHA-256
+   `2ba67551…13016`, `76 595` przekładów, kopia w `paczki/`) zawiera napisy
+   prologu z obu zwrotek (`zwrotki/2026-11-14_prolog_pl.md`, `232` klucze;
+   `zwrotki/2026-11-14_prolog_2_pl.md`, `4` klucze) oraz `675` wierszy warstwy
+   `text_msg__grey` przejętych z wierszy głównych.
    Jedno uruchomienie gry — najlepiej od nowej postaci do kreacji — powie, czy
    prolog jest polski i czy napisy filmów 2–3 idą z tej samej treści.
    **Do tego czasu nie twierdzimy, że cinematic jest już polski w grze.**

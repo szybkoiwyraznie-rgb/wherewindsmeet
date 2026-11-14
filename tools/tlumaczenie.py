@@ -72,6 +72,59 @@ def wczytaj(katalog) -> Magazyn:
     return magazyn
 
 
+def _rodzina_i_wiersz(ix, tekst) -> tuple[str, str] | None:
+    """(`rodzina tabeli`, `wiersz`) tekstu źródłowego — np. `("text_msg", "590339")`.
+
+    Warstwy tej samej tabeli (`text_msg` i `text_msg__grey`) mają te same numery
+    wierszy, więc po nich poznajemy, że to **ta sama** linia napisu w innym stylu.
+    """
+    zrodlo = ix.zrodlo(tekst)
+    if not zrodlo:
+        return None
+    tabela, _kolumna, wiersz = zrodlo[0], zrodlo[1], zrodlo[2]
+    return (tabela.split("__")[0], wiersz)
+
+
+def doloz_blizniaki(magazyn: Magazyn, ix) -> dict:
+    """Uzupełnij magazyn przekładami tej samej linii z innej warstwy tej samej tabeli.
+
+    Klucz przekładu to SHA-256 dokładnej treści, a ta sama chińska linia bywa
+    zapisana w `text_msg` i w `text_msg__grey` z inną liczbą spacji (warstwa
+    „szara” ma mówcę wpisanego w treść). Przez to miała osobny, pusty klucz —
+    i właśnie dlatego część napisów cutscen zostawała po angielsku, choć ich
+    przekład już istniał pod kluczem bliźniaka.
+
+    Warunek jest celowo wąski: **ten sam wiersz tej samej tabeli** i ta sama
+    treść po znormalizowaniu spacji. Nie łączymy różnych zdań o tym samym
+    chińskim zapisie (kolizje znaczeń zostają nietknięte — patrz
+    `tests/test_kolizje_wariantow.py`). Uzupełniamy **tylko w pamięci**: pliki
+    `tlumaczenie/pl_*.jsonl` przechowują wyłącznie przekłady ludzi.
+    """
+    from tools import indeks as indeks_mod
+
+    po_wierszu: dict[tuple[str, str], tuple[str, str]] = {}
+    for klucz, przeklad in magazyn.po_kluczu.items():
+        tekst = ix.teksty.get(klucz)
+        if tekst is None or not tekst.zrodlo:
+            continue
+        gdzie = _rodzina_i_wiersz(ix, tekst)
+        if gdzie is not None:
+            po_wierszu.setdefault(gdzie, (indeks_mod.znormalizowany(tekst.zrodlo), przeklad))
+    dodane = 0
+    for klucz, tekst in ix.teksty.items():
+        if klucz in magazyn.po_kluczu or not tekst.zrodlo:
+            continue
+        gdzie = _rodzina_i_wiersz(ix, tekst)
+        if gdzie is None:
+            continue
+        blizniak = po_wierszu.get(gdzie)
+        if blizniak is None or blizniak[0] != indeks_mod.znormalizowany(tekst.zrodlo):
+            continue
+        magazyn.po_kluczu[klucz] = blizniak[1]
+        dodane += 1
+    return {"dodane": dodane, "kluczy": len(magazyn.po_kluczu)}
+
+
 def zapisz(katalog, magazyn: Magazyn) -> list[str]:
     """Zapisz magazyn; zwraca nazwy zapisanych plików. Puste części są usuwane."""
     root = Path(katalog)

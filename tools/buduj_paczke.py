@@ -1595,6 +1595,10 @@ def main(argv=None) -> int:
     try:
         ix = indeks_mod.wczytaj(arguments.indeks)
         magazyn = magazyn_mod.wczytaj(arguments.tlumaczenie) if arguments.tlumaczenie else None
+        if magazyn is not None:
+            # Wypełniamy też linie, których przekład istnieje pod kluczem bliźniaka
+            # o tej samej treści źródłowej (patrz `tlumaczenie.doloz_blizniaki`).
+            magazyn_mod.doloz_blizniaki(magazyn, ix)
         only = None
         if arguments.tylko_sloty:
             only = {line.strip() for line in Path(arguments.tylko_sloty).read_text(encoding="utf-8").splitlines() if line.strip()}

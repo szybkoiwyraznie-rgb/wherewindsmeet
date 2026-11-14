@@ -232,6 +232,7 @@ def main(argv=None) -> int:
     try:
         ix = indeks_mod.wczytaj(arguments.indeks, teksty=False, sceny=False)
         magazyn = magazyn_mod.wczytaj(arguments.magazyn)
+        magazyn_mod.doloz_blizniaki(magazyn, ix)
         if not len(magazyn):
             raise LatkaError("magazyn przekładów jest pusty — nie ma czego wstawiać")
         zh = mapa_tekstow.zloz(arguments.zh)

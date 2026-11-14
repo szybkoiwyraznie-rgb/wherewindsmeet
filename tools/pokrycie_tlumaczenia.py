@@ -45,6 +45,7 @@ except ImportError:  # uruchomienie jako skrypt
 
 TYPY_KINOWE = ("napis", "intro", "film")
 SEKCJA_PRZERYWNIKI = "sceny przerywników (timeline, `ui_type` 10)"
+SEKCJA_GREY = "napisy — warstwa `text_msg__grey` (mówca wpisany w treść)"
 OPIS_TYPU = {
     "napis": "napisy cutscen (text_msg 590000–592694)",
     "intro": "intro (wds_oneday_intro_cutscene_data)",
@@ -90,6 +91,7 @@ def sekcje(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, sceny: bool =
     for numer in sorted(wedlug_filmow, key=lambda value: (str(type(value)), str(value))):
         dodaj(f"  film {numer}", wedlug_filmow[numer])
 
+    dodaj(SEKCJA_GREY, sorted(klucz for klucz, tekst in ix.teksty.items() if _zrodlo_grey(ix, tekst)))
     if sceny:
         dodaj(SEKCJA_PRZERYWNIKI, (slot for _numer, sloty in sceny_przerywnikow(ix) for slot in sloty))
         dodaj(
@@ -98,6 +100,23 @@ def sekcje(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, sceny: bool =
         )
 
     dodaj("wszystkie unikalne teksty wyciągu", ix.teksty.keys())
+    return wynik
+
+
+def _zrodlo_grey(ix: indeks_mod.Indeks, tekst) -> bool:
+    """Czy tekst pochodzi z warstwy `text_msg__grey` (napisy z mówcą w treści)."""
+    zrodlo = ix.zrodlo(tekst)
+    return bool(zrodlo) and zrodlo[0] == "text_msg__grey"
+
+
+def wiersze_grey(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn) -> list[dict]:
+    """Wiersze warstwy `text_msg__grey` bez przekładu (numer wiersza `text_msg`)."""
+    wynik: list[dict] = []
+    for klucz, tekst in sorted(ix.teksty.items()):
+        if not _zrodlo_grey(ix, tekst) or magazyn.przeklad(klucz):
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        wynik.append({"klucz": klucz, "wiersz": int(zrodlo[2]), "zh": tekst.zrodlo, "en": tekst.en})
     return wynik
 
 
@@ -441,6 +460,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         ix = indeks_mod.wczytaj(arguments.indeks, sceny=not arguments.bez_scen or bool(arguments.szukaj))
         magazyn = magazyn_mod.wczytaj(arguments.magazyn)
+        # Dołóż przekłady bliźniaków o tej samej treści źródłowej (różne białe znaki),
+        # żeby pomiar odpowiadał temu, co trafi do gry.
+        blizniaki = magazyn_mod.doloz_blizniaki(magazyn, ix)
     except (indeks_mod.IndeksError, magazyn_mod.MagazynError, OSError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
