@@ -1050,6 +1050,11 @@ cudzego kodu ani nie wymagają tej procedury.
   | wszystkie unikalne teksty wyciągu | 487 684 | 75 603 | 412 081 | 15,5% |
 
   Magazyn: `75 685` przekładów (`75 603` po kluczu + `82` warianty płci).
+- **Sprostowanie (dopisane 2026-11-14 po uwadze właściciela):** otwarcie gry to
+  **ciąg cutscen**, a nie ballady ani poematy. `钗头凤` jest tytułem występu
+  pingtan w filmie 2, `中渡桥之战` — tytułem filmsceny bitwy (film 3); oba mają
+  napisy wierszem, ale opisywanie ich jako „ballad prologu” było błędne.
+  Transkrypcja właściciela jest nadrzędna wobec tych nazw.
 - **Wniosek:** w napisach cutscen brakuje tylko `85` krótkich wtrąceń
   (`Hah!`, `Yes`, `Go?`), a **całe dwa prerenderowane przerywniki filmowe
   (ballada `钗头凤` i otwierający poemat `中渡桥之战`, razem `34` wersy) nie mają
@@ -1085,3 +1090,73 @@ cudzego kodu ani nie wymagają tej procedury.
   filmów z `entry_collect_movie_subtitle_data`, czy z tego samego tekstu
   w scenach — oba warianty są dziś po angielsku, więc odpowiedź da dopiero
   uzupełnienie przekładu. Nie zmieniano `index/` ani `tlumaczenie/`.
+
+## 2026-11-14 (2) — napisy cutscen to sceny `ui_type` 10: osobna sekcja pakietu i polski prolog
+
+- **Objaw (od właściciela):** w napisach prologu — od pierwszej scenki do kreacji
+  postaci — większość linii zostaje po angielsku; właściciel przepisał cały
+  fragment i oznaczył nieprzetłumaczone miejsca.
+- **Fakt — gdzie te linie leżą:** to nie osobna tabela napisów, a **sceny
+  odtwarzane jako przerywniki** (`ui_type` 10 w `dialog_timelines`). W całym
+  wyciągu jest ich `5 995` (`11 677` elementów, `1 221` z przekładem = `10,5%`).
+  Blok prologu tworzą projekty `对话-qiancen.dialog` (`57` scen, `97` elementów,
+  `3` przetłumaczone) i `对话-qiancen` (`22`, `22`, `1`) — ciągłe `10094–10188`.
+  Sprawdzone na `10141`, `10158`, `10168`, `10185`: w tych slotach stoją pełne
+  zdania EN („It's you!”, „After him! Don't let him flee with the Zhenguan
+  Jade!”), czyli dokładnie to, co widać na ekranie.
+- **Fakt — dlaczego braków nie było widać w narzędziach:** te sceny drukowały się
+  w `sceny/*.md` razem z 186 tys. zwykłych kwestii, a `--brak` w
+  `tools/pokrycie_tlumaczenia.py` wypisywał tylko napisy cutscen, intro i filmy.
+  Stąd wrażenie, że „napisy cutscen są prawie przetłumaczone” (`96,8%`) przy
+  prologu w większości angielskim.
+- **Zmiana w pakiecie:** `tools/buduj_paczke.py` ma `UI_TYPY_CUTSCEN` (stała
+  `indeks.UI_TYPY_PRZERYWNIKA`) i `Generator.cutsceny_cinematiczne()`, które
+  piszą `cutsceny/04_sceny_cinematiczne_NN.md` **przed** plikami scen, więc
+  klucz z przerywnika otwiera `PL:` tam, a nie w `sceny/` (w scenach zostaje
+  odsyłacz „tłumaczysz raz”). `paczka.json` ma nowe `liczby_cinematiczne`, a
+  `liczby_cutsceny` obejmuje także tę sekcję. Przebudowa (wersja `5`,
+  `--wypelnij-pl --tylko-z-en`): `11 677` elementów przerywników, `9 109` do
+  wpisania, `936` z przekładem, `1 632` powtórzeń; cutsceny razem `16 209`
+  elementów / `9 115` do wpisania; sceny `204 183` / `149 307`; `kontrola`:
+  `miejsc_pl 422 248`, `zgodne: true`; czas ok. `31 s`.
+- **Hipoteza odrzucona (kolizje wariantów):** zakładaliśmy, że część braków
+  wynika z reguły `_dopasuj_kolizje`, która przy trafieniu w wariant bez
+  przekładu przerywała szukanie. Regułę zmieniono w `tools/patcher_wwm.py`
+  i `tools/zbuduj_latke.py` (teraz: wariant o tym samym EN **z** przekładem →
+  wariant podobny ≥ `0,5` → `None`; warianty bez `PL:` nie blokują bliźniaka,
+  a raport patchera liczy `po_kolizji_dokladne`/`po_kolizji_podobne`).
+  **Pomiar na danych Patcha 2.4: `890` kolizji, w tym `723` z dokładnie jednym
+  przetłumaczonym wariantem, ale `0` takich, w których EN obu wariantów jest
+  podobny ≥ `0,5`** — kolizje z definicji łączą znaczenia odległe, więc dla
+  obecnych danych obie reguły dają ten sam wynik. To nie była przyczyna
+  angielskich napisów; poprawka porządkuje kod i zostaje jako zabezpieczenie,
+  ale **nic nie naprawiła**.
+- **Prawdziwa przyczyna: brak przekładów.** Zmierzone braki w prologu
+  (`sceny 10000–10250`): `115` wierszy scen przerywników + `120` napisów
+  cutscen/intro/filmów = `235` miejsc, `0` z nich miało przekład.
+- **Uzupełnienie (własny przekład z chińskiego):** `zwrotki/2026-11-14_prolog_pl.md`
+  — `232` klucze: `112` wierszy scen przerywników (z `115` braków — trzy klucze
+  powtarzają się w kilku scenach), `85` napisów `text_msg`, `35` wierszy intro
+  i filmów 2–3 (w tym wszystkie wersy `钗头凤` i `中渡桥之战`, przełożone
+  wierszem).
+  Import: `python3 tools/import_zwrotki.py zwrotki/2026-11-14_prolog_pl.md
+  --indeks index --magazyn tlumaczenie` → `232` miejsc, `0` odrzuconych,
+  `0` problemów z tokenami; magazyn `75 916` przekładów.
+- **Pokrycie po imporcie** (`tools/pokrycie_tlumaczenia.py`):
+  napisy cutscen `2 688/2 688` (`100%`), intro `9/9`, filmy `47/47`
+  (film 2 `13/13`, film 3 `21/21`), **blok prologu `10094–10188` bez braków**
+  (`--arkusz --sceny-od 10000 --sceny-do 10250` → `0` miejsc), sceny
+  przerywników `1 382/11 678` (`11,8%`), zwykłe sceny `13 880/187 598` (`7,4%`),
+  cały wyciąg `75 834/487 684` (`15,5%`).
+- **Nowe tryby narzędzia:** `--brak-przerywnikow` (braki scen przerywników
+  wg scen) i `--arkusz PLIK` (`--arkusz-tylko wszystko|kinowe|przerywniki`,
+  `--sceny-od/--sceny-do`) — plik w formacie pakietu (`klucz:`/`PL:`) gotowy do
+  wypełnienia i podania do `import_zwrotki.py`.
+- **Testy:** `397` (`tests/test_buduj_paczke.py` +5 dla sekcji przerywników,
+  `tests/test_pokrycie_tlumaczenia.py` +7, nowy `tests/test_kolizje_wariantow.py`
+  — `6`); cały zestaw zielony.
+- **Ograniczenia:** brak testu w grze — nie wiadomo jeszcze, czy klient rysuje
+  napisy prologu z tych scen (wszystko wskazuje, że tak, bo tekst zgadza się
+  z transkrypcją właściciela) ani czy napisy filmów 2–3 pochodzą z
+  `entry_collect_movie_subtitle_data`, czy z tych samych scen. Sprawdzenie
+  wymaga nowej łatki u właściciela.
