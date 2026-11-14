@@ -1022,3 +1022,66 @@ cudzego kodu ani nie wymagają tej procedury.
     (przetestowane na `index/`: `483 752` miejsc `PL:`, `kontrola()` 100%
     zgodna) oraz `tools/audyt_aktualizacji.py` (wykrywa jako nowość wpisy,
     które w kolejnym patchu globalnym uzyskały wersję `EN`).
+
+## 2026-11-14 — dlaczego napisy otwierającej cutsceny zostały po angielsku (pokrycie, nie podmiana pliku)
+
+- **Objaw od właściciela:** po świeżej łatce PL nałożonej na pliki gry klient
+  (Steam, Windows) nie przywrócił podmienionego `translate_words_map_en_diff`,
+  a napisy początkowej cutsceny były w ok. 80% angielskie. Wcześniejsze
+  podejrzenie, że łatka podmienia `translate_words_map_en_diff` na wersję
+  policzoną od złej bazy, było **koincydencją**: patcher nadpisuje oba pliki
+  docelowe niezależnie i utrzymuje ich spójność, a sama podmiana nie tłumaczy
+  języka napisów.
+- **Wejście:** wyłącznie repozytorium — `index/` (`wwm-indeks-v2`, Patch 2.4
+  `26592996`) i magazyn `tlumaczenie/`. Bez plików gry, bez `zstandard`, bez
+  Dysku Google; w piaskownicy nie ma instalacji właściciela, więc **nic nie
+  zostało sprawdzone w uruchomionej grze**.
+- **Pomiar pokrycia (nowe narzędzie `tools/pokrycie_tlumaczenia.py`):**
+
+  | sekcja | wpisów | z przekładem | braki | % |
+  |---|---|---|---|---|
+  | napisy cutscen (`text_msg` 590000–592694) | 2 688 | 2 603 | 85 | 96,8% |
+  | intro (`wds_oneday_intro_cutscene_data`) | 9 | 8 | 1 | 88,9% |
+  | napisy filmowe (`entry_collect_movie_subtitle_data`) | 47 | 13 | 34 | 27,7% |
+  | — film 1 | 13 | 13 | 0 | 100% |
+  | — film 2 (`评弹曲目《钗头凤》`) | 13 | 0 | 13 | 0% |
+  | — film 3 (`《中渡桥之战》`) | 21 | 0 | 21 | 0% |
+  | sceny (dialogi i plansze z timeline'ów) | 187 598 | 13 301 | 174 297 | 7,1% |
+  | wszystkie unikalne teksty wyciągu | 487 684 | 75 603 | 412 081 | 15,5% |
+
+  Magazyn: `75 685` przekładów (`75 603` po kluczu + `82` warianty płci).
+- **Wniosek:** w napisach cutscen brakuje tylko `85` krótkich wtrąceń
+  (`Hah!`, `Yes`, `Go?`), a **całe dwa prerenderowane przerywniki filmowe
+  (ballada `钗头凤` i otwierający poemat `中渡桥之战`, razem `34` wersy) nie mają
+  ani jednego przekładu**. Film 1 (poemat o lampionach) jest przetłumaczony
+  w całości. Dodatkowo dialogi w scenach — czyli większość wypowiadanego tekstu
+  w grze — mają dopiero `7,1%` pokrycia.
+- **Dlaczego brak tych 34 wersów nie był widoczny w pakiecie:** w `v4`
+  (`paczki/v4/paczka.json`) sekcja `02_intro_i_filmy` ma
+  `56` elementów i `do_wpisania: 0`, bo wiersze filmowe są tam oznaczone jako
+  **powtórzenie** tekstów ze scen: `08_campaign_01.md` (scena `2953` i `2954`,
+  `中渡桥之战`) oraz `80_dialogi-wg-projektow_04.md` (scena `40712`, ballada).
+  Klucz przekładu jest ten sam (SHA-256 tekstu źródłowego), więc tłumacz miał
+  je wypełnić w plikach scen — i tam zostały puste. Sekcja cutscen nie
+  raportowała ich jako braków.
+- **Odtworzenie `v4` z repozytorium:** `python3 tools/buduj_paczke.py --indeks
+  index --wyj /tmp/pak --wersja 4 --data … --tlumaczenie tlumaczenie
+  --wypelnij-pl --tylko-z-en --bez-zip` daje dokładnie zapisane w `paczki/v4`
+  liczby (`liczby_cutsceny`: `4 532` elementów, `4 110` przetłumaczonych,
+  `416` powtórzeń, `6` do wpisania; `liczby`: `465 551`/`75 683`/`346 565`).
+  Bez `--tylko-z-en` pojawia się `135` dodatkowych otwartych miejsc w
+  `03_plansze_i_streszczenia` — różnica pochodzi wyłącznie z tej flagi.
+- **Sprawdzenie hipotezy „to nie pokrycie, a podłączenie”:** narzędzie ma tryb
+  `--szukaj "<fragment zdania>"`, który dla tekstu z gry podaje klucz, miejsce
+  (napisy cutscen / film `n` / intro / scena), tabelę źródłową i to, czy
+  w magazynie jest przekład. Jeśli linia **ma** przekład, a klient nadal pokazuje
+  angielski, problem jest w podłączeniu (inna mapa albo inny nośnik napisów)
+  i wtedy trzeba go badać dalej; jeśli przekładu **nie ma**, gra pokazuje
+  angielski zgodnie z projektem (klient pozostaje w języku EN).
+- **Testy:** `22` nowe testy w `tests/test_pokrycie_tlumaczenia.py` (sekcje,
+  braki, serie ciągłych wierszy, sloty wariantów płci, szukanie po `ZH`/`EN`/`PL`,
+  limit i skracanie tekstu); cały `tools/run_tests.py` zielony.
+- **Ograniczenia:** brak testu w grze; nie wiadomo, czy klient rysuje napisy
+  filmów z `entry_collect_movie_subtitle_data`, czy z tego samego tekstu
+  w scenach — oba warianty są dziś po angielsku, więc odpowiedź da dopiero
+  uzupełnienie przekładu. Nie zmieniano `index/` ani `tlumaczenie/`.

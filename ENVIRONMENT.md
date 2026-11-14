@@ -26,7 +26,9 @@ git diff --check
 W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 `check_repository.py` sprawdza pliki **w indeksie Git**, więc nowe pliki trzeba
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
-Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
+Dysku Google ani sekretów. Pokrycie przekładu (co w grze zostanie po angielsku)
+mierzy read-only `python3 tools/pokrycie_tlumaczenia.py` — czyta tylko `index/`
+i `tlumaczenie/`, bez `zstandard` i bez plików gry. `run_tests.py` zwraca błąd również wtedy, gdy nie
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
 metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); aktualny
 zbieracz, jego budowę i prywatny odbiór opisuje [docs/COLLECTOR.md](docs/COLLECTOR.md),

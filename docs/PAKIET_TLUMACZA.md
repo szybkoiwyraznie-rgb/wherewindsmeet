@@ -268,6 +268,35 @@ Wydzielona sekcja cutscen (4 532 elementów, 4 116 `PL:` w `v3`):
   pozostałe plansze `cutscenes` z powiązaniem klonów mobilnych (`>= 10 000 000`),
   zadań i wątków.
 
+## Co jeszcze zostanie po angielsku (pokrycie przekładu)
+
+Zanim ktoś uzna, że „łatka nie działa”, bo w grze widać angielski, trzeba
+sprawdzić, czy ten tekst **ma** przekład w magazynie. Służy do tego read-only
+`tools/pokrycie_tlumaczenia.py` — czyta wyłącznie `index/` i `tlumaczenie/`,
+bez plików gry i bez `zstandard`:
+
+```sh
+python3 tools/pokrycie_tlumaczenia.py            # tabela pokrycia sekcji
+python3 tools/pokrycie_tlumaczenia.py --brak     # wiersze bez przekładu (cutsceny, intro, filmy)
+python3 tools/pokrycie_tlumaczenia.py --szukaj "Winter Night"
+python3 tools/pokrycie_tlumaczenia.py --bez-scen --json
+```
+
+Sekcje odpowiadają temu, co widzi klient: napisy cutscen (`text_msg`
+`590000–592694`), intro (`wds_oneday_intro_cutscene_data`), napisy filmowe
+(`entry_collect_movie_subtitle_data`, osobno dla każdego filmu) oraz sceny
+z timeline'ów. `--szukaj` przyjmuje fragment `ZH`, `EN` albo `PL` i pokazuje
+klucz, miejsce w grze, tabelę źródłową i to, czy przekład istnieje — czyli
+rozstrzyga, czy dana linia jest nieprzetłumaczona, czy niepodłączona.
+
+Przekład jest przypisany do klucza (SHA-256 tekstu źródłowego), więc jeden wpis
+obejmuje wszystkie identyfikatory o tym samym tekście: mapę, cutscenę i scenę.
+Dlatego w pakiecie wiersze filmowe bywają oznaczone jako „powtórzenie —
+tłumaczysz raz: …” i trzeba je wypełnić w pliku sceny, który pakiet wskazuje.
+Pomiar z 2026-11-14 (szczegóły w [dzienniku](EXPERIMENT_LOG.md)): napisy cutscen
+`96,8%`, intro `88,9%`, napisy filmowe `27,7%` (ballada `钗头凤` i poemat
+`中渡桥之战` po `0%`), sceny `7,1%`, cały wyciąg `15,5%`.
+
 ## Zwrotka → magazyn przekładów
 
 ```sh

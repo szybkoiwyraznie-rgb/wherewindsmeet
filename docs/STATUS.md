@@ -1,6 +1,6 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-13**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-14**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
 ## Gdzie jesteśmy
@@ -73,6 +73,18 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
   34 491 scen uporządkowanych w zadaniach (w tym 25 434 „według numeracji” za
   taką sceną — oznaczone w nagłówku jako kolejność z numeracji, nie powiązanie),
   12 341 według projektu i 26 562 rozmów tła według miejsca.
+- **Pokrycie przekładu (2026-11-14, `tools/pokrycie_tlumaczenia.py`):** magazyn
+  ma `75 685` przekładów (`75 603` po kluczu + `82` warianty płci), ale rozkład
+  jest bardzo nierówny: napisy cutscen `text_msg 590000–592694` — `2 603`/`2 688`
+  (`96,8%`, brakuje 85 krótkich wtrąceń typu `Hah!`/`Yes`), intro `8`/`9`,
+  napisy filmowe `13`/`47` (`27,7%`; film 1 ma `100%`, a ballada `钗头凤`
+  i otwierający poemat `中渡桥之战` — `34` wersy — **`0%`**), dialogi w scenach
+  `13 301`/`187 598` (`7,1%`). Napisy otwierającej cutsceny zostają po angielsku
+  **z powodu braków w magazynie, nie podmiany pliku przez łatkę** — szczegóły,
+  liczby i odtworzenie pakietu `v4` w [dzienniku](EXPERIMENT_LOG.md); przyczyną
+  jest też to, że w `v4` sekcja `02_intro_i_filmy` oznacza wiersze filmowe jako
+  powtórzenia tekstów ze scen (`08_campaign_01.md`, scena `2953`/`2954`;
+  `80_dialogi-wg-projektow_04.md`, scena `40712`) i nie raportuje ich jako braków.
 - **Płeć bohatera**: 1 860 kwestii ma osobne identyfikatory dla bohatera
   i bohaterki; w pakiecie mają osobne `PL:`.
 - **Aktualizacja przyrostowa sprawdzona na danych**: najpierw między paczką
@@ -102,6 +114,7 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 | Import zwrotki | Gotowy i zweryfikowany produkcyjnie na `WWM_PL1.zip` (`tools/import_zwrotki.py`: `75 685` zaimportowanych przekładów w `tlumaczenie/`, `0` błędów formatu/tokenów, `21` kluczy odrzuconych z powodu usunięcia w Patchu 2.4). |
 | Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` na `25906190`) **zweryfikowana w uruchomionej grze Steam**; pełna łatka fabularna i test `patcher_wwm.py` na Patchu 2.4 (`26592996`) w realnym oknie gry czekają na sprawdzenie. |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`, przetestowany 8-częściowy zrzut 516 MB z Patcha 2.4), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
+| Pokrycie przekładu | `tools/pokrycie_tlumaczenia.py` mierzy z `index/` i `tlumaczenie/`, co w grze zostanie po angielsku: napisy cutscen `96,8%`, intro `88,9%`, napisy filmowe `27,7%` (film 2 i 3 po `0%`), sceny `7,1%`, cały wyciąg `15,5%`. Testy w `tests/test_pokrycie_tlumaczenia.py`; pomiar bez plików gry. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
 ## Otwarte ustalenia
@@ -126,18 +139,32 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    odcięto w `index/`, a wśród pozostałych `1 294` tekstów bez `EN` ponad 70%
    to etykiety testowe, zaślepki i wpisy wycofane (`测试`, `废弃`, `占坑`).
    Zakres tłumaczenia wyznacza `--tylko-z-en` (patrz [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
-7. `21` pustych tabel rozmieszczeń `spaces.*` z Patcha 2.4 (`0x00`) jest bez
+7. **Uzupełnić 34 wersy napisów filmowych i 85 wtrąceń cutscen** — to jedyne
+   duże bloki angielskiego w napisach kinowych; reszta pokrycia to sceny
+   (`7,1%`). Klucze czekają w magazynie `tlumaczenie/` (klucz = SHA-256 tekstu
+   źródłowego), a wiersze filmowe trzeba wypełnić w plikach scen wskazanych
+   w pakiecie jako „tłumaczysz raz”. Nie wiadomo jeszcze, czy klient rysuje
+   napisy filmów z `entry_collect_movie_subtitle_data`, czy z tego samego
+   tekstu w scenach — dziś oba miejsca są po angielsku, więc rozstrzygnie to
+   dopiero łatka z uzupełnionym przekładem.
+8. `21` pustych tabel rozmieszczeń `spaces.*` z Patcha 2.4 (`0x00`) jest bez
    tekstów i trafia do rejestru błędów w `index/manifest.json`.
-8. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.
+9. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.
 
 ## Następny krok
 
-1. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
+1. Uzupełnić przekład napisów filmowych (film 2: `13` wersów ballady `钗头凤`,
+   film 3: `21` wersów poematu `中渡桥之战`) oraz brakujących `85` wtrąceń
+   cutscen, zaimportować zwrotkę (`tools/import_zwrotki.py`) i przebudować
+   łatkę — dopiero to sprawdzi, czy cinematic jest już polski. Przed każdą
+   diagnozą „coś jest po angielsku” uruchomić
+   `python3 tools/pokrycie_tlumaczenia.py` i `--szukaj "<fragment zdania>"`.
+2. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
    pierwsze wydanie samowystarczalnego spolszczenia **`WWM_Spolszczenie_PL_v0.1.0.zip`**
    (`75 685` przekładów z `tlumaczenie/`, ok. `4,3 MB`, `tools/one_click_patch.py
    --tylko-magazyn --wydanie v0.1.0 --wyj-zip dist/WWM_Spolszczenie_PL_v0.1.0.zip`).
-2. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
+3. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
    → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
    Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
-3. Po każdym kolejnym patchu gry: właściciel klika
+4. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
