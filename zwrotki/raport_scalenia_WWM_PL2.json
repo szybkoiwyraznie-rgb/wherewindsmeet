@@ -1,0 +1,110 @@
+{
+ "zrodlo": "WWM_PL2.zip",
+ "przed": {
+  "po_kluczu": 75838,
+  "po_id": 82
+ },
+ "po": {
+  "po_kluczu": 85281,
+  "po_id": 326
+ },
+ "dodane_klucze": 9443,
+ "dodane_warianty_plci": 244,
+ "nadpisane_konflikty": 15,
+ "konflikty": [
+  {
+   "klucz": "08aab1099e50167f",
+   "moje": "Dziwni ci ludzie… jakby mnie nie widzieli.",
+   "tlumacza": "Dziwni ci ludzie… zupełnie jakby mnie nie widzieli."
+  },
+  {
+   "klucz": "0a788c3fd446c918",
+   "moje": "Jak będziecie mieli okazję, zajrzyjcie do Zielnej Lecznicy w Wiosce Morelowej. Rehmania dziewięć razy parzona i dziewięć razy suszona w słońcu nie ma sobie równych.",
+   "tlumacza": "Jak będziecie mieli okazję, zajrzyjcie do Domu Stu Ziół w Wiosce Morelowej. Rehmania dziewięć razy parzona i dziewięć razy suszona w słońcu nie ma sobie równych."
+  },
+  {
+   "klucz": "15d106243ae1c63d",
+   "moje": "Atuo opowiada historię + wjazd konno",
+   "tlumacza": "Tuo opowiada historię + wjazd konno"
+  },
+  {
+   "klucz": "348f1cf1243e74bc",
+   "moje": "Rozumiem.",
+   "tlumacza": "Rozumiem"
+  },
+  {
+   "klucz": "4b890d71810a0693",
+   "moje": "Ha ha ha…",
+   "tlumacza": "Haha… ha, ha… ha…"
+  },
+  {
+   "klucz": "58b1ee48d28b9729",
+   "moje": "Ja?",
+   "tlumacza": "Dzięki mnie?"
+  },
+  {
+   "klucz": "70fd54321b307c80",
+   "moje": "Kto chce spróbować?",
+   "tlumacza": "Kto spróbuje?"
+  },
+  {
+   "klucz": "7884018bf977c1aa",
+   "moje": "Zacznij od techniki aktywnej “Zielony parawan gór” z “Pędzla Zielonych Gór”, by zyskać wzmocnienie i zatrzymać wrogów, przejdź na “Dziewięć Warstw Wiosny” i techniką aktywną “Porzucić wiosenny żal” przerwij wrogom, potem na zmianę używaj technik pochodnych lekkiego i ciężkiego ataku, by w pełni zgromadzić kwiaty; następnie użyj techniki specjalnej “Kwiat, co nie więdnie”, wróć do “Pędzla Zielonych Gór”, lekkim atakiem ładowanym “Sława bez przystani” podrzuć cel, techniką specjalną “Głos w pustych górach” podrzuć go drugi raz, a na koniec stuknij ciężki atak, by wykonać “Wzmocniony pościg w powietrzu”.",
+   "tlumacza": "Zacznij od techniki aktywnej “Zerwana Zieleń Parawanu” z “Pędzla Zielonych Gór”, by zyskać wzmocnienie i zatrzymać wrogów, przejdź na “Dziewięć Warstw Wiosny” i techniką aktywną “Porzucić wiosenny żal” przerwij wrogom, potem na zmianę używaj technik pochodnych lekkiego i ciężkiego ataku, by w pełni zgromadzić kwiaty; następnie użyj techniki specjalnej “Kwiat, co nie więdnie”, wróć do “Pędzla Zielonych Gór”, lekkim atakiem ładowanym “Sława bez przystani” podrzuć cel, techniką specjalną “Głos w pustych górach” podrzuć go drugi raz, a na koniec stuknij ciężki atak, by wykonać “Wzmocniony pościg w powietrzu”."
+  },
+  {
+   "klucz": "81c28a42b8af4988",
+   "moje": "Aa!",
+   "tlumacza": "Ach!"
+  },
+  {
+   "klucz": "84a1011661b5bd3e",
+   "moje": "Ukrywasz się na okręcie bojowym i wpływasz z Rong Yuan na Staw Jinming.\nPo drodze widzisz, że na Stawie Jinming trwają ćwiczenia wojskowe.\nWidzisz szyk ognistych strzał, dźwignie miażdżące łodzie, miotane dzbany z płonącym olejem.\nW końcu lądujesz na trybunie.",
+   "tlumacza": "Ukrywasz się na okręcie bojowym i wpływasz z Murong Yuan na Staw Jinming.\nPo drodze widzisz, że na Stawie Jinming trwają ćwiczenia wojskowe.\nWidzisz szyk ognistych strzał, dźwignie miażdżące łodzie, miotane dzbany z płonącym olejem.\nW końcu lądujesz na trybunie."
+  },
+  {
+   "klucz": "84dd97c41191469b",
+   "moje": "Dobrze.",
+   "tlumacza": "Dobrze"
+  },
+  {
+   "klucz": "8aba69d0b271528d",
+   "moje": "Zacznij od techniki aktywnej “Zielony parawan gór” z “Pędzla Zielonych Gór”, by zyskać wzmocnienie i zatrzymać wrogów, przejdź na “Dziewięć Warstw Wiosny” i techniką aktywną “Porzucić wiosenny żal” przerwij wrogom, potem przytrzymaj lekki atak ładowany “Wiosna odlatuje”, by w pełni zgromadzić kwiaty; następnie użyj techniki specjalnej “Kwiat, co nie więdnie”, wróć do “Pędzla Zielonych Gór”, techniką specjalną “Głos w pustych górach” podrzuć cel, a na koniec stuknij ciężki atak, by wykonać “Pościg w powietrzu”.",
+   "tlumacza": "Zacznij od techniki aktywnej “Zerwana Zieleń Parawanu” z “Pędzla Zielonych Gór”, by zyskać wzmocnienie i zatrzymać wrogów, przejdź na “Dziewięć Warstw Wiosny” i techniką aktywną “Porzucić wiosenny żal” przerwij wrogom, potem przytrzymaj lekki atak ładowany “Wiosna odlatuje”, by w pełni zgromadzić kwiaty; następnie użyj techniki specjalnej “Kwiat, co nie więdnie”, wróć do “Pędzla Zielonych Gór”, techniką specjalną “Głos w pustych górach” podrzuć cel, a na koniec stuknij ciężki atak, by wykonać “Pościg w powietrzu”."
+  },
+  {
+   "klucz": "8af85ce981d9ec89",
+   "moje": "Hę?",
+   "tlumacza": "Hm?"
+  },
+  {
+   "klucz": "a09d75cf613004e2",
+   "moje": "Ha!",
+   "tlumacza": "Hej-ja!"
+  },
+  {
+   "klucz": "aa4366eeb11a562d",
+   "moje": "Nie wiem, prawda to czy nie…",
+   "tlumacza": "Ciekawe, czy prawdziwa…"
+  }
+ ],
+ "pliki": [
+  "pl_0.jsonl",
+  "pl_1.jsonl",
+  "pl_2.jsonl",
+  "pl_3.jsonl",
+  "pl_4.jsonl",
+  "pl_5.jsonl",
+  "pl_6.jsonl",
+  "pl_7.jsonl",
+  "pl_8.jsonl",
+  "pl_9.jsonl",
+  "pl_a.jsonl",
+  "pl_b.jsonl",
+  "pl_c.jsonl",
+  "pl_d.jsonl",
+  "pl_e.jsonl",
+  "pl_f.jsonl",
+  "pl_warianty.jsonl"
+ ]
+}
