@@ -94,8 +94,9 @@ Zasady:
 - 73 296 jednostek ma kontekst w pliku 02; kontekst obejmuje też sceny bez
   polskiego dialogu, bo mówiący i hasła są niezależne od przekładu
   (574 hasła z pełną kartą, reszta to powtórzenia samego imienia),
-- karty bez polskiego przekładu są oznaczone `*(EN)*`: biogramy encyklopedii
-  w magazynie są na razie po angielsku (54 karty polskie, 520 angielskich),
+- karty bez polskiego przekładu mają tekst z gry z gwiazdką, tak samo jak kwestie
+  w pliku 01: `- **Wang Qing:** \*Wang Qing can still recall the argument...`
+  (1 035 kart; biogramy encyklopedii są na razie po angielsku),
 - 64 112 pozycji w pliku 03,
 - archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (2 162 663 B).
 

@@ -152,6 +152,12 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
                       "kwestie bez przekładu poza prologiem idą z gwiazdką")
         self.assertNotIn("[brak przekładu]", poza_prologiem)
 
+    def test_kontekst_bez_polskiego_ma_gwiazdke(self):
+        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
+        self.assertNotIn("*(EN)*", tekst)
+        if "# Prolog" in tekst:
+            self.assertIn("\\*", tekst, "karta bez polskiego opisu idzie z gwiazdką")
+
     def test_rozmiar(self):
         self.assertGreater(self.statystyka["linii"], 10_000)
 

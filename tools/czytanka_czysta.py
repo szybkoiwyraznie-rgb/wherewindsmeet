@@ -548,13 +548,14 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
             else:
                 kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
                 uzyte.update(k for klucze in kolumny.values() for k in klucze)
+            # ta sama zasada co w pliku 01: brak polskiego → tekst z gry z gwiazdką
+            tresc_opisu = opis if opis_pl else f"\\*{opis}"
             if nazwa and opis:
-                znacznik = "" if opis_pl else " *(EN)*"
-                karty.append(f"- **{nazwa}:** {opis}{znacznik}")
+                karty.append(f"- **{nazwa}:** {tresc_opisu}")
             elif nazwa:
                 karty.append(f"- **{nazwa}**")
             else:
-                karty.append(f"- {opis}")
+                karty.append(f"- {tresc_opisu}")
         if not karty:
             continue
         ktory += 1
@@ -671,8 +672,8 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii w prologu pokazano z gwiazdką, bo przekładu jeszcze nie ma.
 
-Karty kontekstu bez polskiego przekładu są oznaczone `*(EN)*` — tekst jest wtedy
-angielski z danych gry, żeby hasło nie zniknęło z czytanki.
+Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
+jak kwestie w pliku 01 — żeby hasło nie zniknęło z czytanki.
 """
 
 
