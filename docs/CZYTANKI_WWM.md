@@ -1,5 +1,8 @@
 # Czytanki Where Winds Meet (`tools/buduj_czytanki.py`)
 
+> **Czytanka do czytania** (trzy pliki: sceny, cutsceny, reszta) —
+> [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+>
 > **Wariant w kolejności z gry** — prolog, potem krainy po kolei, sceny po numerze
 > dialogu — opisuje [docs/CZYTANKA_KOLEJNOSC_GRY.md](CZYTANKA_KOLEJNOSC_GRY.md)
 > (`tools/buduj_czytanke_gry.py`). Ten dokument dotyczy korpusu fabuły

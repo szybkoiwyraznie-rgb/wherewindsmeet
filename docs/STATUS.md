@@ -160,13 +160,16 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-0. **Pełna Czytanka (trzy warstwy) i wydanie `v0.4.0` czekają na przejrzenie.**
-   `tools/zbuduj_czytanke_pelna.py` składa `01_prolog.md` + `02_krainy/`
-   (chronologia), `03_fabula/`, `04_kontekst/` i `05_reszta/` (9 sekcji wg rodzaju)
-   w jeden pakiet `WWM_Czytanka_pelna_2026-11-14.zip` (`26 688 858 B`, 187 plików);
-   pokrycie magazynu sprawdzone próbą `600` tekstów — `0` braków.
-   Wydanie `v0.4.0` (`5 330 079 B`, `86 282` przekłady, SHA-256 `2bfdfc62…2ad8`)
-   jest **pełnym** stanem na dziś; `v0.3.0` (`76 595`) jest nieaktualne.
+0. **Czytanka do czytania jest gotowa i wysłana.** `tools/czytanka_czysta.py`
+   daje trzy pliki po jednym na rodzaj treści: `01_sceny.md` (dialog linia po
+   linii: `- **Mówca:** tekst`, prolog i krainy po kolei), `02_cutsceny.md`
+   (filmy i napisy przerywników), `03_reszta.md` (przedmioty, sztuki walki,
+   encyklopedia, postacie, zadania). Bez czasów, kluczy i tabel.
+   8 908 scen, 92 216 kwestii. Paczka: `WWM_Czytanka_PL_2026-11-14.zip`
+   (`1 523 414 B`), Dysk Google id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
+   Opis formatu: [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+   Wcześniejsze zestawy techniczne (tabele z chińskim i angielskim, trzy warstwy)
+   są w koszu Dysku i zostają wyłącznie jako narzędzia audytu.
 1. **Czytanka w kolejności z gry — warstwa chronologiczna.** `tools/buduj_czytanke_gry.py`
    buduje ją z `index/prowincje.json`: prolog → krainy w kolejności odwiedzania
    (`燕南 → 清河 → 熔炉 → 河西 → …`) → sceny po numerze dialogu. Opis i granice:

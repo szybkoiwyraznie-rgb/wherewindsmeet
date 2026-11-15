@@ -1271,3 +1271,26 @@ cudzego kodu ani nie wymagają tej procedury.
   `v0.3.0` miał `76 595` przekładów i jest nieaktualne. Na Dysku Google:
   id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`; pełna czytanka: id `1WMWHXs6DFLmcub1FfhDxrVXm4n9vGy7U`.
   **Nie testowano w grze.**
+
+### 2026-11-14 — Czytanka ma być do czytania, nie zestawem technicznym
+
+- **Właściciel odrzucił poprzednie paczki:** tabele z kolumnami chiński/angielski/polski,
+  znaczniki czasu i podział na 167–187 plików to nie czytanka. Czytanka to dialog
+  linia po linii z mówcą i tekstem, jeden plik na rodzaj treści.
+- **Nowy format** (`tools/czytanka_czysta.py`, `wwm-czytanka-czysta-v1`):
+  `- **Mówca:** tekst` jedna kwestia na linię, bez odstępów między kwestiami,
+  bez czasów i kluczy; pusty wiersz tylko między scenami. Trzy pliki:
+  `01_sceny.md`, `02_cutsceny.md`, `03_reszta.md`.
+- **Mówca z danych, nie z etykiety rekwizytu:** `sceny.o` to
+  `[nazwa_zh, typ, id_osoby, klucz]`, ale klucz bywa nazwą skrzyni (`三品宝箱`),
+  więc imię bierzemy z `postacie[id].n` (polskie, inaczej angielskie); klucz
+  z obsady tylko wtedy, gdy jego chiński tekst zgadza się z nazwą w obsadzie.
+  Postać gracza `你` pokazujemy jako `Ty`.
+- **Reszta bez dublowania:** wiersz tekstu to `w = (tabela, wiersz[, klucz_nazwy])`;
+  trzeci element wskazuje nazwę własną, więc nie zgadujemy, co jest nazwą, a co
+  opisem. Wpisy tego samego przedmiotu scalane są w jedną linię.
+- **Liczby:** 8 908 scen, 92 216 kwestii z polskim, 263 076 kwestii bez przekładu
+  pominięto (pełny szkielet dostępny przez `--zakres wszystko`). Paczka
+  `WWM_Czytanka_PL_2026-11-14.zip`, `1 523 414 B`, id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
+  Poprzednie trzy paczki czytanek przeniesione do kosza Dysku.
+- **Testy:** `439` (doszło `9` w `TestCzytankaDoCzytania`).
