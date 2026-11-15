@@ -127,3 +127,17 @@ ustaloną z Twojego spisu i pilnować tylko porządku wewnątrz jednostek.
   shardach (podział po pierwszym znaku klucza, jak reszta indeksu). Pola:
   `k` (klucz tekstu), `z` (`dialog`/`napis`/`napis_grey`/`film`), `d` (dialog),
   `i` (id w puli), `t` (czas), `o` (kolejność), `s` (`source_id`).
+
+## Prolog złożony z klucza — `zwrotki/prolog_wg_klucza.md`
+
+`tools/prolog_z_klucza.py` składa transkrypt gracza z kluczem technicznym:
+
+- sceny idą w kolejności transkryptu (szkielet, póki nie ma skryptu zadania),
+- wewnątrz sceny linie sortuje już **klucz z danych** — dialogi po numerze
+  i czasie, napisy po `id`, więc kolejność wewnętrzna nie zależy od pamięci,
+- gdy ten sam tekst jest w kilku wariantach, wybierany jest **najwcześniejszy
+  w danych** (wariant główny), a pozostałe odgałęzienia trafiają do aneksu.
+
+Wynik dla prologu: 21 linii ucieczki to `dialog 10167`–`10187` w numeracji
+rosnącej, a scenka otwierająca to napisy `590336`–`590351` (z dwiema liniami
+z warstwy `_grey`). Aneks pokazuje warianty `590352`–`590360` i `591485`–`591494`.

@@ -70,5 +70,22 @@ class TestZbieranieKluczy(unittest.TestCase):
         self.assertEqual(zebrane[0]["formatted_text"], "追上去，不能让他带走镇冠珏！")
 
 
+class TestWyborWariantu(unittest.TestCase):
+    def test_wybiera_najwczesniejszy_wariant(self):
+        from tools import prolog_z_klucza as pzk
+
+        po_pl = {"idz": ["aaa", "bbb"]}
+        porzadek = {
+            "aaa": [{"k": "aaa", "z": "napis", "i": 590352, "d": None, "t": None}],
+            "bbb": [{"k": "bbb", "z": "napis", "i": 590337, "d": None, "t": None}],
+        }
+        self.assertEqual(pzk._dopasuj("Idz", po_pl, {}, porzadek), "bbb")
+
+    def test_tekst_poza_danymi_daje_none(self):
+        from tools import prolog_z_klucza as pzk
+
+        self.assertIsNone(pzk._dopasuj("zupełnie inny tekst", {}, {}, {}))
+
+
 if __name__ == "__main__":
     unittest.main()
