@@ -124,6 +124,7 @@ def _glosariusz(index: str = "index") -> dict[str, str]:
     return _GLOSARIUSZ
 
 
+_NAZWY_ENCJI: tuple | None = None
 _NAZWY_ZH: tuple | None = None
 _NAZWY_EN: tuple | None = None
 
@@ -188,6 +189,26 @@ def _nazwy_en(ix) -> dict[str, str]:
     return _NAZWY_EN[1]
 
 
+def _nazwy_encji(ix) -> dict[int, str]:
+    """Numer bytu → angielska nazwa z tabliczki (`spaces.*.entity.N.name`).
+
+    Część obsady scen ma w danych tylko chińską etykietę roboczą, ale byt bywa
+    opisany nazwą w tabeli przestrzeni — wtedy bierzemy ją zamiast transliteracji.
+    """
+    global _NAZWY_ENCJI
+    if _NAZWY_ENCJI is None or _NAZWY_ENCJI[0] is not ix:
+        mapa: dict[int, str] = {}
+        for tekst in ix.teksty.values():
+            zrodlo = ix.zrodlo(tekst)
+            if not zrodlo or not zrodlo[0].startswith("spaces.") or zrodlo[1] != "name":
+                continue
+            trafienie = re.search(r"#(\d+)$", zrodlo[2] or "")
+            if trafienie and tekst.en:
+                mapa[int(trafienie[1])] = tekst.en
+        _NAZWY_ENCJI = (ix, mapa)
+    return _NAZWY_ENCJI[1]
+
+
 def _nazwy_zh(ix) -> dict[str, str]:
     """Chińskie imię → klucz nazwy, żeby mówca nie zostawał po chińsku, gdy gra ma nazwę obcą."""
     global _NAZWY_ZH
@@ -206,6 +227,12 @@ def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
     return _czysty(tekst.en or tekst.zrodlo) if tekst is not None else ""
 
 
+def _cokolwiek_lacinskie(nazwa: str) -> str:
+    """Imię z danych: łacinka zostaje, chińska nazwa bez przekładu idzie w transliterację."""
+    nazwa = _przyciete(nazwa)
+    return pinyin_slownik.romanizuj(nazwa) if re.search(r"[\u3400-\u9fff]", nazwa) else nazwa
+
+
 def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     """Imię mówcy: polskie, a gdy brak przekładu — angielskie z danych gry."""
     nazwa_zh = _czysty(str(osoba[0] or ""))
@@ -220,7 +247,7 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     if wiersz and wiersz.get("n"):
         nazwa = _nazwa_klucza(ix, wiersz["n"], pl)
         if nazwa:
-            return _przyciete(nazwa)
+            return _cokolwiek_lacinskie(nazwa)
     klucz = osoba[3] if len(osoba) > 3 else None
     tekst = ix.teksty.get(klucz) if klucz else None
     if tekst is not None and tekst.zrodlo == nazwa_zh:
@@ -234,6 +261,10 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
         nazwa = _nazwa_klucza(ix, klucz_zh, pl)
         if nazwa and nazwa != nazwa_zh and _dobre_imie(nazwa):
             return _imie_do_etykiety(nazwa)
+    if isinstance(osoba_id, int):
+        en = _nazwy_encji(ix).get(osoba_id, "")
+        if en and _dobre_imie(en):
+            return _imie_do_etykiety(en)
     if nazwa_zh.isdigit():
         return ""                    # samo id postaci to nie mówca
     if any("\u3400" <= z <= "\u9fff" for z in nazwa_zh):

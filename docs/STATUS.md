@@ -174,10 +174,11 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`6 774 996 B`,
-   SHA-256 `a3d003782182f7fa70a979222fcf729c71a92717012a32cf355b69e6617b2741`),
-   Dysk Google id `1sY2RUG1_8ohmYQf3MMPJC2lFnC0m7ZYo` (poprzednia wersja
-   `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA` w koszu). Opis formatu:
+   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`6 775 019 B`,
+   SHA-256 `643de95347cf25bba48bea8227606625dee80eed3fe397e11b8c913ccf90f937`),
+   Dysk Google id `1AMHsNtHROZcxIfSiubHR67yGcBKb8UfG` (poprzednie wersje
+   `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA` i `1sY2RUG1_8ohmYQf3MMPJC2lFnC0m7ZYo`
+   w koszu). Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
    **Stan po decyzjach właściciela z 2026-11-15:** (a) do pliku 02 wchodzą tylko
    hasła, które gra naprawdę opisuje — 8 891 jednostek ma kontekst, 65 351
@@ -188,7 +189,13 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    (c) 4 713 chińskich etykiet mówców przeszło na łacinkę (`大祭师` → `Da Ji Shi`)
    przez tabelę `index/pinyin_znakow.json` (3 156 znaków, `tools/pinyin_slownik.py`),
    więc w czytance nie ma już ani jednej chińskiej etykiety mówcy ani samego
-   numeru postaci. 466 testów zielonych.
+   numeru postaci. **Sprawdzone, dlaczego transliteracja jest w ogóle potrzebna:**
+   w danych gry 59 884 wpisy obsady mają klucz nazwy i wszystkie mają angielską
+   wersję (0 braków), ale 53 184 wpisy mają tylko chińską etykietę roboczą —
+   tabliczkę z nazwą ma zaledwie 32% bytów, więc dla 4 713 etykiet (5% kwestii)
+   gra nie ma angielskiego tekstu do pokazania. Doszła też ścieżka
+   „byt → `spaces.*.entity.N.name`”, która odzyskuje z danych 66 angielskich
+   nazw. 466 testów zielonych.
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.

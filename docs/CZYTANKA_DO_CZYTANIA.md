@@ -71,7 +71,16 @@ Zasady:
   w `index/pinyin_znakow.json` (3 156 znaków), więc przebudowa nie potrzebuje
   żadnej biblioteki; odświeża ją `python3 tools/pinyin_slownik.py --pisz
   index/pinyin_znakow.json`. To transliteracja, nie przekład — gra nie daje dla
-  tych etykiet nazwy obcej,
+  tych etykiet nazwy obcej. Skąd to się bierze (sprawdzone w `index/`):
+  w danych gry obsada scen ma **59 884** wpisy z kluczem nazwy i **wszystkie**
+  mają angielską wersję (brakuje 0), a **53 184** wpisy mają tylko chińską
+  etykietę roboczą (`大祭师`, `卫兵1`), bo tabliczkę z nazwą (`entity_init_data`)
+  ma w wyciągu zaledwie **32%** bytów. Przykład: scena `12000946` (束罪) ma
+  piętnaście linii po angielsku, a mówca stoi tam jako `['大祭师', 3, 1633540005]`
+  — bez klucza nazwy i bez tabliczki, więc gra nie ma czego przetłumaczyć.
+  Po dodaniu ścieżki „byt → `spaces.*.entity.N.name`” część tych imion wraca
+  z danych po angielsku (66 bytów); reszta, 4 713 etykiet i 5% kwestii, to
+  transliteracja,
 - **samo id to nie mówca:** etykiety typu `600001`/`1632390111` nie trafiają do
   czytanki, kwestia zostaje jako goły tekst,
 - **postać gracza to zawsze `Youxia`** — także gdy gra zapisze ją jako `player`,
@@ -123,8 +132,8 @@ Zasady pliku 02 (kontekst):
   encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
   to opisy bez nazwy, więc idą gołym tekstem,
 - 61 905 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (6 774 996 B,
-  SHA-256 `a3d003782182f7fa70a979222fcf729c71a92717012a32cf355b69e6617b2741`).
+- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (6 775 019 B,
+  SHA-256 `643de95347cf25bba48bea8227606625dee80eed3fe397e11b8c913ccf90f937`).
 
 ## Uruchomienie
 
