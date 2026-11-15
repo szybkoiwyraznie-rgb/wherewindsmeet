@@ -1219,3 +1219,30 @@ cudzego kodu ani nie wymagają tej procedury.
   to nie jest sam prolog, a łańcuch o zbieraniu nauk dla 奇物监) oraz `528`
   wierszy szarej warstwy poza zakresem cutscen. Nie wiadomo, czy klient rysuje
   napisy z warstwy głównej czy szarej — tłumaczone są obie.
+
+### 2026-11-14 — Czytanka w kolejności z gry (`tools/buduj_czytanke_gry.py`)
+
+- **Cel:** cała narracja w kolejności występowania w grze, prolog pierwszy, potem
+  krainy po kolei, a w krainie sceny po numerze dialogu. Bez szukania jednego
+  silnikowego porządku cutscen — właściciel potwierdził, że pojedyncza cutscena
+  i tak siedzi w sobie w poprawnej kolejności, więc wystarczy dobrze umieścić sceny.
+- **Kolejność krain z danych:** `tools/prowincje.py` czyta zadania (`przestrzen`,
+  `pian`) i grupuje mapy po nazwie roboczej. Wynik: `92` krainy, `285` map,
+  początek `燕南 → 清河 → 熔炉 → 河西`. Plik `index/prowincje.json`.
+- **Projekty bez mapy:** scena bez `m` dziedziczy krainę po projekcie `对话-*`
+  (najczęstsza mapa projektu) — `34 183` scen trafiło do krain; `13 589` scen
+  w `129` projektach bez żadnej mapy zostało w `95_bez_mapy.md` (nic nie znika,
+  nic nie jest zgadywane).
+- **Prolog a krainy:** `prolog_z_klucza.zasieg()` zwraca klucze prologu i numery
+  scen, których co najmniej `80%` linii pada w transkrypcie — `36` scen nie jest
+  powtarzanych w krainach. Przy okazji przejście po transkrypcie (`_przejscie`)
+  jest wspólne dla `zbuduj()` i `zasieg()`; `zwrotki/prolog_wg_klucza.md` po
+  refaktorze ma identyczny SHA (`c5d42ec2…`).
+- **Wynik:** `72 977` scen, `291 426` linii (w tym `28 356` z polskim), `167`
+  plików, `105 135` wierszy puli napisów, `3` filmy. Wariant tylko z polskim:
+  `8 872` scen. Paczki: `dist/WWM_Czytanka_Gry_2026-11-14.zip` (`17 057 192 B`)
+  i `dist/WWM_Czytanka_Gry_tylko_PL_2026-11-14.zip` (`2 494 764 B`).
+- **Poza narracją** zostaje `66 997` przetłumaczonych kluczy (nazwy przedmiotów,
+  umiejętności, cele zadań, UI) — to nie sceny, więc czytanka ich nie udaje.
+- **Testy:** `426` (cały zestaw zielony; `+17` w `tests/test_czytanka_gry.py`).
+- **Nie testowano w grze:** to porządek z danych, nie z przejścia gry.

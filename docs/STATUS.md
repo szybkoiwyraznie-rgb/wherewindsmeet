@@ -160,6 +160,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
+0. **Czytanka w kolejności z gry jest gotowa do przejrzenia.** `tools/buduj_czytanke_gry.py`
+   buduje ją z `index/prowincje.json`: prolog → krainy w kolejności odwiedzania
+   (`燕南 → 清河 → 熔炉 → 河西 → …`) → sceny po numerze dialogu. Opis i granice:
+   [CZYTANKA_KOLEJNOSC_GRY.md](CZYTANKA_KOLEJNOSC_GRY.md). Właściciel czyta
+   i zgłasza punkty, w których gra pokazuje treść inaczej — poprawiamy je punktowo
+   (np. powrót na zwiedzoną mapę), nie przez przestawianie całości.
 1. **Uruchomić w grze gotową łatkę `v0.3.0` i sprawdzić prolog.** Wysłana na
    Dysk Google `WWM_Spolszczenie_PL_v0.3.0.zip` (`4 506 590 B`, SHA-256
    `2ba67551…13016`, `76 595` przekładów, kopia w `paczki/`) zawiera napisy

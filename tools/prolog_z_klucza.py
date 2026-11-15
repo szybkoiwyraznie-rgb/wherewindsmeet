@@ -91,6 +91,88 @@ def _klucz_tekstu(w: dict) -> str:
     return f"napis {w['i']} ({w['z']})"
 
 
+def _przejscie(linie: list[str]):
+    """Zamienia transkrypt na strumień (rodzaj, tekst).
+
+    `("#", tytuł)` to nagłówek sekcji, `("t", kwestia)` to linia do
+    dopasowania w danych gry. Sklejanie zawiniętych linii dzieje się tutaj,
+    żeby `zbuduj()` i `klucze()` czytały transkrypt identycznie.
+    """
+    poprzedni = ""
+    for l in linie:
+        l = l.rstrip()
+        if not l.strip():
+            continue
+        if l.startswith("#"):
+            poprzedni = l
+            yield "#", l[1:].strip()
+            continue
+        if (poprzedni.startswith("*") and not l.startswith(("*", "#"))
+                and not poprzedni.rstrip().endswith((".", "!", "?", "…", '"', ")"))):
+            poprzedni = poprzedni + " " + l.strip()
+            continue
+        poprzedni = l
+        yield "t", (l[1:].strip() if l.startswith("*") else l.strip())
+
+
+def klucze(index: str = "index", magazyn: str = "tlumaczenie") -> set[str]:
+    """Klucze tekstów, które wchodzą do prologu (do pominięcia w Czytance)."""
+    _ix, po_pl, po_en = _mapy(index, magazyn)
+    porzadek: dict[str, list[dict]] = {}
+    for w in kolejnosc_gry.wczytaj(Path(index)):
+        porzadek.setdefault(w["k"], []).append(w)
+    linie = Path(TRANSKRYPT).read_text(encoding="utf-8-sig").splitlines()
+    wynik: set[str] = set()
+    for rodzaj, tekst in _przejscie(linie):
+        if rodzaj != "t":
+            continue
+        k = _dopasuj(tekst, po_pl, po_en, porzadek)
+        if k:
+            wynik.add(k)
+    return wynik
+
+
+PROG_WYCZERPANIA = 0.8
+
+
+def zasieg(index: str = "index", magazyn: str = "tlumaczenie") -> tuple[set[str], set[int]]:
+    """Co prolog wyczerpuje: klucze i numery scen.
+
+    Pierwszy element to najlepsze trafienia transkryptu (jedno na linię),
+    drugi — numery dialogów, których co najmniej `PROG_WYCZERPANIA` linii
+    pada w transkrypcie; takie sceny są już w prologu i nie powtarzamy ich
+    w części „krainy”.
+    """
+    klucze_prologu = klucze(index, magazyn)
+    _ix, po_pl, po_en = _mapy(index, magazyn)
+    indeks = indeks_mod.wczytaj(index, teksty=False, sceny=True)
+    porzadek: dict[str, list[dict]] = {}
+    for w in kolejnosc_gry.wczytaj(Path(index)):
+        porzadek.setdefault(w["k"], []).append(w)
+
+    kandydaci: set[str] = set()
+    linie = Path(TRANSKRYPT).read_text(encoding="utf-8-sig").splitlines()
+    for rodzaj, tekst in _przejscie(linie):
+        if rodzaj == "t":
+            kandydaci.update(_kandydaci(tekst, po_pl, po_en))
+
+    # Scenę znajdujemy dwiema drogami: przez timeline (`dialog N` w porządku gry)
+    # i wprost po kluczach jej linii — prolog cytuje też wiersze puli napisów,
+    # których żaden wiersz timeline nie wskazuje na dialog.
+    sceny = {int(w["d"]) for k in kandydaci for w in porzadek.get(k, [])
+             if w["z"] == "dialog" and w["d"]}
+    for numer, scena in indeks.sceny.items():
+        if any(e[0] == "k" and e[2] in kandydaci for e in scena.get("e") or []):
+            sceny.add(numer)
+    wyczerpane = set()
+    for numer in sceny:
+        scena = indeks.sceny.get(numer) or {}
+        linie_sceny = [e[2] for e in scena.get("e") or [] if e[0] == "k"]
+        if linie_sceny and sum(k in kandydaci for k in linie_sceny) / len(linie_sceny) >= PROG_WYCZERPANIA:
+            wyczerpane.add(numer)
+    return klucze_prologu, wyczerpane
+
+
 def zbuduj(index: str = "index", magazyn: str = "tlumaczenie") -> str:
     ix, po_pl, po_en = _mapy(index, magazyn)
     porzadek: dict[str, list[dict]] = {}
@@ -160,27 +242,16 @@ def zbuduj(index: str = "index", magazyn: str = "tlumaczenie") -> str:
         out.append("")
         scena.clear()
 
-    poprzedni = ""
-    for l in linie:
-        l = l.rstrip()
-        if not l.strip():
-            continue
-        if l.startswith("#"):
+    for rodzaj, tekst in _przejscie(linie):
+        if rodzaj == "#":
             zamknij()
-            out += [f"## {l[1:].strip()}", ""]
-            poprzedni = l
+            out += [f"## {tekst}", ""]
             continue
-        if (poprzedni.startswith("*") and not l.startswith(("*", "#"))
-                and not poprzedni.rstrip().endswith((".", "!", "?", "…", '"', ")"))):
-            poprzedni = poprzedni + " " + l.strip()
-            continue
-        tekst = l[1:].strip() if l.startswith("*") else l.strip()
         klucz = _dopasuj(tekst, po_pl, po_en, porzadek)
         if klucz is None:
             scena.append(("_(poza danymi)_", "—", tekst, "—", None, "?"))
         else:
             scena.append(opis(klucz))
-        poprzedni = l
     zamknij()
 
     # Aneks: warianty tej samej scenki otwierającej. W toku jest wariant
