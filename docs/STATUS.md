@@ -168,9 +168,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    jest już liczona przy każdym budowaniu: leży w `index/chronologia.jsonl`
    (75 704 jednostki, 4,1 MB), generowana przez `tools/chronologia.py`
    i pilnowana testem `tests/test_chronologia.py`. Liczby: 8 910 scen,
-   1 597 cutscen, 26 941 kwestii z polskim. Paczka:
-   `WWM_Czytanka_PL_2026-11-15.zip` (`1 539 026 B`), Dysk Google id
-   `1W4r42YGl4wNxseGL262sHecj5mthlxr3`. Opis formatu:
+   1 597 cutscen, 26 941 kwestii z polskim; kontekst w pliku 02 obejmuje
+   9 477 z 10 512 jednostek (28 176 pozycji: mówiący, postacie, frakcje,
+   miejsca, przedmioty, sztuki walki — pełna karta raz, potem samo imię).
+   Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`2 168 050 B`). Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były

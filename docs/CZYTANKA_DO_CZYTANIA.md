@@ -8,7 +8,7 @@ uruchomieniu.
 | plik | zawartość | wiersze |
 |---|---|---|
 | `01_sceny_i_cutsceny.md` | filmy, prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze | 48 043 |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki | 480 |
+| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: kto mówi, postacie z encyklopedii, frakcje, miejsca, przedmioty, sztuki walki | 29 892 |
 | `03_reszta.md` | wszystko, czego nie ma w 01 ani w 02, pogrupowane według rodzaju danych | 62 012 |
 
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
@@ -75,8 +75,12 @@ Zasady:
 - mówcy: imię polskie lub angielskie z danych gry, postać gracza jako `Ty`,
   3 561 kwestii ma tylko imię chińskie (gra nie daje dla nich nazwy obcej),
 - 3 filmy, 4 sekcje prologu, 38 sekcji krain,
-- 111 jednostek ma kontekst w pliku 02, 65 331 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (1 539 026 B).
+- 9 477 z 10 512 jednostek ma kontekst w pliku 02; 28 176 pozycji kontekstu
+  (574 hasła z pełną kartą, reszta to powtórzenia samego imienia),
+- karty bez polskiego przekładu są oznaczone `*(EN)*`: biogramy encyklopedii
+  w magazynie są na razie po angielsku (54 karty polskie, 520 angielskich),
+- 64 112 pozycji w pliku 03,
+- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (2 168 050 B).
 
 ## Uruchomienie
 
@@ -87,6 +91,18 @@ python3 tools/czytanka_czysta.py --wyj out/czytanka \
 
 Wszystko, co potrzebne, jest w gicie: `index/`, `tlumaczenie/` i transkrypt
 prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
+
+## Jak powstaje kontekst (02)
+
+Dla każdej jednostki z pliku 01 zbierane jest to samo, co widać w scenie:
+
+- **kto mówi** — obsada sceny z `index/sceny_*.jsonl`; imię z tabeli postaci,
+  a gdy postaci nie ma w tabeli, imię z obsady; biogram z encyklopedii, jeśli jest,
+- **hasła z tekstu** — nazwy z tabel kontekstowych (`world_view_person_info`,
+  `school`, `equip_items`, `kongfu`, `task_*`, `manual_items`…), dopasowane
+  automatem Aho-Corasick po tekście chińskim, z filtrem nazw pospolitych,
+- **pełna karta przy pierwszym wystąpieniu**, przy kolejnych samo imię albo nazwa —
+  dzięki temu widać, kto i co wraca w danej scenie, bez powtarzania biogramów.
 
 ## Czym to się różni od zestawu technicznego
 

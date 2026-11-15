@@ -146,6 +146,7 @@ class Jednostka:
     sekcja: str                      # np. „# 燕南”
     linie: list[tuple[str, str]] = field(default_factory=list)   # (mówca, klucz)
     przestrzenie: set[int] = field(default_factory=set)
+    osoby: list[tuple[str, str]] = field(default_factory=list)    # (id postaci, imię z obsady)
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -232,9 +233,21 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     continue
                 mowca = _mowca_w_scenie(scena, element[1] if len(element) > 1 else None, ix, pl)
                 linie.append((mowca, element[2]))
+            osoby: list[tuple[str, str]] = []
+            widziani: set[tuple[str, str]] = set()
+            for osoba in scena.get("o") or []:
+                if not osoba:
+                    continue
+                pid = str(osoba[2]) if len(osoba) > 2 and isinstance(osoba[2], int) else ""
+                imie = _czysty(str(osoba[0] or ""))
+                if not pid and not imie:
+                    continue
+                if (pid, imie) not in widziani:
+                    widziani.add((pid, imie))
+                    osoby.append((pid, imie))
             jednostki.append(Jednostka(
                 "scena", f"Scena {numer}", sekcja(wiersz["s"]), linie,
-                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}))
+                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             linie = [(_mowca_klucza(k, ix, pl, porzadek, mowcy_napisow)[0], k)
@@ -248,9 +261,10 @@ def _linia(mowca: str, tekst: str) -> str:
 
 
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
-               statystyka: dict) -> tuple[list[str], set[str]]:
+               statystyka: dict) -> tuple[list[str], set[str], set[str]]:
     out: list[str] = []
     uzyte: set[str] = set()
+    zrobione: set[str] = set()
     ostatnia_sekcja = None
     for jednostka in jednostki:
         linie = []
@@ -274,62 +288,162 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         out.append(f"## {jednostka.etykieta}")
         out.extend(linie)
         out.append("")
-    return out, uzyte
+        zrobione.add(jednostka.etykieta)
+    return out, uzyte, zrobione
 
 
-def _karta(baza, pl, tabela: str, rid: str) -> tuple[str, str]:
+def _tekst(ix, pl: dict[str, str], klucz: str | None) -> tuple[str, bool]:
+    """(tekst, czy_polski) — polski z magazynu, a gdy brak, angielski z danych gry."""
+    if not klucz:
+        return "", True
+    if klucz in pl:
+        return pl[klucz], True
+    tekst = ix.teksty.get(klucz)
+    if tekst is None:
+        return "", True
+    return _czysty(tekst.en or tekst.zrodlo or ""), False
+
+
+def _karta_encyklopedii(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
+    row = ix.encyklopedia.get(int(pid)) if str(pid).isdigit() else None
+    if not row:
+        return "", "", True
+    nazwa, _ = _tekst(ix, pl, row.get("nazwa"))
+    if not nazwa:
+        nazwa, _ = _tekst(ix, pl, row.get("inna_nazwa"))
+    opis, opis_pl = "", True
+    for para in row.get("historie") or []:
+        for klucz in para[1:2] or para[:1]:
+            tekst, jest_pl = _tekst(ix, pl, klucz)
+            if len(tekst) > len(opis):
+                opis, opis_pl = tekst, jest_pl
+    return nazwa, opis, opis_pl
+
+
+def _karta_osoby(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
+    """Postać mówiąca: imię z danych gry i biogram z encyklopedii, jeśli jest."""
+    row = ix.postacie.get(int(pid)) if str(pid).isdigit() else None
+    if not row:
+        return "", "", True
+    nazwa, _ = _tekst(ix, pl, row.get("n"))
+    wpis = baza.encyklopedia_po_kluczu.get(row.get("n")) or {}
+    opis, opis_pl = "", True
+    for para in wpis.get("historie") or []:
+        for klucz in para[1:2] or para[:1]:
+            tekst, jest_pl = _tekst(ix, pl, klucz)
+            if len(tekst) > len(opis):
+                opis, opis_pl = tekst, jest_pl
+    return nazwa, opis, opis_pl
+
+
+def _karta_nazwy(ix, pl, nazwa: str, encje: dict) -> tuple[str, str, bool]:
+    """Postać znana tylko z imienia w obsadzie: imię plus biogram, jeśli jest."""
+    wpis = encje.get(nazwa) or {}
+    opis, opis_pl = "", True
+    for para in wpis.get("historie") or []:
+        for klucz in para[1:2] or para[:1]:
+            tekst, jest_pl = _tekst(ix, pl, klucz)
+            if len(tekst) > len(opis):
+                opis, opis_pl = tekst, jest_pl
+    return nazwa, opis, opis_pl
+
+
+def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, str, bool]:
+    """Karta hasła: nazwa, opis i informacja, czy opis jest po polsku."""
+    if tabela == "encyklopedia":
+        return _karta_encyklopedii(baza, ix, pl, rid)
+    if tabela == "osoba":
+        return _karta_osoby(baza, ix, pl, rid)
     kolumny = (baza.tabele.get(tabela) or {}).get(rid) or {}
-    nazwa = ""
-    opis = ""
+    nazwa, opis, opis_pl = "", "", True
     for kolumna, klucze in kolumny.items():
         for klucz in klucze:
-            tekst = pl.get(klucz)
+            tekst, jest_pl = _tekst(ix, pl, klucz)
             if not tekst:
                 continue
             if not nazwa and _NAZWA.search(kolumna):
                 nazwa = tekst
             elif len(tekst) > len(opis) and (_OPIS.search(kolumna) or not _NAZWA.search(kolumna)):
-                opis = tekst
-    if not nazwa and not opis:
-        return "", ""
+                opis, opis_pl = tekst, jest_pl
+    if not nazwa and opis:
+        nazwa, opis = opis, ""
     if nazwa and opis and (opis in nazwa or nazwa in opis):
         opis = ""
-    return nazwa, opis
+    return nazwa, opis, opis_pl
 
 
-def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza) -> tuple[list[str], set[str], int]:
+def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
+                    zrobione: set[str] | None = None) -> tuple[list[str], set[str], int]:
+    """Kontekst do każdej jednostki w kolejności z pliku 01.
+
+    Hasło dostaje pełną kartę przy pierwszym wystąpieniu, a przy kolejnych —
+    samo imię lub nazwę, żeby dało się prześledzić, kto i co wraca w scenie.
+    Kolejność w obrębie jednostki: najpierw mówiący, potem hasła z tekstu.
+    """
     teksty = {}
     for numer, jednostka in enumerate(jednostki):
         if not jednostka.linie:
             continue
         zrodla = [ix.zh(klucz) for _m, klucz in jednostka.linie]
         teksty[f"u{numer}"] = ("\n".join(z for z in zrodla if z), jednostka.przestrzenie)
-    wzmianki = powiazania_czytanek.skanuj_wzmianki_we_scenach(baza, teksty) \
-        if hasattr(powiazania_czytanek, "skanuj_wzmianki_we_scenach") \
-        else powiazania_czytanek.skanuj_wzmianki_w_scenach(baza, teksty)
+    wzmianki = powiazania_czytanek.skanuj_wzmianki_w_scenach(baza, teksty)
+    encje_po_zh: dict[str, dict] = {}
+    for wiersz in ix.encyklopedia.values():
+        for pole in ("nazwa", "inna_nazwa"):
+            zh = ix.zh(wiersz.get(pole))
+            if zh:
+                encje_po_zh.setdefault(zh, wiersz)
 
     out: list[str] = []
-    widziane: dict[tuple[str, str], str] = {}
+    widziane: dict[tuple[str, str], bool] = {}
     uzyte: set[str] = set()
     ostatnia_sekcja = None
     ktory = 0
     for numer, jednostka in enumerate(jednostki):
         if not jednostka.linie:
             continue
-        karty: list[str] = []
+        if zrobione is not None and jednostka.etykieta not in zrobione:
+            continue
+        hasla: list[tuple[str, str]] = [
+            ("osoba", pid) if pid and pid.isdigit() and int(pid) in ix.postacie else ("nazwa", imie or pid)
+            for pid, imie in jednostka.osoby]
         for tabela, ridy in (wzmianki.get(f"u{numer}") or {}).items():
-            for rid in ridy:
-                para = (tabela, rid)
-                if para in widziane:
-                    continue
-                nazwa, opis = _karta(baza, pl, tabela, rid)
-                if not nazwa and not opis:
-                    continue
-                widziane[para] = jednostka.etykieta
-                kolumny = (baza.tabele.get(tabela) or {}).get(rid) or {}
+            hasla.extend((tabela, rid) for rid in ridy)
+        karty: list[str] = []
+        for para in hasla:
+            if para[0] == "nazwa":
+                nazwa, opis, opis_pl = _karta_nazwy(ix, pl, para[1], encje_po_zh)
+            else:
+                nazwa, opis, opis_pl = _karta(baza, ix, pl, *para)
+            if not nazwa and not opis:
+                continue
+            if para in widziane:
+                if nazwa:
+                    karty.append(f"- **{nazwa}**")
+                continue
+            widziane[para] = True
+            if para[0] == "nazwa":
+                uzyte.update(k for k in (encje_po_zh.get(para[1]) or {}).get("historie", []) for k in k)
+            elif para[0] == "osoba":
+                wiersz = ix.postacie.get(int(para[1])) or {}
+                if wiersz.get("n"):
+                    uzyte.add(wiersz["n"])
+                wpis = baza.encyklopedia_po_kluczu.get(wiersz.get("n")) or {}
+                for klucz in (wpis.get("nazwa"), wpis.get("inna_nazwa")):
+                    if klucz:
+                        uzyte.add(klucz)
+                for grupa in wpis.get("historie") or []:
+                    uzyte.update(k for k in grupa if k)
+            else:
+                kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
                 uzyte.update(k for klucze in kolumny.values() for k in klucze)
-                karty.append(f"- **{nazwa}:** {opis}" if nazwa and opis
-                             else (f"- **{nazwa}**" if nazwa else f"- {opis}"))
+            if nazwa and opis:
+                znacznik = "" if opis_pl else " *(EN)*"
+                karty.append(f"- **{nazwa}:** {opis}{znacznik}")
+            elif nazwa:
+                karty.append(f"- **{nazwa}**")
+            else:
+                karty.append(f"- {opis}")
         if not karty:
             continue
         ktory += 1
@@ -393,7 +507,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
                   "kontekst": 0}
 
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
-    tresc, uzyte = _plik_scen(jednostki, pl, zakres, statystyka)
+    tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",
                   "Filmy otwierające, prolog w kolejności z gry, potem krainy po kolei: "
@@ -402,7 +516,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka["plikow"] += 1
 
     baza = powiazania_czytanek.zbuduj_baze(ix)
-    tresc_kontekstu, uzyte_kontekstu, ktore = _plik_kontekstu(ix, jednostki, pl, baza)
+    tresc_kontekstu, uzyte_kontekstu, ktore = _plik_kontekstu(ix, jednostki, pl, baza, zrobione)
     statystyka["kontekst"] = ktore
     (wyj / "02_kontekst_scen_i_cutscen.md").write_text(
         _naglowek("Kontekst scen i cutscen",
@@ -433,7 +547,7 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | plik | zawartość |
 |---|---|
 | `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: filmy, prolog, krainy po kolei, pozostałe napisy |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki |
+| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię |
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
 
 Kwestie w 01: `- **Mówca:** tekst`, jedna kwestia na linię, bez czasów i tabel.
@@ -442,6 +556,9 @@ Zakres: **{zakres}**.
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto.
+
+Karty kontekstu bez polskiego przekładu są oznaczone `*(EN)*` — tekst jest wtedy
+angielski z danych gry, żeby hasło nie zniknęło z czytanki.
 """
 
 
