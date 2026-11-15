@@ -141,3 +141,31 @@ ustaloną z Twojego spisu i pilnować tylko porządku wewnątrz jednostek.
 Wynik dla prologu: 21 linii ucieczki to `dialog 10167`–`10187` w numeracji
 rosnącej, a scenka otwierająca to napisy `590336`–`590351` (z dwiema liniami
 z warstwy `_grey`). Aneks pokazuje warianty `590352`–`590360` i `591485`–`591494`.
+
+## Gdzie w instalacji gry leży sekwencja przerywników (ustalenia z 2026-11-15)
+
+Spis plików instalacji (`spis.txt`, 1 533 pozycje) pokazał, że **nie ma katalogu
+`client\`** — skrypty dialogów (`.ets`/`.etsb`) i asset'y przerywników siedzą
+w 489 paczkach `Resources*.mpk` (razem ok. 200 GB), indeksowanych przez
+`Resources.mpkinfo`. Katalogi `LocalData\FP_Film\*` są puste (cache filmów
+gracza), a 58 plików `.pak` należy do Chromium z overlaya Steama.
+
+Format `*.mpkinfo` (odczytany z `Resources.mpkinfo`, `LT1`, `Patch3109/3110`):
+
+```
+nagłówek: uint32 wersja (=3), uint32 liczba_wpisów
+wpis (20 B): uint64 hash | uint32 offset | uint32 rozmiar | uint32 paczka
+ogon: 16 B
+```
+
+- `Resources.mpkinfo`: 2 650 162 wpisy, 53 003 264 B, sumaryczny rozmiar
+  zasobów ~200 GB, paczka o numerze 0–314 (próbka).
+- `Patch3110.mpkinfo`: 26 wpisów, paczka `6220` — paczki patchy mają osobny
+  zakres numerów.
+
+Ważne: mpkinfo **nie zawiera nazw plików, tylko hashe** — sprawdzone także
+pod kątem `client/dialogs`, `.ets`, `qiancen` (zero trafień). Dopasowanie
+ścieżki do wpisu wymaga funkcji skrótu silnika; testy FNV-1/1a, CRC64, xxHash,
+MurmurHash64A i skrótów MD5/SHA na znanych ścieżkach z bazy (`client/dialogs/…`)
+nie dały trafienia. Do ustalenia skrótu potrzebna jest para „ścieżka → hash”,
+a tę powinien mieć `LocalData\Patch\Patch.mpkdb` (SQLite z listą plików patchy).
