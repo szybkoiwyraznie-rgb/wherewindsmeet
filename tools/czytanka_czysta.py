@@ -34,6 +34,7 @@ from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
 from tools import kolejnosc_gry, powiazania_czytanek  # noqa: E402
 
+DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
 BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
@@ -150,6 +151,32 @@ def _imie_do_etykiety(nazwa: str) -> str:
     """Nazwa mówcy do wyświetlenia: bez ogona interpunkcji, z wielkiej litery."""
     nazwa = _przyciete(nazwa).strip(" .。,，:：;；")
     return nazwa[:1].upper() + nazwa[1:] if nazwa else nazwa
+
+
+_ZH = re.compile(r"[\u3400-\u9fff]")
+
+
+def _etykieta_hasla(ix, nazwa: str) -> str:
+    """Nazwa hasła do pokazania w kontekście (albo pustka, gdy hasło nic nie wnosi).
+
+    Z danych wpadają śmieci: gracz zapisany jako `玩家`/`0`, techniczne
+    „Entity轨道组”, chińskie role („中年男人”). Gracz nie dostaje karty,
+    techniczne śmieci też nie, a chińskie role idą przez słownik nazw mówców.
+    """
+    nazwa = (nazwa or "").strip()
+    if not nazwa or _GRACZ_LAT.match(nazwa) or nazwa.lower() in GRACZ:
+        return ""
+    if nazwa in TECHNICZNE or nazwa.lower() in {t.lower() for t in TECHNICZNE}:
+        return ""
+    if not _ZH.search(nazwa) and not re.search(r"[A-Za-z]", nazwa):
+        return ""            # „0”, myślniki, cyfry
+    if _ZH.search(nazwa):
+        en = _nazwy_en(ix).get(nazwa) or _glosariusz().get(nazwa) or ""
+        if en:
+            nazwa = en
+    if not _dobre_imie(nazwa):
+        return ""
+    return _imie_do_etykiety(nazwa)
 
 
 def _nazwy_en(ix) -> dict[str, str]:
@@ -313,8 +340,9 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 przestrzenie |= gdzie
                 linie.append((mowca, klucz))
             licznik_prologu += 1
+            osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             jednostki.append(Jednostka("prolog", f"Prolog {licznik_prologu}",
-                                       "# Prolog", linie, przestrzenie, z_brakami=True))
+                                       "# Prolog", linie, przestrzenie, osoby, z_brakami=True))
         elif rodzaj == "scena":
             numer = int(wiersz["n"])
             scena = ix.sceny.get(numer) or {}
@@ -348,7 +376,9 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 if linie and linie[-1][1] == klucz:
                     continue
                 linie.append((_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz))
-            jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]), linie))
+            osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
+            jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
+                                       linie, osoby=osoby))
     return jednostki
 
 
@@ -489,6 +519,12 @@ def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, st
     return nazwa, opis, opis_pl
 
 
+def _dodaj(karty: list[str], linia: str) -> None:
+    """Dopisuje kartę, ale nie powtarza jej, gdy ta sama linia stoi już wyżej."""
+    if linia and (not karty or karty[-1] != linia):
+        karty.append(linia)
+
+
 def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
                     zrobione: set[str] | None = None) -> tuple[list[str], set[str], int]:
     """Kontekst do każdej jednostki w kolejności z pliku 01.
@@ -507,12 +543,14 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
     encje_po_zh: dict[str, dict] = {}
     for wiersz in ix.encyklopedia.values():
         for pole in ("nazwa", "inna_nazwa"):
-            zh = ix.zh(wiersz.get(pole))
-            if zh:
-                encje_po_zh.setdefault(zh, wiersz)
+            klucz = wiersz.get(pole)
+            for wariant in (ix.zh(klucz), ix.en(klucz), pl.get(klucz or "")):
+                if wariant:
+                    encje_po_zh.setdefault(wariant, wiersz)
 
     out: list[str] = []
     widziane: dict[tuple[str, str], bool] = {}
+    pokazane_nazwy: dict[str, bool] = {}
     uzyte: set[str] = set()
     ostatnia_sekcja = None
     ktory = 0
@@ -532,36 +570,51 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
                 nazwa, opis, opis_pl = _karta_nazwy(ix, pl, para[1], encje_po_zh)
             else:
                 nazwa, opis, opis_pl = _karta(baza, ix, pl, *para)
+            nazwa = _etykieta_hasla(ix, nazwa)
             if not nazwa and not opis:
+                continue
+            # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa)
+            if nazwa and nazwa in pokazane_nazwy:
+                _dodaj(karty, f"**{nazwa}**")
                 continue
             if para in widziane:
                 if nazwa:
-                    karty.append(f"**{nazwa}**")
+                    _dodaj(karty, f"**{nazwa}**")
                 continue
             widziane[para] = True
-            if para[0] == "nazwa":
-                uzyte.update(k for k in (encje_po_zh.get(para[1]) or {}).get("historie", []) for k in k)
-            elif para[0] == "osoba":
-                wiersz = ix.postacie.get(int(para[1])) or {}
-                if wiersz.get("n"):
-                    uzyte.add(wiersz["n"])
-                wpis = baza.encyklopedia_po_kluczu.get(wiersz.get("n")) or {}
-                for klucz in (wpis.get("nazwa"), wpis.get("inna_nazwa")):
-                    if klucz:
-                        uzyte.add(klucz)
-                for grupa in wpis.get("historie") or []:
-                    uzyte.update(k for k in grupa if k)
-            else:
-                kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
-                uzyte.update(k for klucze in kolumny.values() for k in klucze)
-            # ta sama zasada co w pliku 01: brak polskiego → tekst z gry z gwiazdką
-            tresc_opisu = opis if opis_pl else f"\\*{opis}"
-            if nazwa and opis:
-                karty.append(f"**{nazwa}:** {tresc_opisu}")
+            if nazwa:
+                pokazane_nazwy[nazwa] = True
+            skrocony = len(opis) > DLUGOSC_KARTY
+            tresc_opisu = opis
+            if skrocony:
+                # w kontekście tylko zajawka; pełny tekst zostaje w pliku 03
+                tresc_opisu = opis[:DLUGOSC_KARTY].rsplit(" ", 1)[0] + "…"
+            if not opis_pl and tresc_opisu:
+                tresc_opisu = f"\\*{tresc_opisu}"
+            # hasła zużywamy z pliku 03 tylko wtedy, gdy pokazaliśmy pełny opis
+            if not skrocony:
+                if para[0] == "nazwa":
+                    uzyte.update(k for grupa in (encje_po_zh.get(para[1]) or {}).get("historie", [])
+                                 for k in grupa)
+                elif para[0] == "osoba":
+                    wiersz = ix.postacie.get(int(para[1])) or {}
+                    if wiersz.get("n"):
+                        uzyte.add(wiersz["n"])
+                    wpis = baza.encyklopedia_po_kluczu.get(wiersz.get("n")) or {}
+                    for klucz in (wpis.get("nazwa"), wpis.get("inna_nazwa")):
+                        if klucz:
+                            uzyte.add(klucz)
+                    for grupa in wpis.get("historie") or []:
+                        uzyte.update(k for k in grupa if k)
+                else:
+                    kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
+                    uzyte.update(k for klucze in kolumny.values() for k in klucze)
+            if nazwa and tresc_opisu:
+                _dodaj(karty, f"**{nazwa}:** {tresc_opisu}")
             elif nazwa:
-                karty.append(f"**{nazwa}**")
+                _dodaj(karty, f"**{nazwa}**")
             else:
-                karty.append(tresc_opisu)
+                _dodaj(karty, tresc_opisu)
         if not karty:
             continue
         ktory += 1
