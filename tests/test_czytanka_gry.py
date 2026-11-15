@@ -355,5 +355,6 @@ class TestCzytankaDoCzytania(unittest.TestCase):
         self.assertEqual(self.czytanka._kategoria("kongfu"), "Sztuki walki i umiejętności")
         self.assertEqual(self.czytanka._kategoria("cos_dziwnego"), "Pozostałe teksty")
 
-    def test_gracz_nazywa_sie_ty(self):
-        self.assertEqual(self.czytanka.GRACZ["你"], "Ty")
+    def test_gracz_nazywa_sie_youxia(self):
+        self.assertEqual(self.czytanka.GRACZ["你"], "Youxia")
+        self.assertEqual(self.czytanka.GRACZ["player"], "Youxia")

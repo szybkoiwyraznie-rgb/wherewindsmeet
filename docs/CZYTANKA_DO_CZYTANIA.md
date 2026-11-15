@@ -60,13 +60,21 @@ Zasady:
 
 - **jedna kwestia = jedna linia:** `- **Mówca:** tekst`, bez odstępu między
   kwestiami; pusty wiersz oddziela tylko jednostki (scenę, cutscenę),
-- **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie z danych gry;
-  postać gracza to `Ty`, tory techniczne (`Entity轨道组` itp.) nie mają mówcy,
+- **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
+  z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
+  `index/nazwy_mowcow.json` (219 haseł, rośnie z każdą sesją),
+- **postać gracza to zawsze `Youxia`** — także gdy gra zapisze ją jako `player`,
+  `main_player`, `mian_player` (literówka w danych) czy `player_1`;
+  tory techniczne (`Entity轨道组` itp.) nie mają mówcy,
 - **bez metadanych:** żadnych czasów, numerów klatek, kluczy technicznych ani
   tabel; numer zostaje tylko w nagłówku `## Scena N` / `## Cutscena N`, żeby
   dało się wrócić do gry,
-- **tylko polski:** kwestie bez przekładu są pomijane (domyślnie), **poza prologiem** —
-  tam idą z gwiazdką, tak jak w transkrypcie gry: `- \*That‘s right.`,
+- **kwestie bez przekładu widać:** idą z gwiazdką i tekstem z gry —
+  `- **Mu Ji'an:** \*The illness will flare up next turn!` — żeby nie zginęły
+  z czytanki; `--zakres przetlumaczone` daje plik tylko po polsku,
+- **prolog jest przetłumaczony w całości:** brakujące 5 kluczy dopisałem do
+  magazynu (`tlumaczenie/pl_1000_prolog_uzupelnienia.jsonl`), więc w prologu
+  nie ma już ani jednej gwiazdki,
 - **bez powtórzeń:** dwie identyczne kwestie pod rząd (ten sam klucz albo ta sama
   treść z dwóch wariantów) są sklejane w jedną — w danych gry ten sam tekst bywa
   wpisany dwa razy,
@@ -74,13 +82,17 @@ Zasady:
 
 ## Liczby (2026-11-15)
 
-- 8 910 scen i 1 597 cutscen w pliku 01; 26 604 kwestie na miejscu
-  (26 739 naliczonych, po sklejeniu powtórzeń), 160 912 kwestii bez przekładu
-  pominięto (zakres domyślny), 6 kwestii prologu pokazano z gwiazdką,
+- 75 287 jednostek w pliku 01 (8 910 scen z polskim dialogiem, 1 597 cutscen,
+  reszta to sceny bez przekładu — teraz też są, z gwiazdką),
+- 187 497 linii kwestii: 26 745 po polsku i 160 262 z gwiazdką (tekst z gry),
+- 36 366 kwestii należy do gracza (`Youxia`),
+- 9 319 kwestii ma jeszcze chińską etykietę mówcy (4 713 różnych) — to etykiety
+  opisowe bez odpowiednika w danych gry; schodzą ze słownikiem `nazwy_mowcow.json`,
 - mówcy: imię polskie lub angielskie z danych gry, postać gracza jako `Ty`,
   3 561 kwestii ma tylko imię chińskie (gra nie daje dla nich nazwy obcej),
 - 3 filmy, 4 sekcje prologu, 38 sekcji krain,
-- 9 477 z 10 512 jednostek ma kontekst w pliku 02; 28 176 pozycji kontekstu
+- 73 296 jednostek ma kontekst w pliku 02; kontekst obejmuje też sceny bez
+  polskiego dialogu, bo mówiący i hasła są niezależne od przekładu
   (574 hasła z pełną kartą, reszta to powtórzenia samego imienia),
 - karty bez polskiego przekładu są oznaczone `*(EN)*`: biogramy encyklopedii
   w magazynie są na razie po angielsku (54 karty polskie, 520 angielskich),

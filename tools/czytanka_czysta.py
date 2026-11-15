@@ -40,7 +40,7 @@ _ODNOSNIK = re.compile(r"<([^<>|]{1,80})(\|[^<>]*)?>")
 _SPACJE = re.compile(r"\s+")
 
 # W danych gracza ta sama postać bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
-GRACZ = {nazwa.lower(): "Ty" for nazwa in (
+GRACZ = {nazwa.lower(): "Youxia" for nazwa in (
     "你", "我", "玩家", "主角", "player", "Player", "PLAYER", "You", "主角（玩家）",
     "main_player", "main player", "mainplayer", "protagonist", "主角玩家",
 )}
@@ -72,7 +72,12 @@ _OPIS = re.compile(r"desc|describe|content|text|story|intro|history|word|tip", r
 
 
 def _czysty(tekst: str) -> str:
-    """Zdejmij kody kolorów i odnośniki rich-text, złóż białe znaki."""
+    """Zdejmij kody kolorów i odnośniki rich-text, złóż białe znaki.
+
+    W danych gry łamanie akapitu bywa zapisane dosłownie jako `\\n`, a kwestia
+    ma być jedną linią — zamieniamy to na spację.
+    """
+    tekst = (tekst or "").replace("\\n", " ").replace("\\r", " ").replace("\\t", " ")
     tekst = _ODNOSNIK.sub(lambda m: m.group(1), tekst or "")
     tekst = _KOLOR.sub("", tekst)
     return _SPACJE.sub(" ", tekst).strip()
@@ -101,7 +106,24 @@ def _magazyn(katalog: Path) -> dict[str, str]:
 # W danych gry gracz bywa zapisany różnie, także z literówkami (`mian_player`).
 _GRACZ_LAT = re.compile(r"^(?:main|mian)?[_ ]?player[_ ]?\d*[：:]?$", re.I)
 
+_GLOSARIUSZ: dict[str, str] | None = None
+
+
+def _glosariusz(index: str = "index") -> dict[str, str]:
+    """Ręczny słownik chińskich etykiet mówców → angielskie imiona (`index/nazwy_mowcow.json`).
+
+    Gra nie ma nazw obcych dla mówców zapisanych tylko rolą („青年女人”), więc
+    uzupełniamy je w repo; każdy dopisany wpis działa od razu po przebudowaniu.
+    """
+    global _GLOSARIUSZ
+    if _GLOSARIUSZ is None:
+        plik = Path(index) / "nazwy_mowcow.json"
+        _GLOSARIUSZ = json.loads(plik.read_text(encoding="utf-8")) if plik.exists() else {}
+    return _GLOSARIUSZ
+
+
 _NAZWY_ZH: tuple | None = None
+_NAZWY_EN: tuple | None = None
 
 
 def _przyciete(imie: str) -> str:
@@ -129,6 +151,15 @@ def _imie_do_etykiety(nazwa: str) -> str:
     return nazwa[:1].upper() + nazwa[1:] if nazwa else nazwa
 
 
+def _nazwy_en(ix) -> dict[str, str]:
+    """Chińska nazwa → angielska (zlatynizowana), gdy gra ją ma."""
+    global _NAZWY_EN
+    if _NAZWY_EN is None or _NAZWY_EN[0] is not ix:
+        mapa = {t.zrodlo: t.en for k, t in ix.teksty.items() if t.zrodlo and t.en}
+        _NAZWY_EN = (ix, mapa)
+    return _NAZWY_EN[1]
+
+
 def _nazwy_zh(ix) -> dict[str, str]:
     """Chińskie imię → klucz nazwy, żeby mówca nie zostawał po chińsku, gdy gra ma nazwę obcą."""
     global _NAZWY_ZH
@@ -153,7 +184,7 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     if nazwa_zh.lower() in GRACZ:
         return GRACZ[nazwa_zh.lower()]
     if _GRACZ_LAT.match(nazwa_zh):
-        return "Ty"
+        return "Youxia"
     if nazwa_zh in TECHNICZNE:
         return ""
     osoba_id = osoba[2] if len(osoba) > 2 else None
@@ -175,7 +206,11 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
         nazwa = _nazwa_klucza(ix, klucz_zh, pl)
         if nazwa and nazwa != nazwa_zh and _dobre_imie(nazwa):
             return _imie_do_etykiety(nazwa)
-    return nazwa_zh
+    if any("\u3400" <= z <= "\u9fff" for z in nazwa_zh):
+        en = _nazwy_en(ix).get(nazwa_zh, "") or _glosariusz().get(nazwa_zh, "")
+        if en and _dobre_imie(en):
+            return _imie_do_etykiety(en)
+    return _glosariusz().get(nazwa_zh) or nazwa_zh
 
 
 def _mowca_w_scenie(scena: dict, indeks_mowcy, ix, pl) -> str:
@@ -340,7 +375,7 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
             uzyte.add(klucz)
             tekst = pl.get(klucz)
             if tekst is None:
-                if zakres == "przetlumaczone" and not jednostka.z_brakami:
+                if zakres == "przetlumaczone":
                     statystyka["pominiete"] += 1
                     continue
                 zrodlo_tekst = _z_gry(ix, klucz)
@@ -627,6 +662,8 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
 
 Kwestie w 01: `- **Mówca:** tekst`, jedna kwestia na linię, bez czasów i tabel.
+Gracz zawsze jako **Youxia**. Kwestie bez polskiego przekładu stoją z gwiazdką
+(`- \\*Fate is already sealed.`), więc widać, gdzie tłumaczenia jeszcze nie ma.
 Zakres: **{zakres}**.
 
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
@@ -644,7 +681,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--index", default="index")
     ap.add_argument("--magazyn", default="tlumaczenie")
     ap.add_argument("--wyj", default="out/czytanka")
-    ap.add_argument("--zakres", choices=("przetlumaczone", "wszystko"), default="przetlumaczone")
+    ap.add_argument("--zakres", choices=("przetlumaczone", "wszystko"), default="wszystko",
+                    help="wszystko = kwestie bez przekładu też, z gwiazdką (domyślnie); "
+                         "przetlumaczone = tylko polski")
     ap.add_argument("--zip")
     a = ap.parse_args(argv)
 

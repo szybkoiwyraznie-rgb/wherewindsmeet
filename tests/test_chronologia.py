@@ -115,7 +115,7 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         cls._katalog = tempfile.TemporaryDirectory()
         cls.statystyka = czytanka_czysta.zbuduj(
             index=str(KATALOG / "index"), magazyn=str(KATALOG / "tlumaczenie"),
-            wyj=Path(cls._katalog.name), zakres="przetlumaczone")
+            wyj=Path(cls._katalog.name), zakres="wszystko")
         cls.tekst = (Path(cls._katalog.name) / "01_sceny_i_cutsceny.md").read_text(encoding="utf-8")
 
     @classmethod
@@ -141,10 +141,16 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
                     self.fail(f"powtórzona kwestia w jednostce: {linia}")
                 kwestie.append(linia)
 
-    def test_prolog_ma_kwestie_bez_przekladu_z_gwiazdka(self):
-        prolog = self.tekst[self.tekst.index("# Prolog"):self.tekst.index("\n# ", self.tekst.index("# Prolog") + 2)]
-        self.assertIn("- \\*", prolog, "kwestie bez przekładu mają gwiazdkę")
-        self.assertNotIn("[brak przekładu]", prolog)
+    def test_prolog_jest_przetlumaczony_w_calosci(self):
+        start = self.tekst.index("# Prolog")
+        prolog = self.tekst[start:self.tekst.index("\n# ", start + 2)]
+        self.assertNotIn("\\*", prolog, "prolog nie ma już luk w przekładzie")
+
+    def test_kwestie_bez_przekladu_maja_gwiazdke(self):
+        poza_prologiem = self.tekst[self.tekst.index("\n# ", self.tekst.index("# Prolog") + 2):]
+        self.assertIn("- \\*", poza_prologiem,
+                      "kwestie bez przekładu poza prologiem idą z gwiazdką")
+        self.assertNotIn("[brak przekładu]", poza_prologiem)
 
     def test_rozmiar(self):
         self.assertGreater(self.statystyka["linii"], 10_000)
