@@ -172,10 +172,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    z gwiazdką (160 262 linie), prolog jest przetłumaczony w całości;
    kontekst w pliku 02 obejmuje 73 296 jednostek; 9 319 kwestii ma jeszcze
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
-   Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a kwestie nie
-   mają punktora w ogóle — `**Mówca:** tekst`, bez mówcy goły tekst. Paczka:
-   `WWM_Czytanka_PL_2026-11-15.zip` (`8 459 747 B`), Dysk Google id
-   `13frMjS4fjL9pWdnVZvheFYL4ULQY76Yw`. Opis formatu:
+   Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
+   trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
+   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`7 701 897 B`),
+   Dysk Google id `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA`. Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
