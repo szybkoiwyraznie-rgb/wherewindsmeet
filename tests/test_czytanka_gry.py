@@ -289,6 +289,17 @@ class TestCzytankaDoCzytania(unittest.TestCase):
             {"k": KLUCZ["napis_a"], "pl": "Napisy przerywnika."},
             {"k": KLUCZ["film"], "pl": "Wers filmu."},
         ])
+        self.transkrypt = root / "prolog.txt"
+        self.transkrypt.write_text("# Pierwsza cutscena\nTo ty.\n", encoding="utf-8")
+        stary = prolog_z_klucza.TRANSKRYPT
+        prolog_z_klucza.TRANSKRYPT = str(self.transkrypt)
+        try:
+            from tools import chronologia
+
+            chronologia.zbuduj(index=str(self.index), magazyn=str(self.magazyn),
+                               wyj=self.index / "chronologia.jsonl")
+        finally:
+            prolog_z_klucza.TRANSKRYPT = stary
         self.wyj = root / "czytanka"
         self.statystyka = czytanka_czysta.zbuduj(
             index=str(self.index), magazyn=str(self.magazyn), wyj=self.wyj,
@@ -302,34 +313,37 @@ class TestCzytankaDoCzytania(unittest.TestCase):
 
     def test_trzy_pliki_po_jednym_na_rodzaj(self):
         self.assertEqual(sorted(p.name for p in self.wyj.glob("*.md")),
-                         ["01_sceny.md", "02_cutsceny.md", "03_reszta.md", "README.md"])
+                         ["01_sceny_i_cutsceny.md", "02_kontekst_scen_i_cutscen.md", "03_reszta.md",
+                          "README.md"])
 
     def test_kwestia_ma_mowce_i_tekst_w_jednej_linii(self):
-        tresc = self.czytaj("01_sceny.md")
+        tresc = self.czytaj("01_sceny_i_cutsceny.md")
         self.assertIn("- **B:** Alfa raz.", tresc)
         self.assertIn("## Scena 200", tresc)
 
     def test_bez_czasow_tabel_i_pustych_linii_miedzy_kwestiami(self):
-        tresc = self.czytaj("01_sceny.md")
+        tresc = self.czytaj("01_sceny_i_cutsceny.md")
         self.assertNotIn("|", tresc)
         self.assertNotRegex(tresc, r"\d+\.\d+ ?s")
         self.assertIn("## Scena 200\n- **B:** Alfa raz.", tresc)
 
     def test_kwestie_bez_polskiego_sa_pomijane(self):
-        self.assertNotIn("阿尔法二", self.czytaj("01_sceny.md"))
+        self.assertNotIn("阿尔法二", self.czytaj("01_sceny_i_cutsceny.md"))
         self.assertGreater(self.statystyka["pominiete"], 0)
 
-    def test_cutsceny_maja_film_i_napisy(self):
-        tresc = self.czytaj("02_cutsceny.md")
-        self.assertIn("Film 2", tresc)
-        self.assertIn("- Napisy przerywnika.", tresc)
+    def test_film_jest_na_poczatku_chronologii(self):
+        tresc = self.czytaj("01_sceny_i_cutsceny.md")
+        film = tresc.index("## Film 2")
+        self.assertLess(film, tresc.index("# Prolog"))
+        self.assertLess(film, tresc.index("## Scena"))
 
-    def test_reszta_to_teksty_spoza_scen(self):
-        # wiersz filmu nie jest sceną, więc trafia do reszty jako zwykła kwestia
-        self.assertIn("- Wers filmu.", self.czytaj("03_reszta.md"))
+    def test_napisy_spoza_cutscen_trafiaja_do_reszty(self):
+        # `napis_a` nie należy do żadnej cutsceny ani grupy zadań → plik 03
+        self.assertIn("- Napisy przerywnika.", self.czytaj("03_reszta.md"))
+        self.assertNotIn("Napisy przerywnika.", self.czytaj("01_sceny_i_cutsceny.md"))
 
     def test_scena_bez_mapy_ma_wlasna_sekcje(self):
-        tresc = self.czytaj("01_sceny.md")
+        tresc = self.czytaj("01_sceny_i_cutsceny.md")
         self.assertIn("# Sceny bez przypisanej mapy", tresc)
         self.assertIn("## Scena 400\n- **D:** Samotna kwestia.", tresc)
 

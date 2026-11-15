@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import kolejnosc_gry  # noqa: E402
 
-TRANSKRYPT = "google_drive/prolog_spisany_z_gry_PL_i_miejscami_angielski.txt"
+TRANSKRYPT = "zwrotki/prolog_transkrypt_z_gry.txt"
 
 
 def _mapy(index: str, magazyn: str):

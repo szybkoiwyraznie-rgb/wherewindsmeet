@@ -103,7 +103,11 @@ class Indeks:
         """Główne źródło tekstu: (rodzaj tabeli, ścieżka pola, klucz wiersza)."""
         if not tekst.w:
             return None
-        kind, path = self.zrodla[tekst.w[0]][:2]
+        try:
+            wpis = self.zrodla[tekst.w[0]]
+        except (KeyError, IndexError, TypeError):
+            return None          # wyciąg może nie mieć opisu źródeł (małe fixture'y)
+        kind, path = wpis[:2]
         return kind, path, tekst.w[1]
 
     def nazwa_wiersza(self, tekst: Tekst) -> str | None:

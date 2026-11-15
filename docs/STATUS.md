@@ -160,16 +160,20 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-0. **Czytanka do czytania jest gotowa i wysłana.** `tools/czytanka_czysta.py`
-   daje trzy pliki po jednym na rodzaj treści: `01_sceny.md` (dialog linia po
-   linii: `- **Mówca:** tekst`, prolog i krainy po kolei), `02_cutsceny.md`
-   (filmy i napisy przerywników), `03_reszta.md` (przedmioty, sztuki walki,
-   encyklopedia, postacie, zadania). Bez czasów, kluczy i tabel.
-   8 908 scen, 92 216 kwestii. Paczka: `WWM_Czytanka_PL_2026-11-14.zip`
-   (`1 521 256 B`), Dysk Google id `1IDp83hns7DNmdF6shhlAFMlhA3Xo_wVP`.
-   Opis formatu: [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
-   Wcześniejsze zestawy techniczne (tabele z chińskim i angielskim, trzy warstwy)
-   są w koszu Dysku i zostają wyłącznie jako narzędzia audytu.
+0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** Trzy pliki
+   według ustaleń właściciela: `01_sceny_i_cutsceny.md` (filmy, prolog, krainy po
+   kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze),
+   `02_kontekst_scen_i_cutscen.md` (kontekst w tej samej kolejności),
+   `03_reszta.md` (co nie trafiło do 01 ani 02, według rodzaju). Kolejność nie
+   jest już liczona przy każdym budowaniu: leży w `index/chronologia.jsonl`
+   (75 704 jednostki, 4,1 MB), generowana przez `tools/chronologia.py`
+   i pilnowana testem `tests/test_chronologia.py`. Liczby: 8 910 scen,
+   1 597 cutscen, 26 941 kwestii z polskim. Paczka:
+   `WWM_Czytanka_PL_2026-11-15.zip` (`1 539 026 B`). Opis formatu:
+   [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+   **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
+   `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
+   rozdzielone, czego właściciel nie chce.
 1. **Czytanka w kolejności z gry — warstwa chronologiczna.** `tools/buduj_czytanke_gry.py`
    buduje ją z `index/prowincje.json`: prolog → krainy w kolejności odwiedzania
    (`燕南 → 清河 → 熔炉 → 河西 → …`) → sceny po numerze dialogu. Opis i granice:
