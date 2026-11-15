@@ -33,15 +33,16 @@ from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
 from tools import kolejnosc_gry, powiazania_czytanek  # noqa: E402
 
-BEZ_PRZEKLADU = "[brak przekładu]"
+BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
 BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
 _ODNOSNIK = re.compile(r"<([^<>|]{1,80})(\|[^<>]*)?>")
 _SPACJE = re.compile(r"\s+")
 
 # W danych gracza ta sama postać bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
-GRACZ = {nazwa: "Ty" for nazwa in (
+GRACZ = {nazwa.lower(): "Ty" for nazwa in (
     "你", "我", "玩家", "主角", "player", "Player", "PLAYER", "You", "主角（玩家）",
+    "main_player", "main player", "mainplayer", "protagonist", "主角玩家",
 )}
 TECHNICZNE = {"Entity轨道组", "轨道组", "entity", "Entity", "旁白占位"}
 
@@ -97,6 +98,46 @@ def _magazyn(katalog: Path) -> dict[str, str]:
     return pl
 
 
+# W danych gry gracz bywa zapisany różnie, także z literówkami (`mian_player`).
+_GRACZ_LAT = re.compile(r"^(?:main|mian)?[_ ]?player[_ ]?\d*[：:]?$", re.I)
+
+_NAZWY_ZH: tuple | None = None
+
+
+def _przyciete(imie: str) -> str:
+    """Imię bez wielokropka na końcu („Yingying…” to w danych ozdobnik)."""
+    imie = (imie or "").strip()
+    for ogon in ("…", "..."):
+        if imie.endswith(ogon):
+            imie = imie[: -len(ogon)].strip()
+    return imie
+
+
+def _dobre_imie(nazwa: str) -> bool:
+    """Czy rozwiązana nazwa wygląda na imię, a nie na zdanie z magazynu."""
+    nazwa = nazwa.strip()
+    if not nazwa or len(nazwa) > 30:
+        return False
+    if ". " in nazwa or "。" in nazwa or "!" in nazwa or "?" in nazwa:
+        return False
+    return True
+
+
+def _imie_do_etykiety(nazwa: str) -> str:
+    """Nazwa mówcy do wyświetlenia: bez ogona interpunkcji, z wielkiej litery."""
+    nazwa = _przyciete(nazwa).strip(" .。,，:：;；")
+    return nazwa[:1].upper() + nazwa[1:] if nazwa else nazwa
+
+
+def _nazwy_zh(ix) -> dict[str, str]:
+    """Chińskie imię → klucz nazwy, żeby mówca nie zostawał po chińsku, gdy gra ma nazwę obcą."""
+    global _NAZWY_ZH
+    if _NAZWY_ZH is None or _NAZWY_ZH[0] is not ix:
+        mapa = {t.zrodlo: k for k, t in ix.teksty.items() if t.zrodlo}
+        _NAZWY_ZH = (ix, mapa)
+    return _NAZWY_ZH[1]
+
+
 def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
     if not klucz:
         return ""
@@ -109,8 +150,10 @@ def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
 def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     """Imię mówcy: polskie, a gdy brak przekładu — angielskie z danych gry."""
     nazwa_zh = _czysty(str(osoba[0] or ""))
-    if nazwa_zh in GRACZ:
-        return GRACZ[nazwa_zh]
+    if nazwa_zh.lower() in GRACZ:
+        return GRACZ[nazwa_zh.lower()]
+    if _GRACZ_LAT.match(nazwa_zh):
+        return "Ty"
     if nazwa_zh in TECHNICZNE:
         return ""
     osoba_id = osoba[2] if len(osoba) > 2 else None
@@ -118,13 +161,20 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     if wiersz and wiersz.get("n"):
         nazwa = _nazwa_klucza(ix, wiersz["n"], pl)
         if nazwa:
-            return nazwa
+            return _przyciete(nazwa)
     klucz = osoba[3] if len(osoba) > 3 else None
     tekst = ix.teksty.get(klucz) if klucz else None
     if tekst is not None and tekst.zrodlo == nazwa_zh:
         nazwa = _nazwa_klucza(ix, klucz, pl)
         if nazwa:
-            return nazwa
+            return _przyciete(nazwa)
+    # imię podane tylko po chińsku: poszukaj klucza nazwy o tej samej treści
+    nazwa_zh = _przyciete(nazwa_zh)
+    klucz_zh = _nazwy_zh(ix).get(nazwa_zh)
+    if klucz_zh:
+        nazwa = _nazwa_klucza(ix, klucz_zh, pl)
+        if nazwa and nazwa != nazwa_zh and _dobre_imie(nazwa):
+            return _imie_do_etykiety(nazwa)
     return nazwa_zh
 
 
@@ -147,6 +197,7 @@ class Jednostka:
     linie: list[tuple[str, str]] = field(default_factory=list)   # (mówca, klucz)
     przestrzenie: set[int] = field(default_factory=set)
     osoby: list[tuple[str, str]] = field(default_factory=list)    # (id postaci, imię z obsady)
+    z_brakami: bool = False                                      # pokazuj kwestie bez przekładu
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -209,27 +260,33 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         return [w["k"] for w in wiersze]
 
     jednostki: list[Jednostka] = []
+    licznik_prologu = 0
     for wiersz in chronologia:
         rodzaj = wiersz["t"]
         if rodzaj == "film":
             numer = int(wiersz["n"])
             jednostki.append(Jednostka(
                 "film", f"Film {numer} — {TYTULY_FILMOW.get(numer, f'Film {numer}')}",
-                "# Filmy otwierające", [("", k) for k in klucze_filmu(numer)]))
+                "# Filmy otwierające", [("", k) for k in klucze_filmu(numer) if k]))
         elif rodzaj == "prolog":
             linie, przestrzenie = [], set()
             for klucz in wiersz.get("k") or []:
+                if linie and linie[-1][1] == klucz:
+                    continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 przestrzenie |= gdzie
                 linie.append((mowca, klucz))
-            jednostki.append(Jednostka("prolog", wiersz.get("e") or "Prolog",
-                                       "# Prolog", linie, przestrzenie))
+            licznik_prologu += 1
+            jednostki.append(Jednostka("prolog", f"Prolog {licznik_prologu}",
+                                       "# Prolog", linie, przestrzenie, z_brakami=True))
         elif rodzaj == "scena":
             numer = int(wiersz["n"])
             scena = ix.sceny.get(numer) or {}
             linie = []
             for element in scena.get("e") or []:
                 if element[0] != "k":
+                    continue
+                if linie and linie[-1][1] == element[2]:
                     continue
                 mowca = _mowca_w_scenie(scena, element[1] if len(element) > 1 else None, ix, pl)
                 linie.append((mowca, element[2]))
@@ -250,10 +307,21 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
-            linie = [(_mowca_klucza(k, ix, pl, porzadek, mowcy_napisow)[0], k)
-                     for k in wiersz.get("k") or []]
+            linie = []
+            for klucz in wiersz.get("k") or []:
+                if linie and linie[-1][1] == klucz:
+                    continue
+                linie.append((_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz))
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]), linie))
     return jednostki
+
+
+def _z_gry(ix, klucz: str) -> str:
+    """Tekst kwestii bez przekładu: angielski, a gdy brak — źródłowy chiński."""
+    tekst = ix.teksty.get(klucz)
+    if tekst is None:
+        return ""
+    return _czysty(tekst.en or tekst.zrodlo or "")
 
 
 def _linia(mowca: str, tekst: str) -> str:
@@ -261,7 +329,7 @@ def _linia(mowca: str, tekst: str) -> str:
 
 
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
-               statystyka: dict) -> tuple[list[str], set[str], set[str]]:
+               statystyka: dict, ix=None) -> tuple[list[str], set[str], set[str]]:
     out: list[str] = []
     uzyte: set[str] = set()
     zrobione: set[str] = set()
@@ -272,13 +340,21 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
             uzyte.add(klucz)
             tekst = pl.get(klucz)
             if tekst is None:
-                if zakres == "przetlumaczone":
+                if zakres == "przetlumaczone" and not jednostka.z_brakami:
                     statystyka["pominiete"] += 1
                     continue
-                tekst = BEZ_PRZEKLADU
+                zrodlo_tekst = _z_gry(ix, klucz)
+                if not zrodlo_tekst:
+                    statystyka["pominiete"] += 1
+                    continue
+                tekst = f"\\*{zrodlo_tekst}"
+                statystyka["bez_przekladu"] += 1
             else:
                 statystyka["linii"] += 1
-            linie.append(_linia(mowca, tekst))
+            gotowa = _linia(mowca, tekst)
+            if linie and linie[-1] == gotowa:
+                continue          # ta sama kwestia dwa razy pod rząd to artefakt danych
+            linie.append(gotowa)
         if not linie:
             continue
         statystyka["jednostek"] += 1
@@ -504,10 +580,10 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
 
     wyj.mkdir(parents=True, exist_ok=True)
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
-                  "kontekst": 0}
+                  "kontekst": 0, "bez_przekladu": 0}
 
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
-    tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka)
+    tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",
                   "Filmy otwierające, prolog w kolejności z gry, potem krainy po kolei: "
@@ -555,7 +631,8 @@ Zakres: **{zakres}**.
 
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
-{statystyka['pominiete']} kwestii bez polskiego pominięto.
+{statystyka['pominiete']} kwestii bez polskiego pominięto,
+{statystyka['bez_przekladu']} kwestii w prologu pokazano z gwiazdką, bo przekładu jeszcze nie ma.
 
 Karty kontekstu bez polskiego przekładu są oznaczone `*(EN)*` — tekst jest wtedy
 angielski z danych gry, żeby hasło nie zniknęło z czytanki.

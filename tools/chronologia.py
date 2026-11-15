@@ -85,17 +85,26 @@ def _prolog(index: str, magazyn: str) -> list[dict]:
     linie = Path(prolog_z_klucza.TRANSKRYPT).read_text(encoding="utf-8-sig").splitlines()
 
     jednostki: list[dict] = []
+    numer = 0
     etykieta, klucze = "Prolog", []
     for rodzaj, tekst in prolog_z_klucza._przejscie(linie):
         if rodzaj == "#":
             if klucze:
                 jednostki.append({"t": "prolog", "s": "Prolog", "e": etykieta, "k": klucze})
-            etykieta, klucze = (tekst.strip() or "Prolog"), []
+            numer += 1
+            # nagłówki transkryptu to komentarze właściciela, nie nazwy scen —
+            # w chronologii sekcje prologu są po prostu numerowane
+            etykieta, klucze = f"Prolog {numer}", []
             continue
         klucz = prolog_z_klucza._dopasuj(tekst, po_pl, po_en, porzadek)
-        if klucz:
+        if klucz and (not klucze or klucze[-1] != klucz):
+            # dwie linie transkryptu mogą trafić w ten sam wariant tekstu —
+            # wtedy w grze to jedna kwestia, nie dwie
             klucze.append(klucz)
     if klucze:
+        if numer == 0:
+            numer = 1
+            etykieta = "Prolog 1"
         jednostki.append({"t": "prolog", "s": "Prolog", "e": etykieta, "k": klucze})
     return jednostki
 

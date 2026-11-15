@@ -25,7 +25,8 @@ python3 tools/chronologia.py --sprawdz  # porównaj zapisane z danymi (kod 1 = t
 Zasady kolejności:
 
 1. **filmy** otwierające 1–3,
-2. **prolog** w kolejności transkryptu właściciela
+2. **prolog** w kolejności transkryptu właściciela (sekcje numerowane
+   `Prolog 1…4`; komentarze z transkryptu to notatki dla nas, nie nazwy scen)
    (`zwrotki/prolog_transkrypt_z_gry.txt`, w repo) — napisy i dialogi przemieszane,
 3. **krainy** w kolejności odwiedzania (`index/prowincje.json`), w krainie **sceny
    po numerze dialogu**,
@@ -64,14 +65,18 @@ Zasady:
 - **bez metadanych:** żadnych czasów, numerów klatek, kluczy technicznych ani
   tabel; numer zostaje tylko w nagłówku `## Scena N` / `## Cutscena N`, żeby
   dało się wrócić do gry,
-- **tylko polski:** kwestie bez przekładu są pomijane (domyślnie). `--zakres wszystko`
-  wstawia `[brak przekładu]`, gdy trzeba zobaczyć lukę,
+- **tylko polski:** kwestie bez przekładu są pomijane (domyślnie), **poza prologiem** —
+  tam idą z gwiazdką, tak jak w transkrypcie gry: `- \*That‘s right.`,
+- **bez powtórzeń:** dwie identyczne kwestie pod rząd (ten sam klucz albo ta sama
+  treść z dwóch wariantów) są sklejane w jedną — w danych gry ten sam tekst bywa
+  wpisany dwa razy,
 - **sceny bez mapy** mają własną sekcję, żeby nic nie wypadło.
 
 ## Liczby (2026-11-15)
 
-- 8 910 scen i 1 597 cutscen w pliku 01; 26 941 kwestii z polskim,
-  161 817 kwestii bez przekładu pominięto (zakres domyślny),
+- 8 910 scen i 1 597 cutscen w pliku 01; 26 604 kwestie na miejscu
+  (26 739 naliczonych, po sklejeniu powtórzeń), 160 912 kwestii bez przekładu
+  pominięto (zakres domyślny), 6 kwestii prologu pokazano z gwiazdką,
 - mówcy: imię polskie lub angielskie z danych gry, postać gracza jako `Ty`,
   3 561 kwestii ma tylko imię chińskie (gra nie daje dla nich nazwy obcej),
 - 3 filmy, 4 sekcje prologu, 38 sekcji krain,
@@ -80,7 +85,7 @@ Zasady:
 - karty bez polskiego przekładu są oznaczone `*(EN)*`: biogramy encyklopedii
   w magazynie są na razie po angielsku (54 karty polskie, 520 angielskich),
 - 64 112 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (2 168 050 B).
+- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (2 162 663 B).
 
 ## Uruchomienie
 

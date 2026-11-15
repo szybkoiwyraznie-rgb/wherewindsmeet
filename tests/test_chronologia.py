@@ -94,23 +94,60 @@ class TestZapisanaChronologia(unittest.TestCase):
         naglowki = [linia for linia in transkrypt.read_text(encoding="utf-8-sig").splitlines()
                     if linia.startswith("#")]
         self.assertEqual(len(prolog), len(naglowki))
-        for jednostka, naglowek in zip(prolog, naglowki):
-            self.assertEqual(jednostka["e"], naglowek.lstrip("# ").strip())
+        # komentarze z transkryptu są dla nas, nie dla czytelnika — sekcje są numerowane
+        for numer, jednostka in enumerate(prolog, 1):
+            self.assertTrue(jednostka["e"].startswith("Prolog"))
+            self.assertNotIn("cutscene w grze", jednostka["e"])
+
+    def test_prolog_bez_sasiednich_duplikatow(self):
+        for jednostka in self.jednostki:
+            if jednostka["t"] != "prolog":
+                continue
+            klucze = jednostka["k"]
+            for poprzedni, nastepny in zip(klucze, klucze[1:]):
+                self.assertNotEqual(poprzedni, nastepny,
+                                    f"powtórka klucza w {jednostka.get('e')}")
 
 
 class TestCzytankaCzytaChronologie(unittest.TestCase):
-    def test_kolejnosc_jednostek_z_pliku(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            statystyka = czytanka_czysta.zbuduj(
-                index=str(KATALOG / "index"), magazyn=str(KATALOG / "tlumaczenie"),
-                wyj=Path(tmp), zakres="przetlumaczone")
-            plik = Path(tmp) / "01_sceny_i_cutsceny.md"
-            tekst = plik.read_text(encoding="utf-8")
-        self.assertIn("# Filmy otwierające", tekst)
-        self.assertIn("# Prolog", tekst)
-        self.assertIn("## Cutscena", tekst)
-        self.assertEqual(tekst.count("\n\n\n"), 0)
-        self.assertGreater(statystyka["linii"], 10_000)
+    @classmethod
+    def setUpClass(cls):
+        cls._katalog = tempfile.TemporaryDirectory()
+        cls.statystyka = czytanka_czysta.zbuduj(
+            index=str(KATALOG / "index"), magazyn=str(KATALOG / "tlumaczenie"),
+            wyj=Path(cls._katalog.name), zakres="przetlumaczone")
+        cls.tekst = (Path(cls._katalog.name) / "01_sceny_i_cutsceny.md").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._katalog.cleanup()
+
+    def test_sekcje_chronologii(self):
+        self.assertIn("# Filmy otwierające", self.tekst)
+        self.assertIn("# Prolog", self.tekst)
+        self.assertIn("## Prolog 1", self.tekst)
+        self.assertIn("## Cutscena", self.tekst)
+
+    def test_bez_pustych_linii_miedzy_kwestiami(self):
+        self.assertEqual(self.tekst.count("\n\n\n"), 0)
+
+    def test_bez_powtorzonych_kwestii_pod_rzad(self):
+        kwestie: list[str] = []
+        for linia in self.tekst.splitlines():
+            if linia.startswith("## ") or linia.startswith("# "):
+                kwestie = []
+            elif linia.startswith("- "):
+                if kwestie and kwestie[-1] == linia:
+                    self.fail(f"powtórzona kwestia w jednostce: {linia}")
+                kwestie.append(linia)
+
+    def test_prolog_ma_kwestie_bez_przekladu_z_gwiazdka(self):
+        prolog = self.tekst[self.tekst.index("# Prolog"):self.tekst.index("\n# ", self.tekst.index("# Prolog") + 2)]
+        self.assertIn("- \\*", prolog, "kwestie bez przekładu mają gwiazdkę")
+        self.assertNotIn("[brak przekładu]", prolog)
+
+    def test_rozmiar(self):
+        self.assertGreater(self.statystyka["linii"], 10_000)
 
 
 if __name__ == "__main__":
