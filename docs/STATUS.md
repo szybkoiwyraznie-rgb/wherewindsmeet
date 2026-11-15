@@ -174,11 +174,13 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`6 775 019 B`,
-   SHA-256 `643de95347cf25bba48bea8227606625dee80eed3fe397e11b8c913ccf90f937`),
-   Dysk Google id `1AMHsNtHROZcxIfSiubHR67yGcBKb8UfG` (poprzednie wersje
-   `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA` i `1sY2RUG1_8ohmYQf3MMPJC2lFnC0m7ZYo`
-   w koszu). Opis formatu:
+   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v1.zip`
+   (`6 607 191 B`, SHA-256
+   `b7c84bee07a76b14ef44dfbe84e63a6448c71f3e8fe955541119c8c6235bc97a`),
+   Dysk Google id `15fZGPA4BPd6ZTss0gulX61JzXxBdwQpx` (wszystkie paczki z datą
+   w nazwie są nieaktualne i leżą w koszu). Spis wersji:
+   [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
+   istniejącej paczki. Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
    **Stan po decyzjach właściciela z 2026-11-15:** (a) do pliku 02 wchodzą tylko
    hasła, które gra naprawdę opisuje — 8 891 jednostek ma kontekst, 65 351
@@ -195,7 +197,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    tabliczkę z nazwą ma zaledwie 32% bytów, więc dla 4 713 etykiet (5% kwestii)
    gra nie ma angielskiego tekstu do pokazania. Doszła też ścieżka
    „byt → `spaces.*.entity.N.name`”, która odzyskuje z danych 66 angielskich
-   nazw. 466 testów zielonych.
+   nazw. **02 po decyzji z tej samej sesji:** opis hasła = definicja z danych gry
+   (`describe*`, `introduction*`, `description`, `npc_desc`, `job_info`),
+   a przy postaciach sama tożsamość z encyklopedii (`tozsamosc`); rozdziały
+   fabularne encyklopedii (`historie`) i karty z samą nazwą są wycięte.
+   Zostało 501 jednostek z kontekstem i 178 kart (każda raz). 467 testów zielonych
+   (520 podtestów).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.

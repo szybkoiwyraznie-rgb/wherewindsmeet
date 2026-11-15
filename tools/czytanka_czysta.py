@@ -70,7 +70,26 @@ KATEGORIE = (
 )
 
 _NAZWA = re.compile(r"name|title|bowu|imie", re.I)
-_OPIS = re.compile(r"desc|describe|content|text|story|intro|history|word|tip", re.I)
+# Kolumny z definicją hasła. Świadomie nie ma tu `content`, `story_*`, `page_*`,
+# `talk_content`, `tips` — to opowieści i streszczenia scen, nie opisy.
+_OPIS = re.compile(r"describe|description|intro|^des$|job_info|npc_desc", re.I)
+# Kolejność: najpierw zwięzła definicja, potem dłuższe warianty.
+_OPIS_KOLEJNOSC = (
+    "describe_str", "describe", "brief_describe_str", "introduction",
+    "introduction_long", "description", "jianghu_brief_description", "job_info",
+    "npc_desc", "des", "introduction_location", "introduction_short",
+    "extra_describe_1", "generation_description", "sidepage_boss_desc",
+)
+# Tabele, w których „opis” to w rzeczywistości opowieść, list, mail albo kwestia.
+_NARRACYJNE = {
+    "ac_raw", "book_config", "cutscene_person_info_config", "display_poem_text_config",
+    "emails_data", "ever_know_clue_data", "ever_know_content_data",
+    "expedition_history", "expedition_story_info", "guider_task", "guider_tujian_data",
+    "loading_base_config", "npc_amity_relation_data", "region_collect_jianwen_data",
+    "tasks_envelop_data", "world_view_person_event", "world_view_person_voice",
+    "task_progress_light_info", "task_progress_dark_info", "task_progress_ending",
+    "task_progress_dark_group", "task_prelude_custom_config", "task_group_info",
+}
 
 
 def _czysty(tekst: str) -> str:
@@ -489,47 +508,50 @@ def _tekst(ix, pl: dict[str, str], klucz: str | None) -> tuple[str, bool]:
     return _czysty(tekst.en or tekst.zrodlo or ""), False
 
 
+def _tozsamosc(ix, pl, wpis: dict) -> tuple[str, bool]:
+    """Krótkie „kim jest” z encyklopedii (`tozsamosc`), a nie opowieść.
+
+    Wpisy encyklopedii mają tylko rozdziały fabularne (`historie`) — to streszczenia
+    scen, nie opisy postaci, więc ich nie bierzemy. Zostaje etykieta tożsamości,
+    np. „回春堂主人” → „Master of the Vernal Hall”, „叛徒” → „The Traitor”.
+    """
+    czesci: list[str] = []
+    opis_pl = True
+    for klucz in wpis.get("tozsamosc") or []:
+        tekst, jest_pl = _tekst(ix, pl, klucz)
+        if tekst and tekst not in czesci:
+            czesci.append(tekst)
+            opis_pl = opis_pl and jest_pl
+    return " · ".join(czesci), opis_pl
+
+
 def _karta_encyklopedii(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
+    """Hasło encyklopedii: imię i tożsamość. Rozdziałów fabularnych nie pokazujemy."""
     row = ix.encyklopedia.get(int(pid)) if str(pid).isdigit() else None
     if not row:
         return "", "", True
     nazwa, _ = _tekst(ix, pl, row.get("nazwa"))
     if not nazwa:
         nazwa, _ = _tekst(ix, pl, row.get("inna_nazwa"))
-    opis, opis_pl = "", True
-    for para in row.get("historie") or []:
-        for klucz in para[1:2] or para[:1]:
-            tekst, jest_pl = _tekst(ix, pl, klucz)
-            if len(tekst) > len(opis):
-                opis, opis_pl = tekst, jest_pl
+    opis, opis_pl = _tozsamosc(ix, pl, row)
     return nazwa, opis, opis_pl
 
 
 def _karta_osoby(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
-    """Postać mówiąca: imię z danych gry i biogram z encyklopedii, jeśli jest."""
+    """Postać mówiąca: imię z danych gry i tożsamość z encyklopedii, jeśli jest."""
     row = ix.postacie.get(int(pid)) if str(pid).isdigit() else None
     if not row:
         return "", "", True
     nazwa, _ = _tekst(ix, pl, row.get("n"))
     wpis = baza.encyklopedia_po_kluczu.get(row.get("n")) or {}
-    opis, opis_pl = "", True
-    for para in wpis.get("historie") or []:
-        for klucz in para[1:2] or para[:1]:
-            tekst, jest_pl = _tekst(ix, pl, klucz)
-            if len(tekst) > len(opis):
-                opis, opis_pl = tekst, jest_pl
+    opis, opis_pl = _tozsamosc(ix, pl, wpis)
     return nazwa, opis, opis_pl
 
 
 def _karta_nazwy(ix, pl, nazwa: str, encje: dict) -> tuple[str, str, bool]:
-    """Postać znana tylko z imienia w obsadzie: imię plus biogram, jeśli jest."""
+    """Postać znana tylko z imienia w obsadzie: imię plus tożsamość z encyklopedii."""
     wpis = encje.get(nazwa) or {}
-    opis, opis_pl = "", True
-    for para in wpis.get("historie") or []:
-        for klucz in para[1:2] or para[:1]:
-            tekst, jest_pl = _tekst(ix, pl, klucz)
-            if len(tekst) > len(opis):
-                opis, opis_pl = tekst, jest_pl
+    opis, opis_pl = _tozsamosc(ix, pl, wpis)
     return nazwa, opis, opis_pl
 
 
@@ -544,12 +566,19 @@ def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, st
     for kolumna, klucze in kolumny.items():
         for klucz in klucze:
             tekst, jest_pl = _tekst(ix, pl, klucz)
-            if not tekst:
-                continue
-            if not nazwa and _NAZWA.search(kolumna):
+            if tekst and not nazwa and _NAZWA.search(kolumna):
                 nazwa = tekst
-            elif len(tekst) > len(opis) and (_OPIS.search(kolumna) or not _NAZWA.search(kolumna)):
-                opis, opis_pl = tekst, jest_pl
+    if tabela not in _NARRACYJNE:
+        opisowe = [k for k in kolumny if _OPIS.search(k)]
+        opisowe.sort(key=lambda k: _OPIS_KOLEJNOSC.index(k) if k in _OPIS_KOLEJNOSC else len(_OPIS_KOLEJNOSC))
+        for kolumna in opisowe:
+            for klucz in kolumny[kolumna]:
+                tekst, jest_pl = _tekst(ix, pl, klucz)
+                if tekst and len(tekst) > len(opis):
+                    opis, opis_pl = tekst, jest_pl
+                    break
+            if opis:
+                break
     if nazwa and opis and (opis in nazwa or nazwa in opis):
         opis = ""
     return nazwa, opis, opis_pl
@@ -610,13 +639,11 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
             if not opis:
                 # bez opisu nie ma czego pokazać — hasło zostaje w pliku 03
                 continue
-            # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa)
+            # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa);
+            # powtórka nie wnosi treści, więc się nie pojawia
             if nazwa and nazwa in pokazane_nazwy:
-                _dodaj(karty, f"**{nazwa}**")
                 continue
             if para in widziane:
-                if nazwa:
-                    _dodaj(karty, f"**{nazwa}**")
                 continue
             widziane[para] = True
             if nazwa:
@@ -759,7 +786,7 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | plik | zawartość |
 |---|---|
 | `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię, bez punktora |
+| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: tylko hasła, które gra naprawdę opisuje — pełna karta raz, powtórki się nie powtarzają, bez punktora |
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem; tu też hasła bez opisu i pełne teksty kart uciętych w 02 |
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
@@ -776,7 +803,12 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
-jak kwestie w pliku 01 — żeby hasło nie zniknęło z czytanki.
+jak kwestie w pliku 01.
+
+Opis hasła to definicja z danych gry (przedmiot, frakcja, miejsce, sztuka walki),
+a przy postaciach krótka tożsamość z encyklopedii („Chen Zixi: Master of the Vernal
+Hall”). Rozdziałów fabularnych encyklopedii (`historie`) nie bierzemy — to
+streszczenia scen, nie opisy postaci.
 """
 
 
@@ -788,8 +820,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--zakres", choices=("przetlumaczone", "wszystko"), default="wszystko",
                     help="wszystko = kwestie bez przekładu też, z gwiazdką (domyślnie); "
                          "przetlumaczone = tylko polski")
-    ap.add_argument("--zip")
+    ap.add_argument("--zip", help="własna ścieżka paczki (nadpisuje plik)")
+    ap.add_argument("--wersja", help="numer wersji paczki, np. 7 → dist/WWM_Czytanka_PL_v7.zip; "
+                                     "nigdy nie nadpisuje istniejącej wersji")
     a = ap.parse_args(argv)
+    if a.wersja:
+        numer = a.wersja.strip().lstrip("vV")
+        if not numer.isdigit():
+            ap.error("--wersja przyjmuje liczbę, np. 7")
+        cel = Path("dist") / f"WWM_Czytanka_PL_v{numer}.zip"
+        if cel.exists():
+            ap.error(f"{cel} już jest — podnieś numer wersji (v{int(numer) + 1}?)")
+        a.zip = str(cel)
 
     wyj = Path(a.wyj)
     statystyka = zbuduj(index=a.index, magazyn=a.magazyn, wyj=wyj, zakres=a.zakres)

@@ -107,9 +107,19 @@ Zasady pliku 02 (kontekst):
   nie dostaje nagłówka w 02. Dzięki temu 02 to kontekst, a nie lista imion
   (wcześniej 91 tys. kart z samą nazwą, m.in. `**玩家**`, `**0**`,
   `**Entity轨道组**` — wycięte),
-- **pełna karta przy pierwszym wystąpieniu**, przy kolejnych samo imię albo nazwa,
+- **opis to definicja, nie opowieść.** Bierzemy kolumny opisowe z danych gry:
+  `describe`, `describe_str`, `introduction`, `description`, `npc_desc`,
+  `job_info` — czyli przedmioty, frakcje, miejsca, sztuki walki, opisy NPC.
+  Świadomie **nie** bierzemy `content`, `talk_content`, `page_*`, `story_*`,
+  `tips`, `jianwen_text` — to dialogi, księgi, mails i streszczenia cudzych opowieści,
+- **postać dostaje krótką tożsamość z encyklopedii** (`tozsamosc`), np.
+  „Chen Zixi: Master of the Vernal Hall”, „Jiang Wulang: The Traitor”.
+  Rozdziałów fabularnych encyklopedii (`historie`) **nie pokazujemy** — to
+  streszczenia scen, nie opisy postaci; zostają w pliku 03,
+- **hasło pojawia się raz.** Powtórki nie wchodzą w ogóle (wcześniej było przy
+  nich samo imię — puste imię bez treści to szum),
 - **opis dłuższy niż 600 znaków jest ucinany wielokropkiem**; pełny tekst zostaje
-  w pliku 03, żeby angielskie biogramy nie zalewały kontekstu,
+  w pliku 03,
 - **karta bez polskiego przekładu ma gwiazdkę** i tekst z gry, tak samo jak
   kwestie w 01.
 
@@ -123,17 +133,20 @@ Zasady pliku 02 (kontekst):
 - **0 kwestii z chińską etykietą mówcy** i 0 z samym numerem; 4 713 etykiet
   chińskich przeszło na łacinkę (tabela 3 156 znaków),
 - 3 pieśni (na końcu), 4 sekcje prologu, 38 sekcji krain,
-- **8 891 jednostek ma kontekst w pliku 02** — tylko te, w których jest co
-  pokazać: 749 haseł z opisem (pełna karta raz, potem samo imię). Reszta haseł
-  (65 351 pozycji) jest w pliku 03, bo gra nie daje im żadnego opisu — m.in.
-  Jiang Yan (`江晏`), Nefryt Zhenguan (`镇冠珏`), Hojna Wiosna (`丰厚醇`),
-  Dawne Przymierze Yanbei (`燕北旧盟`),
+- **501 jednostek ma kontekst w pliku 02** — tylko te, w których jest co pokazać,
+  i tylko z prawdziwym opisem (178 kart, każda raz). Reszta haseł (65 420 pozycji)
+  jest w pliku 03, bo gra nie daje im definicji — m.in. Jiang Yan (`江晏`),
+  Nefryt Zhenguan (`镇冠珏`), Hojna Wiosna (`丰厚醇`), Dawne Przymierze Yanbei
+  (`燕北旧盟`), a także rozdziały fabularne encyklopedii,
 - 704 karty bez polskiego przekładu mają tekst z gry z gwiazdką (biogramy
   encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
   to opisy bez nazwy, więc idą gołym tekstem,
 - 61 905 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (6 775 019 B,
-  SHA-256 `643de95347cf25bba48bea8227606625dee80eed3fe397e11b8c913ccf90f937`).
+- archiwum: `dist/WWM_Czytanka_PL_v1.zip` (6 607 191 B,
+  SHA-256 `b7c84bee07a76b14ef44dfbe84e63a6448c71f3e8fe955541119c8c6235bc97a`).
+  Wersje numerujemy (`v1`, `v2`, `v3`…), nie datujemy — spis:
+  [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md), a `--wersja N` nie pozwala
+  nadpisać istniejącej paczki.
 
 ## Uruchomienie
 

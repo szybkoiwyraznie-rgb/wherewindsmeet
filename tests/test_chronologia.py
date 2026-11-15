@@ -185,13 +185,17 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
                               f"mówca po chińsku: {mowca}")
             self.assertFalse(mowca.isdigit(), f"mówca to samo id: {mowca}")
 
-    def test_kontekst_tylko_hasla_z_opisem(self):
-        """Hasła bez opisu nie wchodzą do 02 — zostają w 03."""
+    def test_kontekst_bez_golych_nazw(self):
+        """W 02 nie ma kart z samą nazwą — hasło bez opisu zostaje w 03."""
         tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        opisane = {m[1] for m in re.finditer(r"^\*\*([^*]+):\*\* ", tekst, re.M)}
         for trafienie in re.finditer(r"^\*\*([^*]+)\*\*$", tekst, re.M):
-            self.assertIn(trafienie[1], opisane,
-                          f"hasło bez opisu w kontekście: {trafienie[1]}")
+            self.fail(f"hasło bez opisu w kontekście: {trafienie[1]}")
+
+    def test_kontekst_bez_opowiesci_z_encyklopedii(self):
+        """Rozdziały fabularne encyklopedii to nie opisy postaci — nie wchodzą do 02."""
+        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
+        self.assertNotIn("At Blissful Retreat, Jiang Wulang drank alone", tekst)
+        self.assertNotIn("opened his eyes to pitch darkness", tekst)
 
     def test_rozmiar(self):
         self.assertGreater(self.statystyka["linii"], 10_000)
