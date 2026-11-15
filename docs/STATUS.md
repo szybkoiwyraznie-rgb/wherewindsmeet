@@ -160,7 +160,14 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 
 ## Następny krok
 
-0. **Czytanka w kolejności z gry jest gotowa do przejrzenia.** `tools/buduj_czytanke_gry.py`
+0. **Pełna Czytanka (trzy warstwy) i wydanie `v0.4.0` czekają na przejrzenie.**
+   `tools/zbuduj_czytanke_pelna.py` składa `01_prolog.md` + `02_krainy/`
+   (chronologia), `03_fabula/`, `04_kontekst/` i `05_reszta/` (9 sekcji wg rodzaju)
+   w jeden pakiet `WWM_Czytanka_pelna_2026-11-14.zip` (`26 688 858 B`, 187 plików);
+   pokrycie magazynu sprawdzone próbą `600` tekstów — `0` braków.
+   Wydanie `v0.4.0` (`5 330 079 B`, `86 282` przekłady, SHA-256 `2bfdfc62…2ad8`)
+   jest **pełnym** stanem na dziś; `v0.3.0` (`76 595`) jest nieaktualne.
+1. **Czytanka w kolejności z gry — warstwa chronologiczna.** `tools/buduj_czytanke_gry.py`
    buduje ją z `index/prowincje.json`: prolog → krainy w kolejności odwiedzania
    (`燕南 → 清河 → 熔炉 → 河西 → …`) → sceny po numerze dialogu. Opis i granice:
    [CZYTANKA_KOLEJNOSC_GRY.md](CZYTANKA_KOLEJNOSC_GRY.md). Paczki na Dysku
@@ -168,9 +175,9 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    Właściciel czyta
    i zgłasza punkty, w których gra pokazuje treść inaczej — poprawiamy je punktowo
    (np. powrót na zwiedzoną mapę), nie przez przestawianie całości.
-1. **Uruchomić w grze gotową łatkę `v0.3.0` i sprawdzić prolog.** Wysłana na
-   Dysk Google `WWM_Spolszczenie_PL_v0.3.0.zip` (`4 506 590 B`, SHA-256
-   `2ba67551…13016`, `76 595` przekładów, kopia w `paczki/`) zawiera napisy
+2. **Uruchomić w grze gotową łatkę `v0.4.0` i sprawdzić prolog.** Wysłana na
+   Dysk Google `WWM_Spolszczenie_PL_v0.4.0.zip` (`5 330 079 B`, SHA-256
+   `2bfdfc62…2ad8`, `86 282` przekłady) zawiera napisy
    prologu z obu zwrotek (`zwrotki/2026-11-14_prolog_pl.md`, `232` klucze;
    `zwrotki/2026-11-14_prolog_2_pl.md`, `4` klucze) oraz `675` wierszy warstwy
    `text_msg__grey` przejętych z wierszy głównych.
@@ -180,12 +187,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    Przed każdą diagnozą „coś jest po angielsku” uruchomić
    `python3 tools/pokrycie_tlumaczenia.py` (`--brak`, `--brak-przerywnikow`,
    `--szukaj "<fragment zdania>"`).
-2. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
+3. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
    pierwsze wydanie samowystarczalnego spolszczenia **`WWM_Spolszczenie_PL_v0.1.0.zip`**
    (`75 685` przekładów z `tlumaczenie/`, ok. `4,3 MB`, `tools/one_click_patch.py
    --tylko-magazyn --wydanie v0.1.0 --wyj-zip dist/WWM_Spolszczenie_PL_v0.1.0.zip`).
-3. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
+4. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
    → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
    Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
-4. Po każdym kolejnym patchu gry: właściciel klika
+5. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).

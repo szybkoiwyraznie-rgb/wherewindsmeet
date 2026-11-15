@@ -225,3 +225,45 @@ class TestKolejnoscWPliku(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPakietCzytanki(unittest.TestCase):
+    """Składanie trzech warstw w jeden pakiet (`tools/zbuduj_czytanke_pelna.py`)."""
+
+    def test_katalogi_warstw(self):
+        from tools import zbuduj_czytanke_pelna as pakiet
+
+        self.assertEqual(pakiet.KATALOGI["epizody"], "03_fabula")
+        self.assertEqual(pakiet.KATALOGI["kontekst_scen"], "04_kontekst")
+        self.assertEqual(pakiet.KATALOGI["dodatkowe"], "05_reszta")
+
+    def test_normalizacja_zdejmuje_kreski_tabel_i_barwy(self):
+        from tools import zbuduj_czytanke_pelna as pakiet
+
+        # czytanki łamią komórki na kilka wierszy tabeli — porównanie musi to znieść
+        self.assertEqual(
+            pakiet._znormalizuj("| Wachlarz Strażnika   |   Śniegu · Na próbę |"),
+            "wachlarz strażnika śniegu · na próbę",
+        )
+        self.assertEqual(pakiet._znormalizuj("#a66829Noc#E w piwnicy"), "noc w piwnicy")
+        self.assertEqual(pakiet._znormalizuj("Wejdź <Fang Wenxiu|30094|#Y> teraz"),
+                         "wejdź teraz")
+
+    def test_pokrycie_znajduje_tekst_w_pakiecie(self):
+        from tools import zbuduj_czytanke_pelna as pakiet
+
+        with tempfile.TemporaryDirectory() as katalog:
+            root = Path(katalog)
+            (root / "out").mkdir()
+            (root / "out" / "a.md").write_text(
+                "| Nazwa   |\n|---|\n| Wachlarz Strażnika |\n| Śniegu · Na próbę |\n",
+                encoding="utf-8")
+            magazyn = root / "tlumaczenie"
+            magazyn.mkdir()
+            _zapisz_jsonl(magazyn / "pl_a.jsonl", [
+                {"k": "a" * 16, "pl": "Wachlarz Strażnika Śniegu · Na próbę"},
+                {"k": "b" * 16, "pl": "Tekst, którego w pakiecie nie ma nigdzie"},
+            ])
+            wynik = pakiet.sprawdz_pokrycie(root / "out", magazyn, proba=10)
+            self.assertEqual(wynik["kluczy_w_magazynie"], 2)
+            self.assertEqual(wynik["nieznalezione_w_probie"], 1)

@@ -1250,3 +1250,24 @@ cudzego kodu ani nie wymagają tej procedury.
   `WWM_Czytanka_Gry_tylko_PL_2026-11-14.zip` (`2494764 B`,
   id `1lj_SPiXvpa0NFh2IIwd8YocZBYwm_UQ-`).
 - **Nie testowano w grze:** to porządek z danych, nie z przejścia gry.
+
+### 2026-11-14 — pełna Czytanka: trzy warstwy razem + wydanie `v0.4.0`
+
+- **Poprawka zakresu:** poprzedni pakiet dawał tylko warstwę chronologiczną.
+  Ustalenie projektu mówi o trzech rodzajach plików, więc `tools/zbuduj_czytanke_pelna.py`
+  składa je w jeden katalog: `01_prolog.md` + `02_krainy/` (chronologia),
+  `03_fabula/`, `04_kontekst/` (1:1 do fabuły), `05_reszta/` (9 sekcji wg rodzaju).
+- **Liczby pakietu:** 187 plików .md, `109 MB` w katalogu, ZIP `26 688 858 B`.
+  Chronologia: `72 977` scen, `291 426` linii (`28 356` z polskim), `92` krainy.
+  Fabuła: `44 301` scen w `1 169` epizodach, `37 938` przetłumaczonych slotów.
+  Kontekst: `11 031`. Reszta: `61 491` z `389 891` slotów.
+- **Pokrycie sprawdzone, nie deklarowane:** próba losowa `600` przetłumaczonych
+  tekstów z magazynu — **0 braków** w pakiecie. Wcześniejsze „66 997 kluczy poza
+  narracją” to warstwa `05_reszta/`, nie luka.
+- **Wydanie `v0.4.0`:** `dist/WWM_Spolszczenie_PL_v0.4.0.zip`, `5 330 079 B`,
+  `12` plików, SHA-256 `2bfdfc6285f1a7c26517c7d40617ca1233b166a4582a9181f96c2bd16ee92ad8`,
+  `86 282` przekłady (`85 956` kluczy + `326` wariantów płci), `675` bliźniaków
+  warstwy `text_msg__grey`, `745` kolizji odłożonych. **To jest stan pełny** —
+  `v0.3.0` miał `76 595` przekładów i jest nieaktualne. Na Dysku Google:
+  id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`; pełna czytanka: id `1WMWHXs6DFLmcub1FfhDxrVXm4n9vGy7U`.
+  **Nie testowano w grze.**

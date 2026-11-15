@@ -1,4 +1,28 @@
-# Czytanka w kolejności z gry (`tools/buduj_czytanke_gry.py`)
+# Czytanka WWM: trzy warstwy i kolejność z gry
+
+Pakiet buduje `tools/zbuduj_czytanke_pelna.py`. Składa on **trzy rodzaje treści**,
+tak jak ustalono w projekcie, i dokłada do nich warstwę chronologiczną:
+
+| katalog w pakiecie | warstwa | narzędzie |
+|---|---|---|
+| `01_prolog.md`, `02_krainy/` | **chronologia** — gdzie treść pada w grze | `tools/buduj_czytanke_gry.py` |
+| `03_fabula/` | **fabuła** — te same wydarzenia w wątkach zadań, numeracja `Epizod E / Scena E.S` | `tools/buduj_czytanki.py` (`epizody.md`) |
+| `04_kontekst/` | **kontekst 1:1 do fabuły** — postacie, encyklopedia, frakcje, miejsca, poezja, księgi, poszlaki, przedmioty, sztuki walki | `tools/buduj_czytanki.py` (`kontekst_scen.md`) |
+| `05_reszta/` | **cała pozostała treść wg rodzaju** — 9 sekcji: bohaterowie, zadania, przedmioty, encyklopedia, świat, walka, komunikaty, interfejs, resztki | `tools/buduj_czytanki.py` (`dodatkowe.md`) |
+
+```bash
+python3 tools/zbuduj_czytanke_pelna.py --wyj out/czytanka_pelna \
+    --zip dist/WWM_Czytanka_pelna_2026-11-14.zip
+```
+
+Skrypt na końcu sprawdza pokrycie magazynu: losowa próba 600 przetłumaczonych
+tekstów musi się znaleźć w pakiecie (próba z 2026-11-14: **0 braków**). To dlatego
+wcześniejsza liczba „66 997 kluczy poza narracją” nie znaczy „poza czytanką” —
+one są w `05_reszta/`, tylko nie w scenach.
+
+---
+
+## Warstwa chronologiczna (`tools/buduj_czytanke_gry.py`)
 
 Czytanka dla właściciela projektu: cała narracja Where Winds Meet ułożona tak,
 jak gra ją pokazuje — bez zgadywania i bez pomijania scen. Różni się od
@@ -42,8 +66,8 @@ nie są powtarzane w krainach.
 - 72 977 scen, 291 426 linii, w tym 28 356 z polskim
 - 36 scen wyczerpanych przez prolog, 13 589 scen bez mapy w 129 projektach
 - 105 135 wierszy puli napisów, 3 filmy
-- poza narracją zostaje 66 997 przetłumaczonych kluczy (przedmioty, umiejętności,
-  cele zadań, UI) — one są w paczce językowej, nie w scenach
+- 66 997 przetłumaczonych kluczy nie jest scenami (przedmioty, umiejętności, cele
+  zadań, UI) — są w warstwie `05_reszta/` i w paczce językowej
 
 ## Uruchomienie
 
