@@ -1245,4 +1245,8 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Poza narracją** zostaje `66 997` przetłumaczonych kluczy (nazwy przedmiotów,
   umiejętności, cele zadań, UI) — to nie sceny, więc czytanka ich nie udaje.
 - **Testy:** `426` (cały zestaw zielony; `+17` w `tests/test_czytanka_gry.py`).
+- **Na Dysku Google** (folder paczek): `WWM_Czytanka_Gry_2026-11-14.zip`
+  (`17057192 B`, id `1g3H3sZoZd2H5Gx8ybVoWn-8Um739584K`) i
+  `WWM_Czytanka_Gry_tylko_PL_2026-11-14.zip` (`2494764 B`,
+  id `1lj_SPiXvpa0NFh2IIwd8YocZBYwm_UQ-`).
 - **Nie testowano w grze:** to porządek z danych, nie z przejścia gry.
