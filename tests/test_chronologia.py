@@ -16,7 +16,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools import chronologia, czytanka_czysta
+import re
+
+from tools import chronologia, czytanka_czysta, pinyin_slownik
 
 KATALOG = Path(__file__).resolve().parent.parent
 
@@ -172,9 +174,52 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         if "# Prolog" in tekst:
             self.assertIn("\\*", tekst, "karta bez polskiego opisu idzie z gwiazdką")
 
+    def test_mowca_po_lacince(self):
+        """Etykiety mówców nie mogą zostać po chińsku ani jako same numery."""
+        for linia in self.tekst.splitlines():
+            trafienie = re.match(r"^\*\*([^*]+):\*\* ", linia)
+            if not trafienie:
+                continue
+            mowca = trafienie[1]
+            self.assertIsNone(re.search(r"[\u3400-\u9fff]", mowca),
+                              f"mówca po chińsku: {mowca}")
+            self.assertFalse(mowca.isdigit(), f"mówca to samo id: {mowca}")
+
+    def test_kontekst_tylko_hasla_z_opisem(self):
+        """Hasła bez opisu nie wchodzą do 02 — zostają w 03."""
+        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
+        opisane = {m[1] for m in re.finditer(r"^\*\*([^*]+):\*\* ", tekst, re.M)}
+        for trafienie in re.finditer(r"^\*\*([^*]+)\*\*$", tekst, re.M):
+            self.assertIn(trafienie[1], opisane,
+                          f"hasło bez opisu w kontekście: {trafienie[1]}")
+
     def test_rozmiar(self):
         self.assertGreater(self.statystyka["linii"], 10_000)
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPinyinEtykiet(unittest.TestCase):
+    """Chińskie etykiety mówców idą w łacinkę z tabeli w repo (bez bibliotek)."""
+
+    def test_znaki_sa_w_tabeli(self):
+        mapa = pinyin_slownik.wczytaj(KATALOG / "index")
+        self.assertGreater(len(mapa), 1_000)
+        self.assertEqual(mapa.get("大"), "da")
+
+    def test_transliteracja_imienia(self):
+        mapa = pinyin_slownik.wczytaj(KATALOG / "index")
+        self.assertEqual(pinyin_slownik.romanizuj("大祭师", mapa), "Da Ji Shi")
+
+    def test_transliteracja_z_cyfra(self):
+        mapa = pinyin_slownik.wczytaj(KATALOG / "index")
+        self.assertEqual(pinyin_slownik.romanizuj("卫兵1", mapa), "Wei Bing 1")
+
+    def test_nawiasy_pelnej_szerokosci(self):
+        mapa = pinyin_slownik.wczytaj(KATALOG / "index")
+        self.assertEqual(pinyin_slownik.romanizuj("兰澳（少女）", mapa), "Lan Ao (Shao Nv)")
+
+    def test_lacina_zostaje_bez_zmian(self):
+        self.assertEqual(pinyin_slownik.romanizuj("Chen Zixi"), "Chen Zixi")

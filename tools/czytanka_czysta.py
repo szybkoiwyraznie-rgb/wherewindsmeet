@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
-from tools import kolejnosc_gry, powiazania_czytanek  # noqa: E402
+from tools import kolejnosc_gry, powiazania_czytanek, pinyin_slownik  # noqa: E402
 
 DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
@@ -234,11 +234,16 @@ def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
         nazwa = _nazwa_klucza(ix, klucz_zh, pl)
         if nazwa and nazwa != nazwa_zh and _dobre_imie(nazwa):
             return _imie_do_etykiety(nazwa)
+    if nazwa_zh.isdigit():
+        return ""                    # samo id postaci to nie mówca
     if any("\u3400" <= z <= "\u9fff" for z in nazwa_zh):
         en = _nazwy_en(ix).get(nazwa_zh, "") or _glosariusz().get(nazwa_zh, "")
         if en and _dobre_imie(en):
             return _imie_do_etykiety(en)
-    return _glosariusz().get(nazwa_zh) or nazwa_zh
+    etykieta = _glosariusz().get(nazwa_zh) or nazwa_zh
+    if etykieta.isdigit():
+        return ""
+    return pinyin_slownik.romanizuj(etykieta)
 
 
 def _mowca_w_scenie(scena: dict, indeks_mowcy, ix, pl) -> str:
@@ -571,7 +576,8 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
             else:
                 nazwa, opis, opis_pl = _karta(baza, ix, pl, *para)
             nazwa = _etykieta_hasla(ix, nazwa)
-            if not nazwa and not opis:
+            if not opis:
+                # bez opisu nie ma czego pokazać — hasło zostaje w pliku 03
                 continue
             # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa)
             if nazwa and nazwa in pokazane_nazwy:
@@ -640,6 +646,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
         nazwa_tabeli = ix.zrodla[numer][0] if isinstance(numer, int) and numer < len(ix.zrodla) else str(numer)
         etykieta = _kategoria(nazwa_tabeli)
         nazwa = _nazwa_klucza(ix, zrodlo.w[2], pl) if len(zrodlo.w) > 2 else ""
+        nazwa = pinyin_slownik.romanizuj(nazwa) if nazwa else nazwa
         zbior = widziane.setdefault(etykieta, set())
         if nazwa:
             if ("nazwa", nazwa) not in zbior:
@@ -693,8 +700,10 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     (wyj / "02_kontekst_scen_i_cutscen.md").write_text(
         _naglowek("Kontekst scen i cutscen",
                   "Te same jednostki i ta sama kolejność co w pliku 01: postacie, encyklopedia, "
-                  "frakcje, miejsca, przedmioty i sztuki walki wymienione w scenie. Każde hasło "
-                  "ma pełną kartę przy pierwszym wystąpieniu.") + "\n".join(tresc_kontekstu) + "\n",
+                  "frakcje, miejsca, przedmioty i sztuki walki wymienione w scenie. Wchodzą tylko "
+                  "hasła, które gra naprawdę opisuje; pełna karta stoi przy pierwszym wystąpieniu, "
+                  "przy kolejnych samo imię albo nazwa. Opis dłuższy niż "
+                  f"{DLUGOSC_KARTY} znaków jest ucinany wielokropkiem — całość zostaje w pliku 03.") + "\n".join(tresc_kontekstu) + "\n",
         encoding="utf-8")
     statystyka["plikow"] += 1
 
@@ -720,18 +729,20 @@ def _readme(statystyka: dict, zakres: str) -> str:
 |---|---|
 | `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
 | `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię, bez punktora |
-| `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
+| `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem; tu też hasła bez opisu i pełne teksty kart uciętych w 02 |
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
 i tabel; kwestia bez mówcy to goły tekst.
 Gracz zawsze jako **Youxia**. Kwestie bez polskiego przekładu stoją z gwiazdką
-(`- \\*Fate is already sealed.`), więc widać, gdzie tłumaczenia jeszcze nie ma.
+(`\\*Fate is already sealed.`), więc widać, gdzie tłumaczenia jeszcze nie ma.
+Etykiety mówców zapisane w grze tylko po chińsku są transliterowane na łacinkę
+(`大祭师` → `Da Ji Shi`), bo tłumaczenia tych nazw gra nie ma.
 Zakres: **{zakres}**.
 
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
-{statystyka['bez_przekladu']} kwestii w prologu pokazano z gwiazdką, bo przekładu jeszcze nie ma.
+{statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01 — żeby hasło nie zniknęło z czytanki.

@@ -52,7 +52,7 @@ Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 Duch Jelenia prowadzi cię do jaskini…
 
 ## Scena 10099
-**伶人师傅:** Nie powinieneś był przychodzić!
+**Ling Ren Shi Fu:** Nie powinieneś był przychodzić!
 **Youxia:** Te wszystkie krwawe sprawy, setki dusz, które odeszły — one mnie tu prowadzą!
 ```
 
@@ -66,6 +66,14 @@ Zasady:
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
   `index/nazwy_mowcow.json` (219 haseł, rośnie z każdą sesją),
+- **etykiety tylko po chińsku są transliterowane:** `大祭师` → `Da Ji Shi`,
+  `卫兵1` → `Wei Bing 1`, `兰澳（少女）` → `Lan Ao (Shao Nv)`. Tabela znaków leży
+  w `index/pinyin_znakow.json` (3 156 znaków), więc przebudowa nie potrzebuje
+  żadnej biblioteki; odświeża ją `python3 tools/pinyin_slownik.py --pisz
+  index/pinyin_znakow.json`. To transliteracja, nie przekład — gra nie daje dla
+  tych etykiet nazwy obcej,
+- **samo id to nie mówca:** etykiety typu `600001`/`1632390111` nie trafiają do
+  czytanki, kwestia zostaje jako goły tekst,
 - **postać gracza to zawsze `Youxia`** — także gdy gra zapisze ją jako `player`,
   `main_player`, `mian_player` (literówka w danych) czy `player_1`;
   tory techniczne (`Entity轨道组` itp.) nie mają mówcy,
@@ -73,7 +81,7 @@ Zasady:
   tabel; numer zostaje tylko w nagłówku `## Scena N` / `## Cutscena N`, żeby
   dało się wrócić do gry,
 - **kwestie bez przekładu widać:** idą z gwiazdką i tekstem z gry —
-  `- **Mu Ji'an:** \*The illness will flare up next turn!` — żeby nie zginęły
+  `**Mu Ji'an:** \*The illness will flare up next turn!` — żeby nie zginęły
   z czytanki; `--zakres przetlumaczone` daje plik tylko po polsku,
 - **prolog jest przetłumaczony w całości:** brakujące 5 kluczy dopisałem do
   magazynu (`tlumaczenie/pl_1000_prolog_uzupelnienia.jsonl`), więc w prologu
@@ -83,26 +91,40 @@ Zasady:
   wpisany dwa razy,
 - **sceny bez mapy** mają własną sekcję, żeby nic nie wypadło.
 
-## Liczby (2026-11-15)
+Zasady pliku 02 (kontekst):
+
+- **tylko hasła, które gra naprawdę opisuje.** Nazwa bez opisu to za mało —
+  takie hasła zostają w pliku 03, a jednostka, w której nie ma nic do pokazania,
+  nie dostaje nagłówka w 02. Dzięki temu 02 to kontekst, a nie lista imion
+  (wcześniej 91 tys. kart z samą nazwą, m.in. `**玩家**`, `**0**`,
+  `**Entity轨道组**` — wycięte),
+- **pełna karta przy pierwszym wystąpieniu**, przy kolejnych samo imię albo nazwa,
+- **opis dłuższy niż 600 znaków jest ucinany wielokropkiem**; pełny tekst zostaje
+  w pliku 03, żeby angielskie biogramy nie zalewały kontekstu,
+- **karta bez polskiego przekładu ma gwiazdkę** i tekst z gry, tak samo jak
+  kwestie w 01.
+
+## Liczby (2026-11-15, po wycięciu haseł bez opisu)
 
 - 75 287 jednostek w pliku 01 (8 910 scen z polskim dialogiem, 1 597 cutscen,
   reszta to sceny bez przekładu — teraz też są, z gwiazdką),
-- 186 959 linii kwestii: 26 554 po polsku i 160 405 z gwiazdką (tekst z gry);
-  180 459 linii ma mówcę (`**Mówca:** tekst`), 6 500 to goły tekst bez mówcy,
-- 36 366 kwestii należy do gracza (`Youxia`),
-- 9 319 kwestii ma jeszcze chińską etykietę mówcy (4 713 różnych) — to etykiety
-  opisowe bez odpowiednika w danych gry; schodzą ze słownikiem `nazwy_mowcow.json`,
-- mówcy: imię polskie lub angielskie z danych gry, postać gracza jako `Ty`,
-  3 561 kwestii ma tylko imię chińskie (gra nie daje dla nich nazwy obcej),
+- 186 961 linii kwestii: 26 554 po polsku i 160 407 z gwiazdką (tekst z gry);
+  180 375 linii ma mówcę (`**Mówca:** tekst`), 6 586 to goły tekst bez mówcy,
+- 36 266 kwestii należy do gracza (`Youxia`),
+- **0 kwestii z chińską etykietą mówcy** i 0 z samym numerem; 4 713 etykiet
+  chińskich przeszło na łacinkę (tabela 3 156 znaków),
 - 3 pieśni (na końcu), 4 sekcje prologu, 38 sekcji krain,
-- 73 296 jednostek ma kontekst w pliku 02; kontekst obejmuje też sceny bez
-  polskiego dialogu, bo mówiący i hasła są niezależne od przekładu
-  (574 hasła z pełną kartą, reszta to powtórzenia samego imienia),
-- karty bez polskiego przekładu mają tekst z gry z gwiazdką, tak samo jak kwestie
-  w pliku 01: `- **Wang Qing:** \*Wang Qing can still recall the argument...`
-  (1 035 kart; biogramy encyklopedii są na razie po angielsku),
-- 64 112 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (8 486 049 B).
+- **8 891 jednostek ma kontekst w pliku 02** — tylko te, w których jest co
+  pokazać: 749 haseł z opisem (pełna karta raz, potem samo imię). Reszta haseł
+  (65 351 pozycji) jest w pliku 03, bo gra nie daje im żadnego opisu — m.in.
+  Jiang Yan (`江晏`), Nefryt Zhenguan (`镇冠珏`), Hojna Wiosna (`丰厚醇`),
+  Dawne Przymierze Yanbei (`燕北旧盟`),
+- 704 karty bez polskiego przekładu mają tekst z gry z gwiazdką (biogramy
+  encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
+  to opisy bez nazwy, więc idą gołym tekstem,
+- 61 905 pozycji w pliku 03,
+- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (6 774 996 B,
+  SHA-256 `a3d003782182f7fa70a979222fcf729c71a92717012a32cf355b69e6617b2741`).
 
 ## Uruchomienie
 

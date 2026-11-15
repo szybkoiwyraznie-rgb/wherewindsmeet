@@ -174,9 +174,21 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`7 701 897 B`),
-   Dysk Google id `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA`. Opis formatu:
+   goły tekst. Paczka: `WWM_Czytanka_PL_2026-11-15.zip` (`6 774 996 B`,
+   SHA-256 `a3d003782182f7fa70a979222fcf729c71a92717012a32cf355b69e6617b2741`),
+   Dysk Google id `1sY2RUG1_8ohmYQf3MMPJC2lFnC0m7ZYo` (poprzednia wersja
+   `11xske9GnxodIF8Q9x_rjMy8lq0FkEOMA` w koszu). Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+   **Stan po decyzjach właściciela z 2026-11-15:** (a) do pliku 02 wchodzą tylko
+   hasła, które gra naprawdę opisuje — 8 891 jednostek ma kontekst, 65 351
+   pozycji bez opisu przeniesiono do 03 (m.in. `江晏`/Jiang Yan, `镇冠珏`/Nefryt
+   Zhenguan, `丰厚醇`/Hojna Wiosna, `燕北旧盟`/Dawne Przymierze Yanbei — gra nie
+   daje im żadnego opisu); (b) karty bez opisu zniknęły też z list haseł, razem
+   z 28 tys. śmieciowych wpisów (`玩家`, `0`, `Entity轨道组`) i 747 duplikatami;
+   (c) 4 713 chińskich etykiet mówców przeszło na łacinkę (`大祭师` → `Da Ji Shi`)
+   przez tabelę `index/pinyin_znakow.json` (3 156 znaków, `tools/pinyin_slownik.py`),
+   więc w czytance nie ma już ani jednej chińskiej etykiety mówcy ani samego
+   numeru postaci. 466 testów zielonych.
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.
