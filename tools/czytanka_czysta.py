@@ -484,8 +484,6 @@ def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, st
                 nazwa = tekst
             elif len(tekst) > len(opis) and (_OPIS.search(kolumna) or not _NAZWA.search(kolumna)):
                 opis, opis_pl = tekst, jest_pl
-    if not nazwa and opis:
-        nazwa, opis = opis, ""
     if nazwa and opis and (opis in nazwa or nazwa in opis):
         opis = ""
     return nazwa, opis, opis_pl
@@ -538,7 +536,7 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
                 continue
             if para in widziane:
                 if nazwa:
-                    karty.append(f"- **{nazwa}**")
+                    karty.append(f"**{nazwa}**")
                 continue
             widziane[para] = True
             if para[0] == "nazwa":
@@ -559,11 +557,11 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
             # ta sama zasada co w pliku 01: brak polskiego → tekst z gry z gwiazdką
             tresc_opisu = opis if opis_pl else f"\\*{opis}"
             if nazwa and opis:
-                karty.append(f"- **{nazwa}:** {tresc_opisu}")
+                karty.append(f"**{nazwa}:** {tresc_opisu}")
             elif nazwa:
-                karty.append(f"- **{nazwa}**")
+                karty.append(f"**{nazwa}**")
             else:
-                karty.append(f"- {tresc_opisu}")
+                karty.append(tresc_opisu)
         if not karty:
             continue
         ktory += 1
@@ -578,7 +576,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
     """Co nie trafiło do 01 ani 02 — pogrupowane rodzajem: „nazwa — opis”."""
     sekcje: dict[str, dict[str, list[str]]] = {}
     bez_nazwy: dict[str, list[str]] = {}
-    widziane: dict[str, set[str]] = {}
+    widziane: dict[str, set[tuple[str, str]]] = {}
     for klucz, tekst in pl.items():
         if klucz in uzyte:
             continue
@@ -591,16 +589,16 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
         nazwa = _nazwa_klucza(ix, zrodlo.w[2], pl) if len(zrodlo.w) > 2 else ""
         zbior = widziane.setdefault(etykieta, set())
         if nazwa:
-            if nazwa not in zbior:
+            if ("nazwa", nazwa) not in zbior:
                 sekcje.setdefault(etykieta, {})[nazwa] = []
-                zbior.add(nazwa)
+                zbior.add(("nazwa", nazwa))
             if tekst != nazwa and tekst not in nazwa and nazwa not in tekst:
                 if tekst not in sekcje[etykieta][nazwa]:
                     sekcje[etykieta][nazwa].append(tekst)
         else:
-            linia = f"- {tekst}"
-            if len(linia) >= 4 and linia not in zbior:
-                zbior.add(linia)
+            linia = tekst
+            if len(linia) >= 4 and ("linia", linia) not in zbior:
+                zbior.add(("linia", linia))
                 bez_nazwy.setdefault(etykieta, []).append(linia)
         statystyka["reszta"] += 1
 
@@ -609,7 +607,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
         out += [f"# {etykieta}", ""]
         for nazwa in sorted(sekcje.get(etykieta, {}), key=str.lower):
             opis = " · ".join(sekcje[etykieta][nazwa])
-            out.append(f"- **{nazwa}:** {opis}" if opis else f"- **{nazwa}**")
+            out.append(f"**{nazwa}:** {opis}" if opis else f"**{nazwa}**")
         out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
         out.append("")
     return out
@@ -668,7 +666,7 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | plik | zawartość |
 |---|---|
 | `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię |
+| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię, bez punktora |
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów

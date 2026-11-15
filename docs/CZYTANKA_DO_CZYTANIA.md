@@ -60,9 +60,9 @@ Zasady:
 
 - **jedna kwestia = jedna linia**, bez odstępu między kwestiami; pusty wiersz
   oddziela tylko jednostki (scenę, cutscenę),
-- **bez punktora w ogóle:** kwestia to `**Mówca:** tekst`, a gdy mówcy nie ma —
-  goły tekst. Punktor mylił, bo część kwestii to dalszy ciąg zdania łamanego na
-  dwa wiersze; dotyczy to też cutscen,
+- **bez punktora w ogóle — w każdym pliku:** kwestia to `**Mówca:** tekst`,
+  a gdy mówcy nie ma — goły tekst. Ten sam układ w 02 (hasła) i 03 (reszta):
+  `**Nazwa:** opis`. Punktor nic nie wnosił, a przy łamanych zdaniach mylił,
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
   `index/nazwy_mowcow.json` (219 haseł, rośnie z każdą sesją),
