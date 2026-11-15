@@ -87,7 +87,12 @@ def _magazyn(katalog: Path) -> dict[str, str]:
     return pl
 
 
-GRACZ = {"你": "Ty", "我": "Ja", "玩家": "Ty", "主角": "Ty"}
+# W danych gry ta sama postać gracza bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
+GRACZ = {nazwa: "Ty" for nazwa in (
+    "你", "我", "玩家", "主角", "player", "Player", "PLAYER", "You", "主角（玩家）",
+)}
+# Techniczne nazwy torów i grupy entity — nie są mówcami.
+TECHNICZNE = {"Entity轨道组", "轨道组", "entity", "Entity", "旁白占位"}
 
 
 def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
@@ -115,6 +120,8 @@ def _mowca(scena: dict, indeks_mowcy, ix, pl: dict[str, str]) -> str:
     nazwa_zh = _czysty(str(osoba[0] or ""))
     if nazwa_zh in GRACZ:
         return GRACZ[nazwa_zh]
+    if nazwa_zh in TECHNICZNE:
+        return ""
 
     osoba_id = osoba[2] if len(osoba) > 2 else None
     wiersz = ix.postacie.get(osoba_id) if isinstance(osoba_id, int) else None

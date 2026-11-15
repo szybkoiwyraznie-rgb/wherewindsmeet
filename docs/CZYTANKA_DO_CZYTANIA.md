@@ -39,6 +39,9 @@ Zasady:
 ## Liczby (2026-11-14)
 
 - 8 908 scen, 92 216 kwestii z polskim; 263 076 kwestii bez przekładu pominięto,
+- 25 219 linii dialogu; mówcy: 21 357 z imieniem polskim lub angielskim
+  (postać gracza jako `Ty`), 3 561 z imieniem chińskim — gra nie ma dla nich
+  nazwy obcej w danych, więc zostaje zapis źródłowy,
 - 3 filmy, napisy przerywników w blokach `## Cutscena A–B`,
 - 03_reszta: przedmioty i stroje, sztuki walki, encyklopedia, postacie, zadania,
   świat i sekty, walka, interfejs, pozostałe.

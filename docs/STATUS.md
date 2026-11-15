@@ -166,7 +166,7 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    (filmy i napisy przerywników), `03_reszta.md` (przedmioty, sztuki walki,
    encyklopedia, postacie, zadania). Bez czasów, kluczy i tabel.
    8 908 scen, 92 216 kwestii. Paczka: `WWM_Czytanka_PL_2026-11-14.zip`
-   (`1 523 414 B`), Dysk Google id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
+   (`1 521 256 B`), Dysk Google id `1IDp83hns7DNmdF6shhlAFMlhA3Xo_wVP`.
    Opis formatu: [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
    Wcześniejsze zestawy techniczne (tabele z chińskim i angielskim, trzy warstwy)
    są w koszu Dysku i zostają wyłącznie jako narzędzia audytu.
