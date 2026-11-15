@@ -318,14 +318,14 @@ class TestCzytankaDoCzytania(unittest.TestCase):
 
     def test_kwestia_ma_mowce_i_tekst_w_jednej_linii(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
-        self.assertIn("- **B:** Alfa raz.", tresc)
+        self.assertIn("**B:** Alfa raz.", tresc)
         self.assertIn("## Scena 200", tresc)
 
     def test_bez_czasow_tabel_i_pustych_linii_miedzy_kwestiami(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
         self.assertNotIn("|", tresc)
         self.assertNotRegex(tresc, r"\d+\.\d+ ?s")
-        self.assertIn("## Scena 200\n- **B:** Alfa raz.", tresc)
+        self.assertIn("## Scena 200\n**B:** Alfa raz.", tresc)
 
     def test_kwestie_bez_polskiego_sa_pomijane(self):
         self.assertNotIn("阿尔法二", self.czytaj("01_sceny_i_cutsceny.md"))
@@ -339,13 +339,13 @@ class TestCzytankaDoCzytania(unittest.TestCase):
 
     def test_napisy_spoza_cutscen_trafiaja_do_reszty(self):
         # `napis_a` nie należy do żadnej cutsceny ani grupy zadań → plik 03
-        self.assertIn("- Napisy przerywnika.", self.czytaj("03_reszta.md"))
+        self.assertIn("Napisy przerywnika.", self.czytaj("03_reszta.md"))
         self.assertNotIn("Napisy przerywnika.", self.czytaj("01_sceny_i_cutsceny.md"))
 
     def test_scena_bez_mapy_ma_wlasna_sekcje(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
         self.assertIn("# Sceny bez przypisanej mapy", tresc)
-        self.assertIn("## Scena 400\n- **D:** Samotna kwestia.", tresc)
+        self.assertIn("## Scena 400\n**D:** Samotna kwestia.", tresc)
 
     def test_czysty_tekst_zdejmuje_kody(self):
         self.assertEqual(self.czytanka._czysty("#a66829Noc#E <Fang|1|#Y> w piwnicy"), "Noc Fang w piwnicy")

@@ -12,7 +12,8 @@
 3. `03_reszta.md` — cała reszta przekładów, której nie ma w 01 ani w 02,
    pogrupowana według rodzaju danych.
 
-Format kwestii w 01: jedna linia `- **Mówca:** tekst`, bez czasów, kluczy i tabel.
+Format kwestii w 01: jedna linia `**Mówca:** tekst` (bez punktora), bez czasów,
+kluczy i tabel; kwestia bez mówcy to goły tekst.
 
 Użycie:
     python3 tools/czytanka_czysta.py --wyj out/czytanka --zip dist/WWM_Czytanka.zip
@@ -359,17 +360,13 @@ def _z_gry(ix, klucz: str) -> str:
     return _czysty(tekst.en or tekst.zrodlo or "")
 
 
-def _linia(mowca: str, tekst: str, bez_punktu: bool = False) -> str:
-    """Kwestia w jednej linii.
+def _linia(mowca: str, tekst: str) -> str:
+    """Kwestia w jednej linii, bez punktora.
 
-    Bez punktora: gdy nie ma mówcy (często to dalszy ciąg zdania łamanego na dwa
-    wiersze) oraz w cutscenach, gdzie podpisy i tak są narracją, nie dialogiem.
+    Punktor mylił: część kwestii to dalszy ciąg zdania łamanego na dwa wiersze,
+    a w cutscenach i tak nie ma mówcy. Zostaje sam mówca i tekst.
     """
-    if not mowca:
-        return tekst
-    if bez_punktu:
-        return f"**{mowca}:** {tekst}"
-    return f"- **{mowca}:** {tekst}"
+    return f"**{mowca}:** {tekst}" if mowca else tekst
 
 
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
@@ -396,7 +393,7 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
                 statystyka["bez_przekladu"] += 1
             else:
                 statystyka["linii"] += 1
-            gotowa = _linia(mowca, tekst, jednostka.rodzaj == "cutscena")
+            gotowa = _linia(mowca, tekst)
             if gotowa in widziane_linie:
                 continue          # ta sama kwestia drugi raz w tej samej jednostce
             widziane_linie.add(gotowa)
@@ -674,7 +671,8 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię |
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
 
-Kwestie w 01: `- **Mówca:** tekst`, jedna kwestia na linię, bez czasów i tabel.
+Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
+i tabel; kwestia bez mówcy to goły tekst.
 Gracz zawsze jako **Youxia**. Kwestie bez polskiego przekładu stoją z gwiazdką
 (`- \\*Fate is already sealed.`), więc widać, gdzie tłumaczenia jeszcze nie ma.
 Zakres: **{zakres}**.

@@ -46,23 +46,23 @@ Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 # 燕南 — Mapa Yannan
 
 ## Scena 10094
-- **The Shimmer of South:** O niebiosa bez litości, czemu nie dacie mi umrzeć razem z tobą!
+**The Shimmer of South:** O niebiosa bez litości, czemu nie dacie mi umrzeć razem z tobą!
 
 ## Cutscena 30354
-- ...
+Duch Jelenia prowadzi cię do jaskini…
 
 ## Scena 10099
-- **伶人师傅:** Nie powinieneś był przychodzić!
-- **Ty:** Te wszystkie krwawe sprawy, setki dusz, które odeszły — one mnie tu prowadzą!
+**伶人师傅:** Nie powinieneś był przychodzić!
+**Youxia:** Te wszystkie krwawe sprawy, setki dusz, które odeszły — one mnie tu prowadzą!
 ```
 
 Zasady:
 
 - **jedna kwestia = jedna linia**, bez odstępu między kwestiami; pusty wiersz
   oddziela tylko jednostki (scenę, cutscenę),
-- **punktor tylko przy mówcy:** `- **Mówca:** tekst`. Kwestia bez jawnego mówcy
-  idzie jako goły tekst (często to dalszy ciąg zdania łamanego na dwa wiersze),
-  a **cutsceny nie mają punktora wcale** — nawet gdy mówca jest znany,
+- **bez punktora w ogóle:** kwestia to `**Mówca:** tekst`, a gdy mówcy nie ma —
+  goły tekst. Punktor mylił, bo część kwestii to dalszy ciąg zdania łamanego na
+  dwa wiersze; dotyczy to też cutscen,
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
   `index/nazwy_mowcow.json` (219 haseł, rośnie z każdą sesją),
@@ -88,7 +88,7 @@ Zasady:
 - 75 287 jednostek w pliku 01 (8 910 scen z polskim dialogiem, 1 597 cutscen,
   reszta to sceny bez przekładu — teraz też są, z gwiazdką),
 - 186 959 linii kwestii: 26 554 po polsku i 160 405 z gwiazdką (tekst z gry);
-  180 459 linii ma mówcę i punktor, 6 500 to goły tekst (bez mówcy lub cutscena),
+  180 459 linii ma mówcę (`**Mówca:** tekst`), 6 500 to goły tekst bez mówcy,
 - 36 366 kwestii należy do gracza (`Youxia`),
 - 9 319 kwestii ma jeszcze chińską etykietę mówcy (4 713 różnych) — to etykiety
   opisowe bez odpowiednika w danych gry; schodzą ze słownikiem `nazwy_mowcow.json`,

@@ -126,20 +126,14 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         self.assertGreater(self.tekst.index("# Pieśni"),
                            self.tekst.index("# Cutsceny bez grupy zadań"))
 
-    def test_kwestie_bez_mowcy_bez_punktora(self):
+    def test_kwestie_bez_punktora(self):
         for linia in self.tekst.splitlines():
-            if linia.startswith("- ") and ":** " not in linia and "\\*" not in linia:
-                self.fail(f"kwestia bez mówcy z punktorem: {linia[:60]}")
+            if linia.startswith("- "):
+                self.fail(f"kwestia z punktorem: {linia[:60]}")
 
-    def test_cutsceny_bez_punktora(self):
-        w_cutscenie = False
-        for linia in self.tekst.splitlines():
-            if linia.startswith("## Cutscena"):
-                w_cutscenie = True
-            elif linia.startswith("## ") or linia.startswith("# "):
-                w_cutscenie = False
-            elif w_cutscenie and linia.startswith("- "):
-                self.fail(f"cutscena z punktorem: {linia[:60]}")
+    def test_mowca_jest_pogrubiony(self):
+        self.assertIn("**Youxia:**", self.tekst)
+        self.assertNotIn("- **", self.tekst)
 
     def test_sekcje_chronologii(self):
         self.assertIn("# Pieśni", self.tekst)
@@ -156,7 +150,7 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         for linia in self.tekst.splitlines():
             if linia.startswith("## ") or linia.startswith("# "):
                 kwestie = set()
-            elif linia.strip() and not linia.startswith(("#", "*")):
+            elif linia.strip() and not linia.startswith("#"):
                 if linia in kwestie:
                     self.fail(f"powtórzona kwestia w jednostce: {linia[:60]}")
                 kwestie.add(linia)
