@@ -75,8 +75,23 @@ def _kraina_scen(ix, krainy: list[dict]) -> tuple[dict[int, str], list[str]]:
     return przypisanie, kolejnosc
 
 
-def _prolog(index: str, magazyn: str) -> list[dict]:
-    """Prolog w kolejności transkryptu: sekcje z nagłówków, w środku klucze tekstów."""
+def _zrodlo_tabeli(ix, klucz: str) -> str | None:
+    """Nazwa tabeli, z której pochodzi tekst (np. `cutscene_text_oversea`)."""
+    tekst = ix.teksty.get(klucz)
+    zrodlo = ix.zrodlo(tekst) if tekst is not None else None
+    return zrodlo[0] if zrodlo else None
+
+
+def _prolog(index: str, magazyn: str) -> tuple[list[dict], set[int]]:
+    """Prolog w kolejności transkryptu: sekcje z nagłówków, w środku klucze tekstów.
+
+    Linia transkryptu, która nie jest kwestią, bywa streszczeniem cutsceny
+    (`cutscenes.synopsis_text_mobile`). Wtedy w tym miejscu wchodzi jednostka
+    `cutscena` — tak streszczenie „Robak przelatuje i wnika w zwłoki…” trafia
+    między Prolog 3 i Prolog 4, zamiast wylądować na końcu pliku jako „scena bez
+    przypisanej mapy”. Zwrócone numery cutscen są potem pomijane przy
+    rozmieszczaniu cutscen w krainach, żeby nic nie stało dwa razy.
+    """
     _ix, po_pl, po_en = prolog_z_klucza._mapy(index, magazyn)
     porzadek: dict[str, list[dict]] = defaultdict(list)
     for wiersz in kolejnosc_gry.wczytaj(Path(index)):
@@ -84,20 +99,62 @@ def _prolog(index: str, magazyn: str) -> list[dict]:
             porzadek[wiersz["k"]].append(wiersz)
     linie = Path(prolog_z_klucza.TRANSKRYPT).read_text(encoding="utf-8-sig").splitlines()
 
+    # klucz streszczenia → numer cutsceny; transkrypt jest po polsku, więc
+    # szukamy wśród kandydatów dopasowanych po polskim i angielskim tekście
+    cutscena_streszczenia: dict[str, int] = {}
+    for no, przerywnik in _ix.przerywniki.items():
+        if przerywnik.get("streszczenie"):
+            cutscena_streszczenia.setdefault(przerywnik["streszczenie"], no)
+
     jednostki: list[dict] = []
+    uzyte_cutsceny: set[int] = set()
     numer = 0
+    czesc = 0
+    po_banerze = False             # sekcję otworzyła tabliczka krainy, nie nagłówek                      # ile jednostek dana sekcja transkryptu już dała
     etykieta, klucze = "Prolog", []
+
+    def zamknij(etykieta: str, klucze: list[str]) -> None:
+        if klucze:
+            jednostki.append({"t": "prolog", "s": "Prolog", "e": etykieta, "k": klucze})
+
     for rodzaj, tekst in prolog_z_klucza._przejscie(linie):
         if rodzaj == "#":
-            if klucze:
-                jednostki.append({"t": "prolog", "s": "Prolog", "e": etykieta, "k": klucze})
-            numer += 1
+            zamknij(etykieta if czesc == 0 else f"{etykieta} (ciąg dalszy)", klucze)
+            if po_banerze:
+                po_banerze = False   # tabliczka już policzyła tę sekcję
+            else:
+                numer += 1
+            czesc = 0
             # nagłówki transkryptu to komentarze właściciela, nie nazwy scen —
             # w chronologii sekcje prologu są po prostu numerowane
             etykieta, klucze = f"Prolog {numer}", []
             continue
+        # „QINGHE - VERDANT WILDS” w transkrypcie to tabliczka krainy
+        # (`cutscene_text_oversea`), a nie kwestia — otwiera nową sekcję prologu
+        if any(_zrodlo_tabeli(_ix, k) == "cutscene_text_oversea"
+               for k in prolog_z_klucza._kandydaci(tekst, po_pl, po_en)):
+            zamknij(etykieta if czesc == 0 else f"{etykieta} (ciąg dalszy)", klucze)
+            numer += 1
+            czesc = 0
+            po_banerze = True
+            etykieta, klucze = f"Prolog {numer}", []
+            continue
         klucz = prolog_z_klucza._dopasuj(tekst, po_pl, po_en, porzadek)
-        if klucz and (not klucze or klucze[-1] != klucz):
+        if not klucz:
+            no = next((cutscena_streszczenia[k]
+                       for k in prolog_z_klucza._kandydaci(tekst, po_pl, po_en)
+                       if k in cutscena_streszczenia), None)
+            if no is not None and no not in uzyte_cutsceny:
+                klucz_streszczenia = _ix.przerywniki[no]["streszczenie"]
+                if klucze:
+                    czesc += 1
+                    zamknij(etykieta if czesc == 1 else f"{etykieta} (ciąg dalszy)", klucze)
+                    klucze = []
+                jednostki.append({"t": "cutscena", "n": no, "s": "Prolog",
+                                  "e": f"Cutscena {no}", "k": [klucz_streszczenia]})
+                uzyte_cutsceny.add(no)
+            continue
+        if not klucze or klucze[-1] != klucz:
             # dwie linie transkryptu mogą trafić w ten sam wariant tekstu —
             # wtedy w grze to jedna kwestia, nie dwie
             klucze.append(klucz)
@@ -105,12 +162,17 @@ def _prolog(index: str, magazyn: str) -> list[dict]:
         if numer == 0:
             numer = 1
             etykieta = "Prolog 1"
-        jednostki.append({"t": "prolog", "s": "Prolog", "e": etykieta, "k": klucze})
-    return jednostki
+        zamknij(etykieta if czesc == 0 else f"{etykieta} (ciąg dalszy)", klucze)
+    return jednostki, uzyte_cutsceny
 
 
-def _cutsceny(ix) -> tuple[dict[int, list[dict]], list[dict]]:
-    """Cutsceny rozdzielone na przypisane do grup zadań i pozostałe."""
+def _cutsceny(ix, pomijane: set[int] | None = None) -> tuple[dict[int, list[dict]], list[dict]]:
+    """Cutsceny rozdzielone na przypisane do grup zadań i pozostałe.
+
+    `pomijane` to cutsceny, które już stoją w prologu (streszczenie z transkryptu) —
+    nie mogą się powtórzyć w krainach.
+    """
+    pomijane = pomijane or set()
     przerywniki = ix.przerywniki
     grupy = ix.grupy
     powtorki = ix.cutsceny_kontekst.get("powtorka") or []
@@ -129,14 +191,14 @@ def _cutsceny(ix) -> tuple[dict[int, list[dict]], list[dict]]:
     for grupa, lista in sorted(grupa_cutsceny.items()):
         for wiersz in lista:
             no = wiersz["no"]
-            if no in przypisane:
+            if no in przypisane or no in pomijane:
                 continue
             przypisane.add(no)
             jednostki_grup[grupa].append(_jednostka_cutsceny(no, przerywniki[no], grupa))
 
     reszta: list[dict] = []
     for no in sorted(przerywniki):
-        if no not in przypisane:
+        if no not in przypisane and no not in pomijane:
             jednostka = _jednostka_cutsceny(no, przerywniki[no], None)
             if jednostka.get("k"):
                 reszta.append(jednostka)
@@ -177,10 +239,11 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
         if wiersz.get("z") == "film" and wiersz.get("d") is not None:
             filmy.add(int(wiersz["d"]))
 
-    jednostki.extend(_prolog(index, magazyn))
+    jednostki_prologu, cutsceny_w_prologu = _prolog(index, magazyn)
+    jednostki.extend(jednostki_prologu)
 
     sceny = sorted(numer for numer, scena in ix.sceny.items() if scena.get("e"))
-    grupy_cutscen, cutsceny_bez_grupy = _cutsceny(ix)
+    grupy_cutscen, cutsceny_bez_grupy = _cutsceny(ix, cutsceny_w_prologu)
     kotwice = _kotwice_grup(ix, sceny)
     przy_scenie: dict[int, list[dict]] = defaultdict(list)
     for grupa, lista in grupy_cutscen.items():

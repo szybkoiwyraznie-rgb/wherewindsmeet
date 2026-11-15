@@ -73,11 +73,25 @@ class TestZapisanaChronologia(unittest.TestCase):
 
     def test_cutsceny_przy_scenie_swojej_grupy(self):
         przypisane = [j for j in self.jednostki
-                      if j["t"] == "cutscena" and j["s"] != chronologia.BEZ_GRUPY]
+                      if j["t"] == "cutscena" and j["s"] not in (chronologia.BEZ_GRUPY, "Prolog")]
         self.assertGreater(len(przypisane), 100)
         for jednostka in przypisane:
             self.assertIn("g", jednostka)
             self.assertTrue(jednostka.get("k"))
+
+    def test_cutscena_w_prologu_ma_streszczenie(self):
+        """Streszczenie cutsceny z transkryptu stoi w prologu, między sekcjami."""
+        prolog = [j for j in self.jednostki if j["s"] == "Prolog"]
+        cutsceny = [j for j in prolog if j["t"] == "cutscena"]
+        self.assertTrue(cutsceny, "w prologu jest cutscena ze streszczeniem")
+        for jednostka in cutsceny:
+            self.assertTrue(jednostka.get("k"))
+            self.assertNotIn("g", jednostka)
+        pozycje_prologu = [i for i, j in enumerate(self.jednostki) if j["s"] == "Prolog"]
+        for jednostka in cutsceny:
+            pozycja = self.jednostki.index(jednostka)
+            self.assertGreater(pozycja, min(pozycje_prologu))
+            self.assertLess(pozycja, max(pozycje_prologu))
 
     def test_cutsceny_bez_grupy_na_koncu(self):
         rodzaje = [j["t"] for j in self.jednostki]
@@ -196,6 +210,12 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
         self.assertNotIn("At Blissful Retreat, Jiang Wulang drank alone", tekst)
         self.assertNotIn("opened his eyes to pitch darkness", tekst)
+
+    def test_streszczenie_cutsceny_stoi_w_prologu(self):
+        """Streszczenie cutsceny z transkryptu jest w prologu, między Prolog 3 i Prolog 4."""
+        self.assertLess(self.tekst.index("## Prolog 3"), self.tekst.index("## Cutscena 30150"))
+        self.assertLess(self.tekst.index("## Cutscena 30150"), self.tekst.index("## Prolog 4"))
+        self.assertEqual(self.tekst.count("Robak przelatuje"), 1)
 
     def test_rozmiar(self):
         self.assertGreater(self.statystyka["linii"], 10_000)

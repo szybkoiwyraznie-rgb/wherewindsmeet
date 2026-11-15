@@ -98,7 +98,17 @@ Zasady:
 - **bez powtórzeń:** dwie identyczne kwestie pod rząd (ten sam klucz albo ta sama
   treść z dwóch wariantów) są sklejane w jedną — w danych gry ten sam tekst bywa
   wpisany dwa razy,
-- **sceny bez mapy** mają własną sekcję, żeby nic nie wypadło.
+- **sceny bez mapy** mają własną sekcję, żeby nic nie wypadło,
+- **streszczenie cutsceny jest treścią cutsceny, nie osobnym dodatkiem.**
+  W transkrypcie prologu (źródle kolejności prologu, `zwrotki/`) między kwestiami
+  stoi linia, która nie jest kwestią, tylko streszczeniem przerywnika
+  (`cutscenes.synopsis_text_mobile`). Taka linia zamienia się w jednostkę
+  `## Cutscena N` dokładnie w tym miejscu — dlatego „Robak przelatuje i wnika
+  w zwłoki…” stoi między `## Prolog 3` i `## Prolog 4`, a nie w sekcji
+  „Sceny bez przypisanej mapy”. Ten numer cutsceny jest potem pomijany przy
+  rozmieszczaniu cutscen w krainach, żeby nic nie stało dwa razy,
+- **tabliczka krainy nie jest kwestią:** linia z `cutscene_text_oversea`
+  („QINGHE - VERDANT WILDS”) otwiera nową sekcję prologu, a nie linię dialogu.
 
 Zasady pliku 02 (kontekst):
 
@@ -142,8 +152,8 @@ Zasady pliku 02 (kontekst):
   encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
   to opisy bez nazwy, więc idą gołym tekstem,
 - 61 905 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_v1.zip` (6 607 191 B,
-  SHA-256 `b7c84bee07a76b14ef44dfbe84e63a6448c71f3e8fe955541119c8c6235bc97a`).
+- archiwum: `dist/WWM_Czytanka_PL_v2.zip` (6 607 212 B,
+  SHA-256 `06eb1d2ad973e6924e9fd524bc0b5d56ce9e9cc6cfce1d448cc1f08c95c350a6`).
   Wersje numerujemy (`v1`, `v2`, `v3`…), nie datujemy — spis:
   [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md), a `--wersja N` nie pozwala
   nadpisać istniejącej paczki.

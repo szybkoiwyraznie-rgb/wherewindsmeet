@@ -174,10 +174,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v1.zip`
-   (`6 607 191 B`, SHA-256
-   `b7c84bee07a76b14ef44dfbe84e63a6448c71f3e8fe955541119c8c6235bc97a`),
-   Dysk Google id `15fZGPA4BPd6ZTss0gulX61JzXxBdwQpx` (wszystkie paczki z datą
+   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v2.zip`
+   (`6 607 212 B`, SHA-256
+   `06eb1d2ad973e6924e9fd524bc0b5d56ce9e9cc6cfce1d448cc1f08c95c350a6`),
+   Dysk Google id `1uO_0v7fJOr1T0tbKho1rgWoh2ASLSYzq` (wszystkie paczki z datą
    w nazwie są nieaktualne i leżą w koszu). Spis wersji:
    [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
    istniejącej paczki. Opis formatu:
@@ -201,8 +201,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    (`describe*`, `introduction*`, `description`, `npc_desc`, `job_info`),
    a przy postaciach sama tożsamość z encyklopedii (`tozsamosc`); rozdziały
    fabularne encyklopedii (`historie`) i karty z samą nazwą są wycięte.
-   Zostało 501 jednostek z kontekstem i 178 kart (każda raz). 467 testów zielonych
-   (520 podtestów).
+   Zostało 501 jednostek z kontekstem i 178 kart (każda raz). **Streszczenie
+   cutsceny z prologu** (`cutscenes.synopsis_text_mobile`) wchodzi teraz jako
+   jednostka `## Cutscena 30150` dokładnie tam, gdzie stoi w transkrypcie —
+   między Prolog 3 i Prolog 4 — i nie powtarza się w „Scenach bez przypisanej
+   mapy”; tabliczka krainy (`cutscene_text_oversea`) nie udaje już kwestii
+   prologu. 469 testów zielonych (520 podtestów).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.
