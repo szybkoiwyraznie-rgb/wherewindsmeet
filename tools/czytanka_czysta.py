@@ -301,8 +301,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         if rodzaj == "film":
             numer = int(wiersz["n"])
             jednostki.append(Jednostka(
-                "film", f"Film {numer} — {TYTULY_FILMOW.get(numer, f'Film {numer}')}",
-                "# Filmy otwierające", [("", k) for k in klucze_filmu(numer) if k]))
+                "film", f"Pieśń {numer} — {TYTULY_FILMOW.get(numer, f'Pieśń {numer}')}",
+                "# Pieśni", [("", k) for k in klucze_filmu(numer) if k]))
         elif rodzaj == "prolog":
             linie, przestrzenie = [], set()
             for klucz in wiersz.get("k") or []:
@@ -359,8 +359,17 @@ def _z_gry(ix, klucz: str) -> str:
     return _czysty(tekst.en or tekst.zrodlo or "")
 
 
-def _linia(mowca: str, tekst: str) -> str:
-    return f"- **{mowca}:** {tekst}" if mowca else f"- {tekst}"
+def _linia(mowca: str, tekst: str, bez_punktu: bool = False) -> str:
+    """Kwestia w jednej linii.
+
+    Bez punktora: gdy nie ma mówcy (często to dalszy ciąg zdania łamanego na dwa
+    wiersze) oraz w cutscenach, gdzie podpisy i tak są narracją, nie dialogiem.
+    """
+    if not mowca:
+        return tekst
+    if bez_punktu:
+        return f"**{mowca}:** {tekst}"
+    return f"- **{mowca}:** {tekst}"
 
 
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
@@ -371,6 +380,7 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
     ostatnia_sekcja = None
     for jednostka in jednostki:
         linie = []
+        widziane_linie: set[str] = set()
         for mowca, klucz in jednostka.linie:
             uzyte.add(klucz)
             tekst = pl.get(klucz)
@@ -386,9 +396,10 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
                 statystyka["bez_przekladu"] += 1
             else:
                 statystyka["linii"] += 1
-            gotowa = _linia(mowca, tekst)
-            if linie and linie[-1] == gotowa:
-                continue          # ta sama kwestia dwa razy pod rząd to artefakt danych
+            gotowa = _linia(mowca, tekst, jednostka.rodzaj == "cutscena")
+            if gotowa in widziane_linie:
+                continue          # ta sama kwestia drugi raz w tej samej jednostce
+            widziane_linie.add(gotowa)
             linie.append(gotowa)
         if not linie:
             continue
@@ -622,7 +633,8 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",
-                  "Filmy otwierające, prolog w kolejności z gry, potem krainy po kolei: "
+                  "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
+                  "pieśni na końcu, bo w grze nie ma ich na początku: "
                   "sceny i cutsceny przemieszane w kolejności występowania.") + "\n".join(tresc) + "\n",
         encoding="utf-8")
     statystyka["plikow"] += 1
@@ -658,7 +670,7 @@ def _readme(statystyka: dict, zakres: str) -> str:
 
 | plik | zawartość |
 |---|---|
-| `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: filmy, prolog, krainy po kolei, pozostałe napisy |
+| `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
 | `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: kto mówi, postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki walki — pełna karta przy pierwszym wystąpieniu, potem samo imię |
 | `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem |
 

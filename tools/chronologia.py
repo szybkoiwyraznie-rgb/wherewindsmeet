@@ -10,14 +10,14 @@ Wejście (wszystko z repo): `index/` (wyciąg z gry), `index/prowincje.json`
 zapisany w repo). Wyjście: `index/chronologia.jsonl` — po jednej jednostce
 w wierszu, w kolejności występowania w grze:
 
-    {"p": 0, "t": "film", "n": 1, "s": "Filmy otwierające"}
+    {"p": 0, "t": "film", "n": 1, "s": "Pieśni"}
     {"p": 1, "t": "prolog", "s": "Prolog", "e": "Pierwsza cutscena", "k": [...]}
     {"p": 2, "t": "cutscena", "n": 30033, "s": "燕南", "k": ["..."]}
     {"p": 3, "t": "scena", "n": 10094, "s": "燕南"}
 
 Zasady kolejności (te same, co w ustaleniach):
 
-1. filmy otwierające (1–3),
+1. filmy i pieśni (1–3) — na końcu, bo w grze nie ma ich na początku,
 2. prolog w kolejności transkryptu — napisy i dialogi przemieszane,
 3. krainy w kolejności odwiedzania, w krainie sceny po numerze dialogu,
 4. cutsceny **przypisane do grupy zadań** (tabela powtórek: `no` → `grupa`,
@@ -176,8 +176,6 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
     for wiersz in kolejnosc_gry.wczytaj(Path(index)):
         if wiersz.get("z") == "film" and wiersz.get("d") is not None:
             filmy.add(int(wiersz["d"]))
-    for numer in sorted(filmy):
-        jednostki.append({"t": "film", "n": numer, "s": "Filmy otwierające"})
 
     jednostki.extend(_prolog(index, magazyn))
 
@@ -201,6 +199,10 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
     cutsceny_bez_grupy.sort(key=lambda j: j["n"])
     for jednostka in cutsceny_bez_grupy:
         jednostki.append({**jednostka, "s": BEZ_GRUPY})
+
+    # pieśni i filmy idą na koniec: w grze pojawiają się później, nie na starcie
+    for numer in sorted(filmy):
+        jednostki.append({"t": "film", "n": numer, "s": "Pieśni"})
 
     for pozycja, jednostka in enumerate(jednostki):
         jednostka["p"] = pozycja

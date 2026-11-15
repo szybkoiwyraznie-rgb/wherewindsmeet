@@ -7,7 +7,7 @@ uruchomieniu.
 
 | plik | zawartość | wiersze |
 |---|---|---|
-| `01_sceny_i_cutsceny.md` | filmy, prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze | 48 043 |
+| `01_sceny_i_cutsceny.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; pieśni na końcu | 186 959 kwestii |
 | `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: kto mówi, postacie z encyklopedii, frakcje, miejsca, przedmioty, sztuki walki | 29 892 |
 | `03_reszta.md` | wszystko, czego nie ma w 01 ani w 02, pogrupowane według rodzaju danych | 62 012 |
 
@@ -24,7 +24,7 @@ python3 tools/chronologia.py --sprawdz  # porównaj zapisane z danymi (kod 1 = t
 
 Zasady kolejności:
 
-1. **filmy** otwierające 1–3,
+1. **pieśni i filmy** (1–3) — na **końcu**, bo w grze nie ma ich na początku,
 2. **prolog** w kolejności transkryptu właściciela (sekcje numerowane
    `Prolog 1…4`; komentarze z transkryptu to notatki dla nas, nie nazwy scen)
    (`zwrotki/prolog_transkrypt_z_gry.txt`, w repo) — napisy i dialogi przemieszane,
@@ -58,8 +58,11 @@ Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 
 Zasady:
 
-- **jedna kwestia = jedna linia:** `- **Mówca:** tekst`, bez odstępu między
-  kwestiami; pusty wiersz oddziela tylko jednostki (scenę, cutscenę),
+- **jedna kwestia = jedna linia**, bez odstępu między kwestiami; pusty wiersz
+  oddziela tylko jednostki (scenę, cutscenę),
+- **punktor tylko przy mówcy:** `- **Mówca:** tekst`. Kwestia bez jawnego mówcy
+  idzie jako goły tekst (często to dalszy ciąg zdania łamanego na dwa wiersze),
+  a **cutsceny nie mają punktora wcale** — nawet gdy mówca jest znany,
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
   `index/nazwy_mowcow.json` (219 haseł, rośnie z każdą sesją),
@@ -84,13 +87,14 @@ Zasady:
 
 - 75 287 jednostek w pliku 01 (8 910 scen z polskim dialogiem, 1 597 cutscen,
   reszta to sceny bez przekładu — teraz też są, z gwiazdką),
-- 187 497 linii kwestii: 26 745 po polsku i 160 262 z gwiazdką (tekst z gry),
+- 186 959 linii kwestii: 26 554 po polsku i 160 405 z gwiazdką (tekst z gry);
+  180 459 linii ma mówcę i punktor, 6 500 to goły tekst (bez mówcy lub cutscena),
 - 36 366 kwestii należy do gracza (`Youxia`),
 - 9 319 kwestii ma jeszcze chińską etykietę mówcy (4 713 różnych) — to etykiety
   opisowe bez odpowiednika w danych gry; schodzą ze słownikiem `nazwy_mowcow.json`,
 - mówcy: imię polskie lub angielskie z danych gry, postać gracza jako `Ty`,
   3 561 kwestii ma tylko imię chińskie (gra nie daje dla nich nazwy obcej),
-- 3 filmy, 4 sekcje prologu, 38 sekcji krain,
+- 3 pieśni (na końcu), 4 sekcje prologu, 38 sekcji krain,
 - 73 296 jednostek ma kontekst w pliku 02; kontekst obejmuje też sceny bez
   polskiego dialogu, bo mówiący i hasła są niezależne od przekładu
   (574 hasła z pełną kartą, reszta to powtórzenia samego imienia),
@@ -98,7 +102,7 @@ Zasady:
   w pliku 01: `- **Wang Qing:** \*Wang Qing can still recall the argument...`
   (1 035 kart; biogramy encyklopedii są na razie po angielsku),
 - 64 112 pozycji w pliku 03,
-- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (2 162 663 B).
+- archiwum: `dist/WWM_Czytanka_PL_2026-11-15.zip` (8 486 049 B).
 
 ## Uruchomienie
 

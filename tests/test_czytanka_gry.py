@@ -331,11 +331,11 @@ class TestCzytankaDoCzytania(unittest.TestCase):
         self.assertNotIn("阿尔法二", self.czytaj("01_sceny_i_cutsceny.md"))
         self.assertGreater(self.statystyka["pominiete"], 0)
 
-    def test_film_jest_na_poczatku_chronologii(self):
+    def test_piesn_jest_na_koncu_chronologii(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
-        film = tresc.index("## Film 2")
-        self.assertLess(film, tresc.index("# Prolog"))
-        self.assertLess(film, tresc.index("## Scena"))
+        piesn = tresc.index("## Pieśń 2")
+        self.assertGreater(piesn, tresc.index("# Prolog"))
+        self.assertGreater(piesn, tresc.index("## Scena"))
 
     def test_napisy_spoza_cutscen_trafiaja_do_reszty(self):
         # `napis_a` nie należy do żadnej cutsceny ani grupy zadań → plik 03

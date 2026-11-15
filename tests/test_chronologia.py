@@ -42,14 +42,14 @@ class TestZapisanaChronologia(unittest.TestCase):
                                     magazyn=str(KATALOG / "tlumaczenie"))
         self.assertTrue(wynik["ok"], wynik)
 
-    def test_filmy_prolog_krainy(self):
+    def test_prolog_krainy_piesni(self):
         rodzaje = [j["t"] for j in self.jednostki]
-        self.assertEqual(rodzaje[:3], ["film"] * 3)
+        # pieśni na końcu — w grze nie ma ich na początku
+        self.assertEqual(rodzaje[-3:], ["film"] * 3)
         pierwszy_prolog = rodzaje.index("prolog")
         pierwsza_scena = rodzaje.index("scena")
-        self.assertGreater(pierwszy_prolog, 2)
         self.assertLess(pierwszy_prolog, pierwsza_scena)
-        self.assertNotIn("film", rodzaje[pierwszy_prolog:])
+        self.assertNotIn("film", rodzaje[:pierwszy_prolog])
         self.assertNotIn("prolog", rodzaje[pierwsza_scena:])
 
     def test_krainy_raz_po_kolei(self):
@@ -122,8 +122,27 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
     def tearDownClass(cls):
         cls._katalog.cleanup()
 
+    def test_piesni_na_koncu(self):
+        self.assertGreater(self.tekst.index("# Pieśni"),
+                           self.tekst.index("# Cutsceny bez grupy zadań"))
+
+    def test_kwestie_bez_mowcy_bez_punktora(self):
+        for linia in self.tekst.splitlines():
+            if linia.startswith("- ") and ":** " not in linia and "\\*" not in linia:
+                self.fail(f"kwestia bez mówcy z punktorem: {linia[:60]}")
+
+    def test_cutsceny_bez_punktora(self):
+        w_cutscenie = False
+        for linia in self.tekst.splitlines():
+            if linia.startswith("## Cutscena"):
+                w_cutscenie = True
+            elif linia.startswith("## ") or linia.startswith("# "):
+                w_cutscenie = False
+            elif w_cutscenie and linia.startswith("- "):
+                self.fail(f"cutscena z punktorem: {linia[:60]}")
+
     def test_sekcje_chronologii(self):
-        self.assertIn("# Filmy otwierające", self.tekst)
+        self.assertIn("# Pieśni", self.tekst)
         self.assertIn("# Prolog", self.tekst)
         self.assertIn("## Prolog 1", self.tekst)
         self.assertIn("## Cutscena", self.tekst)
@@ -133,13 +152,14 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
 
     def test_bez_powtorzonych_kwestii_pod_rzad(self):
         kwestie: list[str] = []
+        kwestie: set[str] = set()
         for linia in self.tekst.splitlines():
             if linia.startswith("## ") or linia.startswith("# "):
-                kwestie = []
-            elif linia.startswith("- "):
-                if kwestie and kwestie[-1] == linia:
-                    self.fail(f"powtórzona kwestia w jednostce: {linia}")
-                kwestie.append(linia)
+                kwestie = set()
+            elif linia.strip() and not linia.startswith(("#", "*")):
+                if linia in kwestie:
+                    self.fail(f"powtórzona kwestia w jednostce: {linia[:60]}")
+                kwestie.add(linia)
 
     def test_prolog_jest_przetlumaczony_w_calosci(self):
         start = self.tekst.index("# Prolog")
@@ -148,7 +168,7 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
 
     def test_kwestie_bez_przekladu_maja_gwiazdke(self):
         poza_prologiem = self.tekst[self.tekst.index("\n# ", self.tekst.index("# Prolog") + 2):]
-        self.assertIn("- \\*", poza_prologiem,
+        self.assertIn("\\*", poza_prologiem,
                       "kwestie bez przekładu poza prologiem idą z gwiazdką")
         self.assertNotIn("[brak przekładu]", poza_prologiem)
 
