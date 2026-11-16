@@ -610,6 +610,60 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
     return ["# Pamiątki — przedmioty z historią", ""] + karty
 
 
+_POI_PLIK = "poi.jsonl"
+
+
+def _poi(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
+         katalog: str | Path) -> list[str]:
+    """Punkty na mapie (POI): nazwa, a przy dowodzie także numer sceny.
+
+    Numer sceny wchodzi tylko wtedy, gdy gra zapisała go w wierszu POI
+    (`play_dialog_no` / `result_play_dialog` — patrz `tools/poi_z_bazy.py`).
+    Sama nazwa pliku scenariusza (`interact_storyline`) nie jest powiązaniem,
+    więc nie robi z POI „sceny N”.
+    """
+    plik = Path(katalog) / _POI_PLIK
+    if not plik.is_file():
+        return []
+    numer = _przestrzen(ix, "active_interact_way", "button_name")
+    mapa: dict[str, str] = {}
+    if numer is not None:
+        for klucz, tekst in ix.teksty.items():
+            if tekst.w and tekst.w[0] == numer:
+                mapa.setdefault(str(tekst.w[1]), klucz)
+    wpisy: list[str] = []
+    widziane: set[str] = set()
+    bez_nazwy = 0
+    z_dialogiem = 0
+    for wiersz in plik.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        klucz = mapa.get(str(wpis.get("id") or ""))
+        if not klucz or klucz in uzyte:
+            bez_nazwy += 1 if not klucz else 0
+            continue
+        nazwa = (pl.get(klucz) or ("\\\\*" + _z_gry(ix, klucz))).strip()
+        if not nazwa.strip("\\* "):
+            bez_nazwy += 1
+            continue
+        if nazwa in widziane:
+            continue
+        widziane.add(nazwa)
+        dialog = wpis.get("dialog")
+        if dialog:
+            z_dialogiem += 1
+            wpisy.append(f"**{nazwa}** — scena {dialog}")
+        else:
+            wpisy.append(f"**{nazwa}**")
+        statystyka["poi"] = statystyka.get("poi", 0) + 1
+    statystyka["poi_z_dialogiem"] = z_dialogiem
+    statystyka["poi_bez_nazwy"] = bez_nazwy
+    if not wpisy:
+        return []
+    return ["# Punkty na mapie (POI)", ""] + wpisy + [""]
+
+
 def _linia(mowca: str, tekst: str) -> str:
     """Kwestia w jednej linii, bez punktora.
 
@@ -975,6 +1029,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
     tresc_reszty += _zbiory(ix, pl, uzyte | uzyte_kontekstu, statystyka)
     tresc_reszty += _pamiatki(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
+    tresc_reszty += _poi(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
     (wyj / "03_reszta.md").write_text(
         _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
         + "\n".join(tresc_reszty) + "\n", encoding="utf-8")
@@ -1010,7 +1065,7 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
-{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek oraz {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) w pliku 03.
+{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek oraz {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) oraz {statystyka.get('poi', 0)} punktów na mapie (POI, z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01.

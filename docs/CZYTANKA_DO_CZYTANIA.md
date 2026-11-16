@@ -83,7 +83,13 @@ Zasady kolejności:
    z identyfikatora ikony z danych gry (`head_npc_…_jiangwulang`), nie
    z domysłu; pamiątka bez nazwy przedmiotu nie wchodzi i jest policzona
    w README (`pamiatki_bez_nazwy`).
-10. **kwestie zależne od płci bohatera** mają przekład pod osobnym
+10. **punkty na mapie (POI)** mają w 03 sekcję `# Punkty na mapie (POI)`:
+   `**Nazwa** — scena N` **tylko wtedy**, gdy gra zapisała numer sceny
+   w wierszu POI (`play_dialog_no` / `result_play_dialog`). Sama ścieżka
+   scenariusza (`interact_storyline`, np. `…/sxd_longwenbiaoji.etsb`) nie jest
+   powiązaniem — POI stoi wtedy bez numeru. POI bez nazwy w wyciągu nie wchodzi,
+   a licznik `poi_bez_nazwy` w README mówi, ile ich było.
+11. **kwestie zależne od płci bohatera** mają przekład pod osobnym
    identyfikatorem (`@id`), a nie pod kluczem tekstu. Czytanka czyta
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem

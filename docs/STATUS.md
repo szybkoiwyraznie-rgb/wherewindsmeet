@@ -22,6 +22,16 @@ z gry z gwiazdką). 22 pamiątki nie mają w wyciągu nazwy przedmiotu — nie
 wchodzą, licznik `pamiatki_bez_nazwy` w README czytanki mówi ile. Opowieści
 pamiątek nie są przetłumaczone (0 ze 120), więc wszystkie idą z gwiazdką.
 
+**Punkty na mapie (POI) są w czytance.** POI to wiersze `active_interact_way`
+(nazwa w `button_name`, numer sceny w `play_dialog_no` / `result_play_dialog`).
+`tools/poi_z_bazy.py` zapisuje `index/poi.jsonl` (10 368 wierszy, 1 368 z numerem
+sceny), a `czytanka_czysta._poi()` robi w `03` sekcję `# Punkty na mapie (POI)`:
+**2 907 POI**, z tego **365** z potwierdzonym numerem sceny. Pozostałe
+**7 294** nie mają nazwy w naszym wyciągu (zna on tylko 3 074 z 10 357 wierszy
+tej kolumny) — są policzone w README (`poi_bez_nazwy`), nie zmyślone.
+POI `200046001` („Dragon Pattern Mark”) ma tylko ścieżkę scenariusza
+`client/dialogs/hjt/sxd_longwenbiaoji.etsb`, bez numeru sceny — tak zostaje.
+
 **Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
 jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu
 z kluczem tekstu (`index/warianty.jsonl`). Naprawione 2026-11-14 w

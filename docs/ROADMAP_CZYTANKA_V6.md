@@ -111,7 +111,32 @@ referencje: `text_msg` wiersz 741036 ma `zh` + `en` („When Jiang Wulang passed
 the blacksmith's shop…”), ale nic w indeksie nie mówiło, że należy do przedmiotu
 1100010. Dopiero tabela `curio_config` z bazy gry daje ten klucz.
 
-## C. POI w czytance
+## C. POI w czytance — **zrobione w części (2 907 z 10 368)**
+
+**Co zrobiono (2026-11-14).** POI to wiersze `active_interact_way`: nazwa
+w kolumnie `button_name`, a **numer sceny tylko tam, gdzie gra go zapisuje** —
+`play_dialog_no` / `result_play_dialog`. `tools/poi_z_bazy.py` zapisuje to do
+`index/poi.jsonl` (10 368 wierszy; 1 368 z numerem sceny), a
+`czytanka_czysta._poi()` robi w 03 sekcję `# Punkty na mapie (POI)`:
+`**Nazwa** — scena N`, a bez dowodu samo `**Nazwa**`. Wyszło **2 907 POI**,
+z tego **365** z potwierdzonym numerem sceny.
+
+**Dlaczego nie wszystkie.** Wyciąg `index/` zna nazwę tylko dla **3 074**
+z 10 357 wierszy tej kolumny (`index/teksty_*.jsonl` trzyma jeden świadek na
+tekst, więc nazwa użyta wcześniej w innej tabeli traci świadka POI). Pozostałe
+**7 294** POI nie wchodzą i są policzone w README jako `poi_bez_nazwy` — nie
+zmyślamy nazw.
+
+**Czego nadal brakuje.**
+- „Dragon Pattern Mark” (POI `200046001`) **nie ma** numeru sceny w wierszu:
+  jest tylko `interact_storyline: client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
+  Nazwa pliku pasuje do „longwenbiaoji” = 龙纹标记, ale to nie jest dowód
+  liczbowy, więc POI stoi bez numeru. Do domknięcia trzeba pliku klienta
+  `.etsb` (albo tabeli „ścieżka → numer dialogu” — takiej nie ma: przeszukane
+  wszystkie 28 727 tabel ze schematem, jedyne trafienie to sam ten wiersz POI).
+- Nazw POI brakujących w indeksie nie da się dołożyć bez mapy „identyfikator
+  tekstu → klucz”, której wyciąg nie ma.
+
 
 **Objaw.** „Dragon Pattern Mark” nie występuje w żadnym pliku czytanki.
 
