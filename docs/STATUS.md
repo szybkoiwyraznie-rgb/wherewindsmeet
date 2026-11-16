@@ -3,6 +3,15 @@
 Aktualizacja: **2026-11-14**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+**Dane z gry na Dysku Google:** 8 części `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`
+(60 plików, `536 MB` po rozpakowaniu). Spis „co leży w której części” jest
+w repozytorium: [PLIKI_W_PACZKACH.md](PLIKI_W_PACZKACH.md) + `index/paczki.json`
+(generuje `tools/spis_paczek.py`). Pobieranie: narzędzie `google_drive`
+`download_file` **zapisuje plik na dysk sandboxa** (`google_drive/…`, nie wkleja
+treści do rozmowy) — innej drogi nie ma, bo sandbox nie ma sieci do Dysku
+(`curl https://drive.google.com` → `000`, GitHub → `200`). Rozpakowanie:
+`python3 tools/spis_paczek.py --rozpakuj local/dane` odtwarza ścieżki gry.
+
 **Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
 jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu
 z kluczem tekstu (`index/warianty.jsonl`). Naprawione 2026-11-14 w

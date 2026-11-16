@@ -1,0 +1,779 @@
+{
+ "format": "wwm-spis-paczek-v1",
+ "paczki": [
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1.zip",
+   "numer": 1,
+   "czesciz": 8,
+   "bajtow": 53234905,
+   "sha256": "8b3c6ae11852bb8968e673a83f41f23e91699b2cb97bdb333502fd6bc24c639f",
+   "drive_id": "1WY_2aukAQRc-h8ilIgiWZak_0PGGY7nW",
+   "utworzone": "2026-11-13T18:31:17.6217092Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 20,
+   "pliki": [
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/data1005",
+     "rodzaj": "db_data",
+     "bajtow": 444572,
+     "sha256": "c1a24d1ec139e762520d02e7649a0401cb18bd8ebb53794b6849fe7d194901c5",
+     "schowane_jako": "pliki/000001_data1005",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/data1201",
+     "rodzaj": "db_data",
+     "bajtow": 544732,
+     "sha256": "ee9542fb76f498d5551b01fa74278da71f664fd0f5eb6a875c9401b3c4f379f1",
+     "schowane_jako": "pliki/000002_data1201",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/index1001",
+     "rodzaj": "db_index",
+     "bajtow": 2403377,
+     "sha256": "29734245678970488555ca2f8693ae4c9d87ff16d3b601809b3415944fecd0d5",
+     "schowane_jako": "pliki/000003_index1001",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/index1200",
+     "rodzaj": "db_index",
+     "bajtow": 953794,
+     "sha256": "257dfab290644ace0b7f54f2122991ec24a00e2ccc0e5980287a35f30d1e5a0c",
+     "schowane_jako": "pliki/000004_index1200",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff",
+     "rodzaj": "map_diff",
+     "bajtow": 19326459,
+     "sha256": "b25ce2a3e256368bc88119a21e3a251199b00e5152dbbf7b14312099e1fa6d45",
+     "schowane_jako": "pliki/000005_translate_words_map_en_diff",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/MANIFEST",
+     "rodzaj": "manifest",
+     "bajtow": 1465586,
+     "sha256": "c51aa892fc86fe03d2924c9e6a7f8a9471ee1a6f72639e0759d3ed60541bdb5a",
+     "schowane_jako": "pliki/000006_MANIFEST",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_disease.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 7192,
+     "sha256": "86921ff3dcd5516d0f01ffd54c28cec57cff7c64187a327f398d40f42faeed49",
+     "schowane_jako": "pliki/000007_formula_disease.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_npc.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 105127,
+     "sha256": "1ddcb13491231d506868f938563b919b02c373a5ff9f55f724235fae8eabc9b7",
+     "schowane_jako": "pliki/000008_formula_npc.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_pet.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 36055,
+     "sha256": "a92ed8214ac5eda795b9dabb1af6a777b309858b2bc375c541ed02ab3e130b3a",
+     "schowane_jako": "pliki/000009_formula_pet.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_player.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 297405,
+     "sha256": "37b884c7fcb091b8ebef1227cf785378c80468e917ec3b0b15c85047a8c8e8c2",
+     "schowane_jako": "pliki/000010_formula_player.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_player_grey.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 273512,
+     "sha256": "adaa2528aec932c1a6b58e2177d3d77e750cf1e7d04cbd03c4193cef79c39131",
+     "schowane_jako": "pliki/000011_formula_player_grey.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_ququ.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 8807,
+     "sha256": "c719125ea89b5951f3e28981bb954d2c1254c46facf19b213148d17d06ed9c8b",
+     "schowane_jako": "pliki/000012_formula_ququ.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "LocalData/Patch/HD/oversea/formula/formula_zzq_npc.ft",
+     "rodzaj": "patch_other",
+     "bajtow": 15525,
+     "sha256": "70f4f2afc8bb084c90224ef2b9977b8150d17b82633339b1dc5fbf0c2d7dea89",
+     "schowane_jako": "pliki/000013_formula_zzq_npc.ft",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1001",
+     "rodzaj": "db_data",
+     "bajtow": 2109440,
+     "sha256": "0506e743fb2710f962f559eae205fb45be5024d5124922f980416c723c6c1760",
+     "schowane_jako": "pliki/000014_data1001",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1200",
+     "rodzaj": "db_data",
+     "bajtow": 2147399,
+     "sha256": "1ec8f8c79e44f91ce76145cd62a085f4d834be03aadc586e709e71c6bc46adf9",
+     "schowane_jako": "pliki/000015_data1200",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index1001",
+     "rodzaj": "db_index",
+     "bajtow": 2393310,
+     "sha256": "1264ebf5dffd46c121cfc03fd991e11a97cb9a5bd4f2c1f394cb4e6a7b6d0a4c",
+     "schowane_jako": "pliki/000016_index1001",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index1200",
+     "rodzaj": "db_index",
+     "bajtow": 952513,
+     "sha256": "8b323da7d12d2d46024088f138370c8bebf6d7c0a1192048e3106f44d27abe4b",
+     "schowane_jako": "pliki/000017_index1200",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/locale/translate_words_map_en_diff",
+     "rodzaj": "map_diff",
+     "bajtow": 18967030,
+     "sha256": "d39d74f85c7e6f1616890d36e37c8d52aad7c9578f4b73331edafd7cd96a75c0",
+     "schowane_jako": "pliki/000018_translate_words_map_en_diff",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/locale/translate_words_map_zh_cn_diff",
+     "rodzaj": "map_diff",
+     "bajtow": 1744397,
+     "sha256": "ae1d11d3f9783de95cbf244dad6d4e6398f52bcb291aa518c846f3b98b516c4b",
+     "schowane_jako": "pliki/000019_translate_words_map_zh_cn_diff",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/MANIFEST",
+     "rodzaj": "manifest",
+     "bajtow": 1463533,
+     "sha256": "2c51e2d69202c9fbd1c20325b5c791f873f177449f094d64b7b13e62d97f5a28",
+     "schowane_jako": "pliki/000020_MANIFEST",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc2.zip",
+   "numer": 2,
+   "czesciz": 8,
+   "bajtow": 51261518,
+   "sha256": "3b238cf34cec8bac2525e9c0203489407d04fc7ecaf3891c85e07d90172466fd",
+   "drive_id": "1P9lRwzz-aKoNFAoHrGKS9sgQicVxh054",
+   "utworzone": "2026-11-13T18:31:21.1596155Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 1,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/locale/translate_words_map_en",
+     "rodzaj": "map_en",
+     "bajtow": 51239638,
+     "sha256": "9a2bb446dc2dcc1e2bb4b1bb3207e2990ef7533341a9035ef376c545c3bbdbef",
+     "schowane_jako": "pliki/000001_translate_words_map_en",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc3.zip",
+   "numer": 3,
+   "czesciz": 8,
+   "bajtow": 78661351,
+   "sha256": "844ebd8862b3d0e8cf031f8436577057e7b0980f208d4266caaaea8215ea9c18",
+   "drive_id": "13DCiJzsJBhMXE98DWvbo-GefT3r7aNIW",
+   "utworzone": "2026-11-13T18:31:24.9162349Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 2,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/locale/translate_words_map_zh_cn",
+     "rodzaj": "map_zh_cn",
+     "bajtow": 69165469,
+     "sha256": "503d9dd81d71ee5113dd40ac4f1a05e41af84a6266e85c2d8258a350137cf487",
+     "schowane_jako": "pliki/000001_translate_words_map_zh_cn",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1",
+     "rodzaj": "db_data",
+     "bajtow": 9686870,
+     "sha256": "7d0d15dfcc6d7d9000071ec29a6125b934a955519b3b23fb8221a95c263bea3d",
+     "schowane_jako": "pliki/000002_data1",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc4.zip",
+   "numer": 4,
+   "czesciz": 8,
+   "bajtow": 79694882,
+   "sha256": "0310feeefaa167e6723c48951ee38da4771f5b04cf70fe3449a6d39d28cdbd9a",
+   "drive_id": "1dPVcOChJqR3NOPd37w8inXOVZdbZWmRy",
+   "utworzone": "2026-11-13T18:31:30.1747586Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 12,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/data10",
+     "rodzaj": "db_data",
+     "bajtow": 15919912,
+     "sha256": "2cf77ecc0565dfe15cc3e952c121c91964dba4f7ee9d2f466b2ee9d9f90e3d76",
+     "schowane_jako": "pliki/000001_data10",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1002",
+     "rodzaj": "db_data",
+     "bajtow": 2097923,
+     "sha256": "102f51c907f926aa48fee532187d164d745cb09aa90a350a6f6b70ec84fb0591",
+     "schowane_jako": "pliki/000002_data1002",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1003",
+     "rodzaj": "db_data",
+     "bajtow": 5246809,
+     "sha256": "a28671c4d50b71bbbfdf0322643a20660b2e952552ba3b5893943de5b54c92a1",
+     "schowane_jako": "pliki/000003_data1003",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1004",
+     "rodzaj": "db_data",
+     "bajtow": 3151482,
+     "sha256": "9a30379f3e5ec2c552867d4c05eafe63b1255a15ef538b72f19147ff632f1e79",
+     "schowane_jako": "pliki/000004_data1004",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1005",
+     "rodzaj": "db_data",
+     "bajtow": 47050,
+     "sha256": "7a209a446e8cad5ad2b016f7f1bff9c818e2e1cf56060dcc3c175e26dcbe0884",
+     "schowane_jako": "pliki/000005_data1005",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data11",
+     "rodzaj": "db_data",
+     "bajtow": 978506,
+     "sha256": "18bea14b2602fbd6fbe97683e841c2cc070bb9886106497e3d15fdcb6dc54e70",
+     "schowane_jako": "pliki/000006_data11",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data1201",
+     "rodzaj": "db_data",
+     "bajtow": 540173,
+     "sha256": "383a548b6786b45f6fc5668d93c42c284a2244a2545a6062681059669fb7693c",
+     "schowane_jako": "pliki/000007_data1201",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data2",
+     "rodzaj": "db_data",
+     "bajtow": 11729107,
+     "sha256": "d78d4c2957245575c78d483ded9a6be040e36f9c6a0e101e194e8bfbe4be22de",
+     "schowane_jako": "pliki/000008_data2",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data200",
+     "rodzaj": "db_data",
+     "bajtow": 9803126,
+     "sha256": "be92bfb47f8145d8023faa3cd11dd1f4744182aa853e54def01a6b6a3d19d2fc",
+     "schowane_jako": "pliki/000009_data200",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data201",
+     "rodzaj": "db_data",
+     "bajtow": 10363520,
+     "sha256": "1528c972573e296aaf1cf6d9fc4ae9cef581e9f709009e661e9f49983906db53",
+     "schowane_jako": "pliki/000010_data201",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data202",
+     "rodzaj": "db_data",
+     "bajtow": 10997047,
+     "sha256": "ce95526d22a581210e55489bb4098d53f24f72bde6d3ebffaa7997507955629d",
+     "schowane_jako": "pliki/000011_data202",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data203",
+     "rodzaj": "db_data",
+     "bajtow": 10430273,
+     "sha256": "96aa3b7c6a9c894a20f07bc560b9253ea91129919e7c56472bc7083d485f1791",
+     "schowane_jako": "pliki/000012_data203",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc5.zip",
+   "numer": 5,
+   "czesciz": 8,
+   "bajtow": 77703409,
+   "sha256": "6954595098bae94e4db2dce1a68e7be5eeb28592c45e97801441970e0257b0d9",
+   "drive_id": "1ebkASEIe3qLAfZ6nLB3WFKlNv7I__CHs",
+   "utworzone": "2026-11-13T18:31:35.5788057Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 7,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/data204",
+     "rodzaj": "db_data",
+     "bajtow": 10226957,
+     "sha256": "516b2c3492df38ee2977f2362521492b5a5bcd107eba8a60c678313f59feaa72",
+     "schowane_jako": "pliki/000001_data204",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data205",
+     "rodzaj": "db_data",
+     "bajtow": 7428829,
+     "sha256": "23ea65f2644b11132f35d8ce8736d2ef2d0ce402638c1b48e92c92560968229b",
+     "schowane_jako": "pliki/000002_data205",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data206",
+     "rodzaj": "db_data",
+     "bajtow": 10494169,
+     "sha256": "9542ecb458262b0f9e6600ef84d1e05294fc0151133641f2f1b3b67f342aa0fd",
+     "schowane_jako": "pliki/000003_data206",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data207",
+     "rodzaj": "db_data",
+     "bajtow": 11022172,
+     "sha256": "d924f5133e47cb1d5ae73f46ef24926ebef27dbf887cef96ff8f75f53b5a0528",
+     "schowane_jako": "pliki/000004_data207",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data208",
+     "rodzaj": "db_data",
+     "bajtow": 11674686,
+     "sha256": "6819052910da3931faf4ec669995cade11b77aeaae45c931022a4e3a691caec4",
+     "schowane_jako": "pliki/000005_data208",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data209",
+     "rodzaj": "db_data",
+     "bajtow": 13363208,
+     "sha256": "a9e628220640166feb1e50d978e3790f1524361ae505ba91a9b8c7dfa43d7e2c",
+     "schowane_jako": "pliki/000006_data209",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data210",
+     "rodzaj": "db_data",
+     "bajtow": 15205158,
+     "sha256": "59ad416595ffb05a1dca91ce1de2c1f8b6125a04bc7efd72105543cf7e6481d3",
+     "schowane_jako": "pliki/000007_data210",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc6.zip",
+   "numer": 6,
+   "czesciz": 8,
+   "bajtow": 75465922,
+   "sha256": "5cb3482a2a4808ea937136ce5c3243de3669d30c2d57c4767d1e54c1cfc29aa8",
+   "drive_id": "1HAhta2xCvOg-n0fVTX08wev7u0eD1QQH",
+   "utworzone": "2026-11-13T18:31:41.0232298Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 9,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/data211",
+     "rodzaj": "db_data",
+     "bajtow": 13041230,
+     "sha256": "700450aaaf26412ff2b488116708a19dfcc5d88b0fbe33c4da7771fc7f10f42f",
+     "schowane_jako": "pliki/000001_data211",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data212",
+     "rodzaj": "db_data",
+     "bajtow": 6423280,
+     "sha256": "3d3ec5809f690cfada1bad28e29aa74e8770662ab28fd460b90770a7628ff67c",
+     "schowane_jako": "pliki/000002_data212",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data3",
+     "rodzaj": "db_data",
+     "bajtow": 10456267,
+     "sha256": "3ed779e7da5db975ccef897b1e800db6799a6e393157cce8c289b19bb1319c4a",
+     "schowane_jako": "pliki/000003_data3",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data4",
+     "rodzaj": "db_data",
+     "bajtow": 6444096,
+     "sha256": "c11dae04d4cbe87d01ee617faa46c903319cb6e606d378529545b0d306cb9d41",
+     "schowane_jako": "pliki/000004_data4",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data5",
+     "rodzaj": "db_data",
+     "bajtow": 7972689,
+     "sha256": "17f9121fc60ada9af7717b30ae1c22d1631be6a91cccf03b59734809384365cd",
+     "schowane_jako": "pliki/000005_data5",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data6",
+     "rodzaj": "db_data",
+     "bajtow": 2500594,
+     "sha256": "214bd64adadd3aed9fb23c0aa9ff90bd4880876821dbf232435babf9a3e3cb3b",
+     "schowane_jako": "pliki/000006_data6",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data7",
+     "rodzaj": "db_data",
+     "bajtow": 9571489,
+     "sha256": "ab3d0f49f2037e0aea49d9d00094ddc605b23e9e80bc81f40e4588be81e91f2b",
+     "schowane_jako": "pliki/000007_data7",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data8",
+     "rodzaj": "db_data",
+     "bajtow": 11049524,
+     "sha256": "545d300a0ee78f0a1e14571842e16cbfc722012dd49378a5fe18977a619100a5",
+     "schowane_jako": "pliki/000008_data8",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/data9",
+     "rodzaj": "db_data",
+     "bajtow": 12228156,
+     "sha256": "68055d97b41f2301e1bdf0321b5ad0e9b20f8350a107165a7f384f6ac6aeedd5",
+     "schowane_jako": "pliki/000009_data9",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc7.zip",
+   "numer": 7,
+   "czesciz": 8,
+   "bajtow": 76139002,
+   "sha256": "0c51464b65203e2298f84f24dbb435c525f6a37b44aca85d0f0156cfa1d53ef2",
+   "drive_id": "1jMZ5h-fqNO4CqeT7fxnS40gb8fxCDjSR",
+   "utworzone": "2026-11-13T18:31:46.6531615Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 7,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/index1",
+     "rodzaj": "db_index",
+     "bajtow": 21544537,
+     "sha256": "94945b5353fb28f8342e95c80d9dde825f685abb38276003cee8e850ca44856d",
+     "schowane_jako": "pliki/000001_index1",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index2",
+     "rodzaj": "db_index",
+     "bajtow": 21399925,
+     "sha256": "c2d33e0a165fb331a0cf6881d4ed6fbbe6c1fc190387d795b7b3cdff94a881df",
+     "schowane_jako": "pliki/000002_index2",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index200",
+     "rodzaj": "db_index",
+     "bajtow": 5622712,
+     "sha256": "14c48d7a0b3965df9d1be62ca178f276e334b81158c4fb88bb9960edfedd42c3",
+     "schowane_jako": "pliki/000003_index200",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index201",
+     "rodzaj": "db_index",
+     "bajtow": 5163919,
+     "sha256": "fd7fccfb642af004d8c7d621ea5babde702b7f52edee60b303e3af0181fa5323",
+     "schowane_jako": "pliki/000004_index201",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index202",
+     "rodzaj": "db_index",
+     "bajtow": 9966637,
+     "sha256": "8937aca7044ac84da44b53d862cb5d81f03c745eeae945e502b34812b7f2436f",
+     "schowane_jako": "pliki/000005_index202",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index203",
+     "rodzaj": "db_index",
+     "bajtow": 20588949,
+     "sha256": "a03212dc68680f593f63fb04a51643817f07062e68dd5525384d3694bc83379c",
+     "schowane_jako": "pliki/000006_index203",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index204",
+     "rodzaj": "db_index",
+     "bajtow": 2300404,
+     "sha256": "51ddf021fe062e29ad36102224e1b29ef33e36fc914471d9df831b58425c1e85",
+     "schowane_jako": "pliki/000007_index204",
+     "status": "copied"
+    }
+   ]
+  },
+  {
+   "paczka": "WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc8.zip",
+   "numer": 8,
+   "czesciz": 8,
+   "bajtow": 48296595,
+   "sha256": "31c6d1590d6933278595b515676ce27e6276e592994474a5a5afaa06ad33964c",
+   "drive_id": "14YU61aRpV-DQZ3Md0VycTKznPpfLx9St",
+   "utworzone": "2026-11-13T18:31:51.5830277Z",
+   "zbieracz": "1.3.0",
+   "build": "26592996",
+   "plikow": 2,
+   "pliki": [
+    {
+     "zrodlo": "Package/HD/oversea/index3",
+     "rodzaj": "db_index",
+     "bajtow": 26291345,
+     "sha256": "82666901fe9377e6a1a8033a30ba42b79ad1f714b972ad5b17cfebec44aef92a",
+     "schowane_jako": "pliki/000001_index3",
+     "status": "copied"
+    },
+    {
+     "zrodlo": "Package/HD/oversea/index4",
+     "rodzaj": "db_index",
+     "bajtow": 22280406,
+     "sha256": "d4be1a69f409bed2137cba2632468bb2d651554a4df1e07e94499b5e0bbfd75f",
+     "schowane_jako": "pliki/000002_index4",
+     "status": "copied"
+    }
+   ]
+  }
+ ],
+ "gdzie_szukac": {
+  "LocalData/Patch/HD/oversea/MANIFEST": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/data1005": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/data1201": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_disease.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_npc.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_pet.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_player.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_player_grey.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_ququ.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/formula/formula_zzq_npc.ft": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/index1001": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/index1200": [
+   1
+  ],
+  "LocalData/Patch/HD/oversea/locale/translate_words_map_en_diff": [
+   1
+  ],
+  "Package/HD/oversea/MANIFEST": [
+   1
+  ],
+  "Package/HD/oversea/data1": [
+   3
+  ],
+  "Package/HD/oversea/data10": [
+   4
+  ],
+  "Package/HD/oversea/data1001": [
+   1
+  ],
+  "Package/HD/oversea/data1002": [
+   4
+  ],
+  "Package/HD/oversea/data1003": [
+   4
+  ],
+  "Package/HD/oversea/data1004": [
+   4
+  ],
+  "Package/HD/oversea/data1005": [
+   4
+  ],
+  "Package/HD/oversea/data11": [
+   4
+  ],
+  "Package/HD/oversea/data1200": [
+   1
+  ],
+  "Package/HD/oversea/data1201": [
+   4
+  ],
+  "Package/HD/oversea/data2": [
+   4
+  ],
+  "Package/HD/oversea/data200": [
+   4
+  ],
+  "Package/HD/oversea/data201": [
+   4
+  ],
+  "Package/HD/oversea/data202": [
+   4
+  ],
+  "Package/HD/oversea/data203": [
+   4
+  ],
+  "Package/HD/oversea/data204": [
+   5
+  ],
+  "Package/HD/oversea/data205": [
+   5
+  ],
+  "Package/HD/oversea/data206": [
+   5
+  ],
+  "Package/HD/oversea/data207": [
+   5
+  ],
+  "Package/HD/oversea/data208": [
+   5
+  ],
+  "Package/HD/oversea/data209": [
+   5
+  ],
+  "Package/HD/oversea/data210": [
+   5
+  ],
+  "Package/HD/oversea/data211": [
+   6
+  ],
+  "Package/HD/oversea/data212": [
+   6
+  ],
+  "Package/HD/oversea/data3": [
+   6
+  ],
+  "Package/HD/oversea/data4": [
+   6
+  ],
+  "Package/HD/oversea/data5": [
+   6
+  ],
+  "Package/HD/oversea/data6": [
+   6
+  ],
+  "Package/HD/oversea/data7": [
+   6
+  ],
+  "Package/HD/oversea/data8": [
+   6
+  ],
+  "Package/HD/oversea/data9": [
+   6
+  ],
+  "Package/HD/oversea/index1": [
+   7
+  ],
+  "Package/HD/oversea/index1001": [
+   1
+  ],
+  "Package/HD/oversea/index1200": [
+   1
+  ],
+  "Package/HD/oversea/index2": [
+   7
+  ],
+  "Package/HD/oversea/index200": [
+   7
+  ],
+  "Package/HD/oversea/index201": [
+   7
+  ],
+  "Package/HD/oversea/index202": [
+   7
+  ],
+  "Package/HD/oversea/index203": [
+   7
+  ],
+  "Package/HD/oversea/index204": [
+   7
+  ],
+  "Package/HD/oversea/index3": [
+   8
+  ],
+  "Package/HD/oversea/index4": [
+   8
+  ],
+  "Package/HD/oversea/locale/translate_words_map_en": [
+   2
+  ],
+  "Package/HD/oversea/locale/translate_words_map_en_diff": [
+   1
+  ],
+  "Package/HD/oversea/locale/translate_words_map_zh_cn": [
+   3
+  ],
+  "Package/HD/oversea/locale/translate_words_map_zh_cn_diff": [
+   1
+  ]
+ }
+}

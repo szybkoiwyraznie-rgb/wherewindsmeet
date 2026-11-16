@@ -72,6 +72,10 @@ skróty wejść stoją w `index/manifest.json`.
 
 ## Trzecia dostawa — Patch 2.4 (`2026-11-13`, build `26592996`)
 
+Spis zawartości tych ośmiu części (co leży w której, z SHA-256): [PLIKI_W_PACZKACH.md](PLIKI_W_PACZKACH.md)
+i `index/paczki.json`; generuje `tools/spis_paczek.py`, rozpakowanie do `local/dane`
+odtwarza ścieżki gry.
+
 Zebrana narzędziem `collector` `1.3.0` (`WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`,
 8 części po ok. 64 MB, łącznie 516 MB, `637` pozycji inwentarza, `60` unikalnych
 plików sprawdzonych przez `tools/validate_collector_return.py`):
