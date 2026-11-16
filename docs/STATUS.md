@@ -42,20 +42,22 @@ w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przek�
 klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
 `client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
 
-**Kolumna „wiersz puli” jest porządkiem gry w cutscenach (v7, 2026-11-14).**
-Pole `kn` w `index/chronologia.jsonl` miesza napisy przypisane wprost z tabeli
-gry (`cutsceny_napisy.jsonl`, 5 wpisów) i bloki puli `text_msg`, więc kwestie
-w cutscenie stały w kolejności losowej — `## Cutscena 30161` zaczynała się od
-„Jaki człowiek w czerni?”. Teraz `tools/czytanka_czysta.py` sortuje kwestie po
-numerze wiersza puli (`index/cutsceny_kontekst.jsonl`, wiersze `napis`; zapasowo
-pole `i` z `index/kolejnosc_*.jsonl`). Ten sam przerywnik leży w plikach gry dwa
-razy (30161: wiersze 590153–590179 i 591125–591169) — pierwszy zestaw jest treścią,
-drugi stoi pod `### Inny wariant napisów tej cutsceny (wiersze …)`, a powtórzone
-kwestie wypadają. Streszczenie sceny dostało nagłówek `### Streszczenie sceny`
-i nie udaje już ostatniej kwestii dialogu. Regresja: `tests/test_czytanka_kolejnosc_cutscen.py`.
-Paczka: `dist/WWM_Czytanka_PL_v7.zip`, **6 785 364 B**, SHA-256
-`62cd3f1da6693a45eee2fc54264f6d42b907454187129a7593ef51cde2aa2620`, Dysk
-`1YwJYMlwmycdV2A6rTWdUOowt8gwNpnGc`.
+**Kolejność kwestii w cutscenach: wiersz puli to za mało (v8, 2026-11-14).**
+Porządek bierzemy z numeru wiersza puli `text_msg` (`index/cutsceny_kontekst.jsonl`,
+wiersze `napis`) — to naprawiło v7. Ale **to nie jest kolejność gry**: dla cutsceny
+30161 ta sama scena leży w dwóch miejscach puli (590153–590179 i 591125–591169),
+a „Stój!” stoi w wierszu 591170, daleko za rozmową, choć w grze pada jako trzecia
+kwestia. Osi czasu cutscen w danych nie ma (sprawdzone: `tools/cutsceny_z_bazy.py`
+— `.cine` nie ma w pakiecie, `dialog_timelines.*` nie zawierają ani jednego napisu
+puli), więc kolejność z ekranu jest **danymi**: `index/cutsceny_ekran.jsonl`
+(`no`, `wiersze`, `dowod`). `tools/czytanka_czysta.py` stawia wtedy te kwestie
+dokładnie jak w grze (także wiersze spoza `kn`), a resztę sceny zsuwa pod
+`### Inny wariant napisów tej cutsceny (…)`. Wiersze `napis_grey` nie podmieniają
+już kluczy puli — wcześniej gubiły kwestie z przekładem („Jak można tak zasnąć?”).
+Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` (13 testów), całość 540 OK.
+Paczka: `dist/WWM_Czytanka_PL_v8.zip`, **6 785 383 B**, SHA-256
+`467c53f2c6f6215843c0e56491abbdd36f9438a0a6a7367ef214d1d69e5fe917`, Dysk
+`1w-DOnDjN_NP3VbzAgmesl5eH4sdqhWkv`.
 
 **D — decyzja właściciela (2026-11-14): zostawiamy, powiąże sceny sam.**
 W repo został `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`, opis

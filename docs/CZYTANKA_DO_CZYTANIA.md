@@ -67,6 +67,14 @@ Zasady kolejności:
      w obu wariantach wypadają, więc nic nie czyta się dwa razy.
    * **streszczenie sceny** stoi zawsze na końcu, pod własnym nagłówkiem
      `### Streszczenie sceny` — nie udaje już ostatniej kwestii dialogu.
+   * **kolejność z ekranu gry** (`index/cutsceny_ekran.jsonl`): pliki gry nie mają osi
+     czasu cutscen (sprawdzone w `tools/cutsceny_z_bazy.py` — osie `.cine` nie są
+     w pakiecie, a `dialog_timelines.*` nie zawierają ani jednego napisu puli), więc
+     kolejności nie da się z nich odczytać. Tam, gdzie właściciel przepisał napisy
+     z ekranu, wiersze puli idą do tego pliku w kolejności z gry (pole `wiersze`,
+     uzasadnienie w `dowod`) i czytanka stawia je dokładnie tak, także wiersze spoza
+     pola `kn` (np. „Stój!” z wiersza 591170 w cutscenie 30161). Reszta wierszy sceny
+     schodzi wtedy pod `### Inny wariant napisów tej cutsceny (…)`, więc nic nie ginie.
 7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
    z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
    `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101

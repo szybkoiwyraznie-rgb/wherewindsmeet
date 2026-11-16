@@ -390,7 +390,7 @@ def _wiersze_napisow(ix, porzadek: dict[str, list[dict]]) -> dict[str, int]:
         if klucz in wiersze:
             continue
         for wpis in wystapienia:
-            if str(wpis.get("z") or "").startswith("napis") and isinstance(wpis.get("i"), int):
+            if wpis.get("z") == "napis" and isinstance(wpis.get("i"), int):
                 wiersze[klucz] = wpis["i"]
                 break
     return wiersze
@@ -401,16 +401,45 @@ def _bez_interpunkcji(tekst: str) -> str:
     return " ".join(re.sub(r"[^\w\s]", " ", tekst.lower()).split())
 
 
-def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int],
-                     pl: dict[str, str]) -> tuple[list[str], dict[int, str], list[str]]:
+def _kolejnosc_ekranu(katalog) -> dict[int, dict]:
+    """Kolejność kwestii odczytana z ekranu gry (pole `wiersze` + `dowod`).
+
+    Pliki gry nie mają osi czasu cutscen (sprawdzone w `tools/cutsceny_z_bazy.py`),
+    więc kolejności nie da się z nich odczytać samej. Tam, gdzie właściciel przepisał
+    napisy z ekranu, zapisujemy kolejność wierszy puli w `index/cutsceny_ekran.jsonl`;
+    czytanka stawia wtedy te kwestie dokładnie tak, jak lecą w grze.
+    """
+    sciezka = Path(katalog) / "cutsceny_ekran.jsonl"
+    if not sciezka.is_file():
+        return {}
+    wynik: dict[int, dict] = {}
+    for linia in sciezka.read_text(encoding="utf-8").splitlines():
+        if not linia.strip():
+            continue
+        wpis = json.loads(linia)
+        numer = wpis.get("no")
+        wiersze = [w for w in wpis.get("wiersze") or [] if isinstance(w, int)]
+        if isinstance(numer, int) and wiersze:
+            wynik[numer] = {"wiersze": wiersze, "dowod": wpis.get("dowod") or ""}
+    return wynik
+
+
+def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
+                     ekran: dict | None = None,
+                     klucz_wiersza: dict[int, str] | None = None
+                     ) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
-    Kolejność bierzemy z wierszy puli. W plikach gry ten sam przerywnik leży czasem
-    **dwa razy** (dwa warianty napisów, np. 590153–590179 i 591125–591169 w cutscenie
-    30161): kwestie się powtarzają, a tekst bywa inny. Dlatego bloki dzielimy po dużym
-    odstępie wierszy, pierwszy pokazujemy jako główny, a pozostałe pod nagłówkiem —
-    nic nie ginie, ale czytelnik nie dostaje dwóch scen splątanych w jedną.
-    Streszczenie sceny (`k`) idzie na końcu, pod własnym nagłówkiem.
+    Kolejność bierzemy z wierszy puli (`text_msg`). W plikach gry ten sam przerywnik
+    leży czasem **dwa razy** (np. 590153–590179 i 591125–591169 w cutscenie 30161):
+    kwestie się powtarzają, a tekst bywa inny. Dlatego bloki dzielimy po dużym odstępie
+    wierszy, pierwszy pokazujemy jako główny, a pozostałe pod nagłówkiem — nic nie
+    ginie, ale czytelnik nie dostaje dwóch scen splątanych w jedną.
+
+    Gdy znamy kolejność z ekranu gry (`index/cutsceny_ekran.jsonl`), treść sceny stoi
+    dokładnie w tej kolejności (także wiersze spoza `kn`, np. „Stój!” z 591170),
+    a reszta wierszy schodzi do wariantu. Streszczenie sceny (`k`) idzie na końcu,
+    pod własnym nagłówkiem.
     """
     napisy = [k for k in wiersz.get("kn") or [] if k]
     pozycja: dict[str, int] = {}
@@ -434,9 +463,22 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int],
     podtytuly: dict[int, str] = {}
     powtorzone: list[str] = []
     widziane: set[str] = set()
+
+    tresc: list[str] = []
+    if ekran and klucz_wiersza:
+        for numer in ekran["wiersze"]:
+            klucz = klucz_wiersza.get(numer)
+            if klucz and klucz not in tresc:
+                tresc.append(klucz)
+    if tresc:
+        klucze.extend(tresc)
+        widziane.update(_bez_interpunkcji(pl[k]) for k in tresc if pl.get(k))
+        zostalo = [k for blok in bloki for k in blok if k not in set(tresc)]
+        bloki = [zostalo] if zostalo else []
+
     for numer_bloku, blok in enumerate(bloki):
         naglowek = ""
-        if numer_bloku:
+        if numer_bloku or (klucze and blok):
             numery = [wiersze[k] for k in blok if k in wiersze]
             opis = (f"wiersze {min(numery)}–{max(numery)}" if numery and min(numery) != max(numery)
                     else f"wiersz {numery[0]}" if numery else "wiersze bez numeru")
@@ -463,7 +505,8 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int],
 
 
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
-                             krainy: list[dict] | None = None) -> list[Jednostka]:
+                             krainy: list[dict] | None = None,
+                             ekran: dict[int, dict] | None = None) -> list[Jednostka]:
     """Chronologia jest zapisana w `index/chronologia.jsonl`; tu tylko czytamy kolejność."""
     nazwy_pl = _nazwy_krain(ix, pl, krainy or [])
 
@@ -473,6 +516,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
     mowcy_napisow = {w["wiersz"]: w.get("mowca_en")
                      for w in ix.cutsceny_kontekst.get("napis", []) if w.get("wiersz")}
     wiersze_napisow = _wiersze_napisow(ix, porzadek)
+    klucze_wierszy = {w["wiersz"]: w["k"] for w in ix.cutsceny_kontekst.get("napis", [])
+                      if w.get("wiersz") and w.get("k")}
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -529,7 +574,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
-            klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl)
+            klucze, podtytuly, powtorzone = _napisy_cutsceny(
+                wiersz, wiersze_napisow, pl, (ekran or {}).get(numer), klucze_wierszy)
             linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
                      for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
@@ -1151,7 +1197,8 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
                   "kontekst": 0, "bez_przekladu": 0}
 
-    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
+    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy,
+                                        _kolejnosc_ekranu(index))
     tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",

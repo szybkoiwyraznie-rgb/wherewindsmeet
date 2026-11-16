@@ -65,8 +65,51 @@ class TestKolejnoscCutscen(unittest.TestCase):
         class Ix:
             cutsceny_kontekst = {"napis": [{"k": "k1", "wiersz": 590153}]}
 
+        # wiersze „napis_grey” nie wchodzą: to ten sam wiersz puli z tekstem bez przekładu
         porzadek = {"k1": [{"z": "napis", "i": 590153}], "k2": [{"z": "napis_grey", "i": 591125}]}
-        self.assertEqual(cz._wiersze_napisow(Ix(), porzadek), {"k1": 590153, "k2": 591125})
+        self.assertEqual(cz._wiersze_napisow(Ix(), porzadek), {"k1": 590153})
+
+
+class TestKolejnoscZEkranu(unittest.TestCase):
+    """Kolejność przepisana z ekranu gry bije porządek wierszy puli."""
+
+    def test_ekran_ustawia_tresc_i_sciaga_reszte_do_wariantu(self):
+        wiersz = {"t": "cutscena", "n": 1, "kn": ["k1", "k2", "k3", "k4"], "k": []}
+        wiersze = _wiersze(**{"k1": 590153, "k2": 590154, "k3": 591148, "k4": 591149})
+        klucz_wiersza = {590153: "k1", 590154: "k2", 591148: "k3", 591149: "k4",
+                         591170: "poza-kn"}       # wiersz spoza `kn`, jak „Stój!”
+        pl = {"k1": "Pierwsza.", "k2": "Druga.", "k3": "Trzecia.", "k4": "Czwarta.",
+              "poza-kn": "Kwestia spoza puli sceny."}
+        ekran = {"wiersze": [591149, 591170, 590153, 590154], "dowod": "ekran"}
+
+        klucze, podtytuly, _ = cz._napisy_cutsceny(wiersz, wiersze, pl, ekran, klucz_wiersza)
+
+        # k3 (591148) nie jest na liście z ekranu, więc schodzi do wariantu na końcu
+        self.assertEqual(klucze, ["k4", "poza-kn", "k1", "k2", "k3"])
+        self.assertEqual(list(podtytuly), [4])
+        self.assertTrue(podtytuly[4].startswith("Inny wariant napisów"))
+
+    def test_ekran_zostawia_reszte_pod_naglowkiem_wariantu(self):
+        wiersz = {"t": "cutscena", "n": 1, "kn": ["a", "b", "c"], "k": []}
+        wiersze = _wiersze(a=590100, b=591100, c=591101)
+        klucz_wiersza = {590100: "a", 591100: "b", 591101: "c"}
+        pl = {"a": "Z ekranu.", "b": "Wariant pierwszy.", "c": "Wariant drugi."}
+
+        klucze, podtytuly, _ = cz._napisy_cutsceny(
+            wiersz, wiersze, pl, {"wiersze": [590100], "dowod": "ekran"}, klucz_wiersza)
+
+        self.assertEqual(klucze, ["a", "b", "c"])
+        self.assertEqual(list(podtytuly), [1])
+        self.assertTrue(podtytuly[1].startswith("Inny wariant napisów"))
+
+    def test_plik_z_kolejnoscia_ekranu_jest_czytany(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as katalog:
+            (Path(katalog) / "cutsceny_ekran.jsonl").write_text(
+                '{"no": 30161, "wiersze": [591148, 591149, 591170], "dowod": "ekran"}\n',
+                encoding="utf-8")
+            mapa = cz._kolejnosc_ekranu(katalog)
+        self.assertEqual(mapa[30161]["wiersze"], [591148, 591149, 591170])
 
 
 class TestNaglowkiWPliku(unittest.TestCase):
