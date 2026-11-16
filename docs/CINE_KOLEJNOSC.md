@@ -22,12 +22,23 @@ samym sposobem dla wszystkich przerywników.
    każdej serii idą zgodnie z grą, ale **nie mówią, jak serie się przeplatają**
    — a właśnie przeplatanie decyduje o kolejności („Stój!” pada między drugą
    a czwartą kwestią Ruby).
-3. **Osie dialogów (`dialog_timelines.*`) nie zawierają głosu przerywników.**
-   Sprawdzone na wszystkich **26 990** osiach, które da się odczytać z danych
-   w piaskownicy: ani jedna nie ma w `used_sound_bnk` banku `…_cs_zlxl`
-   (0 trafień na 26 990). Pozostałe **48 017** osi leży w plikach
-   `data204`–`data208`, których w piaskownicy **nie ma** — więc ten wynik nie
-   jest jeszcze rozstrzygający i trzeba go domknąć.
+3. **Baza gry — cała — nie zawiera kolejności kwestii przerywnika.** Właściciel
+   wgrał na Dysk brakujące binarki (`binarki/`: `data1`, `data204`–`data210`,
+   `index*`, `MANIFEST`), więc baza jest teraz kompletna i sprawdzenie jest
+   pełne, nie częściowe. Dowody (narzędzie: `tools/szukaj_w_bazie.py`):
+   - **osie dialogów:** wszystkie **75 007** tabel `dialog_timelines.*` czyta się
+     bez błędu; **ani jedna** nie ma w `used_sound_bnk` banku `…_cs_zlxl`
+     i **ani jedna** nie zawiera kwestii z tej sceny (szukane teksty: 站住,
+     老大 / 周红线, 快点起来),
+   - **wiersz napisów:** identyfikator `591148` („老大 老大”, pierwsza kwestia
+     z ekranu) występuje w całej bazie **dwa razy** — w `text_msg` i w
+     `text_msg__grey`. Żadna inna tabela się do niego nie odwołuje. To samo jego
+     hash (`13727916233045163908`): tylko `text_msg__grey`,
+   - **nagranie:** identyfikator `7150686` (`vo_sm_sxdm4_cs_zlxl_hx_01`)
+     występuje tylko w `sound_data` — nic go nie szereguje,
+   - **żadna tabela nie jest kluczowana numerem przerywnika** (30161 jako klucz
+     nie istnieje), a `new_graph_cues.*` (2 530 tabel) nie zna ani jednej nazwy
+     zawierającej `zlxl`.
 4. **Tabela `cutscenes` nie ma osi czasu.** Dla 30161 daje tylko: `cine_name`
    `sq001_zlxl`, `cine_path Char/e_01_cutscene/qhrw/sq001_zlxl/sq001_zlxl.cine`,
    `cine_duration 78,664`, `montage_num 17`, `cutscene_graph
@@ -36,23 +47,26 @@ samym sposobem dla wszystkich przerywników.
 
 ## Gdzie ta kolejność najprawdopodobniej jest
 
-**W pliku osi czasu przerywnika — `.cine`.** To ten plik, który gra odtwarza:
+**W pliku osi czasu przerywnika — `.cine`** — i tylko tam. To ten plik, który gra odtwarza:
 ma na osi czasu ponumerowane zdarzenia (nagranie, napis, kamera), a numery
 `hx_01…pma_06` z `sound_data` są właśnie nazwami zdarzeń w takiej osi.
 Plików `.cine` **nie ma w pakiecie aktualizacji** (sprawdzone: w zebranych
 `INWENTARZ.jsonl` ani jednego wpisu `.cine`, a `docs/STATUS.md` opisuje to
 samo dla `.mpk`), więc trzeba je wziąć z instalacji gry.
 
-Druga możliwość, mniej pewna: osie `dialog_timelines.*` z plików
-`data204`–`data208` (48 017 osi, których nie mogliśmy odczytać).
+To już nie jest hipoteza „być może”: po uzupełnieniu bazy wszystkie 75 007 osi
+dialogów zostało sprawdzonych i żadna nie dotyczy tego przerywnika (patrz punkt 3
+wyżej).
 
 ## Co jest potrzebne, żeby to domknąć
 
-Albo **(A)** pliki `.cine` przerywników z instalacji gry — zbiera je
-`collector/ZBIERZ_CINE.bat` (albo `collector/zbierz_cine.ps1`): kopiuje tylko
-`*.cine` z `Char/e_01_cutscene`, niczego nie zmienia, pakuje ZIP-a obok skryptu;
-albo **(B)** brakujące części zrzutu bazy: `…_czesc2.zip`, `…_czesc3.zip`,
-`…_czesc5.zip` (w nich leżą `data1`, `data204`–`data210`).
+(Baza jest już kompletna, więc ta droga jest zamknięta.) Zostaje **(A)**: pliki
+`.cine` przerywników. Jeśli leżą jako pliki w instalacji gry, zbiera je
+`collector/ZBIERZ_CINE.bat` (kopiuje tylko `*.cine`, nic nie zmienia). Jeśli
+siedzą wyłącznie w paczkach `.mpk` (1 GB), trzeba je najpierw z paczek wyjąć —
+służy do tego `collector/SNIFFER_MPK.bat` w trybie `-Szybki` na 3 paczkach:
+wynik to kilka MB, z których odczytam układ indeksu paczki; jeśli nazwy ścieżek
+są w paczce widoczne, napiszę wycinarkę pobierającą **tylko** `sq001_zlxl.cine`.
 
 Gdy (A) będzie w rękach: `tools/cine_kolejnosc.py` odczyta zdarzenia osi
 i wypisze kwestie w kolejności czasu; jeśli wyjdzie z tego dokładnie 39 linii
