@@ -17,7 +17,7 @@ nieudowodniona, nigdy nie zmyślona.
 | B | brakujące przedmioty i pamiątki („Stara włócznia”, „QinghePast-At Heaven's Pier 1”) | są (`index/teksty_*.jsonl`, tabela 4735) | nie | 2 |
 | C | POI w czytance („Dragon Pattern Mark”) | są nazwy (`index/teksty_b.jsonl`, tabela 39) | tak — powiązanie POI → scena | 3 |
 | D | scena → następna scena (4700001 → 4700041 → 4700352) | częściowo (`index/kolejnosc_*.jsonl`) | prawdopodobnie tak | 4 |
-| E | kwestie po angielsku w scenach, które w grze są po polsku | nie (tekst jest tylko zh+en) | tak — pliki `locale` z gry | 1 (blokada: 1 odpowiedź) |
+| E | kwestie po angielsku w scenach, które w grze są po polsku | **tak** — przekłady są w `tlumaczenie/pl_warianty.jsonl` | nie | **zrobione** |
 
 ## A. Porządek questów w 03 — **zrobione**
 
@@ -135,7 +135,36 @@ z `grupy_zadan` + numerów scen).
 czytance jednym łańcuchem, a każdy skok ma dowód (pole z tabeli albo wpis
 w grupie zadania).
 
-## E. Angielskie kwestie w scenach, które w grze są po polsku
+## E. Angielskie kwestie w scenach, które w grze są po polsku — **zrobione**
+
+**Przyczyna (potwierdzona na scenie 4700001).** Kwestie zależne od płci bohatera
+mają w grze osobny identyfikator na każdy wariant, a wspólny klucz tekstu.
+Magazyn trzyma je w `tlumaczenie/pl_warianty.jsonl` pod `id`, a indeks
+(`index/warianty.jsonl`) wiąże `id` z kluczem tekstu i numerem wariantu
+(1 = bohater, 2 = bohaterka). Czytanka czytała tylko `pl_X.jsonl` po kluczu,
+więc **wszystkie kwestie gracza z wariantem płci wychodziły po angielsku**,
+mimo gotowego przekładu. Tak było w całej scenie 4700001: 14 z 23 linii.
+
+**Naprawa.** `tools/tlumaczenie.py`: `wczytaj(katalog, warianty=...)` dokłada
+`po_kluczu_wariantow` (klucz tekstu → przekład), `przeklad()`/`ma()` sięgają do
+niego, a `po_kluczu_pelny()` daje scalony słownik. Czytanka
+(`tools/czytanka_czysta.py::_magazyn`) i `tools/pokrycie_tlumaczenia.py` podają
+teraz ścieżkę `index/warianty.jsonl`. Czytamy **wariant bohatera** (mężczyzna,
+zgodnie z decyzją właściciela); gdy rodzina go nie ma (21 z 180 przetłumaczonych
+rodzin), bierzemy drugi dostępny wariant — lepszy polski z żeńską końcówką niż
+angielski.
+
+**Efekt.** Scena 4700001 jest w całości po polsku („Ten znak to…”, „Ostrożnie.”,
+„Ciężka i ostra. Nie baw się nią.”). Kwestie bez przekładu: 160 912 → **160 751**;
+linii w 01/02: 29 395 → **29 556**. Znika też fałszywy komunikat narzędzia
+„BRAK przekładu → w grze po angielsku” dla tych kwestii.
+
+**Co zostaje otwarte.** Ten sam błąd może siedzieć w innych miejscach, które
+czytają magazyn bez `warianty=`: `tools/buduj_paczke.py`, `tools/buduj_czytanki.py`
+(wydanie „pełne”), `tools/zbuduj_latke.py`. Trzeba przejść po kolei i sprawdzić,
+czy nie gubią wariantów — to osobne zadanie, nie blokuje czytanki.
+
+## E. (archiwum) Objaw i dowody
 
 **Objaw.** W scenie 4700001 kwestie `\*This symbol...`, `\*Careful!` itd. są po
 angielsku, a kwestie Ruby'ego po polsku. W grze — zdaniem właściciela — cała

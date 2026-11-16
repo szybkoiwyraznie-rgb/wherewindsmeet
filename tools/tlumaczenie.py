@@ -29,16 +29,29 @@ class MagazynError(Exception):
 class Magazyn:
     po_kluczu: dict[str, str] = field(default_factory=dict)
     po_id: dict[str, str] = field(default_factory=dict)  # id tekstu jako 16 znaków hex
+    # Klucz tekstu → przekład tego wariantu płci, który czytamy (domyślnie bohater).
+    # Wypełniane tylko wtedy, gdy `wczytaj` dostanie ścieżkę `index/warianty.jsonl`.
+    po_kluczu_wariantow: dict[str, str] = field(default_factory=dict)
 
     def __len__(self) -> int:
         return len(self.po_kluczu) + len(self.po_id)
 
     def ma(self, slot: str) -> bool:
         """`slot` w zapisie pakietu: klucz albo `@id`."""
-        return slot[1:] in self.po_id if slot.startswith("@") else slot in self.po_kluczu
+        if slot.startswith("@"):
+            return slot[1:] in self.po_id
+        return slot in self.po_kluczu or slot in self.po_kluczu_wariantow
 
     def przeklad(self, slot: str) -> str | None:
-        return self.po_id.get(slot[1:]) if slot.startswith("@") else self.po_kluczu.get(slot)
+        if slot.startswith("@"):
+            return self.po_id.get(slot[1:])
+        return self.po_kluczu.get(slot) or self.po_kluczu_wariantow.get(slot)
+
+    def po_kluczu_pelny(self) -> dict[str, str]:
+        """Przekłady po kluczu tekstu: zwykłe, a gdzie ich brak — wariant bohatera."""
+        scalone = dict(self.po_kluczu_wariantow)
+        scalone.update(self.po_kluczu)
+        return scalone
 
     def ustaw(self, slot: str, pl: str) -> None:
         if slot.startswith("@"):
@@ -47,8 +60,33 @@ class Magazyn:
             self.po_kluczu[slot] = pl
 
 
-def wczytaj(katalog) -> Magazyn:
-    """Wczytaj magazyn; brak katalogu oznacza pusty magazyn."""
+WARIANT_CZYTANY = 1  # 1 = bohater, 2 = bohaterka; czytanka czyta jednego bohatera
+
+
+def mapa_wariantow(sciezka) -> dict[str, dict[int, str]]:
+    """`index/warianty.jsonl` → klucz tekstu → {wariant płci: id tekstu}."""
+    mapa: dict[str, dict[int, str]] = {}
+    path = Path(sciezka)
+    if not path.is_file():
+        return mapa
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            ident, klucz, wariant = row.get("id"), row.get("k"), row.get("w")
+            if ident and klucz and wariant is not None:
+                mapa.setdefault(klucz, {})[int(wariant)] = ident
+    return mapa
+
+
+def wczytaj(katalog, warianty=None) -> Magazyn:
+    """Wczytaj magazyn; brak katalogu oznacza pusty magazyn.
+
+    `warianty` to ścieżka `index/warianty.jsonl`. Bez niej kwestie zależne od
+    płci bohatera nie mają przekładu po kluczu tekstu — magazyn trzyma je pod
+    identyfikatorem (`@id`), a klucz jest wspólny dla obu wariantów.
+    """
     root = Path(katalog)
     magazyn = Magazyn()
     if not root.is_dir():
@@ -69,6 +107,12 @@ def wczytaj(katalog) -> Magazyn:
                         magazyn.po_kluczu[row["k"]] = text
                 except (json.JSONDecodeError, KeyError, TypeError) as error:
                     raise MagazynError(f"{path.name}:{number}: {error!r}") from error
+    if warianty is not None:
+        for klucz, warianty_tekstu in mapa_wariantow(warianty).items():
+            ident = warianty_tekstu.get(WARIANT_CZYTANY) or warianty_tekstu[min(warianty_tekstu)]
+            tekst = magazyn.po_id.get(ident)
+            if tekst:
+                magazyn.po_kluczu_wariantow[klucz] = tekst
     return magazyn
 
 

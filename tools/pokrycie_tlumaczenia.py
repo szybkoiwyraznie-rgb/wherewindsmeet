@@ -459,7 +459,9 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         ix = indeks_mod.wczytaj(arguments.indeks, sceny=not arguments.bez_scen or bool(arguments.szukaj))
-        magazyn = magazyn_mod.wczytaj(arguments.magazyn)
+        magazyn = magazyn_mod.wczytaj(
+            arguments.magazyn, warianty=Path(arguments.indeks) / "warianty.jsonl"
+        )
         # Dołóż przekłady bliźniaków o tej samej treści źródłowej (różne białe znaki),
         # żeby pomiar odpowiadał temu, co trafi do gry.
         blizniaki = magazyn_mod.doloz_blizniaki(magazyn, ix)

@@ -73,6 +73,12 @@ Zasady kolejności:
    żadnego zadania (np. kwestie z `debate_guider_dialog_data`), zostają na końcu
    sekcji, alfabetycznie — nic nie wypada, ale nie udają questów.
 
+9. **kwestie zależne od płci bohatera** mają przekład pod osobnym
+   identyfikatorem (`@id`), a nie pod kluczem tekstu. Czytanka czyta
+   **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
+   ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem
+   wychodziła po angielsku mimo gotowego przekładu.
+
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
 

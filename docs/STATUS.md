@@ -3,6 +3,11 @@
 Aktualizacja: **2026-11-14**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+**Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
+jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu
+z kluczem tekstu (`index/warianty.jsonl`). Naprawione 2026-11-14 w
+`tools/tlumaczenie.py` (`wczytaj(..., warianty=...)`); czytamy wariant bohatera.
+
 Pięć braków zgłoszonych przez właściciela (angielskie kwestie w scenach,
 brakujące przedmioty, brak POI, brak powiązań scena → scena, alfabetyczny
 porządek questów w 03) ma plan i kolejność w

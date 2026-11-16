@@ -144,6 +144,7 @@ def main(argv: list[str] | None = None) -> int:
     from pathlib import Path
 
     from tools import indeks as indeks_mod
+    from tools import tlumaczenie as tlumaczenie_mod
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--index", default="index")
@@ -151,13 +152,10 @@ def main(argv: list[str] | None = None) -> int:
     argumenty = parser.parse_args(argv)
 
     ix = indeks_mod.wczytaj(argumenty.index, teksty=True, sceny=False)
-    pl: dict[str, str] = {}
-    for sciezka in sorted(Path(argumenty.magazyn).glob("pl_*.jsonl")):
-        for linia in sciezka.open(encoding="utf-8"):
-            rekord = json.loads(linia)
-            klucz = rekord.get("k") or rekord.get("klucz")
-            if klucz and rekord.get("pl"):
-                pl[klucz] = rekord["pl"]
+    magazyn = tlumaczenie_mod.wczytaj(
+        argumenty.magazyn, warianty=Path(argumenty.index) / "warianty.jsonl"
+    )
+    pl = magazyn.po_kluczu_pelny()
     krainy = json.loads((Path(argumenty.index) / "prowincje.json").read_text(encoding="utf-8"))
     for blok in plan(ix, pl, krainy):
         print(f"## {blok.tytul}  ({blok.rodzaj}, {len(blok.klucze)})")

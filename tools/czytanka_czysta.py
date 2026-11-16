@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
 from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
+from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
 DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
@@ -112,16 +113,18 @@ def _kategoria(tabela: str) -> str:
     return "Pozostałe teksty"
 
 
-def _magazyn(katalog: Path) -> dict[str, str]:
-    pl: dict[str, str] = {}
-    for sciezka in sorted(katalog.glob("pl_*.jsonl")):
-        for linia in sciezka.open(encoding="utf-8"):
-            rekord = json.loads(linia)
-            klucz = rekord.get("k") or rekord.get("klucz")
-            tekst = rekord.get("pl")
-            if klucz and isinstance(tekst, str) and tekst.strip():
-                pl.setdefault(klucz, _czysty(tekst))
-    return pl
+def _magazyn(katalog: Path, index: Path | str = "index") -> dict[str, str]:
+    """Przekłady po kluczu tekstu, razem z wariantami płci bohatera.
+
+    Kwestie zależne od płci gracza mają w grze osobne identyfikatory (`@id`),
+    a w magazynie osobny plik `pl_warianty.jsonl`. Bez `index/warianty.jsonl`
+    nie da się ich przypisać do klucza tekstu — i wtedy czytanka pokazywała
+    angielski tekst mimo gotowego przekładu (np. „This symbol…” w scenie
+    4700001). Czytamy wariant bohatera; gdy go nie ma, pierwszy dostępny.
+    """
+    magazyn = tlumaczenie_mod.wczytaj(katalog, warianty=Path(index) / "warianty.jsonl")
+    return {klucz: _czysty(tekst) for klucz, tekst in magazyn.po_kluczu_pelny().items()
+            if tekst and tekst.strip()}
 
 
 # W danych gry gracz bywa zapisany różnie, także z literówkami (`mian_player`).
@@ -788,7 +791,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
 
 def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     ix = indeks_mod.wczytaj(index, teksty=True, sceny=True)
-    pl = _magazyn(Path(magazyn))
+    pl = _magazyn(Path(magazyn), Path(index))
     porzadek = _wczytaj_porzadek(index)
     chronologia = chronologia_mod.wczytaj(index)
     krainy = json.loads((Path(index) / "prowincje.json").read_text(encoding="utf-8"))
