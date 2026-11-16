@@ -87,6 +87,17 @@ tabela nie jest kluczowana numerem przerywnika. Kolejność jest w pliku osi
 `.cine`, którego paczka nie zawiera — dowody i plan: `docs/CINE_KOLEJNOSC.md`,
 narzędzie: `tools/szukaj_w_bazie.py`.
 
+**E — decyzja właściciela (2026-11-14): dokładnej kolejności z ekranu nie
+odtwarzamy.** Po domknięciu bazy (wyżej) sprawdzenie wyszło negatywnie, a wyjęcie
+osi `.cine` z paczek `.mpk` (1 GB) uznajemy za nieopłacalne. Dlatego w v9 kwestie
+przerywnika idą w kolejności **najnowszej redakcji napisów z danych** (nowszy blok
+wierszy puli, grany przed starszym), a nie w kolejności z ekranu — i tak to jest
+opisane, bez udawania. Dwie rzeczy z tej rozmowy są w v9 zrobione: **streszczenie
+sceny stoi na górze**, zaraz pod numerem (`### Streszczenie sceny` — 2 267 cutscen,
+sprawdzone wszystkie), a **niepewnych mówców nie drukujemy** (żadnych nazw ról,
+samych okrzyków, żadnych podpowiedzi `mowca_en`; w całych cutscenach zostały
+2 podpisy).
+
 **D — decyzja właściciela (2026-11-14): zostawiamy, powiąże sceny sam.**
 W repo został `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`, opis
 `docs/SNIFFER_MPK.md`) jako opcja na później: sondowanie paczek `.mpk`
