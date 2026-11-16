@@ -12,6 +12,16 @@ treści do rozmowy) — innej drogi nie ma, bo sandbox nie ma sieci do Dysku
 (`curl https://drive.google.com` → `000`, GitHub → `200`). Rozpakowanie:
 `python3 tools/spis_paczek.py --rozpakuj local/dane` odtwarza ścieżki gry.
 
+**Pamiątki (przedmioty z historią) są w czytance.** Gra trzyma je w tabelach
+`curio_config` / `curio_owner` / `curio_theme` (+ `equip_items` na nazwę
+i opis). `tools/pamiatki_z_bazy.py` zapisuje z nich **same liczby** do
+`index/pamiatki.jsonl` (120 wierszy), a `czytanka_czysta._pamiatki()` dokłada
+sekcję `# Pamiątki — przedmioty z historią` do `03`: **98 pamiątek** z tytułem
+„właściciel — przedmiot” i całą opowieścią (przekład, a bez przekładu tekst
+z gry z gwiazdką). 22 pamiątki nie mają w wyciągu nazwy przedmiotu — nie
+wchodzą, licznik `pamiatki_bez_nazwy` w README czytanki mówi ile. Opowieści
+pamiątek nie są przetłumaczone (0 ze 120), więc wszystkie idą z gwiazdką.
+
 **Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
 jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu
 z kluczem tekstu (`index/warianty.jsonl`). Naprawione 2026-11-14 w

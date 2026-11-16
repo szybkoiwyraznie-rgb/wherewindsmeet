@@ -77,6 +77,12 @@ Zasady kolejności:
    zasłyszane historie`, `# Zbiory i pamiątki — karty przeciwników`): para
    „tytuł + pełny tekst” z jednego wiersza gry, także bez przekładu (wtedy
    z gwiazdką). Wcześniej wchodził sam tekst bez tytułu, a bez przekładu — wcale.
+   Pamiątki (przedmioty z historią) stoją w sekcji `# Pamiątki — przedmioty
+   z historią`: tytuł „właściciel — przedmiot” (`**jiangwulang — Stara
+   włócznia**`) i cała opowieść z gry pod spodem. Właściciel bez przekładu idzie
+   z identyfikatora ikony z danych gry (`head_npc_…_jiangwulang`), nie
+   z domysłu; pamiątka bez nazwy przedmiotu nie wchodzi i jest policzona
+   w README (`pamiatki_bez_nazwy`).
 10. **kwestie zależne od płci bohatera** mają przekład pod osobnym
    identyfikatorem (`@id`), a nie pod kluczem tekstu. Czytanka czyta
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie

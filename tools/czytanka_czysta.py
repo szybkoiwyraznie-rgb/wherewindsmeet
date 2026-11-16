@@ -25,6 +25,7 @@ import argparse
 import json
 import re
 import sys
+import textwrap
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -506,6 +507,109 @@ def _zbiory(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict) -> list[s
     return out
 
 
+_PAMIATKI_PLIK = "pamiatki.jsonl"
+# rola -> (tabela, kolumna): przestrzeń świadków z `index/zrodla.json`
+_PAMIATKI_PRZESTRZENIE = (
+    ("nazwa", "equip_items", "name"),
+    ("wlasciciel", "curio_owner", "owner_name"),
+    ("pamiec", "text_msg", "content"),
+)
+
+
+def _przestrzen(ix, tabela: str, kolumna: str) -> int | None:
+    """Numer przestrzeni świadków dla (tabela, kolumna) albo None."""
+    for numer, wpis in enumerate(ix.zrodla):
+        if wpis[0] == tabela and wpis[1] == kolumna:
+            return numer
+    return None
+
+
+def _wlasiciel(pl, wpis: dict, klucz: str | None) -> str:
+    """Kto jest właścicielem pamiątki: przekład, a bez niego sama nazwa z ikony.
+
+    Ikona właściciela (`head_npc_zhuxiannpc_jiangwulang`) to identyfikator
+    z danych gry, nie wymyślony tekst — bierzemy z niej ostatni człon.
+    """
+    if klucz:
+        przeklad = pl.get(klucz)
+        if przeklad:
+            return przeklad.strip()
+    ikona = str(wpis.get("wlasciciel_ikona") or "")
+    if not ikona:
+        return ""
+    czlon = ikona.rsplit("/", 1)[-1].split(".", 1)[0]
+    czlon = czlon.rsplit("_", 1)[-1]
+    return "" if czlon.isdigit() else czlon
+
+
+def _blok_tekstu(tekst: str, przeklad: bool) -> list[str]:
+    """Historia przedmiotu: przekład bez zmian, źródło z gwiazdką przy każdej linii."""
+    linie = [linia.rstrip() for linia in textwrap.dedent(tekst).splitlines()]
+    if przeklad:
+        return linie
+    return [("\\*" + linia) if linia.strip() else "" for linia in linie]
+
+
+def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
+              katalog: str | Path) -> list[str]:
+    """Pamiątki (przedmioty z historią): właściciel, nazwa i cała historia.
+
+    Wiersze liczbowe bierze `index/pamiatki.jsonl` (`tools/pamiatki_z_bazy.py`),
+    teksty — jak wszędzie — świadkowie `index/teksty_*.jsonl`. Pamiątka bez
+    nazwy przedmiotu nie wchodzi (nie mamy jak jej zatytułować), a licznik
+    `pamiatki_bez_nazwy` mówi, ile ich było.
+    """
+    plik = Path(katalog) / _PAMIATKI_PLIK
+    if not plik.is_file():
+        return []
+    mapy: dict[str, dict[str, str]] = {}
+    for rola, tabela, kolumna in _PAMIATKI_PRZESTRZENIE:
+        numer = _przestrzen(ix, tabela, kolumna)
+        mapa: dict[str, str] = {}
+        if numer is not None:
+            for klucz, tekst in ix.teksty.items():
+                if tekst.w and tekst.w[0] == numer:
+                    mapa.setdefault(str(tekst.w[1]), klucz)
+        mapy[rola] = mapa
+    ukryte = 0
+    karty: list[str] = []
+    widziane: set[str] = set()
+    for wiersz in plik.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        klucz_historii = mapy["pamiec"].get(str(wpis.get("pamiec") or ""))
+        if not klucz_historii or klucz_historii in uzyte:
+            continue
+        klucz_nazwy = mapy["nazwa"].get(str(wpis.get("przedmiot") or ""))
+        if not klucz_nazwy:
+            ukryte += 1
+            continue
+        nazwa = (pl.get(klucz_nazwy) or _z_gry(ix, klucz_nazwy)).strip()
+        if not nazwa:
+            ukryte += 1
+            continue
+        historia = pl.get(klucz_historii)
+        zrodlo = historia or _z_gry(ix, klucz_historii)
+        if not zrodlo.strip():
+            continue
+        wlasciciel = _wlasiciel(pl, wpis, mapy["wlasciciel"].get(str(wpis.get("wlasciciel") or "")))
+        tytul = f"{wlasciciel} — {nazwa}" if wlasciciel else nazwa
+        if tytul in widziane:
+            continue
+        widziane.add(tytul)
+        uzyte.add(klucz_historii)
+        karty.append(f"**{tytul}**")
+        karty.append("")
+        karty.extend(_blok_tekstu(zrodlo, bool(historia)))
+        karty.append("")
+        statystyka["pamiatki"] = statystyka.get("pamiatki", 0) + 1
+    statystyka["pamiatki_bez_nazwy"] = statystyka.get("pamiatki_bez_nazwy", 0) + ukryte
+    if not karty:
+        return []
+    return ["# Pamiątki — przedmioty z historią", ""] + karty
+
+
 def _linia(mowca: str, tekst: str) -> str:
     """Kwestia w jednej linii, bez punktora.
 
@@ -870,6 +974,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
 
     tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
     tresc_reszty += _zbiory(ix, pl, uzyte | uzyte_kontekstu, statystyka)
+    tresc_reszty += _pamiatki(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
     (wyj / "03_reszta.md").write_text(
         _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
         + "\n".join(tresc_reszty) + "\n", encoding="utf-8")
@@ -905,7 +1010,7 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
-{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek w pliku 03.
+{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek oraz {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) w pliku 03.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01.
