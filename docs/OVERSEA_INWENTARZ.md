@@ -85,5 +85,11 @@ plików sprawdzonych przez `tools/validate_collector_return.py`):
   `data1005`, `data1201`, `translate_words_map_en_diff` (19 326 459 B — zastępuje
   warstwę `_diff` EN z `Package/`) oraz 7 binarnych plików `formula/*.ft`
   (w tej dostawie brak `LocalData/Patch/.../translate_words_map_zh_cn_diff`).
+- **Numery plików na Dysku Google** (do ponownego pobrania, gdy lokalna kopia
+  `local/dane` zostanie usunięta): `czesc1` `1WY_2aukAQRc-h8ilIgiWZak_0PGGY7nW`,
+  `czesc2` `1P9lRwzz-aKoNFAoHrGKS9sgQicVxh054`, `czesc3` `13DCiJzsJBhMXE98DWvbo-GefT3r7aNIW`,
+  `czesc4` `1dPVcOChJqR3NOPd37w8inXOVZdbZWmRy`, `czesc5` `1ebkASEIe3qLAfZ6nLB3WFKlNv7I__CHs`,
+  `czesc6` `1HAhta2xCvOg-n0fVTX08wev7u0eD1QQH`, `czesc7` `1jMZ5h-fqNO4CqeT7fxnS40gb8fxCDjSR`,
+  `czesc8` `14YU61aRpV-DQZ3Md0VycTKznPpfLx9St`.
 - **Wyciąg `index/` w repozytorium** został zaktualizowany do tej dostawy (szczegóły
   i liczby w [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
