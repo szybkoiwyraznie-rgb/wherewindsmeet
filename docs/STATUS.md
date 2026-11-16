@@ -3,6 +3,11 @@
 Aktualizacja: **2026-11-14**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+Pięć braków zgłoszonych przez właściciela (angielskie kwestie w scenach,
+brakujące przedmioty, brak POI, brak powiązań scena → scena, alfabetyczny
+porządek questów w 03) ma plan i kolejność w
+[ROADMAP_CZYTANKA_V6.md](ROADMAP_CZYTANKA_V6.md).
+
 ## Gdzie jesteśmy
 
 **Wyciąg `index/` w repozytorium jest już zaktualizowany do Patcha 2.4
