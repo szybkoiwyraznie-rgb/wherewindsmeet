@@ -43,7 +43,8 @@ from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_sl
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
 DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
-PROG_WARIANTU = 48         # tyle wierszy puli `text_msg` rozdziela dwa warianty napisów
+PROG_WARIANTU = 48
+PROG_NAGLOWKA_REDAKCJI = 3   # ile kwestii przed pierwszym bliźniakiem należy jeszcze do dialogu sceny
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
 BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
@@ -263,6 +264,51 @@ def _cokolwiek_lacinskie(nazwa: str) -> str:
     return pinyin_slownik.romanizuj(nazwa) if re.search(r"[\u3400-\u9fff]", nazwa) else nazwa
 
 
+_ROLE_ZH = ("士兵", "侍卫", "守卫", "护卫", "军士", "甲士", "官兵", "公差", "衙役", "捕快",
+            "路人", "村民", "百姓", "众人", "众弟子", "黑衣人", "看客", "商贩", "伙计", "小厮",
+            "侍从", "宫人", "车夫", "黄门", "百姓们", "围观")
+_ROLE_EN = frozenset({"soldier", "soldiers", "guard", "guards", "officer", "enforcer", "attendant",
+                      "bystander", "civilian", "crowd", "vendor", "passerby", "patrol", "servant",
+                      "maid", "peasant", "villager", "sentry", "trooper", "guardman", "onlooker",
+                      "spectator", "escort", "porter", "beggar", "clerk", "official", "inspector"})
+_ROLE_PL = ("żołnierz", "strażnik", "oficer", "wartownik", "przechodzień", "wieśniak", "sługa",
+            "urzędnik", "straż", "tłum", "gwardzista", "konwojent")
+
+
+# Same okrzyki: w danych gry stoją przy nich nazwy cudzych postaci (gracz nie ma nazwy),
+# więc podpis mówcy jest tu częściej mylny niż pomocny.
+_OKRZYKI_ZH = frozenset({"哼", "嗯", "啊", "哎", "诶", "哦", "噢", "呀", "哈", "嘿", "喂", "咦",
+                        "呃", "唉", "唔", "嘶", "嗯嗯", "哈哈", "嘿嘿", "呵呵", "哎呀", "哎哟",
+                        "哎呦", "啊呀", "哇", "嘁", "呸", "嘻", "嚯", "嗷", "呜", "嗷呜"})
+
+
+def _okrzyk(tekst: str) -> bool:
+    """Czy kwestia to sam okrzyk (bez treści, która wskazywałaby mówcę)."""
+    czysty = re.sub(r"[^\w]", "", tekst or "")
+    return bool(czysty) and czysty in _OKRZYKI_ZH
+
+
+def _bez_roli(nazwa: str) -> str:
+    """Nazwa mówcy bez etykiet samych ról („审查士兵”, „Inspection Soldier”).
+
+    Kwestie anonimowych przechodniów mają w danych gry nazwę roli, nie osoby. Taka
+    etykieta nie identyfikuje mówcy (właściciel: „Inspection Soldier” przed „Stój!” to
+    nie ten, kto mówi), więc jej nie pokazujemy — lepiej żadnego podpisu niż mylny.
+    """
+    tekst = (nazwa or "").strip()
+    if not tekst:
+        return ""
+    if any(token in tekst for token in _ROLE_ZH):
+        return ""
+    slowa = {slowo.strip(".,'’()[]").lower() for slowo in tekst.split()}
+    if slowa & _ROLE_EN:
+        return ""
+    maly = tekst.lower()
+    if any(token in maly for token in _ROLE_PL):
+        return ""
+    return nazwa
+
+
 def _mowca(osoba: list, ix, pl: dict[str, str]) -> str:
     """Imię mówcy: polskie, a gdy brak przekładu — angielskie z danych gry."""
     nazwa_zh = _czysty(str(osoba[0] or ""))
@@ -313,7 +359,7 @@ def _mowca_w_scenie(scena: dict, indeks_mowcy, ix, pl) -> str:
         if len(obsada) != 1:
             return ""
         indeks_mowcy = 0
-    return _mowca(obsada[indeks_mowcy], ix, pl)
+    return _bez_roli(_mowca(obsada[indeks_mowcy], ix, pl))
 
 
 @dataclass
@@ -343,8 +389,17 @@ TYTULY_FILMOW = {1: "Pieśń o lampionach", 2: "Utwór pingtan „Szpila feniksa
                  3: "Bitwa na Moście Zhongdu"}
 
 
-def _mowca_klucza(klucz: str, ix, pl, porzadek, mowcy_napisow) -> tuple[str, set[int]]:
-    """Mówca i przestrzenie dla pojedynczego klucza tekstu z chronologii."""
+def _mowca_klucza(klucz: str, ix, pl, porzadek, mowcy_napisow=None) -> tuple[str, set[int]]:
+    """Mówca i przestrzenie dla pojedynczego klucza tekstu z chronologii.
+
+    Mówcę podajemy **tylko wtedy, gdy naprawdę wynika z danych**: z kroku dialogu
+    w scenie (`o`), gdzie gra przypisuje kwestię do osoby. Napisy puli `text_msg`
+    (cutsceny, prolog) nie mają pola mówcy — dawniej braliśmy go z podpowiedzi
+    `mowca_en` dopisanej przy innym tekście o tej samej treści i to podszywało
+    cudze nazwiska (np. „Inspection Soldier” przed „Stój!”, „Handlebar Hu” w Prologu 4).
+    Podpowiedzi nie są identyfikacją mówcy, więc ich nie używamy (`mowcy_napisow`
+    zostaje w sygnaturze dla zgodności wywołań).
+    """
     przestrzenie: set[int] = set()
     for wiersz in porzadek.get(klucz) or []:
         if wiersz["z"] == "dialog" and wiersz["d"]:
@@ -354,10 +409,6 @@ def _mowca_klucza(klucz: str, ix, pl, porzadek, mowcy_napisow) -> tuple[str, set
                 if element[0] == "k" and element[2] == klucz:
                     return _mowca_w_scenie(scena, element[1] if len(element) > 1 else None,
                                            ix, pl), przestrzenie
-        elif str(wiersz["z"]).startswith("napis"):
-            nazwa = _czysty(mowcy_napisow.get(wiersz["i"]) or "")
-            if nazwa:
-                return nazwa, przestrzenie
     return "", przestrzenie
 
 
@@ -401,45 +452,79 @@ def _bez_interpunkcji(tekst: str) -> str:
     return " ".join(re.sub(r"[^\w\s]", " ", tekst.lower()).split())
 
 
-def _kolejnosc_ekranu(katalog) -> dict[int, dict]:
-    """Kolejność kwestii odczytana z ekranu gry (pole `wiersze` + `dowod`).
+def _sygnatury(klucze: list[str], pl: dict[str, str]) -> dict[str, str]:
+    """Sygnatura treści kwestii (bez interpunkcji i wielkości liter)."""
+    return {k: _bez_interpunkcji(pl[k]) for k in klucze if pl.get(k)}
 
-    Pliki gry nie mają osi czasu cutscen (sprawdzone w `tools/cutsceny_z_bazy.py`),
-    więc kolejności nie da się z nich odczytać samej. Tam, gdzie właściciel przepisał
-    napisy z ekranu, zapisujemy kolejność wierszy puli w `index/cutsceny_ekran.jsonl`;
-    czytanka stawia wtedy te kwestie dokładnie tak, jak lecą w grze.
+
+def _podziel_na_bloki(klucze: list[str], wiersze: dict[str, int]) -> list[list[str]]:
+    """Bloki napisów cutsceny: ciągłe fragmenty puli `text_msg`.
+
+    Ten sam przerywnik leży w puli kilka razy (starsza i nowsza wersja napisów), a obok
+    niego potrafią stać wiersze z innej treści (np. recytacja wiersza w 30161). Bloki
+    rozcinamy tam, gdzie numer wiersza odskakuje o więcej niż `PROG_WARIANTU`.
     """
-    sciezka = Path(katalog) / "cutsceny_ekran.jsonl"
-    if not sciezka.is_file():
-        return {}
-    wynik: dict[int, dict] = {}
-    for linia in sciezka.read_text(encoding="utf-8").splitlines():
-        if not linia.strip():
+    bloki: list[list[str]] = []
+    for klucz in klucze:
+        numer = wiersze.get(klucz)
+        poprzedni = wiersze.get(bloki[-1][-1]) if bloki else None
+        if bloki and (numer is None or poprzedni is None or numer - poprzedni <= PROG_WARIANTU):
+            bloki[-1].append(klucz)
+        else:
+            bloki.append([klucz])
+    return bloki
+
+
+def _najwyzszy(blok: list[str], wiersze: dict[str, int]) -> int:
+    numery = [wiersze[k] for k in blok if k in wiersze]
+    return max(numery) if numery else -1
+
+
+def _dialog_sceny(blok: list[str], bloki: list[list[str]], wiersze: dict[str, int],
+                  sygnatury: dict[str, str]) -> tuple[list[str], list[str]]:
+    """(dialog sceny, treść wsunięta przed dialog) w bloku najnowszej redakcji.
+
+    Grana wersja napisów powtarza zdania starszej wersji tej samej sceny, więc kwestia
+    z bliźniakiem w innym bloku jest dialogiem sceny. Najnowsza redakcja zaczyna się
+    jednak czasem o kilka kwestii wcześniej niż pierwszy bliźniak (w 30161 to dwa
+    okrzyki „Wodzu! Wodzu!”, „Wodzu, obudź się!”) — dlatego dialog zaczynamy
+    `PROG_NAGLOWKA_REDAKCJI` wierszy przed pierwszym bliźniakiem. Wszystko przed tym
+    progiem to inna treść wsunięta w ten sam ciąg wierszy (recytacja wiersza w 30161)
+    i idzie osobno, po dialogu.
+    """
+    inne: set[str] = set()
+    for inny in bloki:
+        if inny is blok:
             continue
-        wpis = json.loads(linia)
-        numer = wpis.get("no")
-        wiersze = [w for w in wpis.get("wiersze") or [] if isinstance(w, int)]
-        if isinstance(numer, int) and wiersze:
-            wynik[numer] = {"wiersze": wiersze, "dowod": wpis.get("dowod") or ""}
-    return wynik
+        for klucz in inny:
+            syg = sygnatury.get(klucz)
+            if syg:
+                inne.add(syg)
+    blizniaki = [wiersze[k] for k in blok
+                 if k in wiersze and sygnatury.get(k) in inne]
+    if not blizniaki:
+        return blok, []
+    prog = min(blizniaki) - PROG_NAGLOWKA_REDAKCJI
+    dialog = [k for k in blok if (wiersze.get(k) or 0) >= prog]
+    obce = [k for k in blok if (wiersze.get(k) or 0) < prog]
+    return dialog, obce
 
 
 def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
-                     ekran: dict | None = None,
-                     klucz_wiersza: dict[int, str] | None = None
+                     audio: dict[int, str] | None = None
                      ) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
-    Kolejność bierzemy z wierszy puli (`text_msg`). W plikach gry ten sam przerywnik
-    leży czasem **dwa razy** (np. 590153–590179 i 591125–591169 w cutscenie 30161):
-    kwestie się powtarzają, a tekst bywa inny. Dlatego bloki dzielimy po dużym odstępie
-    wierszy, pierwszy pokazujemy jako główny, a pozostałe pod nagłówkiem — nic nie
-    ginie, ale czytelnik nie dostaje dwóch scen splątanych w jedną.
+    Kolejność bierzemy z numerów wierszy puli `text_msg` — to jedyna oś porządku, jaką
+    gra podaje dla napisów przerywnika (`kn` w chronologii miesza napisy przypisane
+    wprost z tabeli gry z blokami puli). Ten sam przerywnik leży w puli kilka razy:
+    starsza i nowsza wersja napisów (np. 590153–590179 i 591148–591169 w cutscenie
+    30161). Grany jest **najnowszy** blok (najwyższe numery wierszy, patrz
+    `_podziel_na_bloki`), a w nim najpierw dialog sceny, potem treść bez bliźniaka
+    (`_kwestie_sceny`). Starsze wersje schodzą pod nagłówek, żeby nic nie ginęło,
+    ale czytelnik nie dostał dwóch scen splątanych w jedną.
 
-    Gdy znamy kolejność z ekranu gry (`index/cutsceny_ekran.jsonl`), treść sceny stoi
-    dokładnie w tej kolejności (także wiersze spoza `kn`, np. „Stój!” z 591170),
-    a reszta wierszy schodzi do wariantu. Streszczenie sceny (`k`) idzie na końcu,
-    pod własnym nagłówkiem.
+    Streszczenie sceny (`k`) stoi **na początku**, zaraz pod nagłówkiem cutsceny.
     """
     napisy = [k for k in wiersz.get("kn") or [] if k]
     pozycja: dict[str, int] = {}
@@ -450,35 +535,29 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
         numer = wiersze.get(klucz)
         return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
 
-    bloki: list[list[str]] = []
-    for klucz in sorted(pozycja, key=do_sortowania):
-        numer = wiersze.get(klucz)
-        poprzedni = wiersze.get(bloki[-1][-1]) if bloki else None
-        if bloki and (numer is None or poprzedni is None or numer - poprzedni <= PROG_WARIANTU):
-            bloki[-1].append(klucz)
-        else:
-            bloki.append([klucz])
+    bloki = _podziel_na_bloki(sorted(pozycja, key=do_sortowania), wiersze)
+    if len(bloki) > 1:
+        kolejnosc = sorted(range(len(bloki)), key=lambda i: _najwyzszy(bloki[i], wiersze),
+                           reverse=True)
+        bloki = [bloki[i] for i in kolejnosc]
+        sygnatury = _sygnatury([k for blok in bloki for k in blok], pl)
+        dialog, obce = _dialog_sceny(bloki[0], bloki, wiersze, sygnatury)
+        bloki = [dialog] + ([obce] if obce else []) + bloki[1:]
 
     klucze: list[str] = []
     podtytuly: dict[int, str] = {}
     powtorzone: list[str] = []
     widziane: set[str] = set()
 
-    tresc: list[str] = []
-    if ekran and klucz_wiersza:
-        for numer in ekran["wiersze"]:
-            klucz = klucz_wiersza.get(numer)
-            if klucz and klucz not in tresc:
-                tresc.append(klucz)
-    if tresc:
-        klucze.extend(tresc)
-        widziane.update(_bez_interpunkcji(pl[k]) for k in tresc if pl.get(k))
-        zostalo = [k for blok in bloki for k in blok if k not in set(tresc)]
-        bloki = [zostalo] if zostalo else []
+    streszczenie = [k for k in wiersz.get("k") or [] if k]
+    if streszczenie:
+        podtytuly[0] = "Streszczenie sceny"
+        klucze.extend(streszczenie)
+        widziane.update(_bez_interpunkcji(pl[k]) for k in streszczenie if pl.get(k))
 
     for numer_bloku, blok in enumerate(bloki):
         naglowek = ""
-        if numer_bloku or (klucze and blok):
+        if numer_bloku:
             numery = [wiersze[k] for k in blok if k in wiersze]
             opis = (f"wiersze {min(numery)}–{max(numery)}" if numery and min(numery) != max(numery)
                     else f"wiersz {numery[0]}" if numery else "wiersze bez numeru")
@@ -496,17 +575,11 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
                 podtytuly[len(klucze)] = naglowek
                 czeka_na_naglowek = False
             klucze.append(klucz)
-
-    streszczenie = [k for k in wiersz.get("k") or [] if k]
-    if streszczenie:
-        podtytuly[len(klucze)] = "Streszczenie sceny"
-        klucze.extend(streszczenie)
     return klucze, podtytuly, powtorzone
 
 
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
-                             krainy: list[dict] | None = None,
-                             ekran: dict[int, dict] | None = None) -> list[Jednostka]:
+                             krainy: list[dict] | None = None) -> list[Jednostka]:
     """Chronologia jest zapisana w `index/chronologia.jsonl`; tu tylko czytamy kolejność."""
     nazwy_pl = _nazwy_krain(ix, pl, krainy or [])
 
@@ -515,6 +588,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         return f"# {nazwa} — {polska}" if polska and polska != nazwa else f"# {nazwa}"
     mowcy_napisow = {w["wiersz"]: w.get("mowca_en")
                      for w in ix.cutsceny_kontekst.get("napis", []) if w.get("wiersz")}
+    audio_napisow = {w["wiersz"]: w["audio"]
+                     for w in ix.cutsceny_kontekst.get("napis", []) if w.get("audio")}
     wiersze_napisow = _wiersze_napisow(ix, porzadek)
     klucze_wierszy = {w["wiersz"]: w["k"] for w in ix.cutsceny_kontekst.get("napis", [])
                       if w.get("wiersz") and w.get("k")}
@@ -541,6 +616,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 przestrzenie |= gdzie
+                if _okrzyk(ix.zh(klucz)):
+                    mowca = ""
                 linie.append((mowca, klucz))
             licznik_prologu += 1
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
@@ -556,6 +633,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 if linie and linie[-1][1] == element[2]:
                     continue
                 mowca = _mowca_w_scenie(scena, element[1] if len(element) > 1 else None, ix, pl)
+                if _okrzyk(ix.zh(element[2])):
+                    mowca = ""      # samo „Ech!”, „Ha!”, „Mhm.” — obsada podaje tu zwykle kogoś innego
                 linie.append((mowca, element[2]))
             osoby: list[tuple[str, str]] = []
             widziani: set[tuple[str, str]] = set()
@@ -574,8 +653,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
-            klucze, podtytuly, powtorzone = _napisy_cutsceny(
-                wiersz, wiersze_napisow, pl, (ekran or {}).get(numer), klucze_wierszy)
+            klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
+                                                            audio_napisow)
             linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
                      for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
@@ -1197,8 +1276,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
                   "kontekst": 0, "bez_przekladu": 0}
 
-    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy,
-                                        _kolejnosc_ekranu(index))
+    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
     tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",

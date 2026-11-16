@@ -42,22 +42,38 @@ w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przek�
 klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
 `client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
 
-**Kolejność kwestii w cutscenach: wiersz puli to za mało (v8, 2026-11-14).**
-Porządek bierzemy z numeru wiersza puli `text_msg` (`index/cutsceny_kontekst.jsonl`,
-wiersze `napis`) — to naprawiło v7. Ale **to nie jest kolejność gry**: dla cutsceny
-30161 ta sama scena leży w dwóch miejscach puli (590153–590179 i 591125–591169),
-a „Stój!” stoi w wierszu 591170, daleko za rozmową, choć w grze pada jako trzecia
-kwestia. Osi czasu cutscen w danych nie ma (sprawdzone: `tools/cutsceny_z_bazy.py`
-— `.cine` nie ma w pakiecie, `dialog_timelines.*` nie zawierają ani jednego napisu
-puli), więc kolejność z ekranu jest **danymi**: `index/cutsceny_ekran.jsonl`
-(`no`, `wiersze`, `dowod`). `tools/czytanka_czysta.py` stawia wtedy te kwestie
-dokładnie jak w grze (także wiersze spoza `kn`), a resztę sceny zsuwa pod
-`### Inny wariant napisów tej cutsceny (…)`. Wiersze `napis_grey` nie podmieniają
-już kluczy puli — wcześniej gubiły kwestie z przekładem („Jak można tak zasnąć?”).
-Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` (13 testów), całość 540 OK.
-Paczka: `dist/WWM_Czytanka_PL_v8.zip`, **6 785 383 B**, SHA-256
-`467c53f2c6f6215843c0e56491abbdd36f9438a0a6a7367ef214d1d69e5fe917`, Dysk
-`1w-DOnDjN_NP3VbzAgmesl5eH4sdqhWkv`.
+**Kolejność kwestii w cutscenach: z danych gry, bez dyktowania (v9, 2026-11-14).**
+Wersja v8 niosła kolejność przepisaną przez właściciela z ekranu
+(`index/cutsceny_ekran.jsonl`) — właściciel ją odrzucił: dopisywanie listy do każdej
+cutsceny zaprzecza idei czytanek. Plik usunięty, a porządek liczy się z samych danych;
+w tym celu przeczytana została **baza gry** (`tools/baza_gry.py`, MANIFEST + `indexN` +
+`dataN`, części 1, 4, 6, 7, 8 paczki): `text_msg` ma 126 538 wierszy w `data10`
+i bliźniaczą tabelę `text_msg__grey` (126 541 wierszy w `data212`), a napisy cutscen
+mają wyłącznie kolumny `content` i `id` — **żadnej osi czasu, żadnego numeru sceny**
+i żadnego pola mówcy. Wiersze puli nie są też nigdzie indziej w bazie odwoływane
+(przeszukane wszystkie chunki wszystkich `dataN`, jakie mamy: `591148` występuje tylko
+w `text_msg` i `text_msg__grey`). Wniosek: kolejność da się odczytać tylko z układu
+samej puli.
+Reguła v9: bloki po odstępie numerów wierszy, **grany jest blok o najwyższych numerach**
+(nowsza redakcja tej samej sceny — w 30161 591148–591169 przed 590153–590179); w bloku
+głównym dialog to kwestie z bliźniakiem w innym bloku, a ciąg bez bliźniaka przed
+pierwszym bliźniakiem (do 3 kwestii) należy jeszcze do dialogu. Efekt w 30161:
+„Szefie! Szefie!”, „Wodzu, obudź się!”, „Miałaś iść ze mną do Kaplicy Generała!”,
+„Jak można tak zasnąć?” — zgodnie z tym, co właściciel słyszał; recytacja poematu
+o Ośmiu Wspaniałych stoi niżej, pod nagłówkiem wariantu. **„Stój!” (wiersz 591170)
+nie ma w danych żadnego miejsca w tej scenie** — nie należy do `kn` cutsceny 30161
+i nie występuje w żadnym dialogu tej sceny, więc nie jest już wstawiane na siłę.
+Osi czasu cutscen w zebranych plikach nie ma (`.cine` nie ma w pakiecie,
+`dialog_timelines.*` nie zawierają ani jednego napisu puli) — gdyby doszła, kolejność
+dałoby się odczytać wprost.
+**Streszczenie sceny stoi teraz na początku**, zaraz pod nagłówkiem (`### Streszczenie
+sceny`). **Podpisy mówców tylko pewne:** podpowiedzi `mowca_en` z `text_msg` nie są już
+używane (tak powstawało „Handlebar Hu” przy „Ech!” w Prologu 4), nazwy samych ról
+(„审查士兵” → „Inspection Soldier”) i same okrzyki nie dostają podpisu.
+Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` (12 testów), całość 539 OK.
+Paczka: `dist/WWM_Czytanka_PL_v9.zip`, **6 771 018 B**, SHA-256 `e0b4125e1f3d81f78c6592e2ae72896c6bd0eeea91f1fb042ebee00a4d31e84a` —
+**nie wysłana** (czeka na decyzję właściciela); v8 (`1w-DOnDjN_NP3VbzAgmesl5eH4sdqhWkv`)
+leży na Dysku do jego decyzji.
 
 **D — decyzja właściciela (2026-11-14): zostawiamy, powiąże sceny sam.**
 W repo został `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`, opis
