@@ -61,6 +61,18 @@ Zasady kolejności:
    cutscen wcześniej odłożonych do „Scen bez przypisanej mapy” stoi w swojej
    krainie (燕南 194 → 218, 河西 16 → 55, 不见 6 → 20 i mniejsze).
 
+8. **zadania w 03 idą kolejnością gry, nie alfabetem** — sekcja `# Zadania i wątki`
+   dzieli się na `## Wątek główny`, `## Wątki poboczne (łańcuchy)`, bloki
+   `## Zadania pojedyncze — <kraina>` i na końcu `## Pozostałe zadania i wątki`.
+   Kolejność liczy `tools/kolejnosc_zadan.py` z tego samego układu, który dostaje
+   pakiet dla tłumacza (`tools/uklad_scen.py`): typ zadania (wątek główny
+   pierwszy), grupa rozdziału po `kolejnosc` z `index/grupy_zadan.jsonl`,
+   a w grupie łańcuch `pre`/`post` z tabeli zadań. Pojedyncze zadania bez
+   łańcucha stoją osobno, pogrupowane krainą w kolejności odwiedzania
+   (`index/prowincje.json`). Hasła z tej sekcji, których nie da się przypisać do
+   żadnego zadania (np. kwestie z `debate_guider_dialog_data`), zostają na końcu
+   sekcji, alfabetycznie — nic nie wypada, ale nie udają questów.
+
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
 

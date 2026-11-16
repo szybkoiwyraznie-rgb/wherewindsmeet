@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
-from tools import kolejnosc_gry, powiazania_czytanek, pinyin_slownik  # noqa: E402
+from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
 
 DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
@@ -702,11 +702,44 @@ def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
     return out, uzyte, ktory
 
 
-def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
+def _haslo(nazwa: str, opisy: list[str]) -> str:
+    opis = " · ".join(opisy)
+    return f"**{nazwa}:** {opis}" if opis else f"**{nazwa}**"
+
+
+def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, pl,
+                  krainy: list[dict] | None) -> list[str]:
+    """Sekcja „Zadania i wątki” w kolejności łańcucha gry, nie alfabetycznie."""
+    z_klucza: dict[str, str] = {}
+    for nazwa, klucz in klucze_nazw.items():
+        z_klucza.setdefault(klucz, nazwa)
+    out: list[str] = []
+    wypisane: set[str] = set()
+    for blok in kolejnosc_zadan.plan(ix, pl, krainy):
+        linie = []
+        for klucz in blok.klucze:
+            nazwa = z_klucza.get(klucz)
+            if not nazwa or nazwa in wypisane or nazwa not in opisy:
+                continue
+            wypisane.add(nazwa)
+            linie.append(_haslo(nazwa, opisy[nazwa]))
+        if linie:
+            out += [f"## {blok.tytul}", ""] + linie + [""]
+    reszta = [nazwa for nazwa in sorted(opisy, key=str.lower) if nazwa not in wypisane]
+    if reszta:
+        out += ["## Pozostałe zadania i wątki", ""]
+        out += [_haslo(nazwa, opisy[nazwa]) for nazwa in reszta]
+        out.append("")
+    return out
+
+
+def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
+            krainy: list[dict] | None = None) -> list[str]:
     """Co nie trafiło do 01 ani 02 — pogrupowane rodzajem: „nazwa — opis”."""
     sekcje: dict[str, dict[str, list[str]]] = {}
     bez_nazwy: dict[str, list[str]] = {}
     widziane: dict[str, set[tuple[str, str]]] = {}
+    klucze_nazw: dict[str, str] = {}   # „etykieta\x00nazwa” → klucz nazwy w indeksie
     for klucz, tekst in pl.items():
         if klucz in uzyte:
             continue
@@ -723,6 +756,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
             if ("nazwa", nazwa) not in zbior:
                 sekcje.setdefault(etykieta, {})[nazwa] = []
                 zbior.add(("nazwa", nazwa))
+                if len(zrodlo.w) > 2 and isinstance(zrodlo.w[2], str):
+                    klucze_nazw[etykieta + "\x00" + nazwa] = zrodlo.w[2]
             if tekst != nazwa and tekst not in nazwa and nazwa not in tekst:
                 if tekst not in sekcje[etykieta][nazwa]:
                     sekcje[etykieta][nazwa].append(tekst)
@@ -736,9 +771,16 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict) -> list[str]:
     out: list[str] = []
     for etykieta in sorted(set(sekcje) | set(bez_nazwy)):
         out += [f"# {etykieta}", ""]
+        if etykieta == "Zadania i wątki" and sekcje.get(etykieta):
+            wlasne = {klucz.split("\x00", 1)[1]: wartosc
+                      for klucz, wartosc in klucze_nazw.items()
+                      if klucz.startswith(etykieta + "\x00")}
+            out += _sekcja_zadan(sekcje[etykieta], wlasne, ix, pl, krainy)
+            out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
+            out.append("")
+            continue
         for nazwa in sorted(sekcje.get(etykieta, {}), key=str.lower):
-            opis = " · ".join(sekcje[etykieta][nazwa])
-            out.append(f"**{nazwa}:** {opis}" if opis else f"**{nazwa}**")
+            out.append(_haslo(nazwa, sekcje[etykieta][nazwa]))
         out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
         out.append("")
     return out
@@ -778,7 +820,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
         encoding="utf-8")
     statystyka["plikow"] += 1
 
-    tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka)
+    tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
     (wyj / "03_reszta.md").write_text(
         _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
         + "\n".join(tresc_reszty) + "\n", encoding="utf-8")

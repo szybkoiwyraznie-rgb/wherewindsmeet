@@ -19,7 +19,13 @@ nieudowodniona, nigdy nie zmyślona.
 | D | scena → następna scena (4700001 → 4700041 → 4700352) | częściowo (`index/kolejnosc_*.jsonl`) | prawdopodobnie tak | 4 |
 | E | kwestie po angielsku w scenach, które w grze są po polsku | nie (tekst jest tylko zh+en) | tak — pliki `locale` z gry | 1 (blokada: 1 odpowiedź) |
 
-## A. Porządek questów w 03
+## A. Porządek questów w 03 — **zrobione**
+
+Stan: `tools/kolejnosc_zadan.py` + sekcja w `tools/czytanka_czysta.py`; testy
+w `tests/test_kolejnosc_zadan.py`. Kolejność: wątek główny (typ 1) w kolejności
+sekcji z `tools/uklad_scen.py`, potem łańcuchy poboczne, na końcu pojedyncze
+zadania pogrupowane krainą. Treść bez zmian: 75 331 jednostek, 62 838 pozycji
+w reszcie — zmieniła się tylko kolejność linii w sekcji.
 
 **Objaw.** W `03_reszta.md` sekcja „Zadania i wątki” (od linii 49539) jest
 posortowana po nazwie, więc łańcuch główny czyta się alfabetycznie. Ma być po
