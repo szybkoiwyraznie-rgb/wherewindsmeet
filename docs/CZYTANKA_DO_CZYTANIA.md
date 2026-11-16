@@ -7,9 +7,9 @@ uruchomieniu.
 
 | plik | zawartość | wiersze |
 |---|---|---|
-| `01_sceny_i_cutsceny.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; pieśni na końcu | 186 959 kwestii |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: kto mówi, postacie z encyklopedii, frakcje, miejsca, przedmioty, sztuki walki | 29 892 |
-| `03_reszta.md` | wszystko, czego nie ma w 01 ani w 02, pogrupowane według rodzaju danych | 62 012 |
+| `01_sceny_i_cutsceny.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 189 566 kwestii |
+| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: kto mówi, postacie z encyklopedii, frakcje, miejsca, przedmioty, sztuki walki | 601 pozycji w 502 jednostkach |
+| `03_reszta.md` | wszystko, czego nie ma w 01 ani w 02, pogrupowane według rodzaju danych | 59 624 |
 
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 
@@ -35,10 +35,20 @@ Zasady kolejności:
    zakres numerów dialogów). Dzięki temu przerywniki są przemieszane ze scenami,
    choć same nie mają numeru dialogu,
 5. **cutsceny bez grupy** stoją na końcu, w kolejności własnych numerów, w sekcji
-   `# Cutsceny bez grupy zadań` — nie udajemy, że znamy ich miejsce.
+   `# Cutsceny bez grupy zadań` — nie udajemy, że znamy ich miejsce,
+6. **napisy przerywników** (pula `text_msg`, 2 688 wierszy) nie leżą już w 03.
+   Napis w danych gry **nie ma numeru cutsceny** — ma tylko identyfikator wiersza
+   i nazwę nagrania (`vo_sm_sxdm4_cs_zlxl_hx_07`). Dlatego:
+   * blok, którego scenę rozpoznajemy po sprawdzonej kotwicy
+     (`kontekst_cutscen.KOTWICE_SCEN_TM`) albo po prefiksie nagrania
+     (`VO_DOMENY`), dostaje numer cutsceny i stoi **w tej cutscenie** (pole `kn`,
+     przed streszczeniem) — tak `## Cutscena 30161` ma całą scenę przebudzenia
+     z Ruby („Wodzu, obudź się!”),
+   * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
+     w kolejności wierszy, a nie alfabetycznie.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
-"s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 704 jednostki, 4,1 MB.
+"s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
 
 ## Format
 

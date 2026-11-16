@@ -206,7 +206,14 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    jednostka `## Cutscena 30150` dokładnie tam, gdzie stoi w transkrypcie —
    między Prolog 3 i Prolog 4 — i nie powtarza się w „Scenach bez przypisanej
    mapy”; tabliczka krainy (`cutscene_text_oversea`) nie udaje już kwestii
-   prologu. 469 testów zielonych (520 podtestów).
+   prologu. **Napisy przerywników** (pula `text_msg`, 2 688 wierszy) wyszły
+   z alfabetycznej reszty: blok rozpoznany po kotwicy scen albo po nazwie nagrania
+   dostaje numer cutsceny i stoi w niej (`## Cutscena 30161` ma pełną scenę
+   „Wodzu, obudź się!” z Ruby), a pozostałe 44 bloki stoją w sekcji
+   `# Napisy przerywników` w kolejności wierszy z pliku gry. W danych gry napis
+   **nie ma numeru cutsceny** — numer siedzi w osi czasu cutsceny, której wyciąg
+   z `index/` nie obejmuje, więc 2 349 z 2 688 wierszy nie da się przypisać
+   do konkretnej cutsceny. 475 testów zielonych (520 podtestów).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.

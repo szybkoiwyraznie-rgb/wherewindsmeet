@@ -125,6 +125,67 @@ class TestZapisanaChronologia(unittest.TestCase):
                                     f"powtórka klucza w {jednostka.get('e')}")
 
 
+class TestNapisyPrzerywnikow(unittest.TestCase):
+    """Pula napisów przerywników (`text_msg`) ma trafić do 01, nie do 03.
+
+    W danych gry napis nie ma numeru cutsceny — jest tylko wiersz i nazwa nagrania.
+    Dlatego chronologia trzyma je w blokach scen: część podpięta pod cutscenę
+    (`kn`), reszta w sekcji „Napisy przerywników”, w kolejności z pliku gry.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from tools import indeks
+        cls.jednostki = _dane()
+        cls.pula = sorted({w["k"] for w in
+                           indeks.wczytaj(str(KATALOG / "index"), teksty=True, sceny=False)
+                           .cutsceny_kontekst.get("napis", []) if w.get("k")})
+
+    def _klucze(self) -> list[str]:
+        """Klucze napisów przerywników (bez prologu — tam transkrypt powtarza kwestie)."""
+        klucze: list[str] = []
+        for jednostka in self.jednostki:
+            if jednostka["t"] == "napisy":
+                klucze.extend(jednostka.get("k") or [])
+            elif jednostka["t"] == "cutscena":
+                klucze.extend(jednostka.get("kn") or [])
+        return klucze
+
+    def test_pula_napisow_jest_w_calosci_w_chronologii(self):
+        self.assertGreater(len(self.pula), 2000)
+        klucze = set(self._klucze())
+        brakujace = [k for k in self.pula if k not in klucze]
+        # kwestie, które transkrypt prologu już pokazał, nie powtarzają się w blokach
+        w_prologu = {k for j in self.jednostki if j["t"] == "prolog" for k in j.get("k") or []}
+        brakujace = [k for k in brakujace if k not in w_prologu]
+        self.assertFalse(brakujace[:5], f"{len(brakujace)} napisów poza chronologią")
+
+    def test_zaden_napis_nie_stoi_dwa_razy(self):
+        klucze = self._klucze()
+        powtorzone = {k for k in klucze if klucze.count(k) > 1}
+        self.assertFalse(sorted(powtorzone)[:5], f"powtórzone napisy: {len(powtorzone)}")
+
+    def test_przebudzenie_z_ruby_jest_przy_cutscenie(self):
+        """„Wodzu, obudź się!” należy do cutsceny 30161, nie do alfabetycznej reszty."""
+        klucz = "5eca4f42781900b5"
+        trafienia = [j for j in self.jednostki if klucz in (j.get("kn") or [])]
+        self.assertEqual(len(trafienia), 1)
+        self.assertEqual(trafienia[0]["t"], "cutscena")
+        self.assertEqual(trafienia[0]["n"], 30161)
+
+    def test_napisy_stoja_przed_piesniami(self):
+        rodzaje = [j["t"] for j in self.jednostki]
+        self.assertIn("napisy", rodzaje)
+        self.assertLess(rodzaje.index("napisy"), len(rodzaje) - 3)
+        self.assertEqual(rodzaje[-3:], ["film"] * 3)
+
+    def test_bloki_maja_tytul(self):
+        for jednostka in self.jednostki:
+            if jednostka["t"] == "napisy":
+                self.assertGreater(len(jednostka["e"]), 5, "blok bez tytułu")
+                self.assertTrue(jednostka.get("k"))
+
+
 class TestCzytankaCzytaChronologie(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -146,6 +207,11 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         for linia in self.tekst.splitlines():
             if linia.startswith("- "):
                 self.fail(f"kwestia z punktorem: {linia[:60]}")
+
+    def test_napisy_przerywnikow_sa_w_01(self):
+        self.assertIn("Wodzu, obudź się!", self.tekst)
+        reszta = (Path(self._katalog.name) / "03_reszta.md").read_text(encoding="utf-8")
+        self.assertNotIn("Wodzu, obudź się!", reszta)
 
     def test_mowca_jest_pogrubiony(self):
         self.assertIn("**Youxia:**", self.tekst)

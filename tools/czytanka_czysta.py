@@ -427,13 +427,26 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             linie = []
-            for klucz in wiersz.get("k") or []:
+            # `kn` to napisy przerywnika (pula `text_msg`) — stoją przed streszczeniem
+            for klucz in list(wiersz.get("kn") or []) + list(wiersz.get("k") or []):
                 if linie and linie[-1][1] == klucz:
                     continue
                 linie.append((_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz))
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
                                        linie, osoby=osoby))
+        elif rodzaj == "napisy":
+            linie = []
+            for klucz in wiersz.get("k") or []:
+                if linie and linie[-1][1] == klucz:
+                    continue
+                mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
+                linie.append((mowca, klucz))
+            osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
+            jednostki.append(Jednostka(
+                "napisy", wiersz.get("e") or "Napisy przerywnika",
+                "# Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)",
+                linie, osoby=osoby))
     return jednostki
 
 

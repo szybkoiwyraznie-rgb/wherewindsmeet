@@ -25,7 +25,11 @@ Zasady kolejności (te same, co w ustaleniach):
    się zaczyna — dzięki temu przerywniki są przemieszane ze scenami, choć same
    nie mają numeru dialogu,
 5. cutsceny bez grupy zadań stoją na końcu, w kolejności własnych numerów
-   (sekcja „Cutsceny bez grupy zadań”) — nie udajemy, że znamy ich miejsce.
+   (sekcja „Cutsceny bez grupy zadań”) — nie udajemy, że znamy ich miejsce,
+6. napisy przerywników (pula `text_msg`) trafiają do 01, nie do 03: te, których
+   scenę da się rozpoznać po nazwie nagrania albo po sprawdzonej kotwicy, stoją
+   **w swojej cutscenie** (pole `kn`, przed streszczeniem), a pozostałe — w sekcji
+   „Napisy przerywników”, w kolejności wierszy z pliku gry.
 
 Ten plik jest generowany, ale commitowany: test `tests/test_chronologia.py`
 pilnuje, żeby po zmianie danych wygenerować go ponownie (`--sprawdz`), a nie
@@ -40,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -51,7 +56,16 @@ from tools import kolejnosc_gry, prolog_z_klucza  # noqa: E402
 
 BEZ_MAPY = "Sceny bez przypisanej mapy"
 BEZ_GRUPY = "Cutsceny bez grupy zadań"
+PULA_NAPISOW = "Napisy przerywników"
 DOMYSLNY_PLIK = Path("index") / "chronologia.jsonl"
+
+# Ile napisów bez nagrania może dołączyć do sceny, która zaczyna się za nimi.
+# Napisy przerywników mają w plikach gry tylko identyfikator wiersza i nazwę
+# nagrania (`vo_…_cs_<scena>_<numer>`); wiersze bez nagrania stoją w puli przed
+# sceną, do której należą (tak jest np. z „Wodzu, obudź się!” przed kwestiami
+# Ruby z `vo_sm_sxdm4_cs_zlxl_hx_02`).
+ZASIEG_NAGRANIA = 25
+_KOD_VO = re.compile(r"(vo_.+_cs_[a-z0-9_]+?)_\d+$")
 
 
 def _kraina_scen(ix, krainy: list[dict]) -> tuple[dict[int, str], list[str]]:
@@ -227,6 +241,97 @@ def _kotwice_grup(ix, sceny: list[int]) -> dict[int, int]:
     return kotwice
 
 
+def _kod_vo(audio: str | None) -> str | None:
+    """Kod sceny z nazwy nagrania: `vo_sm_sxdm4_cs_zlxl_hx_07` → `vo_…_cs_zlxl_hx`."""
+    trafienie = _KOD_VO.match((audio or "").lower())
+    return trafienie.group(1) if trafienie else None
+
+
+def _pula_napisow(ix) -> list[dict]:
+    """Napisy przerywników w kolejności wierszy z pliku gry (pula `text_msg`)."""
+    wiersze = [w for w in (ix.cutsceny_kontekst.get("napis") or []) if w.get("k")]
+    wiersze.sort(key=lambda w: w.get("wiersz") or 0)
+    return wiersze
+
+
+def _kody_napisow(wiersze: list[dict], kotwice: dict[int, tuple]) -> list[str | None]:
+    """Kod sceny dla każdego napisu; napisy bez nagrania idą do sceny, która zaczyna się za nimi."""
+    kody = [_kod_vo(w.get("audio")) for w in wiersze]
+    wynik: list[str | None] = list(kody)
+    for pozycja, kod in enumerate(kody):
+        if kod is not None:
+            continue
+        for nastepny in range(pozycja + 1, min(pozycja + 1 + ZASIEG_NAGRANIA, len(wiersze))):
+            if wiersze[nastepny].get("wiersz") in kotwice:
+                break          # granica sprawdzona ręcznie — nie przechodzimy przez nią
+            if kody[nastepny]:
+                wynik[pozycja] = kody[nastepny]
+                break
+    # krótki ogon bez nagrań doklejamy do sceny przed nim; dłuższy ciąg to osobny blok
+    pozycja = 0
+    while pozycja < len(wynik):
+        if wynik[pozycja]:
+            pozycja += 1
+            continue
+        koniec = pozycja
+        while koniec < len(wynik) and not wynik[koniec]:
+            koniec += 1
+        if pozycja and koniec - pozycja <= ZASIEG_NAGRANIA:
+            poprzedni = wynik[pozycja - 1]
+            for i in range(pozycja, koniec):
+                wynik[i] = poprzedni
+        pozycja = koniec
+    return wynik
+
+
+def _bloki_napisow(ix) -> list[dict]:
+    """Pula napisów przerywników podzielona na sceny.
+
+    W danych gry napis ma tylko identyfikator wiersza i nazwę nagrania; **nie ma
+    numeru cutsceny**, do której należy (numer siedzi w osi czasu cutsceny, której
+    wyciąg z gry nie obejmuje). Dlatego dzielimy pulę na bloki po sprawdzonych
+    kotwicach scen (`kontekst_cutscen.KOTWICE_SCEN_TM`) i po zmianie kodu nagrania,
+    a numer cutsceny przypisujemy tylko tam, gdzie kotwica lub prefiks nagrania
+    podaje go wprost (`vo_sm_sxdm4_cs_zlxl` → 30161).
+    """
+    from tools import kontekst_cutscen as kc   # lokalnie: ten moduł ciągnie sporo wiedzy o mówcach
+
+    wiersze = _pula_napisow(ix)
+    if not wiersze:
+        return []
+    kotwice = kc.KOTWICE_SCEN_TM
+    kody = _kody_napisow(wiersze, kotwice)
+
+    bloki: list[dict] = []
+    for wiersz, kod in zip(wiersze, kody):
+        nowy = not bloki or wiersz["wiersz"] in kotwice or kod != bloki[-1]["kod"]
+        if nowy:
+            bloki.append({"start": wiersz["wiersz"], "koniec": wiersz["wiersz"],
+                          "kod": kod, "klucze": []})
+        blok = bloki[-1]
+        blok["koniec"] = wiersz["wiersz"]
+        blok["klucze"].append(wiersz["k"])
+
+    for blok in bloki:
+        kotwica = kotwice.get(blok["start"])
+        domena = kc.dopasuj_domene_vo(blok["kod"]) if blok["kod"] else None
+        if kotwica:
+            blok["e"] = kotwica[0]
+            blok["g"] = kotwica[1]
+            blok["c"] = tuple(kotwica[2])
+        elif domena:
+            blok["e"] = domena[1]
+            blok["g"] = domena[2]
+            blok["c"] = tuple(domena[3])
+        else:
+            blok["e"] = (f"Napisy przerywnika — wiersze {blok['start']}–{blok['koniec']}"
+                         if blok["start"] != blok["koniec"]
+                         else f"Napisy przerywnika — wiersz {blok['start']}")
+            blok["g"] = None
+            blok["c"] = ()
+    return bloki
+
+
 def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DOMYSLNY_PLIK) -> dict:
     ix = indeks_mod.wczytaj(index, teksty=True, sceny=True)
     krainy = json.loads((Path(index) / "prowincje.json").read_text(encoding="utf-8"))
@@ -253,6 +358,30 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
             continue
         przy_scenie[kotwica].extend(lista)
 
+    # Napisy przerywników: najpierw te, o których wiadomo, do której cutsceny należą
+    klucze_prologu = {k for j in jednostki if j["t"] == "prolog" for k in j.get("k") or []}
+    cutsceny_wg_numeru: dict[int, dict] = {}
+    for lista in przy_scenie.values():
+        for jednostka in lista:
+            cutsceny_wg_numeru[int(jednostka["n"])] = jednostka
+    for jednostka in cutsceny_bez_grupy:
+        cutsceny_wg_numeru[int(jednostka["n"])] = jednostka
+
+    osobne_napisy: list[dict] = []
+    przypisane_napisy = 0
+    for blok in _bloki_napisow(ix):
+        klucze = [k for k in blok["klucze"] if k not in klucze_prologu]
+        if not klucze:
+            continue
+        cel = next((cutsceny_wg_numeru[no] for no in blok["c"]
+                    if no in cutsceny_wg_numeru), None)
+        if cel is not None:
+            cel.setdefault("kn", []).extend(klucze)   # napisy stoją przed streszczeniem
+            przypisane_napisy += len(klucze)
+        else:
+            osobne_napisy.append({"t": "napisy", "e": blok["e"],
+                                  "s": PULA_NAPISOW, "k": klucze})
+
     for kraina in kolejnosc_krain:
         for numer in (n for n in sceny if przypisanie.get(n) == kraina):
             for jednostka in przy_scenie.get(numer, ()):
@@ -262,6 +391,9 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
     cutsceny_bez_grupy.sort(key=lambda j: j["n"])
     for jednostka in cutsceny_bez_grupy:
         jednostki.append({**jednostka, "s": BEZ_GRUPY})
+
+    # napisy bez rozpoznanej cutsceny — w kolejności z pliku gry, nie alfabetycznie
+    jednostki.extend(osobne_napisy)
 
     # pieśni i filmy idą na koniec: w grze pojawiają się później, nie na starcie
     for numer in sorted(filmy):
@@ -282,6 +414,9 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
         "cutscen_bez_grupy": sum(1 for j in jednostki
                                  if j["t"] == "cutscena" and j["s"] == BEZ_GRUPY),
         "prolog": sum(1 for j in jednostki if j["t"] == "prolog"),
+        "napisy_blokow": sum(1 for j in jednostki if j["t"] == "napisy"),
+        "napisy_linii": sum(len(j.get("k") or []) for j in jednostki if j["t"] == "napisy"),
+        "napisy_przy_cutscenie": przypisane_napisy,
         "filmow": sum(1 for j in jednostki if j["t"] == "film"),
         "bajtow": len(tresc.encode("utf-8")),
     }
