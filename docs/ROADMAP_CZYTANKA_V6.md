@@ -1,200 +1,106 @@
-# Roadmapa Czytanek — v6
+## Wspólne dla B i C: mapa identyfikatorów tekstów — **zrobione**
 
-Pięć braków zgłoszonych 2026-11-14 przez właściciela, rozpisanych na zadania.
-Każde ma: objaw, co już wiadomo z danych w repozytorium, czego brakuje, plan
-i kryterium akceptacji. Kolejność: najpierw to, co da się zrobić bez nowych
-danych (A, B, C — same nazwy), potem to, co wymaga tabel z bazy gry (D, C —
-powiązania) i wyjaśnienia źródła polszczyzny (E).
+W danych gry nazwy to **liczby**, nie tekst: `equip_items.name`,
+`active_interact_way.button_name`, `curio_owner.owner_name`. Treść leży
+w mapach języka (`locale/translate_words_map_zh_cn` + `_diff`, `_en`), a klucz
+przekładu to SHA-256 z **tekstu źródłowego** (`tools/mapa_tekstow.klucz`).
+Droga jest więc taka:
 
-Zasada bez zmian: wchodzi tylko to, co udowodnione; reszta jest oznaczona jako
-nieudowodniona, nigdy nie zmyślona.
+    identyfikator -> tekst chiński -> klucz -> polski przekład z `tlumaczenie/`
 
-## Skrót
-
-| # | temat | dane w repo | nowe dane | kolejność |
-|---|---|---|---|---|
-| A | questy w 03 w kolejności łańcucha, nie alfabetycznie | są (`index/grupy_zadan.jsonl`) | nie | 1 |
-| B | brakujące przedmioty i pamiątki („Stara włócznia”) | są — 1 020 kart zbiorów + 98 pamiątek z tabel `curio_*` | nie | **zrobione** |
-| C | POI w czytance („Dragon Pattern Mark”) | są nazwy (`active_interact_way.button_name`); baza gry leży w `local/dane` | nie — trzeba tylko znaleźć powiązanie POI → scena | 3 |
-| D | scena → następna scena (4700001 → 4700041 → 4700352) | częściowo: 5 765 scen ma pole `x`; baza gry w `local/dane` | nie — trzeba znaleźć następstwo w grafie dialogu | 4 |
-| E | kwestie po angielsku w scenach, które w grze są po polsku | **tak** — przekłady są w `tlumaczenie/pl_warianty.jsonl` | nie | **zrobione** |
-
-## A. Porządek questów w 03 — **zrobione**
-
-Stan: `tools/kolejnosc_zadan.py` + sekcja w `tools/czytanka_czysta.py`; testy
-w `tests/test_kolejnosc_zadan.py`. Kolejność: wątek główny (typ 1) w kolejności
-sekcji z `tools/uklad_scen.py`, potem łańcuchy poboczne, na końcu pojedyncze
-zadania pogrupowane krainą. Treść bez zmian: 75 331 jednostek, 62 838 pozycji
-w reszcie — zmieniła się tylko kolejność linii w sekcji.
-
-**Objaw.** W `03_reszta.md` sekcja „Zadania i wątki” (od linii 49539) jest
-posortowana po nazwie, więc łańcuch główny czyta się alfabetycznie. Ma być po
-kolejności: rozdział → kraina → quest → etap.
-
-**Co wiadomo.** `index/grupy_zadan.jsonl` ma 1 077 grup; każda ma `kolejnosc`
-(1, 2, …), `start`, `koniec` (lista id zadań zamykających) i `zadania` (lista
-wszystkich id w grupie, w kolejności z gry — pierwszy wpis grupy 1 to `200246`,
-`start` = `220001`). Tytuły grup i zadań są w grupach jako sloty-hashe do
-`index/` (`tytul`, `numer_tytulu`), więc nazwy da się odczytać bez bazy.
-
-**Brakuje.** Jawnego „to zadanie po tamtym”. Ale lista `zadania` w grupie jest
-uporządkowana i `start`/`koniec` dają początek i koniec grupy — to wystarcza,
-żeby zbudować łańcuch w obrębie grupy. Między grupami porządek daje
-`kolejnosc`.
-
-**Plan.**
-1. `tools/kolejnosc_zadan.py`: grupa → lista zadań w kolejności gry (z `zadania`,
-   z pilnowaniem, żeby `start` był pierwszy i `koniec` ostatni), plus nazwa grupy
-   i numer tytułu z `index/`.
-2. W budowniczym czytanek sekcja „Zadania” sortuje: najpierw grupy główne
-   (rozpoznane po tytule/rozdziale), potem łańcuchy poboczne, na końcu
-   pojedyncze zadania — pogrupowane krainą, tak jak teraz.
-3. Test regresyjny: kolejność z przykładu właściciela (Rozdział pierwszy →
-   „Heaven Has No Pier” → Qinghe → „Znów przyleciała jaskółka” → „Obudzone
-   wspomnienia”) musi wyjść dokładnie w tej kolejności.
-
-**Kryterium.** Żadna grupa w 03 nie jest posortowana alfabetycznie; łańcuch
-z przykładu wychodzi po kolei; zadania spoza grupy zostają w sekcji pobocznej
-według krainy.
+`tools/nazwy_z_map.py` robi z tego mały plik `index/nazwy.jsonl` (10 557
+wpisów, 956 KB) — **tylko** identyfikatory, których naprawdę używa czytanka
+(`index/poi.jsonl`, `index/pamiatki.jsonl`), a nie 1,8 mln wpisów mapy.
+Czytanka czyta go w `_tekst_nazwy()`: najpierw mapa (zna każdy identyfikator),
+potem świadkowie `index/teksty_*.jsonl` (znają tylko to, co trafiło do wyciągu).
+Bez tej mapy 7 294 POI i 22 pamiątki zostawały bez nazwy.
 
 ## B. Brakujące przedmioty i pamiątki — **zrobione**
 
-**Co zrobiono (2026-11-14).** Nowa sekcja 03 `# Zbiory i pamiątki — zasłyszane
-historie` i `# Zbiory i pamiątki — karty przeciwników`: **1 020 kart**, para
-„tytuł + pełny tekst” z jednego wiersza gry (`region_collect_jianwen_data`:
-`jianwen_title` + `jianwen_text`; `card_collecting_boss`: `card_name` +
-`card_content`), a bez przekładu — z gwiazdką (`\*`), tak samo jak kwestie
-w 01.
+**Zbiory (2026-11-14).** Sekcje 03 `# Zbiory i pamiątki — zasłyszane historie`
+i `# Zbiory i pamiątki — karty przeciwników`: **1 020 kart**, para „tytuł +
+pełny tekst” z jednego wiersza gry (`region_collect_jianwen_data`,
+`card_collecting_boss`), a bez przekładu — z gwiazdką (\\*).
 
-**Pamiątki — rozwiązane 2026-11-14, gdy cała baza gry leży w `local/dane`.**
-Pamiątki trzymają cztery tabele `curio_*` (nie `collect_*`, jak zgadywaliśmy):
+**Pamiątki.** Trzymają je cztery tabele `curio_*` (nie `collect_*`, jak
+zgadywaliśmy wcześniej):
 
 | tabela | co daje |
 |---|---|
-| `curio_config` (120 wierszy) | `stuff_id` (przedmiot), `owner_id`, `history_id` (motyw), `history_order`, `memory` (klucz wiersza `text_msg` z opowieścią), `dialog_id` (scena, gdy jest), `location` |
-| `curio_owner` (88) | `owner_name` (tekst) i `owner_icon` — `head_npc_zhuxiannpc_jiangwulang`, stąd „JiangWulang” |
-| `curio_theme` (56) | `history_name` (tekst motywu) i `history_order` |
-| `equip_items` | `name` + `describe_str` (nazwa i krótki opis przedmiotu) |
+| `curio_config` (120 wierszy) | `stuff_id`, `owner_id`, `history_id` (motyw), `history_order`, `memory` (klucz wiersza `text_msg` z opowieścią), `dialog_id`, `location` |
+| `curio_owner` (88) | `owner_name` (identyfikator tekstu) i `owner_icon` — `head_npc_zhuxiannpc_jiangwulang`, stąd „JiangWulang” |
+| `curio_theme` (56) | `history_name`, `history_order` |
+| `equip_items` | `name` + `describe_str` |
 
 Wiersz `curio_config` 35 to dokładnie karta właściciela: `stuff_id` 1100010
 („Stara włócznia”), `owner_id` 1 (Jiang Wulang), `memory` **741036** — ten sam
-wiersz `text_msg`, o którym pisało archiwum niżej, `history_id` 3,
-`history_order` 1.
+`text_msg`, o którym pisało archiwum.
 
-**Jak to weszło do czytanki.** `tools/pamiatki_z_bazy.py` czyta te tabele
-i zapisuje **same liczby** do `index/pamiatki.jsonl` (120 wierszy). Nazwy
-i opowieści dokłada `czytanka_czysta._pamiatki()` świadkami
-`index/teksty_*.jsonl` (przestrzeń `equip_items.name` = 1496,
-`curio_owner.owner_name` = 1167, `text_msg.content` = 4735) — ten sam
-mechanizm co przy pozostałych zbiorach. Sekcja w 03 to
-`# Pamiątki — przedmioty z historią`, tytuł **„właściciel — przedmiot”**
-(`**jiangwulang — Stara włócznia**`), pod nim cała opowieść: przekład, a gdy go
-nie ma — tekst z gry z gwiazdką. Wyszło **98 pamiątek**; 22 nie mają w wyciągu
-nazwy przedmiotu, więc nie wchodzą, a licznik `pamiatki_bez_nazwy` w README
-mówi, ile ich było.
+`tools/pamiatki_z_bazy.py` zapisuje z tych tabel **same liczby**
+(`index/pamiatki.jsonl`: `przedmiot`, `nazwa_id`, `wlasciciel_id`, `pamiec`),
+`index/nazwy.jsonl` daje treść nazw, a `czytanka_czysta._pamiatki()` stawia
+w 03 sekcję `# Pamiątki — przedmioty z historią`: tytuł **„właściciel —
+przedmiot”** i cała opowieść. Wychodzi **120 pamiątek, 0 bez nazwy**. Przykład
+z pliku:
 
-**Czego nadal nie ma (i nie zmyślamy).**
-- Przekładu opowieści pamiątek: **0 ze 120**. Wszystkie idą z gwiazdką.
-- Nazwy „QinghePast-At Heaven's Pier 1”: takiego tekstu nie ma ani w danych gry
-  (przeszukane 28 434 małych tabel i całe `local/dane`), ani w naszym
-  przekładzie. „JiangWulang” występuje w grze tylko jako właściciel pamiątek
-  i jako identyfikatory głosu (`vo_xsfb_jiangwulang_*` w `index/sceny_*.jsonl`).
-- 6 pamiątek ma `dialog_id` (scena). To materiał dla C/D — patrz niżej.
+    **Jiang Wulang — Stara włócznia**
 
-## B. (archiwum) Objaw i dowody
+    \\*When Jiang Wulang passed the blacksmith's shop, he pretended to buy…
 
-**Objaw.** „JiangWulang-Stara włócznia” nie miało w czytankach pełnej karty.
-Nazwa i krótki opis były w 03, opowieści nie było.
+**Czego nie ma i nie zmyślamy.**
+- Przekładu opowieści pamiątek: **0 ze 120** — wszystkie idą z gwiazdką.
+- Nazwy „QinghePast-At Heaven's Pier 1”: takiego tekstu nie ma w danych gry
+  (przeszukane `local/dane` i 28 727 tabel ze schematem) ani w przekładzie.
 
-**Dlaczego wcześniej nie wyszło.** Wyciąg `index/` trzyma **teksty**, nie
-referencje: `text_msg` wiersz 741036 ma `zh` + `en` („When Jiang Wulang passed
-the blacksmith's shop…”), ale nic w indeksie nie mówiło, że należy do przedmiotu
-1100010. Dopiero tabela `curio_config` z bazy gry daje ten klucz.
+## C. POI w czytance — **zrobione (2 948 w 03, 368 z numerem sceny)**
 
-## C. POI w czytance — **zrobione w części (2 907 z 10 368)**
+POI to wiersze `active_interact_way`: nazwa w `button_name` (identyfikator
+tekstu), a numer sceny **tylko tam, gdzie gra go zapisuje** (`play_dialog_no` /
+`result_play_dialog`). `tools/poi_z_bazy.py` → `index/poi.jsonl` (10 368
+wierszy, 1 368 z numerem sceny), `index/nazwy.jsonl` → treść nazwy.
+`czytanka_czysta._poi()` daje w 03 sekcję `# Punkty na mapie (POI)`:
+`**Nazwa** — scena N`, a bez dowodu samo `**Nazwa**`.
 
-**Co zrobiono (2026-11-14).** POI to wiersze `active_interact_way`: nazwa
-w kolumnie `button_name`, a **numer sceny tylko tam, gdzie gra go zapisuje** —
-`play_dialog_no` / `result_play_dialog`. `tools/poi_z_bazy.py` zapisuje to do
-`index/poi.jsonl` (10 368 wierszy; 1 368 z numerem sceny), a
-`czytanka_czysta._poi()` robi w 03 sekcję `# Punkty na mapie (POI)`:
-`**Nazwa** — scena N`, a bez dowodu samo `**Nazwa**`. Wyszło **2 907 POI**,
-z tego **365** z potwierdzonym numerem sceny.
+- **2 948** haseł (tyle jest różnych nazw; powtórzone nazwy nie dublują tekstu),
+- **368** z potwierdzonym numerem sceny,
+- **11** POI zostało bez nazwy — ich identyfikatora nie ma w mapach języka
+  (licznik `poi_bez_nazwy` w README).
 
-**Dlaczego nie wszystkie.** Wyciąg `index/` zna nazwę tylko dla **3 074**
-z 10 357 wierszy tej kolumny (`index/teksty_*.jsonl` trzyma jeden świadek na
-tekst, więc nazwa użyta wcześniej w innej tabeli traci świadka POI). Pozostałe
-**7 294** POI nie wchodzą i są policzone w README jako `poi_bez_nazwy` — nie
-zmyślamy nazw.
+**„Dragon Pattern Mark” jest w 03** (i „Dragon Pattern Contraption” też), ale
+z gwiazdką: klucz `b86a976ba200e189` (龙纹标记) **nie ma polskiego przekładu**.
+Numeru sceny ten POI nie ma: w wierszu jest tylko
+`interact_storyline: client/dialogs/hjt/sxd_longwenbiaoji.etsb`. Nazwa pliku
+pasuje do „longwenbiaoji” = 龙纹标记, ale to nie dowód liczbowy — POI stoi bez
+numeru, dopóki nie będzie pliku klienta `.etsb` (tabeli „ścieżka → numer
+dialogu” nie ma: przeszukane wszystkie 28 727 tabel ze schematem, jedyne
+trafienie to sam wiersz tego POI).
 
-**Czego nadal brakuje.**
-- „Dragon Pattern Mark” (POI `200046001`) **nie ma** numeru sceny w wierszu:
-  jest tylko `interact_storyline: client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
-  Nazwa pliku pasuje do „longwenbiaoji” = 龙纹标记, ale to nie jest dowód
-  liczbowy, więc POI stoi bez numeru. Do domknięcia trzeba pliku klienta
-  `.etsb` (albo tabeli „ścieżka → numer dialogu” — takiej nie ma: przeszukane
-  wszystkie 28 727 tabel ze schematem, jedyne trafienie to sam ten wiersz POI).
-- Nazw POI brakujących w indeksie nie da się dołożyć bez mapy „identyfikator
-  tekstu → klucz”, której wyciąg nie ma.
+## D. Scena → następna scena — **nie da się udowodnić z zebranych danych (zamknięte)**
 
+Właściciel podał następstwo **4700001 → 4700041 → 4700352**. Sprawdzone
+wszystko, co mamy, i następstwa w tym nie ma:
 
-**Objaw.** „Dragon Pattern Mark” nie występuje w żadnym pliku czytanki.
+1. **Kolumny.** W 28 727 tabelach ze schematem nazwy `dialog`/`scene`/`story`/
+   `task`/`quest` mają **jedną** kolumnę z „next”: `cutscenes.
+   keep_camera_for_next_cutscene` (kamera, nie fabuła).
+2. **Drzewo sceny.** `dialog_timelines.4700001` (wiersze `timeline`,
+   `dialog_config`, `project_info`, `used_sound_bnk`) nie zawiera **ani razu**
+   liczb 4700041 ani 4700352. `dialog_config` ma tylko `dialog_no`.
+3. **Cała baza.** Przeszukane wszystkie tabele: **żaden wiersz** nie zawiera
+   dwóch z tych trzech numerów, a 4700041 i 4700352 występują w bazie wyłącznie
+   jako identyfikatory **encji / kitów / npc** (`entity_marker.npc_no`,
+   `spawn_kit.kit_serial_id`, `strongpoint_info.enemy_entity_id`) — nie jako
+   sceny.
+4. **Zadania.** 4700001 jest w bazie tylko jako `finish_dialogs` zadań
+   220003 i 10000220003 (grupa 1). 4700041 i 4700352 w żadnym zadaniu nie
+   występują.
 
-**Co wiadomo.** Nazwa jest w indeksie: `index/teksty_b.jsonl`,
-`{"zh":"龙纹标记","en":"Dragon Pattern Mark","w":[39,"200046001"]}` — tabela 39,
-rekord `200046001`. Jest to rekord POI, który w grze startuje scenę 4700001.
-W `out/czytanka/` ani razu.
-
-**Brakuje.** Kolumny z tabeli 39, która mówi „ten POI startuje scenę N” —
-w indeksie są tylko teksty, nie powiązania.
-
-**Stan 2026-11-14 (baza gry jest już w `local/dane`).** Baza ma 114 925 tabel
-i czyta się (`tools/baza_gry.py`), więc tabelę 39 można nazwać i przejrzeć bez
-kolejnej paczki od właściciela. Do zrobienia w następnym kroku.
-
-**Plan.**
-1. Bez nowych danych: sekcja 03 „Punkty na mapie (POI)” — nazwa POI pogrupowana
-   krainą, z liczbą POI.
-2. Z nowych danych (jeden mały zakres zbieracza, tabela 39 i sąsiednie):
-   kolumna „scena startowa” → POI trafia do 02 przy scenie, którą otwiera.
-3. Oznaczenie: POI bez potwierdzonego powiązania stoi samo, bez strzałki do
-   sceny — nigdy „na oko”.
-
-**Kryterium.** Wszystkie POI z indeksu są w 03; te z potwierdzonym powiązaniem
-są też w 02 przy swojej scenie.
-
-## D. Scena → następna scena
-
-**Objaw.** 4700001 → 4700041 → 4700352 to jedno następstwo; w czytance stoją
-osobno, bez łącznika.
-
-**Co wiadomo.** `index/kolejnosc_*.jsonl` opisują **skład** sceny (`s` =
-numer sceny × 100 + numer kwestii, `d` = numer dialogu, `t` = czas), nie
-następstwo. `index/chronologia.jsonl` daje tylko kolejność pozycji w pliku.
-W repozytorium nie ma kolumny „następna scena”.
-
-**Brakuje.** Tabeli z bazy gry (sceny/osi fabuły), która trzyma następstwo —
-albo dowodu, że następstwo wynika z numeracji.
-
-**Stan 2026-11-14 (baza gry w `local/dane`, 114 925 tabel).** Przeszukane
-nazwy tabel z `dialog`/`scene`/`story`/`task` i kolumnami `next*`: jedyne
-trafienie to `cutscenes.keep_camera_for_next_cutscene` (kamera, nie fabuła).
-Czyli następstwo nie leży w kolumnie tabeli — jeśli jest, to w grafie dialogu
-(`space` typu `对话-*.dialog`, skąd bierze się `index/sceny_*.jsonl`: węzły `o`,
-krawędzie `e`). Do zrobienia: sprawdzić, czy krawędź grafu wskazuje numer
-następnej sceny.
-
-**Plan.**
-1. Sprawdzić hipotezę „numeracja + grupa zadania wystarczą” na 20 parach scen
-   z jednego zadania. Jeśli tak — bez nowych danych.
-2. Jeśli nie — mały zakres zbieracza (kilka tabel `data*`, nie cała baza):
-   kolumny `next`/`kolejna` z tabel scen.
-3. W czytance: łańcuch jako sekcja „Ciąg dalszy” z odsyłaczem do numeru sceny;
-   numeracja zostaje, żeby dało się wrócić.
-
-**Kryterium.** Przykład właściciela (4700001 → 4700041 → 4700352) jest w
-czytance jednym łańcuchem, a każdy skok ma dowód (pole z tabeli albo wpis
-w grupie zadania).
+Wniosek: następstwo leży w **plikach klienta** (`.etsb`, `client/dialogs/…`),
+których nie zbieramy, i nie da się go odtworzyć z tabel gry. Zgodnie z zasadą
+„co nieudowodnione, mówimy wprost” **nie łańcuchujemy scen na oko**: trzy sceny
+stoją tam, gdzie je stawia porządek gry (sekcja 燕南), a w `01` są osobnymi
+jednostkami. Jeśli właściciel dostarczy pliki `.etsb` (albo zgodzi się
+potraktować nazwę pliku scenariusza jako dowód), D wróci do pracy.
 
 ## E. Angielskie kwestie w scenach, które w grze są po polsku — **zrobione**
 

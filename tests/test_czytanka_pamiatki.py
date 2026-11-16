@@ -60,12 +60,14 @@ class PamiatkiTests(unittest.TestCase):
         self.assertIn("Historia po polsku", linie)
 
     def test_bez_przekladu_gwiazdka_i_wlasciciel_z_ikony(self):
+        indeks = _Indeks()
+        indeks.teksty.pop("wlasciciel1")  # właściciela nie ma w wyciągu — zostaje ikona
         with self._katalog([{"id": 35, "przedmiot": 1100010, "wlasciciel": 1,
                              "pamiec": 741036, **WLASCICIEL}]) as katalog:
             linie = czytanka_czysta._pamiatki(
-                _Indeks(), {"nazwa1": "Stara włócznia"}, set(), {}, katalog)
+                indeks, {"nazwa1": "Stara włócznia"}, set(), {}, katalog)
         self.assertIn("**jiangwulang — Stara włócznia**", linie)
-        self.assertIn("\\*Story one second line", linie)
+        self.assertIn(czytanka_czysta.GWIAZDKA + "Story one second line", linie)
 
     def test_bez_nazwy_przedmiotu_nie_wchodzi_ale_jest_policzona(self):
         statystyka: dict = {}

@@ -78,11 +78,13 @@ Zasady kolejności:
    „tytuł + pełny tekst” z jednego wiersza gry, także bez przekładu (wtedy
    z gwiazdką). Wcześniej wchodził sam tekst bez tytułu, a bez przekładu — wcale.
    Pamiątki (przedmioty z historią) stoją w sekcji `# Pamiątki — przedmioty
-   z historią`: tytuł „właściciel — przedmiot” (`**jiangwulang — Stara
+   z historią`: tytuł „właściciel — przedmiot” (`**Jiang Wulang — Stara
    włócznia**`) i cała opowieść z gry pod spodem. Właściciel bez przekładu idzie
    z identyfikatora ikony z danych gry (`head_npc_…_jiangwulang`), nie
    z domysłu; pamiątka bez nazwy przedmiotu nie wchodzi i jest policzona
-   w README (`pamiatki_bez_nazwy`).
+   w README (`pamiatki_bez_nazwy`). Nazwy biorą się z `index/nazwy.jsonl`
+   (identyfikator tekstu → treść i klucz przekładu), a nie z domysłu po
+   identyfikatorze wiersza.
 10. **punkty na mapie (POI)** mają w 03 sekcję `# Punkty na mapie (POI)`:
    `**Nazwa** — scena N` **tylko wtedy**, gdy gra zapisała numer sceny
    w wierszu POI (`play_dialog_no` / `result_play_dialog`). Sama ścieżka

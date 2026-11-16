@@ -494,7 +494,7 @@ def _zbiory(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict) -> list[s
                 continue
             tytul = pl.get(klucz_tytulu) or ("\\*" + _z_gry(ix, klucz_tytulu))
             opis = pl.get(klucz_tekstu) or ("\\*" + _z_gry(ix, klucz_tekstu))
-            if not tytul.strip("\\* ") or not opis.strip("\\* "):
+            if not tytul.strip(GWIAZDKA + " ") or not opis.strip(GWIAZDKA + " "):
                 continue
             karta = f"**{tytul}:** {opis}"
             if karta in widziane:
@@ -506,6 +506,10 @@ def _zbiory(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict) -> list[s
             out += [f"# {naglowek}", ""] + karty + [""]
     return out
 
+
+# gwiazdka przy tekście bez przekładu: dwa backslashe i gwiazdka,
+# tak jak w pozostałych sekcjach 03
+GWIAZDKA = "\\*"
 
 _PAMIATKI_PLIK = "pamiatki.jsonl"
 # rola -> (tabela, kolumna): przestrzeń świadków z `index/zrodla.json`
@@ -547,7 +551,48 @@ def _blok_tekstu(tekst: str, przeklad: bool) -> list[str]:
     linie = [linia.rstrip() for linia in textwrap.dedent(tekst).splitlines()]
     if przeklad:
         return linie
-    return [("\\*" + linia) if linia.strip() else "" for linia in linie]
+    return [(GWIAZDKA + linia) if linia.strip() else "" for linia in linie]
+
+
+_NAZWY_PLIK = "nazwy.jsonl"
+
+
+def _wczytaj_nazwy(katalog: str | Path) -> dict[str, dict]:
+    """`index/nazwy.jsonl`: identyfikator tekstu -> klucz przekładu i treść gry."""
+    plik = Path(katalog) / _NAZWY_PLIK
+    if not plik.is_file():
+        return {}
+    mapa: dict[str, dict] = {}
+    for linia in plik.read_text(encoding="utf-8").splitlines():
+        if not linia.strip():
+            continue
+        wpis = json.loads(linia)
+        if wpis.get("k"):
+            mapa[str(wpis.get("id"))] = wpis
+    return mapa
+
+
+def _tekst_nazwy(ix, pl, mapa: dict[str, str], ident,
+                 nazwy: dict[str, dict]) -> tuple[str, str | None]:
+    """(tekst nazwy, klucz przekładu) z mapy identyfikatorów, a bez niej ze świadków.
+
+    Mapy języka (`index/nazwy.jsonl`) znają treść **każdego** identyfikatora
+    z danych gry, świadkowie `index/teksty_*.jsonl` tylko te, które trafiły do
+    wyciągu — dlatego mapa idzie pierwsza.
+    """
+    if ident is None:
+        return "", None
+    wpis = nazwy.get(str(ident))
+    if wpis:
+        klucz = str(wpis["k"])
+        przeklad = pl.get(klucz)
+        if przeklad:
+            return przeklad.strip(), klucz
+        return GWIAZDKA + _czysty(str(wpis.get("en") or wpis.get("zh") or "")), klucz
+    klucz = mapa.get(str(ident))
+    if not klucz:
+        return "", None
+    return (pl.get(klucz) or ("\\\\*" + _z_gry(ix, klucz))).strip(), klucz
 
 
 def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
@@ -562,6 +607,7 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
     plik = Path(katalog) / _PAMIATKI_PLIK
     if not plik.is_file():
         return []
+    nazwy = _wczytaj_nazwy(katalog)
     mapy: dict[str, dict[str, str]] = {}
     for rola, tabela, kolumna in _PAMIATKI_PRZESTRZENIE:
         numer = _przestrzen(ix, tabela, kolumna)
@@ -581,19 +627,20 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
         klucz_historii = mapy["pamiec"].get(str(wpis.get("pamiec") or ""))
         if not klucz_historii or klucz_historii in uzyte:
             continue
-        klucz_nazwy = mapy["nazwa"].get(str(wpis.get("przedmiot") or ""))
-        if not klucz_nazwy:
-            ukryte += 1
-            continue
-        nazwa = (pl.get(klucz_nazwy) or _z_gry(ix, klucz_nazwy)).strip()
-        if not nazwa:
+        nazwa, klucz_nazwy = _tekst_nazwy(
+            ix, pl, mapy["nazwa"],
+            wpis.get("nazwa_id") or wpis.get("przedmiot"), nazwy)
+        if not nazwa.strip(GWIAZDKA + " "):
             ukryte += 1
             continue
         historia = pl.get(klucz_historii)
         zrodlo = historia or _z_gry(ix, klucz_historii)
         if not zrodlo.strip():
             continue
-        wlasciciel = _wlasiciel(pl, wpis, mapy["wlasciciel"].get(str(wpis.get("wlasciciel") or "")))
+        wlasciciel, _ = _tekst_nazwy(
+            ix, pl, mapy["wlasciciel"],
+            wpis.get("wlasciciel_id") or wpis.get("wlasciciel"), nazwy)
+        wlasciciel = wlasciciel.strip(GWIAZDKA + " ") or _wlasiciel(pl, wpis, None)
         tytul = f"{wlasciciel} — {nazwa}" if wlasciciel else nazwa
         if tytul in widziane:
             continue
@@ -625,6 +672,7 @@ def _poi(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
     plik = Path(katalog) / _POI_PLIK
     if not plik.is_file():
         return []
+    nazwy = _wczytaj_nazwy(katalog)
     numer = _przestrzen(ix, "active_interact_way", "button_name")
     mapa: dict[str, str] = {}
     if numer is not None:
@@ -639,13 +687,12 @@ def _poi(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
         if not wiersz.strip():
             continue
         wpis = json.loads(wiersz)
-        klucz = mapa.get(str(wpis.get("id") or ""))
-        if not klucz or klucz in uzyte:
-            bez_nazwy += 1 if not klucz else 0
-            continue
-        nazwa = (pl.get(klucz) or ("\\\\*" + _z_gry(ix, klucz))).strip()
-        if not nazwa.strip("\\* "):
+        nazwa, klucz = _tekst_nazwy(ix, pl, mapa,
+                                    wpis.get("nazwa") or wpis.get("id"), nazwy)
+        if not nazwa.strip(GWIAZDKA + " "):
             bez_nazwy += 1
+            continue
+        if klucz in uzyte:
             continue
         if nazwa in widziane:
             continue

@@ -22,15 +22,31 @@ z gry z gwiazdką). 22 pamiątki nie mają w wyciągu nazwy przedmiotu — nie
 wchodzą, licznik `pamiatki_bez_nazwy` w README czytanki mówi ile. Opowieści
 pamiątek nie są przetłumaczone (0 ze 120), więc wszystkie idą z gwiazdką.
 
-**Punkty na mapie (POI) są w czytance.** POI to wiersze `active_interact_way`
-(nazwa w `button_name`, numer sceny w `play_dialog_no` / `result_play_dialog`).
-`tools/poi_z_bazy.py` zapisuje `index/poi.jsonl` (10 368 wierszy, 1 368 z numerem
-sceny), a `czytanka_czysta._poi()` robi w `03` sekcję `# Punkty na mapie (POI)`:
-**2 907 POI**, z tego **365** z potwierdzonym numerem sceny. Pozostałe
-**7 294** nie mają nazwy w naszym wyciągu (zna on tylko 3 074 z 10 357 wierszy
-tej kolumny) — są policzone w README (`poi_bez_nazwy`), nie zmyślone.
-POI `200046001` („Dragon Pattern Mark”) ma tylko ścieżkę scenariusza
-`client/dialogs/hjt/sxd_longwenbiaoji.etsb`, bez numeru sceny — tak zostaje.
+**Nazwy w grze są liczbami.** `equip_items.name`, `active_interact_way.button_name`,
+`curio_owner.owner_name` to **identyfikatory tekstów**; treść leży w mapach języka
+(`locale/translate_words_map_*`), a klucz przekładu to SHA-256 z tekstu źródłowego.
+`tools/nazwy_z_map.py` zapisuje `index/nazwy.jsonl` (10 557 wpisów) — tylko
+identyfikatory używane przez czytankę, z treścią i kluczem. To odblokowało nazwy.
+
+**Pamiątki (przedmioty z historią).** Tabele `curio_config` / `curio_owner` /
+`curio_theme` / `equip_items`; `tools/pamiatki_z_bazy.py` →
+`index/pamiatki.jsonl`, sekcja `# Pamiątki — przedmioty z historią` w `03`:
+**120 pamiątek, 0 bez nazwy**, tytuł „właściciel — przedmiot”
+(„Jiang Wulang — Stara włócznia”) i cała opowieść. Opowieści nie są
+przetłumaczone (0 ze 120), więc wszystkie idą z gwiazdką.
+
+**Punkty na mapie (POI).** `tools/poi_z_bazy.py` → `index/poi.jsonl` (10 368
+wierszy, 1 368 z numerem sceny), sekcja `# Punkty na mapie (POI)` w `03`:
+**2 948 haseł**, z tego **368** z potwierdzonym numerem sceny, **11** bez nazwy
+w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przekładu
+klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
+`client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
+
+**Następstwo scen (D) jest nieudowalne z zebranych danych.** W 28 727 tabelach
+ze schematem nie ma kolumny „następna scena”, drzewo `dialog_timelines.4700001`
+nie zawiera 4700041 ani 4700352, żaden wiersz bazy nie ma dwóch z tych trzech
+numerów, a 4700001 jest tylko `finish_dialogs` zadań 220003 i 10000220003.
+Następstwo siedzi w plikach klienta `.etsb`, których nie zbieramy.
 
 **Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
 jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu

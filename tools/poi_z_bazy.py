@@ -15,8 +15,12 @@ powiązanie. Nie zgadujemy „ten POI startuje scenę N”, jeśli gra tego nie 
 
 Wynik: `index/poi.jsonl`, jeden wiersz na POI:
 
-    {"id": 200046001, "dialog": null,
+    {"id": 200046001, "nazwa": 17335944675850932813, "dialog": null,
      "storyline": "client/dialogs/hjt/sxd_longwenbiaoji.etsb"}
+
+`nazwa` to **identyfikator tekstu** nazwy (`button_name`) — z niego
+`tools/nazwy_z_map.py` bierze treść z map języka, a klucz przekładu liczy
+SHA-256 z tekstu źródłowego (docs/LOKALIZACJA.md).
 
 Użycie:
     python3 tools/poi_z_bazy.py [KATALOG ...] [--wyj index/poi.jsonl]
@@ -68,6 +72,7 @@ def poi(katalogi) -> list[dict]:
         dialog = _liczba(wiersz.get("play_dialog_no")) or _liczba(wiersz.get("result_play_dialog"))
         wynik.append({
             "id": identyfikator,
+            "nazwa": _liczba(wiersz.get("button_name")),
             "dialog": dialog,
             "storyline": str(wiersz.get("interact_storyline") or ""),
         })

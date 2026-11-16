@@ -18,9 +18,14 @@ tak samo jak robi to z pozostałymi zbiorami.
 
 Wynik: `index/pamiatki.jsonl`, jeden wiersz na pamiątkę:
 
-    {"id": 35, "przedmiot": 1100010, "wlasciciel": 1, "wlasciciel_ikona": "…",
-     "motyw": 3, "kolejnosc": 1, "pamiec": 741036, "dialog": null,
-     "lokacja": 10003}
+    {"id": 35, "przedmiot": 1100010, "nazwa_id": 8966690341954285,
+     "wlasciciel": 1, "wlasciciel_id": 13541160777956032791,
+     "wlasciciel_ikona": "…", "motyw": 3, "kolejnosc": 1, "pamiec": 741036,
+     "dialog": null, "lokacja": 10003}
+
+`nazwa_id` i `wlasciciel_id` to **identyfikatory tekstów** (nie klucze
+przekładu): treść bierze z map języka `tools/nazwy_z_map.py`, a klucz liczy
+SHA-256 z tekstu źródłowego.
 
 `pamiec` to klucz wiersza `text_msg`, w którym leży historia przedmiotu.
 
@@ -78,6 +83,9 @@ def pamiatki(katalogi) -> list[dict]:
     wlasciciele = {}
     for klucz, wiersz in _wiersze(baza, "curio_owner"):
         wlasciciele[str(klucz)] = wiersz
+    przedmioty = {}
+    for klucz, wiersz in _wiersze(baza, "equip_items"):
+        przedmioty[str(klucz)] = wiersz
     wynik = []
     for klucz, wiersz in _wiersze(baza, "curio_config"):
         identyfikator = _liczba(wiersz.get("id")) or _liczba(klucz)
@@ -87,9 +95,18 @@ def pamiatki(katalogi) -> list[dict]:
         ikona = ""
         if wlasciciel is not None:
             ikona = str(wlasciciele.get(str(wlasciciel), {}).get("owner_icon") or "")
+        wlasciciel_nazwa = None
+        if wlasciciel is not None:
+            wlasciciel_nazwa = _liczba(wlasciciele.get(str(wlasciciel), {}).get("owner_name"))
+        przedmiot = _liczba(wiersz.get("stuff_id"))
+        nazwa_id = None
+        if przedmiot is not None:
+            nazwa_id = _liczba(przedmioty.get(str(przedmiot), {}).get("name"))
         wynik.append({
             "id": identyfikator,
-            "przedmiot": _liczba(wiersz.get("stuff_id")),
+            "przedmiot": przedmiot,
+            "nazwa_id": nazwa_id,
+            "wlasciciel_id": wlasciciel_nazwa,
             "wlasciciel": wlasciciel,
             "wlasciciel_ikona": ikona,
             "motyw": _liczba(wiersz.get("history_id")),
