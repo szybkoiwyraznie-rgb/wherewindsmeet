@@ -42,6 +42,13 @@ w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przek�
 klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
 `client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
 
+**D — decyzja właściciela (2026-11-14): zostawiamy, powiąże sceny sam.**
+W repo został `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`, opis
+`docs/SNIFFER_MPK.md`) jako opcja na później: sondowanie paczek `.mpk`
+bez rozpakowywania i bez dotykania procesu gry (nagłówek i ogon, entropia,
+magia kompresji, szukanie nazw ścieżek, okienka bajtów). Nie jest do niczego
+wymagany — czytanka v6 stoi bez niego.
+
 **Następstwo scen (D) jest nieudowalne z zebranych danych.** W 28 727 tabelach
 ze schematem nie ma kolumny „następna scena”, drzewo `dialog_timelines.4700001`
 nie zawiera 4700041 ani 4700352, żaden wiersz bazy nie ma dwóch z tych trzech

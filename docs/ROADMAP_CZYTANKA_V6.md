@@ -102,6 +102,11 @@ stoją tam, gdzie je stawia porządek gry (sekcja 燕南), a w `01` są osobnymi
 jednostkami. Jeśli właściciel dostarczy pliki `.etsb` (albo zgodzi się
 potraktować nazwę pliku scenariusza jako dowód), D wróci do pracy.
 
+**Decyzja właściciela (2026-11-14): D zostaje odpuszczone** — sceny powiąże
+sam. W repo został na później `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`,
+opis `docs/SNIFFER_MPK.md`): sondowanie paczek `.mpk` bez rozpakowywania
+i bez dotykania procesu gry. Nie jest wymagany do v6.
+
 ## E. Angielskie kwestie w scenach, które w grze są po polsku — **zrobione**
 
 **Przyczyna (potwierdzona na scenie 4700001).** Kwestie zależne od płci bohatera
