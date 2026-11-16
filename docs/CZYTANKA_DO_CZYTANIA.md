@@ -73,7 +73,11 @@ Zasady kolejności:
    żadnego zadania (np. kwestie z `debate_guider_dialog_data`), zostają na końcu
    sekcji, alfabetycznie — nic nie wypada, ale nie udają questów.
 
-9. **kwestie zależne od płci bohatera** mają przekład pod osobnym
+9. **zbiory i pamiątki** mają w 03 własne sekcje (`# Zbiory i pamiątki —
+   zasłyszane historie`, `# Zbiory i pamiątki — karty przeciwników`): para
+   „tytuł + pełny tekst” z jednego wiersza gry, także bez przekładu (wtedy
+   z gwiazdką). Wcześniej wchodził sam tekst bez tytułu, a bez przekładu — wcale.
+10. **kwestie zależne od płci bohatera** mają przekład pod osobnym
    identyfikatorem (`@id`), a nie pod kluczem tekstu. Czytanka czyta
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem

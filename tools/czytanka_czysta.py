@@ -461,6 +461,51 @@ def _z_gry(ix, klucz: str) -> str:
     return _czysty(tekst.en or tekst.zrodlo or "")
 
 
+# Karty zbiorów: w jednym wierszu gry leży tytuł i pełny tekst. Wcześniej
+# trafiał do 03 tylko tekst (jako „nazwa — opis” z przypadku), a karty bez
+# przekładu nie trafiały wcale — dlatego w czytance brakowało pamiątek.
+_ZBIORY = (
+    ("region_collect_jianwen_data", "jianwen_title", "jianwen_text",
+     "Zbiory i pamiątki — zasłyszane historie"),
+    ("card_collecting_boss", "card_name", "card_content",
+     "Zbiory i pamiątki — karty przeciwników"),
+)
+
+
+def _zbiory(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict) -> list[str]:
+    """Karty zbiorów: tytuł + pełny tekst, także bez przekładu (z gwiazdką)."""
+    out: list[str] = []
+    kolumny = dict(enumerate(ix.zrodla))
+    for tabela, kol_tytul, kol_tekst, naglowek in _ZBIORY:
+        indeksy = {i for i, wpis in kolumny.items() if wpis[0] == tabela}
+        if not indeksy:
+            continue
+        wiersze: dict[str, dict[str, str]] = {}
+        for klucz, tekst in ix.teksty.items():
+            if tekst.w and tekst.w[0] in indeksy:
+                wiersze.setdefault(str(tekst.w[1]), {})[kolumny[tekst.w[0]][1]] = klucz
+        karty: list[str] = []
+        widziane: set[str] = set()
+        for numer in sorted(wiersze):
+            pola = wiersze[numer]
+            klucz_tytulu, klucz_tekstu = pola.get(kol_tytul), pola.get(kol_tekst)
+            if not klucz_tytulu or not klucz_tekstu or klucz_tekstu in uzyte:
+                continue
+            tytul = pl.get(klucz_tytulu) or ("\\*" + _z_gry(ix, klucz_tytulu))
+            opis = pl.get(klucz_tekstu) or ("\\*" + _z_gry(ix, klucz_tekstu))
+            if not tytul.strip("\\* ") or not opis.strip("\\* "):
+                continue
+            karta = f"**{tytul}:** {opis}"
+            if karta in widziane:
+                continue
+            widziane.add(karta)
+            karty.append(karta)
+            statystyka["zbiory"] = statystyka.get("zbiory", 0) + 1
+        if karty:
+            out += [f"# {naglowek}", ""] + karty + [""]
+    return out
+
+
 def _linia(mowca: str, tekst: str) -> str:
     """Kwestia w jednej linii, bez punktora.
 
@@ -824,6 +869,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka["plikow"] += 1
 
     tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
+    tresc_reszty += _zbiory(ix, pl, uzyte | uzyte_kontekstu, statystyka)
     (wyj / "03_reszta.md").write_text(
         _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
         + "\n".join(tresc_reszty) + "\n", encoding="utf-8")
@@ -858,7 +904,8 @@ Zakres: **{zakres}**.
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
-{statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma.
+{statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
+{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek w pliku 03.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01.

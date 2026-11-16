@@ -14,9 +14,9 @@ nieudowodniona, nigdy nie zmyślona.
 | # | temat | dane w repo | nowe dane | kolejność |
 |---|---|---|---|---|
 | A | questy w 03 w kolejności łańcucha, nie alfabetycznie | są (`index/grupy_zadan.jsonl`) | nie | 1 |
-| B | brakujące przedmioty i pamiątki („Stara włócznia”, „QinghePast-At Heaven's Pier 1”) | są (`index/teksty_*.jsonl`, tabela 4735) | nie | 2 |
-| C | POI w czytance („Dragon Pattern Mark”) | są nazwy (`index/teksty_b.jsonl`, tabela 39) | tak — powiązanie POI → scena | 3 |
-| D | scena → następna scena (4700001 → 4700041 → 4700352) | częściowo (`index/kolejnosc_*.jsonl`) | prawdopodobnie tak | 4 |
+| B | brakujące przedmioty i pamiątki („Stara włócznia”, „QinghePast-At Heaven's Pier 1”) | **częściowo** — karty zbiorów z indeksu | tak — jedna tabela z gry (patrz niżej) | 2 |
+| C | POI w czytance („Dragon Pattern Mark”) | są nazwy (`active_interact_way.button_name`) | tak — powiązanie POI → scena | 3 |
+| D | scena → następna scena (4700001 → 4700041 → 4700352) | częściowo: 5 765 scen ma pole `x` | tak — kolumna „następna scena” | 4 |
 | E | kwestie po angielsku w scenach, które w grze są po polsku | **tak** — przekłady są w `tlumaczenie/pl_warianty.jsonl` | nie | **zrobione** |
 
 ## A. Porządek questów w 03 — **zrobione**
@@ -57,7 +57,32 @@ uporządkowana i `start`/`koniec` dają początek i koniec grupy — to wystarcz
 z przykładu wychodzi po kolei; zadania spoza grupy zostają w sekcji pobocznej
 według krainy.
 
-## B. Brakujące przedmioty i pamiątki
+## B. Brakujące przedmioty i pamiątki — **zrobione w części, reszta czeka na jedną tabelę**
+
+**Co zrobiono (2026-11-14).** Nowa sekcja 03 `# Zbiory i pamiątki — zasłyszane
+historie` i `# Zbiory i pamiątki — karty przeciwników`: **1 020 kart**, para
+„tytuł + pełny tekst” z jednego wiersza gry (`region_collect_jianwen_data`:
+`jianwen_title` + `jianwen_text`; `card_collecting_boss`: `card_name` +
+`card_content`). Karta bez przekładu też wchodzi — z gwiazdką (`\*`), tak samo
+jak kwestie w 01, więc nic nie znika po cichu. Wcześniej w 03 trafiał sam tekst
+bez tytułu, a teksty bez przekładu nie trafiały wcale.
+
+**Co dalej blokuje pełną kartę „Stara włócznia”.** Opowieść, którą pokazuje gra
+(„When Jiang Wulang passed the blacksmith's shop…”), leży w `text_msg`,
+wiersz `741036`, i **nie jest przetłumaczona**. Nazwa przedmiotu i krótki opis
+są osobno (`equip_items`, wiersz `1100010`: „Stara włócznia” + „Z pozoru zwykła
+włócznia…”) — i ta para jest w 03. Brakuje **wiersza tabeli pamiątek**, który
+łączy przedmiot z tą opowieścią: w wyciągu `index/` go nie ma, bo wyciąg trzyma
+teksty, a nie referencje. Nazwy `JiangWulang-…` i `QinghePast-…` nie występują
+w indeksie ani razu.
+
+**Potrzebne:** jedna tabela z gry — ta, która trzyma pamiątki/przedmioty
+kolekcjonerskie (nazwa + identyfikator tekstu `text_msg`). Do ustalenia po
+spisie tabel z `MANIFEST`; kandydaci po nazwach z `index/zrodla.json`:
+`collect_*`, `*_collect_*`, `jianghu_past_*`, `unveil_*_collection_*`,
+`yankov_collect_*`.
+
+## B. (archiwum) Objaw i dowody
 
 **Objaw.** „JiangWulang-Stara włócznia / QinghePast-At Heaven's Pier 1” nie ma
 w czytankach pełnej karty. Nazwa „Stara włócznia” w 03 jest, ale opis z jej
