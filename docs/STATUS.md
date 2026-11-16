@@ -174,10 +174,11 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v2.zip`
-   (`6 607 212 B`, SHA-256
-   `06eb1d2ad973e6924e9fd524bc0b5d56ce9e9cc6cfce1d448cc1f08c95c350a6`),
-   Dysk Google id `1uO_0v7fJOr1T0tbKho1rgWoh2ASLSYzq` (wszystkie paczki z datą
+   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v3.zip`
+   (`6 610 597 B`, SHA-256
+   `7e93e5a47af68c465c40efafbe023424bdf9761fef002d2cc99d48796418abd7`),
+   Dysk Google id `1c8pk1TBJE1jODrpl6IWSM2OkE9cEfTT5` (v2 w koszu;
+   wszystkie paczki z datą
    w nazwie są nieaktualne i leżą w koszu). Spis wersji:
    [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
    istniejącej paczki. Opis formatu:
