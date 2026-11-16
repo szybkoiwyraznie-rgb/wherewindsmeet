@@ -89,6 +89,7 @@ CUTSCENY_TABELE = {
     "entry_collect_movie_subtitle_data",
     "wds_oneday_intro_cutscene_data",
 }
+UI_TYPY_CUTSCEN = indeks_mod.UI_TYPY_PRZERYWNIKA
 ZAKRES_BOTY_TM = (3_220_000, 3_269_999)
 ZAKRES_CUTSCEN_TM = (590_000, 592_694)
 ZAKRES_PROLOG_TM = kc.ZAKRES_PROLOG_TM
@@ -923,6 +924,58 @@ class Generator:
         )
         return self._formatuj_mowce_cutsceny(sp_en, row.get("audio") or "")
 
+    # ------------------------------------- sceny przerywników (timeline)
+
+    def cutsceny_cinematiczne(self, katalog: Path) -> None:
+        """Sceny odtwarzane jako przerywniki (`ui_type` 10) — to ich tekst widzi gracz.
+
+        Musi być wołane **przed** `sceny()`, żeby te kwestie otwierały slot `PL:`
+        w sekcji cutscen, a nie w ogólnym pliku „dialogi według projektów”.
+        """
+        self._aktualna_sekcja = "cutsceny"
+        self._nowe_w_bloku = []
+        numery = sorted(n for n, scena in self.ix.sceny.items() if scena.get("u") in UI_TYPY_CUTSCEN)
+        if not numery:
+            return
+        katalog.mkdir(parents=True, exist_ok=True)
+        wstep = [
+            "Sceny odtwarzane jako przerywniki (`ui_type` 10) — gra pokazuje ich tekst bez okna dialogowego,",
+            "więc to one tworzą napisy cutscen. Kolejność: numer sceny w danych gry.",
+            "Polski tekst wpisujesz w jednej linii po `PL:`. Zasady: `README.md`.",
+        ]
+        pisarz = Pisarz(katalog, "04_sceny_cinematiczne", "Sceny przerywników (timeline) — Where Winds Meet", wstep)
+        for numer in numery:
+            scena = self.ix.sceny[numer]
+            if not scena.get("e") or not self._zawiera_nowe(self._sloty_sceny(scena)):
+                continue
+            naglowek = f"## Scena {numer} — dialog {scena['d']}"
+            if scena.get("p"):
+                naglowek += f" — projekt {scena['p']}"
+            lines = [naglowek, ""]
+            w_bloku: dict[str, int] = {}
+            nr = opened = 0
+            for element in scena["e"]:
+                nr += 1
+                label = ETYKIETA[element[0]]
+                if element[0] == "k":
+                    label += f" — {self._mowca(scena, element[1], element[5] if len(element) > 5 else None)}"
+                slot = self._slot_sceny(element)
+                english = None
+                if slot.startswith("@"):
+                    label += f", wariant: {WARIANT.get(element[3], element[3])}"
+                    english = self.ix.warianty[slot[1:]].get("en") or ""
+                part, is_open = self._element(
+                    nr, label, slot, w_bloku, en=english, miejsce=f"scena {numer}, element {{nr}}"
+                )
+                lines += part
+                opened += is_open
+            self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+        files = pisarz.koniec()
+        if files:
+            self.serie.append(
+                {"baza": "04_sceny_cinematiczne", "tytul": "Sceny przerywników (timeline, `ui_type` 10)", "opis": "cutsceny", "pliki": files}
+            )
+
     def cutsceny(self, katalog: Path) -> None:
         ix = self.ix
         self._aktualna_sekcja = "cutsceny"
@@ -1400,15 +1453,24 @@ def zbuduj(
             old_zip.unlink()
 
     generator = Generator(ix, magazyn, tylko_sloty, tylko_z_en=tylko_z_en, wszystko=wszystko, wypelnij_pl=wypelnij_pl)
+    # Sceny przerywników idą pierwsze: to one mają otwierać `PL:` dla kwestii widocznych
+    # w cutscenach, a nie ogólne pliki scen (tam zostanie odsyłacz „tłumaczysz raz”).
+    generator.cutsceny_cinematiczne(wyj / "cutsceny")
+    cinematiczne_serie = list(generator.serie)
+    generator.serie = []
+    liczby_cinematiczne = Counter(generator.liczby)
+
     generator.sceny(wyj / "sceny")
     sceny_serie = list(generator.serie)
     generator.serie = []
-    liczby_scen = Counter(generator.liczby)
+    liczby_scen = Counter(generator.liczby) - liczby_cinematiczne
 
     generator.cutsceny(wyj / "cutsceny")
-    cutsceny_serie = list(generator.serie)
+    cutsceny_serie = cinematiczne_serie + list(generator.serie)
     generator.serie = []
     liczby_po_cut = Counter(generator.liczby)
+    # `liczby_cutsceny` obejmuje wszystkie sekcje cutscen (także sceny przerywników);
+    # `liczby_cinematiczne` to ich wyodrębniona część.
     liczby_cutsceny = liczby_po_cut - liczby_scen
 
     generator.widoki(wyj / "widoki")
@@ -1474,6 +1536,7 @@ def zbuduj(
         "liczby": dict(liczby),
         "liczby_sceny": dict(liczby_scen),
         "liczby_cutsceny": dict(liczby_cutsceny),
+        "liczby_cinematiczne": dict(liczby_cinematiczne),
         "liczby_widoki": dict(liczby_widokow),
         "liczby_bez_ui_meta": bez_ui_meta,
         "wykluczenia": dict(generator.wykluczenia),
@@ -1532,6 +1595,10 @@ def main(argv=None) -> int:
     try:
         ix = indeks_mod.wczytaj(arguments.indeks)
         magazyn = magazyn_mod.wczytaj(arguments.tlumaczenie) if arguments.tlumaczenie else None
+        if magazyn is not None:
+            # Wypełniamy też linie, których przekład istnieje pod kluczem bliźniaka
+            # o tej samej treści źródłowej (patrz `tlumaczenie.doloz_blizniaki`).
+            magazyn_mod.doloz_blizniaki(magazyn, ix)
         only = None
         if arguments.tylko_sloty:
             only = {line.strip() for line in Path(arguments.tylko_sloty).read_text(encoding="utf-8").splitlines() if line.strip()}

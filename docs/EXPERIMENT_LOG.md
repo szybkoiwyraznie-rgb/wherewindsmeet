@@ -1022,3 +1022,275 @@ cudzego kodu ani nie wymagają tej procedury.
     (przetestowane na `index/`: `483 752` miejsc `PL:`, `kontrola()` 100%
     zgodna) oraz `tools/audyt_aktualizacji.py` (wykrywa jako nowość wpisy,
     które w kolejnym patchu globalnym uzyskały wersję `EN`).
+
+## 2026-11-14 — dlaczego napisy otwierającej cutsceny zostały po angielsku (pokrycie, nie podmiana pliku)
+
+- **Objaw od właściciela:** po świeżej łatce PL nałożonej na pliki gry klient
+  (Steam, Windows) nie przywrócił podmienionego `translate_words_map_en_diff`,
+  a napisy początkowej cutsceny były w ok. 80% angielskie. Wcześniejsze
+  podejrzenie, że łatka podmienia `translate_words_map_en_diff` na wersję
+  policzoną od złej bazy, było **koincydencją**: patcher nadpisuje oba pliki
+  docelowe niezależnie i utrzymuje ich spójność, a sama podmiana nie tłumaczy
+  języka napisów.
+- **Wejście:** wyłącznie repozytorium — `index/` (`wwm-indeks-v2`, Patch 2.4
+  `26592996`) i magazyn `tlumaczenie/`. Bez plików gry, bez `zstandard`, bez
+  Dysku Google; w piaskownicy nie ma instalacji właściciela, więc **nic nie
+  zostało sprawdzone w uruchomionej grze**.
+- **Pomiar pokrycia (nowe narzędzie `tools/pokrycie_tlumaczenia.py`):**
+
+  | sekcja | wpisów | z przekładem | braki | % |
+  |---|---|---|---|---|
+  | napisy cutscen (`text_msg` 590000–592694) | 2 688 | 2 603 | 85 | 96,8% |
+  | intro (`wds_oneday_intro_cutscene_data`) | 9 | 8 | 1 | 88,9% |
+  | napisy filmowe (`entry_collect_movie_subtitle_data`) | 47 | 13 | 34 | 27,7% |
+  | — film 1 | 13 | 13 | 0 | 100% |
+  | — film 2 (`评弹曲目《钗头凤》`) | 13 | 0 | 13 | 0% |
+  | — film 3 (`《中渡桥之战》`) | 21 | 0 | 21 | 0% |
+  | sceny (dialogi i plansze z timeline'ów) | 187 598 | 13 301 | 174 297 | 7,1% |
+  | wszystkie unikalne teksty wyciągu | 487 684 | 75 603 | 412 081 | 15,5% |
+
+  Magazyn: `75 685` przekładów (`75 603` po kluczu + `82` warianty płci).
+- **Sprostowanie (dopisane 2026-11-14 po uwadze właściciela):** otwarcie gry to
+  **ciąg cutscen**, a nie ballady ani poematy. `钗头凤` jest tytułem występu
+  pingtan w filmie 2, `中渡桥之战` — tytułem filmsceny bitwy (film 3); oba mają
+  napisy wierszem, ale opisywanie ich jako „ballad prologu” było błędne.
+  Transkrypcja właściciela jest nadrzędna wobec tych nazw.
+- **Wniosek:** w napisach cutscen brakuje tylko `85` krótkich wtrąceń
+  (`Hah!`, `Yes`, `Go?`), a **całe dwa prerenderowane przerywniki filmowe
+  (ballada `钗头凤` i otwierający poemat `中渡桥之战`, razem `34` wersy) nie mają
+  ani jednego przekładu**. Film 1 (poemat o lampionach) jest przetłumaczony
+  w całości. Dodatkowo dialogi w scenach — czyli większość wypowiadanego tekstu
+  w grze — mają dopiero `7,1%` pokrycia.
+- **Dlaczego brak tych 34 wersów nie był widoczny w pakiecie:** w `v4`
+  (`paczki/v4/paczka.json`) sekcja `02_intro_i_filmy` ma
+  `56` elementów i `do_wpisania: 0`, bo wiersze filmowe są tam oznaczone jako
+  **powtórzenie** tekstów ze scen: `08_campaign_01.md` (scena `2953` i `2954`,
+  `中渡桥之战`) oraz `80_dialogi-wg-projektow_04.md` (scena `40712`, ballada).
+  Klucz przekładu jest ten sam (SHA-256 tekstu źródłowego), więc tłumacz miał
+  je wypełnić w plikach scen — i tam zostały puste. Sekcja cutscen nie
+  raportowała ich jako braków.
+- **Odtworzenie `v4` z repozytorium:** `python3 tools/buduj_paczke.py --indeks
+  index --wyj /tmp/pak --wersja 4 --data … --tlumaczenie tlumaczenie
+  --wypelnij-pl --tylko-z-en --bez-zip` daje dokładnie zapisane w `paczki/v4`
+  liczby (`liczby_cutsceny`: `4 532` elementów, `4 110` przetłumaczonych,
+  `416` powtórzeń, `6` do wpisania; `liczby`: `465 551`/`75 683`/`346 565`).
+  Bez `--tylko-z-en` pojawia się `135` dodatkowych otwartych miejsc w
+  `03_plansze_i_streszczenia` — różnica pochodzi wyłącznie z tej flagi.
+- **Sprawdzenie hipotezy „to nie pokrycie, a podłączenie”:** narzędzie ma tryb
+  `--szukaj "<fragment zdania>"`, który dla tekstu z gry podaje klucz, miejsce
+  (napisy cutscen / film `n` / intro / scena), tabelę źródłową i to, czy
+  w magazynie jest przekład. Jeśli linia **ma** przekład, a klient nadal pokazuje
+  angielski, problem jest w podłączeniu (inna mapa albo inny nośnik napisów)
+  i wtedy trzeba go badać dalej; jeśli przekładu **nie ma**, gra pokazuje
+  angielski zgodnie z projektem (klient pozostaje w języku EN).
+- **Testy:** `22` nowe testy w `tests/test_pokrycie_tlumaczenia.py` (sekcje,
+  braki, serie ciągłych wierszy, sloty wariantów płci, szukanie po `ZH`/`EN`/`PL`,
+  limit i skracanie tekstu); cały `tools/run_tests.py` zielony.
+- **Ograniczenia:** brak testu w grze; nie wiadomo, czy klient rysuje napisy
+  filmów z `entry_collect_movie_subtitle_data`, czy z tego samego tekstu
+  w scenach — oba warianty są dziś po angielsku, więc odpowiedź da dopiero
+  uzupełnienie przekładu. Nie zmieniano `index/` ani `tlumaczenie/`.
+
+## 2026-11-14 (2) — napisy cutscen to sceny `ui_type` 10: osobna sekcja pakietu i polski prolog
+
+- **Objaw (od właściciela):** w napisach prologu — od pierwszej scenki do kreacji
+  postaci — większość linii zostaje po angielsku; właściciel przepisał cały
+  fragment i oznaczył nieprzetłumaczone miejsca.
+- **Fakt — gdzie te linie leżą:** to nie osobna tabela napisów, a **sceny
+  odtwarzane jako przerywniki** (`ui_type` 10 w `dialog_timelines`). W całym
+  wyciągu jest ich `5 995` (`11 677` elementów, `1 221` z przekładem = `10,5%`).
+  Blok prologu tworzą projekty `对话-qiancen.dialog` (`57` scen, `97` elementów,
+  `3` przetłumaczone) i `对话-qiancen` (`22`, `22`, `1`) — ciągłe `10094–10188`.
+  Sprawdzone na `10141`, `10158`, `10168`, `10185`: w tych slotach stoją pełne
+  zdania EN („It's you!”, „After him! Don't let him flee with the Zhenguan
+  Jade!”), czyli dokładnie to, co widać na ekranie.
+- **Fakt — dlaczego braków nie było widać w narzędziach:** te sceny drukowały się
+  w `sceny/*.md` razem z 186 tys. zwykłych kwestii, a `--brak` w
+  `tools/pokrycie_tlumaczenia.py` wypisywał tylko napisy cutscen, intro i filmy.
+  Stąd wrażenie, że „napisy cutscen są prawie przetłumaczone” (`96,8%`) przy
+  prologu w większości angielskim.
+- **Zmiana w pakiecie:** `tools/buduj_paczke.py` ma `UI_TYPY_CUTSCEN` (stała
+  `indeks.UI_TYPY_PRZERYWNIKA`) i `Generator.cutsceny_cinematiczne()`, które
+  piszą `cutsceny/04_sceny_cinematiczne_NN.md` **przed** plikami scen, więc
+  klucz z przerywnika otwiera `PL:` tam, a nie w `sceny/` (w scenach zostaje
+  odsyłacz „tłumaczysz raz”). `paczka.json` ma nowe `liczby_cinematiczne`, a
+  `liczby_cutsceny` obejmuje także tę sekcję. Przebudowa (wersja `5`,
+  `--wypelnij-pl --tylko-z-en`): `11 677` elementów przerywników, `9 109` do
+  wpisania, `936` z przekładem, `1 632` powtórzeń; cutsceny razem `16 209`
+  elementów / `9 115` do wpisania; sceny `204 183` / `149 307`; `kontrola`:
+  `miejsc_pl 422 248`, `zgodne: true`; czas ok. `31 s`.
+- **Hipoteza odrzucona (kolizje wariantów):** zakładaliśmy, że część braków
+  wynika z reguły `_dopasuj_kolizje`, która przy trafieniu w wariant bez
+  przekładu przerywała szukanie. Regułę zmieniono w `tools/patcher_wwm.py`
+  i `tools/zbuduj_latke.py` (teraz: wariant o tym samym EN **z** przekładem →
+  wariant podobny ≥ `0,5` → `None`; warianty bez `PL:` nie blokują bliźniaka,
+  a raport patchera liczy `po_kolizji_dokladne`/`po_kolizji_podobne`).
+  **Pomiar na danych Patcha 2.4: `890` kolizji, w tym `723` z dokładnie jednym
+  przetłumaczonym wariantem, ale `0` takich, w których EN obu wariantów jest
+  podobny ≥ `0,5`** — kolizje z definicji łączą znaczenia odległe, więc dla
+  obecnych danych obie reguły dają ten sam wynik. To nie była przyczyna
+  angielskich napisów; poprawka porządkuje kod i zostaje jako zabezpieczenie,
+  ale **nic nie naprawiła**.
+- **Prawdziwa przyczyna: brak przekładów.** Zmierzone braki w prologu
+  (`sceny 10000–10250`): `115` wierszy scen przerywników + `120` napisów
+  cutscen/intro/filmów = `235` miejsc, `0` z nich miało przekład.
+- **Uzupełnienie (własny przekład z chińskiego):** `zwrotki/2026-11-14_prolog_pl.md`
+  — `232` klucze: `112` wierszy scen przerywników (z `115` braków — trzy klucze
+  powtarzają się w kilku scenach), `85` napisów `text_msg`, `35` wierszy intro
+  i filmów 2–3 (w tym wszystkie wersy `钗头凤` i `中渡桥之战`, przełożone
+  wierszem).
+  Import: `python3 tools/import_zwrotki.py zwrotki/2026-11-14_prolog_pl.md
+  --indeks index --magazyn tlumaczenie` → `232` miejsc, `0` odrzuconych,
+  `0` problemów z tokenami; magazyn `75 916` przekładów.
+- **Pokrycie po imporcie** (`tools/pokrycie_tlumaczenia.py`):
+  napisy cutscen `2 688/2 688` (`100%`), intro `9/9`, filmy `47/47`
+  (film 2 `13/13`, film 3 `21/21`), **blok prologu `10094–10188` bez braków**
+  (`--arkusz --sceny-od 10000 --sceny-do 10250` → `0` miejsc), sceny
+  przerywników `1 382/11 678` (`11,8%`), zwykłe sceny `13 880/187 598` (`7,4%`),
+  cały wyciąg `75 834/487 684` (`15,5%`).
+- **Nowe tryby narzędzia:** `--brak-przerywnikow` (braki scen przerywników
+  wg scen) i `--arkusz PLIK` (`--arkusz-tylko wszystko|kinowe|przerywniki`,
+  `--sceny-od/--sceny-do`) — plik w formacie pakietu (`klucz:`/`PL:`) gotowy do
+  wypełnienia i podania do `import_zwrotki.py`.
+- **Testy:** `397` (`tests/test_buduj_paczke.py` +5 dla sekcji przerywników,
+  `tests/test_pokrycie_tlumaczenia.py` +7, nowy `tests/test_kolizje_wariantow.py`
+  — `6`); cały zestaw zielony.
+- **Ograniczenia:** brak testu w grze — nie wiadomo jeszcze, czy klient rysuje
+  napisy prologu z tych scen (wszystko wskazuje, że tak, bo tekst zgadza się
+  z transkrypcją właściciela) ani czy napisy filmów 2–3 pochodzą z
+  `entry_collect_movie_subtitle_data`, czy z tych samych scen. Sprawdzenie
+  wymaga nowej łatki u właściciela.
+- **Wydanie `v0.2.0` zbudowane i wysłane:** `python3 tools/one_click_patch.py
+  --tylko-magazyn --indeks index --magazyn tlumaczenie --wydanie v0.2.0
+  --wyj-zip dist/WWM_Spolszczenie_PL_v0.2.0.zip` →
+  `4 467 759 B`, `12` plików, SHA-256
+  `a0f12fdce98d5bb0eccbda39ea0a489973e5f83906aec8d94a10f9d35d6b12bc`,
+  `75 916` przekładów w planie (`po_kluczu 75 834`, `po_id 82`, `735`
+  kolizji, `70 097` dopasowań po EN). Kopia w `paczki/`, wysłana na Dysk Google
+  (folder pakietów) jako `WWM_Spolszczenie_PL_v0.2.0.zip`. **Łatka nie była
+  uruchomiona w grze** — to zwrotka i plan, nie potwierdzenie działania.
+
+## 2026-11-14 (3) — druga warstwa napisów (`text_msg__grey`) i domknięcie cytatów właściciela
+
+- **Zgłoszenie właściciela:** sześć linii z transkrypcji prologu nadal po
+  angielsku (`a drink to wet your throat.`, `Well? How is it?`, dwie kwestie
+  Chen Zixi o „wpadaniu na ostrza” i o dzbanie `丰和春` oraz
+  `We'll roam the jianghu together!`).
+- **Fakt — cztery z nich to inna warstwa tej samej tabeli:** `text_msg__grey`,
+  gdzie mówca jest wpisany w treść (`师父 …`, EN `Master: …`). Ten sam wiersz
+  `text_msg` (np. `590339`) ma wersję główną i „szarą” — z innymi odstępami
+  w chińskim tekście, więc **inny SHA-256 i osobny, pusty klucz**. Przekład
+  wersji głównej istniał, ale nie był widoczny dla wersji szarej, a narzędzie
+  pokrycia liczyło tylko wiersze główne — stąd fałszywe `100%` napisów cutscen.
+  Skala: w zakresie `590000–592694` jest **`675` takich wierszy i żaden nie miał
+  przekładu**; w całej warstwie `1 203` wiersze (`528` nadal bez przekładu poza
+  zakresem cutscen).
+- **Zmiana — łączenie bliźniaków:** `tools/tlumaczenie.py: doloz_blizniaki()`
+  dobiera przekład z tego **samego wiersza tej samej tabeli** (rodzina
+  `text_msg` obejmuje `text_msg__grey`) po treści znormalizowanej białymi
+  znakami (`indeks.znormalizowany`). Wpięte w `one_click_patch.py`,
+  `buduj_paczke.py` (`--wypelnij-pl`), `zbuduj_latke.py` i
+  `pokrycie_tlumaczenia.py`, **tylko w pamięci** — do `tlumaczenie/pl_*.jsonl`
+  trafiają wyłącznie przekłady ludzi. Efekt na danych: `675` uzupełnionych
+  wierszy, `przekladow_po 76 595` w raporcie patchera.
+- **Czego świadomie nie robimy:** nie łączymy tekstów o **różnych numerach
+  wierszy**, nawet gdy chiński zapis jest identyczny — to kolizje znaczeń i tam
+  zostaje angielski do czasu własnego tłumaczenia. Pilnują tego testy
+  `tests/test_kolizje_wariantow.py` i `tests/test_blizniaki_warstw.py`
+  (`5` testów: dziedziczenie z `__grey`, brak dziedziczenia z innego wiersza,
+  brak nadpisywania istniejącego przekładu, brak łączenia różnych treści).
+- **Nowa sekcja pomiaru:** `pokrycie_tlumaczenia.py` ma teraz wiersz
+  `napisy — warstwa text_msg__grey`: `675`/`1 203` (`56,1%`).
+- **Dwie kwestie Chen Zixi to osobna sprawa:** leżą w scenach przerywników
+  `3900065` i `3900066` (projekt `对话-longsiyu`), czyli poza blokiem
+  `10094–10188`, i nie miały żadnego przekładu. Przetłumaczone w
+  `zwrotki/2026-11-14_prolog_2_pl.md` razem z pytaniem o wiersz (scena
+  `17200703`) i linią istniejącą tylko po angielsku (`48e4d8b5f54c3665`,
+  brak źródła chińskiego). Import: `4` wpisy, `0` odrzuconych.
+- **Testy:** `402` (cały zestaw zielony).
+- **Wydanie `v0.3.0`:** `dist/WWM_Spolszczenie_PL_v0.3.0.zip`,
+  `4 506 590 B`, `12` plików, SHA-256
+  `2ba67551fd7d0c9736c780f34edb36050e331e1c1a2543340671290181713016`,
+  `76 595` przekładów w magazynie, `675` bliźniaków w planie. Sprawdzone:
+  w planie są wszystkie sześć kluczy z cytatów właściciela. **Nie testowano
+  w grze.**
+- **Co jeszcze w prologu zostaje:** projekty poboczne i questowe wokół prologu
+  (`对话-longsiyu`/`longsiyu.dialog`: `68` scen, `353` elementy bez przekładu —
+  to nie jest sam prolog, a łańcuch o zbieraniu nauk dla 奇物监) oraz `528`
+  wierszy szarej warstwy poza zakresem cutscen. Nie wiadomo, czy klient rysuje
+  napisy z warstwy głównej czy szarej — tłumaczone są obie.
+
+### 2026-11-14 — Czytanka w kolejności z gry (`tools/buduj_czytanke_gry.py`)
+
+- **Cel:** cała narracja w kolejności występowania w grze, prolog pierwszy, potem
+  krainy po kolei, a w krainie sceny po numerze dialogu. Bez szukania jednego
+  silnikowego porządku cutscen — właściciel potwierdził, że pojedyncza cutscena
+  i tak siedzi w sobie w poprawnej kolejności, więc wystarczy dobrze umieścić sceny.
+- **Kolejność krain z danych:** `tools/prowincje.py` czyta zadania (`przestrzen`,
+  `pian`) i grupuje mapy po nazwie roboczej. Wynik: `92` krainy, `285` map,
+  początek `燕南 → 清河 → 熔炉 → 河西`. Plik `index/prowincje.json`.
+- **Projekty bez mapy:** scena bez `m` dziedziczy krainę po projekcie `对话-*`
+  (najczęstsza mapa projektu) — `34 183` scen trafiło do krain; `13 589` scen
+  w `129` projektach bez żadnej mapy zostało w `95_bez_mapy.md` (nic nie znika,
+  nic nie jest zgadywane).
+- **Prolog a krainy:** `prolog_z_klucza.zasieg()` zwraca klucze prologu i numery
+  scen, których co najmniej `80%` linii pada w transkrypcie — `36` scen nie jest
+  powtarzanych w krainach. Przy okazji przejście po transkrypcie (`_przejscie`)
+  jest wspólne dla `zbuduj()` i `zasieg()`; `zwrotki/prolog_wg_klucza.md` po
+  refaktorze ma identyczny SHA (`c5d42ec2…`).
+- **Wynik:** `72 977` scen, `291 426` linii (w tym `28 356` z polskim), `167`
+  plików, `105 135` wierszy puli napisów, `3` filmy. Wariant tylko z polskim:
+  `8 872` scen. Paczki: `dist/WWM_Czytanka_Gry_2026-11-14.zip` (`17 057 192 B`)
+  i `dist/WWM_Czytanka_Gry_tylko_PL_2026-11-14.zip` (`2 494 764 B`).
+- **Poza narracją** zostaje `66 997` przetłumaczonych kluczy (nazwy przedmiotów,
+  umiejętności, cele zadań, UI) — to nie sceny, więc czytanka ich nie udaje.
+- **Testy:** `426` (cały zestaw zielony; `+17` w `tests/test_czytanka_gry.py`).
+- **Na Dysku Google** (folder paczek): `WWM_Czytanka_Gry_2026-11-14.zip`
+  (`17057192 B`, id `1g3H3sZoZd2H5Gx8ybVoWn-8Um739584K`) i
+  `WWM_Czytanka_Gry_tylko_PL_2026-11-14.zip` (`2494764 B`,
+  id `1lj_SPiXvpa0NFh2IIwd8YocZBYwm_UQ-`).
+- **Nie testowano w grze:** to porządek z danych, nie z przejścia gry.
+
+### 2026-11-14 — pełna Czytanka: trzy warstwy razem + wydanie `v0.4.0`
+
+- **Poprawka zakresu:** poprzedni pakiet dawał tylko warstwę chronologiczną.
+  Ustalenie projektu mówi o trzech rodzajach plików, więc `tools/zbuduj_czytanke_pelna.py`
+  składa je w jeden katalog: `01_prolog.md` + `02_krainy/` (chronologia),
+  `03_fabula/`, `04_kontekst/` (1:1 do fabuły), `05_reszta/` (9 sekcji wg rodzaju).
+- **Liczby pakietu:** 187 plików .md, `109 MB` w katalogu, ZIP `26 688 858 B`.
+  Chronologia: `72 977` scen, `291 426` linii (`28 356` z polskim), `92` krainy.
+  Fabuła: `44 301` scen w `1 169` epizodach, `37 938` przetłumaczonych slotów.
+  Kontekst: `11 031`. Reszta: `61 491` z `389 891` slotów.
+- **Pokrycie sprawdzone, nie deklarowane:** próba losowa `600` przetłumaczonych
+  tekstów z magazynu — **0 braków** w pakiecie. Wcześniejsze „66 997 kluczy poza
+  narracją” to warstwa `05_reszta/`, nie luka.
+- **Wydanie `v0.4.0`:** `dist/WWM_Spolszczenie_PL_v0.4.0.zip`, `5 330 079 B`,
+  `12` plików, SHA-256 `2bfdfc6285f1a7c26517c7d40617ca1233b166a4582a9181f96c2bd16ee92ad8`,
+  `86 282` przekłady (`85 956` kluczy + `326` wariantów płci), `675` bliźniaków
+  warstwy `text_msg__grey`, `745` kolizji odłożonych. **To jest stan pełny** —
+  `v0.3.0` miał `76 595` przekładów i jest nieaktualne. Na Dysku Google:
+  id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`; pełna czytanka: id `1WMWHXs6DFLmcub1FfhDxrVXm4n9vGy7U`.
+  **Nie testowano w grze.**
+
+### 2026-11-14 — Czytanka ma być do czytania, nie zestawem technicznym
+
+- **Właściciel odrzucił poprzednie paczki:** tabele z kolumnami chiński/angielski/polski,
+  znaczniki czasu i podział na 167–187 plików to nie czytanka. Czytanka to dialog
+  linia po linii z mówcą i tekstem, jeden plik na rodzaj treści.
+- **Nowy format** (`tools/czytanka_czysta.py`, `wwm-czytanka-czysta-v1`):
+  `- **Mówca:** tekst` jedna kwestia na linię, bez odstępów między kwestiami,
+  bez czasów i kluczy; pusty wiersz tylko między scenami. Trzy pliki:
+  `01_sceny.md`, `02_cutsceny.md`, `03_reszta.md`.
+- **Mówca z danych, nie z etykiety rekwizytu:** `sceny.o` to
+  `[nazwa_zh, typ, id_osoby, klucz]`, ale klucz bywa nazwą skrzyni (`三品宝箱`),
+  więc imię bierzemy z `postacie[id].n` (polskie, inaczej angielskie); klucz
+  z obsady tylko wtedy, gdy jego chiński tekst zgadza się z nazwą w obsadzie.
+  Postać gracza `你` pokazujemy jako `Ty`.
+- **Reszta bez dublowania:** wiersz tekstu to `w = (tabela, wiersz[, klucz_nazwy])`;
+  trzeci element wskazuje nazwę własną, więc nie zgadujemy, co jest nazwą, a co
+  opisem. Wpisy tego samego przedmiotu scalane są w jedną linię.
+- **Liczby:** 8 908 scen, 92 216 kwestii z polskim, 263 076 kwestii bez przekładu
+  pominięto (pełny szkielet dostępny przez `--zakres wszystko`). Paczka
+  `WWM_Czytanka_PL_2026-11-14.zip`, `1 523 414 B`, id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
+  Poprzednie trzy paczki czytanek przeniesione do kosza Dysku.
+- **Testy:** `439` (doszło `9` w `TestCzytankaDoCzytania`).

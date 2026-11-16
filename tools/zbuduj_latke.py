@@ -40,6 +40,7 @@ try:
     from tools import indeks as indeks_mod
     from tools import locale_records as records
     from tools import mapa_tekstow
+    from tools import patcher_wwm
     from tools import tlumaczenie as magazyn_mod
     from tools import wypisz
 except ImportError:  # uruchomienie jako skrypt
@@ -48,6 +49,7 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import indeks as indeks_mod
     from tools import locale_records as records
     from tools import mapa_tekstow
+    from tools import patcher_wwm
     from tools import tlumaczenie as magazyn_mod
     from tools import wypisz
 
@@ -96,18 +98,14 @@ def rodzenstwo_wariantow(warianty: dict[str, dict]) -> dict[str, list[str]]:
 
 
 def _dopasuj_kolizje(warianty_zh: list[list[str]], current: str, magazyn: magazyn_mod.Magazyn) -> str | None:
-    """Dobierz wariant tłumaczenia dla tekstu `zh`, który ma rozbieżne znaczenia w EN."""
-    for key, rep_en in warianty_zh:
-        if rep_en == current:
-            return magazyn.po_kluczu.get(key)
-    best_key, best_sim = None, 0.0
-    for key, rep_en in warianty_zh:
-        score = mapa_tekstow.podobienstwo_en(current, rep_en)
-        if score > best_sim:
-            best_key, best_sim = key, score
-    if best_key is not None and best_sim >= 0.5:
-        return magazyn.po_kluczu.get(best_key)
-    return None
+    """Dobierz wariant tłumaczenia dla tekstu `zh`, który ma rozbieżne znaczenia w EN.
+
+    Ta sama reguła co w `patcher_wwm._dopasuj_kolizje` (patrz komentarz tam): najpierw
+    wariant o tym samym EN **z przekładem**, potem podobny, na końcu jedyny przetłumaczony.
+    Warianty bez `PL:` nie mogą blokować przejęcia przekładu bliźniaka — tak zostawały
+    angielskie napisy.
+    """
+    return patcher_wwm._dopasuj_kolizje(warianty_zh, current, magazyn.po_kluczu)[0]
 
 
 def przeklady_pliku(
@@ -234,6 +232,7 @@ def main(argv=None) -> int:
     try:
         ix = indeks_mod.wczytaj(arguments.indeks, teksty=False, sceny=False)
         magazyn = magazyn_mod.wczytaj(arguments.magazyn)
+        magazyn_mod.doloz_blizniaki(magazyn, ix)
         if not len(magazyn):
             raise LatkaError("magazyn przekładów jest pusty — nie ma czego wstawiać")
         zh = mapa_tekstow.zloz(arguments.zh)

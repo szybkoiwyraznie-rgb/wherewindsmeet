@@ -26,6 +26,12 @@ KTÓRY PLIK URUCHOMIĆ
   kliknij dwa razy URUCHOM.bat → powstanie WWM_DANE_<data>_<losowy-id>.zip.
 - Ręczne pakowanie wybranego zakresu (opcjonalne narzędzie pomocnicze):
   SPAKUJ_DANE.bat albo spakuj_dane.ps1 z parametrem -Zakres.
+- Sniffer paczek .mpk (osobne narzedzie, tylko odczyt):
+  kliknij dwa razy SNIFFER_MPK.bat. Skrypt nie rozpakowuje paczek w calosci —
+  czyta naglowek i ogon kazdej paczki, szuka w bajtach nazw sciezek
+  (client/dialogs, .etsb, .dialog, storyline) i zapisuje male okienka bajtow
+  wokol trafien plus RAPORT.json. Wynik to zwykle kilka MB: ZIP
+  sniffer_mpk_wynik.zip obok folderu skryptu. Szczegoly: docs/SNIFFER_MPK.md.
 
 CO ZROBIĆ KROK PO KROKU
 

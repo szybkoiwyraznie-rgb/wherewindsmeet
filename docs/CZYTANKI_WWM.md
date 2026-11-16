@@ -1,5 +1,13 @@
 # Czytanki Where Winds Meet (`tools/buduj_czytanki.py`)
 
+> **Czytanka do czytania** (trzy pliki: sceny, cutsceny, reszta) —
+> [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+>
+> **Wariant w kolejności z gry** — prolog, potem krainy po kolei, sceny po numerze
+> dialogu — opisuje [docs/CZYTANKA_KOLEJNOSC_GRY.md](CZYTANKA_KOLEJNOSC_GRY.md)
+> (`tools/buduj_czytanke_gry.py`). Ten dokument dotyczy korpusu fabuły
+> i encyklopedii w układzie działów.
+
 Narzędzie `tools/buduj_czytanki.py` (z modułem powiązań `tools/powiazania_czytanek.py`)
 generuje polskie czytanki `.md` oraz deterministyczne archiwum `WWM_CZYTANKI_PL.zip`
 wzorowane na układzie SRW Y, rozszerzonym do trzyplikowego zestawu dla pełnego

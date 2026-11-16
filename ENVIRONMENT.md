@@ -26,7 +26,9 @@ git diff --check
 W Windows można zamiast `python` użyć np. `py -3.11`. Skrypt
 `check_repository.py` sprawdza pliki **w indeksie Git**, więc nowe pliki trzeba
 najpierw dodać do indeksu, aby je skontrolował. Testy nie korzystają z gry,
-Dysku Google ani sekretów. `run_tests.py` zwraca błąd również wtedy, gdy nie
+Dysku Google ani sekretów. Pokrycie przekładu (co w grze zostanie po angielsku)
+mierzy read-only `python3 tools/pokrycie_tlumaczenia.py` — czyta tylko `index/`
+i `tlumaczenie/`, bez `zstandard` i bez plików gry. `run_tests.py` zwraca błąd również wtedy, gdy nie
 uruchomiono żadnego testu lub któryś test został pominięty. Oddzielne narzędzie
 metadanych opisano w [docs/INVENTORY.md](docs/INVENTORY.md); aktualny
 zbieracz, jego budowę i prywatny odbiór opisuje [docs/COLLECTOR.md](docs/COLLECTOR.md),
@@ -40,6 +42,18 @@ Opcjonalne odtworzenie zewnętrznego eksperymentu syntetycznego ma osobne
 zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest częścią CI.
 
 ## Katalogi i wejścia
+
+**Budowanie czyta wyłącznie pliki z repozytorium.** Czytanka
+(`tools/czytanka_czysta.py`), paczka dla tłumacza (`tools/buduj_paczke.py`),
+łatka (`tools/zbuduj_latke.py`, `tools/one_click_patch.py`) i instalator
+(`tools/build_installer_kit.py`) biorą wszystko z `index/`, `tlumaczenie/`
+i `zwrotki/` — **nie** z `google_drive/`, nie z `local/` i nie z Dysku.
+Pliki z Dysku (baza gry, paczki aktualizacji) są **tylko** materiałem do
+inwestygacji: czytają je narzędzia `tools/szukaj_w_bazie.py`,
+`tools/cutsceny_z_bazy.py`, `tools/pamiatki_z_bazy.py`, `tools/poi_z_bazy.py`
+i `tools/kolejnosc_gry.py` (ten ostatni importuje bazę dopiero w funkcji,
+więc nie ciągnie jej do budowania). Pilnuje tego
+`tests/test_budowanie_standalone.py`.
 
 `local/`, `build/`, `dist/`, `artifacts/` i pobrane archiwa są ignorowane.
 Używaj ich na własne, prywatne próbki i wyniki; nie są częścią działającego

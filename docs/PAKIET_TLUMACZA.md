@@ -253,7 +253,14 @@ gry (m.in. kwestie Jiang Yana i Chen Zixiego: `Even at the end of the road,` /
 
 ### `cutsceny.zip`
 
-Wydzielona sekcja cutscen (4 532 elementów, 4 116 `PL:` w `v3`):
+Wydzielona sekcja cutscen (`16 209` elementów od `v5`: `4 532` wierszy
+`text_msg`/intro/filmów plus `11 677` elementów scen przerywników):
+- `04_sceny_cinematiczne_NN.md` (od `v5`) — **sceny przerywników** (`ui_type`
+  10) w kolejności numerów scen, z mówcą i pełnym `EN`/`PL`. To z nich klient
+  rysuje napisy prologu i pozostałych cutscen bez okna dialogowego; w plikach
+  `sceny/` zostaje po nich odsyłacz „tłumaczysz raz”. Liczby tej sekcji są
+  osobno w `paczka.json` → `liczby_cinematiczne`, a `liczby_cutsceny` obejmuje
+  całość;
 - `01_napisy_cutscen_01.md` — napisy `text_msg` `590000–592694` podzielone po
   lukach ID i domenach audio (`sound_data`) na 91 pod-scen fabularnych
   (w `v3`), z przypisaniem mówców z prefiksów ZH, `sound_data`, `mowca_en`
@@ -267,6 +274,42 @@ Wydzielona sekcja cutscen (4 532 elementów, 4 116 `PL:` w `v3`):
   (`task_cutscene_replay`, w tym ich tytuły, rozdziały i streszczenia) oraz
   pozostałe plansze `cutscenes` z powiązaniem klonów mobilnych (`>= 10 000 000`),
   zadań i wątków.
+
+## Co jeszcze zostanie po angielsku (pokrycie przekładu)
+
+Zanim ktoś uzna, że „łatka nie działa”, bo w grze widać angielski, trzeba
+sprawdzić, czy ten tekst **ma** przekład w magazynie. Służy do tego read-only
+`tools/pokrycie_tlumaczenia.py` — czyta wyłącznie `index/` i `tlumaczenie/`,
+bez plików gry i bez `zstandard`:
+
+```sh
+python3 tools/pokrycie_tlumaczenia.py            # tabela pokrycia sekcji
+python3 tools/pokrycie_tlumaczenia.py --brak     # wiersze bez przekładu (cutsceny, intro, filmy)
+python3 tools/pokrycie_tlumaczenia.py --szukaj "Winter Night"
+python3 tools/pokrycie_tlumaczenia.py --bez-scen --json
+```
+
+Sekcje odpowiadają temu, co widzi klient: napisy cutscen (`text_msg`
+`590000–592694`), intro (`wds_oneday_intro_cutscene_data`), napisy filmowe
+(`entry_collect_movie_subtitle_data`, osobno dla każdego filmu), **sceny
+przerywników** (`ui_type` 10 — to z nich klient rysuje napisy prologu bez okna
+dialogowego) oraz pozostałe sceny z timeline'ów. `--szukaj` przyjmuje fragment `ZH`, `EN` albo `PL` i pokazuje
+klucz, miejsce w grze, tabelę źródłową i to, czy przekład istnieje — czyli
+rozstrzyga, czy dana linia jest nieprzetłumaczona, czy niepodłączona.
+
+Przekład jest przypisany do klucza (SHA-256 tekstu źródłowego), więc jeden wpis
+obejmuje wszystkie identyfikatory o tym samym tekście: mapę, cutscenę i scenę.
+Dlatego w pakiecie wiersze filmowe bywają oznaczone jako „powtórzenie —
+tłumaczysz raz: …” i trzeba je wypełnić w pliku sceny, który pakiet wskazuje.
+`--brak-przerywnikow` wypisuje braki scen przerywników wg scen, a
+`--arkusz PLIK` (`--arkusz-tylko wszystko|kinowe|przerywniki`,
+`--sceny-od`/`--sceny-do`) zapisuje plik w formacie pakietu (`klucz:`/`PL:`)
+gotowy do wypełnienia i podania do `import_zwrotki.py`.
+
+Pomiar z 2026-11-14 po imporcie zwrotki prologu (szczegóły w
+[dzienniku](EXPERIMENT_LOG.md)): napisy cutscen `100%`, intro `100%`, napisy
+filmowe `100%` (także wiersze `钗头凤` i `中渡桥之战`), prolog `100%`, sceny
+przerywników `11,8%`, pozostałe sceny `7,4%`, cały wyciąg `15,5%`.
 
 ## Zwrotka → magazyn przekładów
 

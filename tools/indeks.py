@@ -36,6 +36,11 @@ except ImportError:  # uruchomienie jako skrypt
 
 FORMAT = "wwm-indeks-v2"
 
+# `ui_type` scen odtwarzanych jako przerywnik. W danych tworzą m.in. ciągły blok prologu
+# (`dialog_timelines` 10094–10188), a ich tekst zgadza się co do znaku z napisami
+# widocznymi na ekranie — klient pokazuje je bez okna dialogowego.
+UI_TYPY_PRZERYWNIKA = (10,)
+
 
 class IndeksError(Exception):
     """Katalog nie zawiera czytelnego wyciągu w oczekiwanym formacie."""
@@ -58,6 +63,17 @@ def _wiersze(path: Path) -> Iterator[dict]:
                 yield json.loads(line)
             except json.JSONDecodeError as error:
                 raise IndeksError(f"{path.name}:{number}: {error}") from error
+
+
+def znormalizowany(tekst: str) -> str:
+    """Tekst źródłowy bez różnic w białych znakach.
+
+    Ten sam chiński tekst bywa zapisany w kilku tabelach z inną liczbą spacji
+    (np. `text_msg` i `text_msg__grey`), a klucz przekładu to SHA-256 dokładnej
+    treści — więc te same zdania dostają różne klucze i trzeba by je tłumaczyć
+    dwa razy. Do łączenia takich bliźniaków używamy porównania po normalizacji.
+    """
+    return " ".join(tekst.split())
 
 
 @dataclass
@@ -87,7 +103,11 @@ class Indeks:
         """Główne źródło tekstu: (rodzaj tabeli, ścieżka pola, klucz wiersza)."""
         if not tekst.w:
             return None
-        kind, path = self.zrodla[tekst.w[0]][:2]
+        try:
+            wpis = self.zrodla[tekst.w[0]]
+        except (KeyError, IndexError, TypeError):
+            return None          # wyciąg może nie mieć opisu źródeł (małe fixture'y)
+        kind, path = wpis[:2]
         return kind, path, tekst.w[1]
 
     def nazwa_wiersza(self, tekst: Tekst) -> str | None:
