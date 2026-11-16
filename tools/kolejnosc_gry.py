@@ -38,7 +38,7 @@ Użycie:
     python3 tools/kolejnosc_gry.py --baza /sciezka/do/Package \
         --index index --wyj index/kolejnosc.jsonl
 
-    python3 tools/kolejnosc_gry.py --sprawdz google_drive/prolog_spisany_z_gry_PL_i_miejscami_angielski.txt
+    python3 tools/kolejnosc_gry.py --sprawdz zwrotki/prolog_transkrypt_z_gry.txt
 """
 
 from __future__ import annotations
@@ -53,7 +53,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tools import baza_gry  # noqa: E402
 
 
 def skrot(tekst: str) -> str:
@@ -83,7 +82,13 @@ def _klucze(x, out: list[dict]) -> None:
 
 
 def zbierz(katalogi: list[str], manifest: str | None = None) -> list[dict]:
-    """Zbierz kolejność z bazy gry: dialogi, pule napisów i filmy."""
+    """Zbierz kolejność z bazy gry: dialogi, pule napisów i filmy.
+
+    Baza gry jest potrzebna **tylko** tutaj — dlatego importujemy ją dopiero
+    w tym miejscu. Reszta programu (i budowanie czytanek) działa bez plików gry.
+    """
+    from tools import baza_gry  # noqa: PLC0415
+
     b = baza_gry.Baza(katalogi, manifest=manifest, pamiec_chunkow=2048)
     wiersze: list[dict] = []
 

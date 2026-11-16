@@ -76,11 +76,17 @@ Paczka: `dist/WWM_Czytanka_PL_v9.zip`, **6 771 018 B**, SHA-256 `e0b4125e1f3d81f
 **nie wysłana** (czeka na decyzję właściciela); v8 (`1w-DOnDjN_NP3VbzAgmesl5eH4sdqhWkv`)
 leży na Dysku do jego decyzji.
 
-**Baza gry jest kompletna (2026-11-14).** Właściciel wgrał na Dysk brakujące
-binarki z `HD/oversea` i `patch/HD/oversea` (`binarki/`: `data1`, `data204`–`data210`,
-`index*`, `MANIFEST`); są w `google_drive/`, więc odczyty nie kończą się już na
-`brak pliku dataNNN`. Dzięki temu sprawdzenie „czy kolejność kwestii przerywnika
-jest w bazie” jest **pełne** i wynik jest negatywny: wiersz napisu `591148` stoi
+**Baza gry jest kompletna — wyłącznie na potrzeby inwestygacji (2026-11-14).**
+Właściciel wgrał na Dysk brakujące binarki z `HD/oversea` i `patch/HD/oversea`
+(`binarki/`: `data1`, `data204`–`data210`, `index*`, `MANIFEST`); leżą
+w ignorowanym `google_drive/` i **nie są wejściem żadnego budowania**. Czytanka,
+paczka dla tłumacza, łatka i instalator stoją wyłącznie na plikach z repo
+(`index/`, `tlumaczenie/`, `zwrotki/`) — pilnuje tego
+`tests/test_budowanie_standalone.py`, a zasadę zapisano w `ENVIRONMENT.md`.
+Baza służy tylko narzędziom inwestygacyjnym (`tools/szukaj_w_bazie.py`,
+`cutsceny_z_bazy.py`, `pamiatki_z_bazy.py`, `poi_z_bazy.py`).
+Dzięki kompletnej bazie sprawdzenie „czy kolejność kwestii przerywnika jest
+w danych” jest **pełne** i wynik jest negatywny: wiersz napisu `591148` stoi
 tylko w `text_msg` i `text_msg__grey`, nagranie `7150686` tylko w `sound_data`,
 żadna z **75 007** osi `dialog_timelines.*` nie dotyczy tego przerywnika, a żadna
 tabela nie jest kluczowana numerem przerywnika. Kolejność jest w pliku osi

@@ -43,6 +43,18 @@ zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest czę
 
 ## Katalogi i wejścia
 
+**Budowanie czyta wyłącznie pliki z repozytorium.** Czytanka
+(`tools/czytanka_czysta.py`), paczka dla tłumacza (`tools/buduj_paczke.py`),
+łatka (`tools/zbuduj_latke.py`, `tools/one_click_patch.py`) i instalator
+(`tools/build_installer_kit.py`) biorą wszystko z `index/`, `tlumaczenie/`
+i `zwrotki/` — **nie** z `google_drive/`, nie z `local/` i nie z Dysku.
+Pliki z Dysku (baza gry, paczki aktualizacji) są **tylko** materiałem do
+inwestygacji: czytają je narzędzia `tools/szukaj_w_bazie.py`,
+`tools/cutsceny_z_bazy.py`, `tools/pamiatki_z_bazy.py`, `tools/poi_z_bazy.py`
+i `tools/kolejnosc_gry.py` (ten ostatni importuje bazę dopiero w funkcji,
+więc nie ciągnie jej do budowania). Pilnuje tego
+`tests/test_budowanie_standalone.py`.
+
 `local/`, `build/`, `dist/`, `artifacts/` i pobrane archiwa są ignorowane.
 Używaj ich na własne, prywatne próbki i wyniki; nie są częścią działającego
 clone'a ani CI. Nie umieszczaj poświadczeń w repozytorium ani w przykładach.

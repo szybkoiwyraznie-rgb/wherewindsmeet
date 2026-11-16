@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prolog w kolejności z danych gry — podgląd do zatwierdzenia.
 
-Składa transkrypt gracza (`google_drive/prolog_spisany_z_gry_PL_i_miejscami_angielski.txt`)
+Składa transkrypt gracza (`zwrotki/prolog_transkrypt_z_gry.txt`, w repo)
 z technicznym kluczem kolejności (`index/kolejnosc_*.jsonl`):
 
 * każda linia dostaje numer techniczny (dialog + czas albo id w puli napisów),
