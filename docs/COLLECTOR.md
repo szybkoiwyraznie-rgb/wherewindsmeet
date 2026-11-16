@@ -179,6 +179,32 @@ jak i dużych patchy) służy **jeden przycisk** `URUCHOM_AKTUALIZACJE.bat`
   `index*` zostają, bo `baza_gry.py` wymaga ich do dekodowania schematów
   kolumn i offsetów rekordów w `data*`.
 
+### Sam spis tabel i kolumn: `-Zakres schematy`
+
+Do ustalenia, **gdzie w bazie leży wiązanie napisu z cutsceną**, nie potrzeba
+tekstu gry — wystarczą nazwy tabel i kolumn. Zakres `schematy` pakuje wyłącznie
+`MANIFEST` i `index*` (schematy) z `Package/HD/oversea` i
+`LocalData/Patch/HD/oversea`, bez `data*`, bez map tłumaczeń i bez dialogów:
+kilka megabajtów zamiast setek. Uruchomienie (kopia z linii poleceń):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "<ścieżka do gry>" -Zakres schematy
+```
+
+`SPIS.json` w wyniku ma dodatkowe pole `kandydaci_cutscen`: **same nazwy**
+plików w `Package/HD/oversea`, `Package/HD/v2` i `LocalData/Patch/HD/oversea`,
+które wyglądają na os czasu cutscen (`cutscene`, `cinematic`, `timeline`,
+`story_cut`, `perform`, `sequence`). Nic z nich nie jest kopiowane — to odpowiedź
+na pytanie, czy osie czasu są w ogóle osobnymi plikami.
+
+Po odebraniu takiego ZIP-a uruchamiamy `python tools/cutsceny_z_bazy.py`
+z `--tylko-schematy`: wypisuje tabele, których kolumny mogą trzymać numery
+cutscen i wiersze puli napisów. Gdy w kolejnej paczce będą też `data*`
+(`-Zakres kontekst` albo `-Zakres duza_aktualizacja`), to samo narzędzie bez
+`--tylko-schematy` sprawdza zawartość kolumn i zapisuje wiązanie do
+`index/cutsceny_napisy.jsonl`; wtedy `tools/chronologia.py` kładzie każdy napis
+przerywnika w jego własnej cutscenie.
+
 Osobny skrypt `spakuj_dane.ps1` (`SPAKUJ_DANE.bat`) zostaje w pakiecie jako
 narzędzie pomocnicze do ręcznego eksportu wskazanego wycinka (`-Zakres`),
 stosujące tę samą czarną listę zbędnych języków i zasobów:

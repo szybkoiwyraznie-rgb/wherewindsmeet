@@ -197,8 +197,11 @@ def _cutsceny(ix, pomijane: set[int] | None = None) -> tuple[dict[int, list[dict
         no = wiersz.get("no")
         if grupa in grupy and no in przerywniki:
             grupa_cutsceny[grupa].append(wiersz)
-    for lista in grupa_cutsceny.values():
-        lista.sort(key=lambda w: (str(w.get("rozdzial") or ""), w.get("no") or 0))
+    # kolejność w grupie: pozycja zadania, do którego cutscena należy, a nie numer
+    for grupa, lista in grupa_cutsceny.items():
+        kolejnosc = _kolejnosc_zadan(ix, grupa)
+        lista.sort(key=lambda w: (kolejnosc.get(w.get("task_no"), len(kolejnosc)),
+                                  w.get("no") or 0))
 
     przypisane: set[int] = set()
     jednostki_grup: dict[int, list[dict]] = defaultdict(list)
@@ -227,15 +230,30 @@ def _jednostka_cutsceny(no: int, przerywnik: dict, grupa: int | None) -> dict:
     return jednostka
 
 
+def _kolejnosc_zadan(ix, grupa: int) -> dict[int, int]:
+    """Numer zadania → jego pozycja w grupie (z `index/grupy_zadan.jsonl`)."""
+    zadania = (ix.grupy.get(grupa) or {}).get("zadania") or []
+    return {no: pozycja for pozycja, no in enumerate(zadania)}
+
+
 def _kotwice_grup(ix, sceny: list[int]) -> dict[int, int]:
-    """Grupa zadań → numer sceny, przy której grupa się zaczyna (kotwica wstawienia)."""
+    """Grupa zadań → numer sceny, przy której grupa się zaczyna (kotwica wstawienia).
+
+    Preferujemy scenę **z przypisaną mapą**: pierwsza scena grupy pochodzi zwykle
+    z pliku dialogowego bez mapy (`luwenxin.dialog`), a wtedy cała grupa lądowała
+    w sekcji „Sceny bez przypisanej mapy” zamiast w krainie. Gdy w grupie nie ma
+    ani jednej sceny z mapą, zostaje stara reguła.
+    """
     posortowane = sorted(sceny)
+    z_mapa = [numer for numer in posortowane if (ix.sceny.get(numer) or {}).get("m")]
     kotwice: dict[int, int] = {}
     for grupa, dane in ix.grupy.items():
         start = dane.get("start")
         if not start:
             continue
-        kotwica = next((numer for numer in posortowane if numer >= start), None)
+        kotwica = next((numer for numer in z_mapa if numer >= start), None)
+        if kotwica is None:
+            kotwica = next((numer for numer in posortowane if numer >= start), None)
         if kotwica is not None:
             kotwice[grupa] = kotwica
     return kotwice
@@ -332,6 +350,28 @@ def _bloki_napisow(ix) -> list[dict]:
     return bloki
 
 
+def _napisy_z_bazy(index: str | Path) -> dict[int, list[str]]:
+    """Cutscena → jej napisy z `index/cutsceny_napisy.jsonl`.
+
+    Plik powstaje w `tools/cutsceny_z_bazy.py`, gdy w bazie gry znajdzie się
+    tabela wiążąca napis z cutsceną. Dopóki go nie ma, napisy idą do bloków
+    scen (patrz `_bloki_napisow`).
+    """
+    plik = Path(index) / "cutsceny_napisy.jsonl"
+    if not plik.exists():
+        return {}
+    mapa: dict[int, list[str]] = defaultdict(list)
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            wiersz = json.loads(linia)
+            if wiersz.get("no") is None or not wiersz.get("k"):
+                continue
+            mapa[int(wiersz["no"])].append(wiersz["k"])
+    return dict(mapa)
+
+
 def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DOMYSLNY_PLIK) -> dict:
     ix = indeks_mod.wczytaj(index, teksty=True, sceny=True)
     krainy = json.loads((Path(index) / "prowincje.json").read_text(encoding="utf-8"))
@@ -367,10 +407,19 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
     for jednostka in cutsceny_bez_grupy:
         cutsceny_wg_numeru[int(jednostka["n"])] = jednostka
 
+    z_bazy = _napisy_z_bazy(index)
+    klucze_z_bazy = {k for klucze in z_bazy.values() for k in klucze}
+    for no, klucze in z_bazy.items():
+        cel = cutsceny_wg_numeru.get(no)
+        if cel is None:
+            continue
+        cel.setdefault("kn", []).extend(k for k in klucze if k not in klucze_prologu)
+
     osobne_napisy: list[dict] = []
     przypisane_napisy = 0
     for blok in _bloki_napisow(ix):
-        klucze = [k for k in blok["klucze"] if k not in klucze_prologu]
+        klucze = [k for k in blok["klucze"]
+                  if k not in klucze_prologu and k not in klucze_z_bazy]
         if not klucze:
             continue
         cel = next((cutsceny_wg_numeru[no] for no in blok["c"]
@@ -417,6 +466,7 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
         "napisy_blokow": sum(1 for j in jednostki if j["t"] == "napisy"),
         "napisy_linii": sum(len(j.get("k") or []) for j in jednostki if j["t"] == "napisy"),
         "napisy_przy_cutscenie": przypisane_napisy,
+        "napisy_z_bazy": len(klucze_z_bazy),
         "filmow": sum(1 for j in jednostki if j["t"] == "film"),
         "bajtow": len(tresc.encode("utf-8")),
     }

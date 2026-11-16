@@ -32,8 +32,12 @@ Zasady kolejności:
    po numerze dialogu**,
 4. **cutsceny przypisane do grupy zadań** stoją przy scenie, od której ich grupa
    się zaczyna (tabela powtórek daje `no` przerywnika → `grupa`, a grupa ma
-   zakres numerów dialogów). Dzięki temu przerywniki są przemieszane ze scenami,
-   choć same nie mają numeru dialogu,
+   zakres numerów dialogów). Kotwicą jest **pierwsza scena grupy z przypisaną
+   mapą** — pierwsze sceny rozdziału pierwszego pochodzą z `luwenxin.dialog`,
+   który w wyciągu nie ma map, i wcześniej cała grupa trafiała do sekcji
+   „Sceny bez przypisanej mapy”. W obrębie kotwicy cutsceny stoją w kolejności
+   **zadań** (`index/zadania.jsonl`, pole `przerywniki`, pozycja w grupie),
+   a nie w kolejności własnych numerów,
 5. **cutsceny bez grupy** stoją na końcu, w kolejności własnych numerów, w sekcji
    `# Cutsceny bez grupy zadań` — nie udajemy, że znamy ich miejsce,
 6. **napisy przerywników** (pula `text_msg`, 2 688 wierszy) nie leżą już w 03.
@@ -46,6 +50,9 @@ Zasady kolejności:
      z Ruby („Wodzu, obudź się!”),
    * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
      w kolejności wierszy, a nie alfabetycznie.
+   Gdy uda się znaleźć w bazie gry tabelę wiążącą napis z cutsceną
+   (`tools/cutsceny_z_bazy.py` → `index/cutsceny_napisy.jsonl`), chronologia
+   kładzie **każdy** napis w jego własnej cutscenie i bloki znikają.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.

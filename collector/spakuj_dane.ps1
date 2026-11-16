@@ -14,6 +14,9 @@
 #   -Zakres kontekst           -> pozostale dataN + indexN + MANIFEST + LocalData/Patch (bez plikow z blacklisty)
 #   -Zakres duza_aktualizacja  -> data* + index* + MANIFEST + mapy zh_cn/en (i ich _diff) + LocalData/Patch (bez innych jezykow i plikow z blacklisty)
 #   -Zakres wszystko           -> dialogi + kontekst
+#   -Zakres schematy           -> tylko MANIFEST + index* (nazwy tabel i kolumn, bez tekstu gry);
+#                                 z tego tools/cutsceny_z_bazy.py czyta, gdzie w bazie jest
+#                                 powiazanie napisu z cutscena
 #   -BezZip                    -> tylko skopiuj do folderu roboczego (bez pakowania)
 
 [CmdletBinding()]
@@ -21,7 +24,7 @@ param(
     [Parameter(Position = 0)][string] $Gra = '',
     [string] $Wyjscie = '',
     [string] $SteamRoot = '',
-    [ValidateSet('dialogi', 'kontekst', 'duza_aktualizacja', 'wszystko')][string] $Zakres = 'duza_aktualizacja',
+    [ValidateSet('dialogi', 'kontekst', 'duza_aktualizacja', 'wszystko', 'schematy')][string] $Zakres = 'duza_aktualizacja',
     [int] $LimitCzesciMB = 85,
     [long] $LimitCzesciBajtow = 0,
     [switch] $BezZip,
@@ -259,6 +262,15 @@ $kontekst = @(
     'LocalData/Patch/HD/oversea/MANIFEST'
 )
 
+# Same schematy bazy: MANIFEST (spis tabel) i index* (nazwy kolumn). Bez data* i bez tekstu gry.
+$schematy = @()
+foreach ($baza in @('Package/HD/oversea', 'LocalData/Patch/HD/oversea')) {
+    $schematy += "$baza/MANIFEST"
+    foreach ($numer in @(1, 2, 3, 4, 200, 201, 202, 203, 204, 1001, 1200)) {
+        $schematy += "$baza/index$numer"
+    }
+}
+
 # Jawna blacklista nieużywanych plików (inne języki niż zh_cn/en, warianty __small/_mobile,
 # Audio_Area, CameraZone, VirtualWindow, Voxel, model, bulk_data, binarki).
 # Pliki index* (index1..4, index200..204, index1001, index1200) zostają, bo są potrzebne do odczytu data*.
@@ -299,6 +311,9 @@ if ($Zakres -in @('dialogi', 'wszystko', 'duza_aktualizacja')) {
 }
 if ($Zakres -in @('kontekst', 'wszystko', 'duza_aktualizacja')) {
     foreach ($p in $kontekst) { Add-Rel $p }
+}
+if ($Zakres -eq 'schematy') {
+    foreach ($p in $schematy) { Add-Rel $p }
 }
 if ($Zakres -eq 'duza_aktualizacja') {
     foreach ($relDir in @('Package/HD/oversea', 'Package/HD/oversea/locale', 'LocalData/Patch/HD/oversea', 'LocalData/Patch/HD/oversea/locale')) {
@@ -347,12 +362,28 @@ foreach ($wzgledna in $lista) {
     Write-Host ("skopiowano {0} ({1} B)" -f $wzgledna, $plik.Length)
 }
 
+# Nazwy (i tylko nazwy) plików, które mogą trzymać os czasu cutscen. Bez kopiowania.
+$kandydaciCutscen = New-Object 'System.Collections.Generic.List[string]'
+foreach ($relDir in @('Package/HD/oversea', 'Package/HD/v2', 'LocalData/Patch/HD/oversea')) {
+    $dirPath = Join-Path $graRoot ($relDir.Replace('/', '\'))
+    if (-not (Test-Path -LiteralPath $dirPath -PathType Container)) { continue }
+    try { Assert-NoReparseAncestors $dirPath } catch { continue }
+    $pliki = @(Get-ChildItem -LiteralPath $dirPath -File -Force -ErrorAction SilentlyContinue)
+    foreach ($it in $pliki) {
+        if (($it.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+        if ($it.Name -match '(?i)(cutscene|cinematic|timeline|story_?cut|perform|sequence)') {
+            [void] $kandydaciCutscen.Add($relDir + '/' + $it.Name)
+        }
+    }
+}
+
 $raport = [ordered]@{
     format = 'wwm-uzupelnienie-v2'
     created_utc = [DateTime]::UtcNow.ToString('o')
     zakres = $Zakres
     files = @($spis.ToArray())
     bytes = $bajty
+    kandydaci_cutscen = @($kandydaciCutscen.ToArray())
 }
 $raportPath = Join-Path $wyjscieFull 'SPIS.json'
 $raportJson = $raport | ConvertTo-Json -Depth 6

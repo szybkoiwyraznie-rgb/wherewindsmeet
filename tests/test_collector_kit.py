@@ -9,6 +9,8 @@ from zipfile import ZipFile, ZIP_STORED
 
 from tools import build_collector_kit as kit
 
+KATALOG = Path(__file__).resolve().parent.parent
+
 
 class CollectorKitTests(unittest.TestCase):
     def test_reproducible_zip_contains_all_collector_tools_and_readme(self):
@@ -38,6 +40,15 @@ class CollectorKitTests(unittest.TestCase):
                 self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
                 self.assertNotIn(b"\r", data.replace(b"\r\n", b""))
                 self.assertTrue(data.endswith(b"\r\n"))
+
+    def test_spakuj_dane_ma_zakres_schematy(self):
+        """Zakres `schematy` wysyła tylko MANIFEST i index* — bez tekstu gry."""
+        tekst = (KATALOG / "collector" / "spakuj_dane.ps1").read_text(encoding="utf-8-sig")
+        self.assertIn("'schematy'", tekst)
+        self.assertIn("$Zakres -eq 'schematy'", tekst)
+        for numer in ("index1", "index200", "index1001", "index1200"):
+            self.assertIn(numer, tekst)
+        self.assertIn("kandydaci_cutscen", tekst)
 
     def test_invalid_script_encodings_are_rejected(self):
         for data, bom, ascii_only in (

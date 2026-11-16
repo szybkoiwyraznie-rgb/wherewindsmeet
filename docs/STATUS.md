@@ -174,10 +174,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v3.zip`
-   (`6 610 597 B`, SHA-256
-   `7e93e5a47af68c465c40efafbe023424bdf9761fef002d2cc99d48796418abd7`),
-   Dysk Google id `1c8pk1TBJE1jODrpl6IWSM2OkE9cEfTT5` (v2 w koszu;
+   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v4.zip`
+   (`6 609 291 B`, SHA-256
+   `0fe0461f28e7d89a1b53b0f6e6b2e502965b79380a716d42f4a7d5daa6afd85c`),
+   Dysk Google id `1WzykudtneN3nrsjVMVxVxpU7vB-C2xT4` (v3 w koszu;
    wszystkie paczki z datą
    w nazwie są nieaktualne i leżą w koszu). Spis wersji:
    [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
@@ -214,7 +214,14 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
    `# Napisy przerywników` w kolejności wierszy z pliku gry. W danych gry napis
    **nie ma numeru cutsceny** — numer siedzi w osi czasu cutsceny, której wyciąg
    z `index/` nie obejmuje, więc 2 349 z 2 688 wierszy nie da się przypisać
-   do konkretnej cutsceny. 475 testów zielonych (520 podtestów).
+   do konkretnej cutsceny. **Rozdział pierwszy wrócił do krainy:** kotwicą grupy
+   jest pierwsza scena z mapą (wcześniej `luwenxin.dialog` bez map wysyłał całą
+   grupę do „Scen bez przypisanej mapy”), a cutsceny w grupie stoją w kolejności
+   zadań — `## Cutscena 30161` z Ruby jest teraz w krainie 燕南. Do przypięcia
+   pozostałych napisów doszło narzędzie `tools/cutsceny_z_bazy.py` (szuka w bazie
+   tabeli wiążącej napis z cutsceną; czyta też sam spis schematów z
+   `spakuj_dane.ps1 -Zakres schematy`) i zakres `schematy` w zbieraczu.
+   482 testy zielone (520 podtestów).
    **Poprzedni układ (`01_sceny.md` / `02_cutsceny.md` / `03_reszta.md`,
    `WWM_Czytanka_PL_2026-11-14.zip`) jest nieaktualny** — sceny i cutsceny były
    rozdzielone, czego właściciel nie chce.

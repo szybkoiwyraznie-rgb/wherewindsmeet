@@ -173,6 +173,16 @@ class TestNapisyPrzerywnikow(unittest.TestCase):
         self.assertEqual(trafienia[0]["t"], "cutscena")
         self.assertEqual(trafienia[0]["n"], 30161)
 
+    def test_rozdzial_pierwszy_stoi_w_krainie(self):
+        """Cutsceny grupy 1 (rozdział pierwszy) mają stać w krainie, nie w „scenach bez mapy”."""
+        grupa1 = [j for j in self.jednostki if j["t"] == "cutscena" and j.get("g") == 1]
+        self.assertGreater(len(grupa1), 10)
+        bez_mapy = [j["n"] for j in grupa1 if j["s"] == chronologia.BEZ_MAPY]
+        self.assertLessEqual(len(bez_mapy), 5, f"cutsceny poza krainą: {bez_mapy[:5]}")
+        ruby = next(j for j in grupa1 if j["n"] == 30161)
+        self.assertNotEqual(ruby["s"], chronologia.BEZ_MAPY)
+        self.assertTrue(ruby.get("kn"), "scena Ruby ma swoje napisy")
+
     def test_napisy_stoja_przed_piesniami(self):
         rodzaje = [j["t"] for j in self.jednostki]
         self.assertIn("napisy", rodzaje)
