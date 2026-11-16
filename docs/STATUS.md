@@ -60,12 +60,13 @@ głównym dialog to kwestie z bliźniakiem w innym bloku, a ciąg bez bliźniaka
 pierwszym bliźniakiem (do 3 kwestii) należy jeszcze do dialogu. Efekt w 30161:
 „Szefie! Szefie!”, „Wodzu, obudź się!”, „Miałaś iść ze mną do Kaplicy Generała!”,
 „Jak można tak zasnąć?” — zgodnie z tym, co właściciel słyszał; recytacja poematu
-o Ośmiu Wspaniałych stoi niżej, pod nagłówkiem wariantu. **„Stój!” (wiersz 591170)
-nie ma w danych żadnego miejsca w tej scenie** — nie należy do `kn` cutsceny 30161
-i nie występuje w żadnym dialogu tej sceny, więc nie jest już wstawiane na siłę.
-Osi czasu cutscen w zebranych plikach nie ma (`.cine` nie ma w pakiecie,
-`dialog_timelines.*` nie zawierają ani jednego napisu puli) — gdyby doszła, kolejność
-dałoby się odczytać wprost.
+o Ośmiu Wspaniałych stoi niżej, pod nagłówkiem wariantu. **To nadal nie jest kolejność
+z ekranu** i wiadomo już, dlaczego: numer wiersza puli nie jest osią czasu gry. „Stój!” ma
+numer 591170, czyli leży *po* całej rozmowie, choć w grze jest trzecią kwestią; nagrania
+w `sound_data` mają numery tylko w obrębie mówcy (`…_zlxl_hx_01…17` Ruby,
+`…_zlxl_pma_01…06` gracza) i nie mówią, jak serie się przeplatają. Osie czasu
+przerywników są w plikach `.cine`, których paczka aktualizacji nie zawiera — dowody
+i plan: `docs/CINE_KOLEJNOSC.md`.
 **Streszczenie sceny stoi teraz na początku**, zaraz pod nagłówkiem (`### Streszczenie
 sceny`). **Podpisy mówców tylko pewne:** podpowiedzi `mowca_en` z `text_msg` nie są już
 używane (tak powstawało „Handlebar Hu” przy „Ech!” w Prologu 4), nazwy samych ról
