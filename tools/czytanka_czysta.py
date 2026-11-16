@@ -15,6 +15,12 @@
 Format kwestii w 01: jedna linia `**Mówca:** tekst` (bez punktora), bez czasów,
 kluczy i tabel; kwestia bez mówcy to goły tekst.
 
+Cutsceny: kwestie w kolejności wierszy puli `text_msg` (a nie w kolejności z
+chronologii), bo tylko numer wiersza jest porządkiem gry. Gdy w plikach leżą dwa
+zestawy napisów tej samej cutsceny, pierwszy jest treścią, a pozostałe stoją pod
+nagłówkiem `### Inny wariant napisów tej cutsceny (wiersze …)`; powtórzone kwestie
+wypadają. Streszczenie sceny zawsze na końcu, pod `### Streszczenie sceny`.
+
 Użycie:
     python3 tools/czytanka_czysta.py --wyj out/czytanka --zip dist/WWM_Czytanka.zip
 """
@@ -37,6 +43,7 @@ from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_sl
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
 DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
+PROG_WARIANTU = 48         # tyle wierszy puli `text_msg` rozdziela dwa warianty napisów
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
 BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
@@ -320,6 +327,8 @@ class Jednostka:
     przestrzenie: set[int] = field(default_factory=set)
     osoby: list[tuple[str, str]] = field(default_factory=list)    # (id postaci, imię z obsady)
     z_brakami: bool = False                                      # pokazuj kwestie bez przekładu
+    podtytuly: dict[int, str] = field(default_factory=dict)      # numer linii → nagłówek nad nią
+    zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -364,6 +373,95 @@ def _nazwy_krain(ix, pl, porzadki: list[dict]) -> dict[str, str]:
     return nazwy
 
 
+def _wiersze_napisow(ix, porzadek: dict[str, list[dict]]) -> dict[str, int]:
+    """Klucz napisu → numer wiersza w puli `text_msg`, czyli kolejność gry.
+
+    Numer wiersza jest jedynym porządkiem, jaki gra podaje dla napisów przerywnika
+    (`kn` w chronologii miesza napisy przypisane wprost z tabeli i bloki puli, więc
+    kolejność w nim bywa losowa). Bierzemy go z kontekstu cutscen, a gdy tam nie ma —
+    z osi `kolejnosc_*` (wiersze typu `napis*` mają w polu `i` numer wiersza puli).
+    """
+    wiersze: dict[str, int] = {}
+    for wpis in ix.cutsceny_kontekst.get("napis") or []:
+        klucz, numer = wpis.get("k"), wpis.get("wiersz")
+        if klucz and isinstance(numer, int):
+            wiersze.setdefault(klucz, numer)
+    for klucz, wystapienia in porzadek.items():
+        if klucz in wiersze:
+            continue
+        for wpis in wystapienia:
+            if str(wpis.get("z") or "").startswith("napis") and isinstance(wpis.get("i"), int):
+                wiersze[klucz] = wpis["i"]
+                break
+    return wiersze
+
+
+def _bez_interpunkcji(tekst: str) -> str:
+    """Sygnatura kwestii do wyłapania powtórzeń: bez interpunkcji i wielkości liter."""
+    return " ".join(re.sub(r"[^\w\s]", " ", tekst.lower()).split())
+
+
+def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int],
+                     pl: dict[str, str]) -> tuple[list[str], dict[int, str], list[str]]:
+    """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
+
+    Kolejność bierzemy z wierszy puli. W plikach gry ten sam przerywnik leży czasem
+    **dwa razy** (dwa warianty napisów, np. 590153–590179 i 591125–591169 w cutscenie
+    30161): kwestie się powtarzają, a tekst bywa inny. Dlatego bloki dzielimy po dużym
+    odstępie wierszy, pierwszy pokazujemy jako główny, a pozostałe pod nagłówkiem —
+    nic nie ginie, ale czytelnik nie dostaje dwóch scen splątanych w jedną.
+    Streszczenie sceny (`k`) idzie na końcu, pod własnym nagłówkiem.
+    """
+    napisy = [k for k in wiersz.get("kn") or [] if k]
+    pozycja: dict[str, int] = {}
+    for numer, klucz in enumerate(napisy):
+        pozycja.setdefault(klucz, numer)
+
+    def do_sortowania(klucz: str) -> tuple:
+        numer = wiersze.get(klucz)
+        return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
+
+    bloki: list[list[str]] = []
+    for klucz in sorted(pozycja, key=do_sortowania):
+        numer = wiersze.get(klucz)
+        poprzedni = wiersze.get(bloki[-1][-1]) if bloki else None
+        if bloki and (numer is None or poprzedni is None or numer - poprzedni <= PROG_WARIANTU):
+            bloki[-1].append(klucz)
+        else:
+            bloki.append([klucz])
+
+    klucze: list[str] = []
+    podtytuly: dict[int, str] = {}
+    powtorzone: list[str] = []
+    widziane: set[str] = set()
+    for numer_bloku, blok in enumerate(bloki):
+        naglowek = ""
+        if numer_bloku:
+            numery = [wiersze[k] for k in blok if k in wiersze]
+            opis = (f"wiersze {min(numery)}–{max(numery)}" if numery and min(numery) != max(numery)
+                    else f"wiersz {numery[0]}" if numery else "wiersze bez numeru")
+            naglowek = f"Inny wariant napisów tej cutsceny ({opis})"
+        czeka_na_naglowek = bool(naglowek)
+        for klucz in blok:
+            tekst = pl.get(klucz)
+            if tekst:
+                sygnatura = _bez_interpunkcji(tekst)
+                if sygnatura and sygnatura in widziane:
+                    powtorzone.append(klucz)
+                    continue        # ta sama kwestia drugi raz (wariant napisów)
+                widziane.add(sygnatura)
+            if czeka_na_naglowek:
+                podtytuly[len(klucze)] = naglowek
+                czeka_na_naglowek = False
+            klucze.append(klucz)
+
+    streszczenie = [k for k in wiersz.get("k") or [] if k]
+    if streszczenie:
+        podtytuly[len(klucze)] = "Streszczenie sceny"
+        klucze.extend(streszczenie)
+    return klucze, podtytuly, powtorzone
+
+
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                              krainy: list[dict] | None = None) -> list[Jednostka]:
     """Chronologia jest zapisana w `index/chronologia.jsonl`; tu tylko czytamy kolejność."""
@@ -374,6 +472,7 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         return f"# {nazwa} — {polska}" if polska and polska != nazwa else f"# {nazwa}"
     mowcy_napisow = {w["wiersz"]: w.get("mowca_en")
                      for w in ix.cutsceny_kontekst.get("napis", []) if w.get("wiersz")}
+    wiersze_napisow = _wiersze_napisow(ix, porzadek)
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -430,15 +529,13 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
-            linie = []
-            # `kn` to napisy przerywnika (pula `text_msg`) — stoją przed streszczeniem
-            for klucz in list(wiersz.get("kn") or []) + list(wiersz.get("k") or []):
-                if linie and linie[-1][1] == klucz:
-                    continue
-                linie.append((_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz))
+            klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl)
+            linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
+                     for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
-                                       linie, osoby=osoby))
+                                       linie, osoby=osoby, podtytuly=podtytuly,
+                                       zasloniete=tuple(powtorzone)))
         elif rodzaj == "napisy":
             linie = []
             for klucz in wiersz.get("k") or []:
@@ -729,7 +826,9 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
     for jednostka in jednostki:
         linie = []
         widziane_linie: set[str] = set()
-        for mowca, klucz in jednostka.linie:
+        uzyte.update(jednostka.zasloniete)
+        podtytuly = dict(jednostka.podtytuly)
+        for numer_linii, (mowca, klucz) in enumerate(jednostka.linie):
             uzyte.add(klucz)
             tekst = pl.get(klucz)
             if tekst is None:
@@ -748,6 +847,8 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
             if gotowa in widziane_linie:
                 continue          # ta sama kwestia drugi raz w tej samej jednostce
             widziane_linie.add(gotowa)
+            for indeks in sorted(i for i in podtytuly if i <= numer_linii):
+                linie.append(f"### {podtytuly.pop(indeks)}")
             linie.append(gotowa)
         if not linie:
             continue

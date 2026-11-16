@@ -42,6 +42,21 @@ w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przek�
 klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
 `client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
 
+**Kolumna „wiersz puli” jest porządkiem gry w cutscenach (v7, 2026-11-14).**
+Pole `kn` w `index/chronologia.jsonl` miesza napisy przypisane wprost z tabeli
+gry (`cutsceny_napisy.jsonl`, 5 wpisów) i bloki puli `text_msg`, więc kwestie
+w cutscenie stały w kolejności losowej — `## Cutscena 30161` zaczynała się od
+„Jaki człowiek w czerni?”. Teraz `tools/czytanka_czysta.py` sortuje kwestie po
+numerze wiersza puli (`index/cutsceny_kontekst.jsonl`, wiersze `napis`; zapasowo
+pole `i` z `index/kolejnosc_*.jsonl`). Ten sam przerywnik leży w plikach gry dwa
+razy (30161: wiersze 590153–590179 i 591125–591169) — pierwszy zestaw jest treścią,
+drugi stoi pod `### Inny wariant napisów tej cutsceny (wiersze …)`, a powtórzone
+kwestie wypadają. Streszczenie sceny dostało nagłówek `### Streszczenie sceny`
+i nie udaje już ostatniej kwestii dialogu. Regresja: `tests/test_czytanka_kolejnosc_cutscen.py`.
+Paczka: `dist/WWM_Czytanka_PL_v7.zip`, **6 785 364 B**, SHA-256
+`62cd3f1da6693a45eee2fc54264f6d42b907454187129a7593ef51cde2aa2620`, Dysk
+`1YwJYMlwmycdV2A6rTWdUOowt8gwNpnGc`.
+
 **D — decyzja właściciela (2026-11-14): zostawiamy, powiąże sceny sam.**
 W repo został `collector/sniffer_mpk.ps1` (+ `SNIFFER_MPK.bat`, opis
 `docs/SNIFFER_MPK.md`) jako opcja na później: sondowanie paczek `.mpk`

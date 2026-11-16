@@ -55,6 +55,18 @@ Zasady kolejności:
      albo po prefiksie nagrania (`VO_DOMENY`) trafia do cutsceny tak jak dotąd,
    * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
      w kolejności wierszy, a nie alfabetycznie.
+   * **kolejność kwestii w cutscenie bierze się z numeru wiersza puli `text_msg`**
+     (`index/cutsceny_kontekst.jsonl`, wiersze typu `napis`), a nie z pola `kn`
+     w chronologii — to pole miesza napisy przypisane wprost z tabeli gry i bloki
+     puli, więc kwestie stawały w kolejności losowej (w `## Cutscena 30161`
+     „Jaki człowiek w czerni?” stało przed „Wstawaj! Wstawaj no!”).
+   * gdy w plikach gry leżą **dwa zestawy napisów tej samej cutsceny** (np. wiersze
+     590153–590179 i 591125–591169 w cutscenie 30161, ta sama scena w dwóch
+     wersjach), pierwszy zestaw jest treścią sceny, a pozostałe stoją pod
+     `### Inny wariant napisów tej cutsceny (wiersze …)`; kwestie powtórzone
+     w obu wariantach wypadają, więc nic nie czyta się dwa razy.
+   * **streszczenie sceny** stoi zawsze na końcu, pod własnym nagłówkiem
+     `### Streszczenie sceny` — nie udaje już ostatniej kwestii dialogu.
 7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
    z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
    `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101
