@@ -1112,7 +1112,7 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
-{statystyka.get('zbiory', 0)} kart zbiorów i pamiątek oraz {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) oraz {statystyka.get('poi', 0)} punktów na mapie (POI, z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.
+{statystyka.get('zbiory', 0)} kart zbiorów, {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) i {statystyka.get('poi', 0)} punktów na mapie (POI — z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01.
