@@ -179,31 +179,41 @@ jak i dużych patchy) służy **jeden przycisk** `URUCHOM_AKTUALIZACJE.bat`
   `index*` zostają, bo `baza_gry.py` wymaga ich do dekodowania schematów
   kolumn i offsetów rekordów w `data*`.
 
-### Sam spis tabel i kolumn: `-Zakres schematy`
+### Gdzie w bazie leży wiązanie napisu z cutsceną — wiadomo (2026-11-13)
 
-Do ustalenia, **gdzie w bazie leży wiązanie napisu z cutsceną**, nie potrzeba
-tekstu gry — wystarczą nazwy tabel i kolumn. Zakres `schematy` pakuje wyłącznie
-`MANIFEST` i `index*` (schematy) z `Package/HD/oversea` i
-`LocalData/Patch/HD/oversea`, bez `data*`, bez map tłumaczeń i bez dialogów:
-kilka megabajtów zamiast setek. Uruchomienie (kopia z linii poleceń):
+To pytanie ma już odpowiedź, sprawdzoną na pakiecie aktualizacji
+`WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f` (8 ZIP-ów, 54 pliki: `data*`,
+`index*`, `MANIFEST`, mapy `translate_words_map_*`). **Osobny zbieracz ani zakres
+`schematy` nie są do tego potrzebne** — wiązania w bazie po prostu nie ma:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\spakuj_dane.ps1 -Gra "<ścieżka do gry>" -Zakres schematy
-```
+* osie czasu cutscen (`.cine`) nie występują w żadnej rodzinie tabel — rodziny
+  z osią czasu to tylko `dialog_timelines.*` (75 007 tabel) i `AL.*` (biblioteka
+  animacji umiejętności);
+* `dialog_timelines.<dialog_no>` to osie czasu **dialogów**: każdy
+  `EntityTextSpan` ma `time`, `duration`, `source_id`, `text` i `formatted_text`
+  (gotowy chiński tekst), ale napisy puli `text_msg` 590000–592694 nie występują
+  tam ani razu jako identyfikator (0 trafień na 6 844 914 liczb w osiach), ani
+  jako tekst inaczej niż przypadkowo (pojedyncze linie rozsiane po setkach
+  dialogów, najwyżej 8 w jednym);
+* żadna inna tabela nie wskazuje wierszy puli ani ich hashy `text_msg.content`
+  (te są unikalne, więc trafienie cokolwiek by znaczyło).
 
-`SPIS.json` w wyniku ma dodatkowe pole `kandydaci_cutscen`: **same nazwy**
-plików w `Package/HD/oversea`, `Package/HD/v2` i `LocalData/Patch/HD/oversea`,
-które wyglądają na os czasu cutscen (`cutscene`, `cinematic`, `timeline`,
-`story_cut`, `perform`, `sequence`). Nic z nich nie jest kopiowane — to odpowiedź
-na pytanie, czy osie czasu są w ogóle osobnymi plikami.
+Co baza daje naprawdę (`tools/cutsceny_z_bazy.py`, bez `--audyt`):
 
-Po odebraniu takiego ZIP-a uruchamiamy `python tools/cutsceny_z_bazy.py`
-z `--tylko-schematy`: wypisuje tabele, których kolumny mogą trzymać numery
-cutscen i wiersze puli napisów. Gdy w kolejnej paczce będą też `data*`
-(`-Zakres kontekst` albo `-Zakres duza_aktualizacja`), to samo narzędzie bez
-`--tylko-schematy` sprawdza zawartość kolumn i zapisuje wiązanie do
-`index/cutsceny_napisy.jsonl`; wtedy `tools/chronologia.py` kładzie każdy napis
-przerywnika w jego własnej cutscenie.
+* `index/cutsceny_napisy.jsonl` — napisy z **twardym** śladem: `sound_data`
+  trzyma dla tekstu nazwę nagrania, a nagrania przerywników mają w nazwie kod
+  filmu (`vo_sm_sxdm4_cs_zlxl_hx_02` ↔ `cutscenes.cine_name` = `sq001_zlxl`);
+  bierzemy tylko kody wskazujące dokładnie jedną cutscenę. Takich napisów jest
+  5 (4 w cutscenie 30161, 1 w 30707) — reszta puli nie ma ani nagrania, ani kodu;
+* `index/cutsceny_meta.jsonl` — przestrzeń (`cutscene_space_no`), czas trwania
+  (`cine_duration`), plik filmu i pakiet każdej cutsceny; z tego chronologia
+  bierze krainę dla cutscen, których scena-kotwica nie ma mapy (100 z 101).
+
+`--audyt` (około 5 minut) przelicza powyższe dowody jeszcze raz i zapisuje
+`out/audyt_cutscen.json` — żeby nie szukać tego drugi raz. Gdyby wiązanie było
+kiedyś potrzebne dla całej puli, trzeba wyeksportować **osie czasu cutscen**
+(pliki `.cine` albo tabelę, której ten pakiet nie ma) — samo `spakuj_dane.ps1`
+z `-Zakres schematy` tego nie da, bo sprawdzone: takiej tabeli nie ma.
 
 Osobny skrypt `spakuj_dane.ps1` (`SPAKUJ_DANE.bat`) zostaje w pakiecie jako
 narzędzie pomocnicze do ręcznego eksportu wskazanego wycinka (`-Zakres`),

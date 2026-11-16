@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
-"""Szukanie w bazie gry tabeli, która wiąże napis z cutsceną.
+"""Wiązanie napisów przerywników z cutscenami i metadane cutscen — z bazy gry.
 
 Po co: w wyciągu `index/` napis przerywnika ma tylko identyfikator wiersza
-(`text_msg`) i nazwę nagrania — **nie ma numeru cutsceny**. Numer siedzi
-w osi czasu cutsceny, a tej nie ma w tabelach objętych dotychczasowym wyciągiem.
-Ten program przegląda **wszystkie** tabele bazy (`MANIFEST` + `index*` + `data*`)
-i szuka takiej, w której jedna kolumna trzyma numery cutscen, a druga — wiersze
-puli napisów (`text_msg`, 590000–592694). Jeśli ją znajdzie, zapisuje wiązanie
-do `index/cutsceny_napisy.jsonl`; wtedy `tools/chronologia.py` kładzie każdy
-napis w jego własnej cutscenie.
+(`text_msg`, 590000–592694) i czasem nazwę nagrania — **nie ma numeru cutsceny**.
+Ten program czyta bazę gry (`local/dane`: `MANIFEST` + `data*` + `index*`) i bierze
+z niej to, co naprawdę jest w danych:
 
-Dwa tryby:
+1. **numer cutsceny z nazwy nagrania** — `sound_data` trzyma dla tekstu jego
+   nagranie, a nagrania przerywników mają w nazwie kod filmu
+   (`vo_sm_sxdm4_cs_zlxl_hx_02` → `zlxl`), który odpowiada `cutscenes.cine_name`
+   (`sq001_zlxl`). Wiązanie zapisujemy tylko wtedy, gdy kod wskazuje **dokładnie
+   jedną** cutscenę; sprzeczne odrzucamy.
+2. **przestrzeń i czas trwania cutsceny** — `cutscenes.cutscene_space_no`
+   i `cutscenes.cine_duration`; `tools/chronologia.py` kładzie dzięki temu cutscenę
+   w jej krainie, nawet gdy scena-kotwica nie ma mapy.
 
-1. **same schematy** (gdy w katalogu jest `MANIFEST` i `index*`, ale nie ma
-   `data*`) — program wypisuje tabele i ich kolumny, które wyglądają na
-   wiązanie napisów z cutscenami. Nic nie czyta z `data*`, więc nie potrzebuje
-   tekstu gry; do tego służy `collector/spakuj_dane.ps1 -Zakres schematy`.
-2. **pełny** (z `data*`) — program czyta wiersze podejrzanych tabel i sprawdza,
-   czy wartości naprawdę są numerami cutscen i wierszami napisów. Dopiero wtedy
-   zapisuje `index/cutsceny_napisy.jsonl`.
+Czego baza **nie** daje (sprawdzone na pakiecie aktualizacji z 2026-11-13, tryb
+`--audyt` wypisuje dowody):
+
+* osie czasu cutscen (`.cine`) nie są w tym pakiecie w żadnej rodzinie tabel;
+* `dialog_timelines.<dialog_no>` (75 007 tabel) to osie czasu **dialogów**: każdy
+  `EntityTextSpan` ma `time`, `duration`, `source_id`, `text` i `formatted_text`
+  (gotowy chiński tekst), ale napisy puli nie występują tam ani jako identyfikator
+  (0 trafień na 404 861 `source_id`/`text`), ani jako tekst inaczej niż przypadkowo
+  (pojedyncze linie rozsiane po setkach dialogów);
+* żadna inna tabela nie wskazuje wierszy puli ani ich hashy (`text_msg.content`).
 
 Użycie:
-    python3 tools/cutsceny_z_bazy.py --katalog local/dane --raport out/schematy.json
-    python3 tools/cutsceny_z_bazy.py --katalog local/dane --wyj index/cutsceny_napisy.jsonl
+    python3 tools/cutsceny_z_bazy.py --dane local/dane --index index
+    python3 tools/cutsceny_z_bazy.py --dane local/dane --audyt
 """
 
 from __future__ import annotations
@@ -30,236 +36,399 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tools import baza_gry  # noqa: E402
+from tools import baza_gry, indeks as indeks_mod  # noqa: E402
 
 # Wiersze puli napisów przerywników w `text_msg` (patrz `index/cutsceny_kontekst.jsonl`).
 PULA_NAPISOW = (590000, 592694)
 
-# Po czym poznać kolumnę: nazwy z gry bywają mylące, więc zbieramy szeroko,
-# a prawdę i tak sprawdza potem zawartość kolumny.
-SLOWA_CUTSCENA = ("cutscene", "cut_scene", "cinematic", "timeline", "story_cut", "perform")
-SLOWA_NAPIS = ("text_msg", "textmsg", "napis", "subtitle", "sub_title", "txt_id", "text_id",
-               "content_id", "msg_id", "msgid", "dialog_text", "voice_text")
+# Kod filmu w nazwie nagrania stoi po `_cs_`: `vo_sm_sxdm4_cs_zlxl_hx_02`.
+ZNACZNIK_FILMU = "_cs_"
+
+# `cine_name` w bazie ma prefiks zadania (`sq001_zlxl`), nazwa nagrania go nie ma.
+PREFIKS_ZADANIA = "sq"
 
 
-def _podejrzana(nazwa_tabeli: str, kolumny: list[str] | None) -> bool:
-    if not kolumny:
-        return False
-    tekst = " ".join([nazwa_tabeli.lower(), *(k.lower() for k in kolumny)])
-    ma_cut = any(slowo in tekst for slowo in SLOWA_CUTSCENA)
-    ma_napis = any(slowo in tekst for slowo in SLOWA_NAPIS)
-    return ma_cut and ma_napis
+class CutscenyError(Exception):
+    """Baza nie daje się odczytać albo wyciąg nie ma potrzebnych plików."""
 
 
-def _liczba(wartosc) -> int | None:
-    if isinstance(wartosc, bool) or not isinstance(wartosc, int):
+def norm(tekst: str) -> str:
+    """Tekst bez różnic w białych znakach — gra zapisuje te same zdania różnie."""
+    return " ".join((tekst or "").split())
+
+
+def kod_cine(nazwa) -> str | None:
+    """`sq001_zlxl` → `zlxl`; `sq001_zlxl_mobile` → `zlxl_mobile`."""
+    if not isinstance(nazwa, str):
         return None
-    return wartosc
+    kod = nazwa.strip()
+    if not kod:
+        return None
+    glowka, _, reszta = kod.partition("_")
+    if (
+        reszta
+        and glowka.lower().startswith(PREFIKS_ZADANIA)
+        and glowka[len(PREFIKS_ZADANIA):].isdigit()
+    ):
+        return reszta
+    return kod
 
 
-def _kolumny_liczbowe(baza, nazwa: str, limit: int = 4000) -> dict[str, list[int]]:
-    """Pierwsze `limit` wierszy tabeli: kolumna → wartości liczbowe."""
-    zebrane: dict[str, list[int]] = {}
-    for _, wiersz in baza.wiersze(nazwa):
+def kody_cutscen(wiersze) -> dict[str, set[int]]:
+    """Kod filmu → numery cutscen, które ten kod mają w `cine_name`/`cutscene_action`."""
+    kody: dict[str, set[int]] = defaultdict(set)
+    for no, wiersz in wiersze:
         if not isinstance(wiersz, dict):
             continue
-        for kolumna, wartosc in wiersz.items():
-            liczba = _liczba(wartosc)
-            if liczba is not None:
-                zebrane.setdefault(kolumna, []).append(liczba)
-            elif isinstance(wartosc, list):
-                for element in wartosc:
-                    liczba = _liczba(element)
-                    if liczba is not None:
-                        zebrane.setdefault(kolumna, []).append(liczba)
-        if len(next(iter(zebrane.values()), [])) >= limit:
-            break
-    return zebrane
-
-
-def _wiazanie(kolumny: dict[str, list[int]], cutsceny: set[int],
-              napisy: set[int], min_pokrycie: float) -> tuple[str, str] | None:
-    """(kolumna cutscen, kolumna napisów) — gdy obie kolumny zgadzają się z danymi."""
-    def udzial(wartosci: list[int], zbior: set[int], zakres: tuple[int, int] | None = None) -> float:
-        if not wartosci:
-            return 0.0
-        if zbior:
-            trafione = sum(1 for w in wartosci if w in zbior)
-        else:
-            trafione = sum(1 for w in wartosci if zakres[0] <= w <= zakres[1])
-        return trafione / len(wartosci)
-
-    najlepsze = None
-    for kol_cut, wart_cut in kolumny.items():
-        udzial_cut = udzial(wart_cut, cutsceny)
-        if udzial_cut < min_pokrycie:
-            continue
-        for kol_napis, wart_napis in kolumny.items():
-            if kol_napis == kol_cut:
-                continue
-            udzial_napis = udzial(wart_napis, napisy, PULA_NAPISOW) if not napisy else udzial(wart_napis, napisy)
-            if udzial_napis < min_pokrycie:
-                continue
-            wynik = (kol_cut, kol_napis)
-            if najlepsze is None or udzial_cut + udzial_napis > najlepsze[0]:
-                najlepsze = (udzial_cut + udzial_napis, wynik)
-    return najlepsze[1] if najlepsze else None
-
-
-def _zbierz_wiazanie(baza, nazwa: str, kol_cut: str, kol_napis: str,
-                     cutsceny: set[int], napisy: set[int]) -> dict[int, list[int]]:
-    mapa: dict[int, list[int]] = {}
-    for _, wiersz in baza.wiersze(nazwa):
-        if not isinstance(wiersz, dict):
-            continue
-        cut = _liczba(wiersz.get(kol_cut))
-        napis = _liczba(wiersz.get(kol_napis))
-        if cut is None or napis is None:
-            continue
-        if cutsceny and cut not in cutsceny:
-            continue
-        if napisy:
-            if napis not in napisy:
-                continue
-        elif not (PULA_NAPISOW[0] <= napis <= PULA_NAPISOW[1]):
-            continue
-        mapa.setdefault(cut, []).append(napis)
-    return mapa
-
-
-def _wczytaj_odniesienia(index: Path) -> tuple[set[int], set[int]]:
-    """Numery cutscen i wiersze puli napisów z wyciągu w `index/`."""
-    cutsceny: set[int] = set()
-    napisy: set[int] = set()
-    plik = index / "przerywniki.jsonl"
-    if plik.exists():
-        with plik.open(encoding="utf-8") as f:
-            for linia in f:
-                if linia.strip():
-                    cutsceny.add(int(json.loads(linia)["no"]))
-    plik = index / "cutsceny_kontekst.jsonl"
-    if plik.exists():
-        with plik.open(encoding="utf-8") as f:
-            for linia in f:
-                if not linia.strip():
-                    continue
-                wiersz = json.loads(linia)
-                if wiersz.get("typ") == "napis" and wiersz.get("wiersz"):
-                    napisy.add(int(wiersz["wiersz"]))
-    return cutsceny, napisy
-
-
-def szukaj(katalog: list[Path], index: Path, *, min_pokrycie: float = 0.9,
-           tylko_schematy: bool = False, postep=None) -> dict:
-    baza = baza_gry.Baza([str(k) for k in katalog])
-    cutsceny, napisy = _wczytaj_odniesienia(index)
-
-    podejrzane: list[tuple[str, list[str]]] = []
-    for nazwa in sorted(baza.tabele):
-        kolumny = baza.kolumny(nazwa)
-        if _podejrzana(nazwa, kolumny):
-            podejrzane.append((nazwa, kolumny or []))
-    wynik = {
-        "tabel": len(baza.tabele),
-        "podejrzanych": [n for n, _ in podejrzane],
-        "znalezione": None,
-        "wiazania": {},
-        "tryb": "schematy" if tylko_schematy else "pelny",
-    }
-    if postep:
-        postep(f"tabel: {len(baza.tabele)}, podejrzanych: {len(podejrzane)}")
-
-    if tylko_schematy:
-        wynik["kolumny"] = {n: k for n, k in podejrzane}
-        return wynik
-
-    plik_napisow = baza.pliki.get("data1")
-    if plik_napisow is None and not any(p.name.startswith("data") for p in baza.pliki.values()):
-        wynik["blad"] = "brak plików data* — dostępne są tylko schematy"
-        wynik["kolumny"] = {n: k for n, k in podejrzane}
-        return wynik
-
-    for nazwa, _ in podejrzane:
         try:
-            kolumny = _kolumny_liczbowe(baza, nazwa)
-        except baza_gry.BazaError as blad:          # tabela nieczytelna: pomiń, nie przerywaj
-            wynik["wiazania"][nazwa] = {"blad": str(blad)}
+            numer = int(wiersz.get("no", no) or no)
+        except (TypeError, ValueError):
             continue
-        para = _wiazanie(kolumny, cutsceny, napisy, min_pokrycie)
-        if para is None:
+        for pole in ("cine_name", "cutscene_action"):
+            kod = kod_cine(wiersz.get(pole))
+            if kod:
+                kody[kod].add(numer)
+    return {kod: numery for kod, numery in kody.items()}
+
+
+def kod_z_nagrania(nagranie: str, kody: dict[str, set[int]]) -> str | None:
+    """Kod filmu z nazwy nagrania; przy kilku kandydatach wygrywa najdłuższy."""
+    if not isinstance(nagranie, str) or ZNACZNIK_FILMU not in nagranie.lower():
+        return None
+    ogon = nagranie.lower().split(ZNACZNIK_FILMU, 1)[1]
+    kandydaci = [kod for kod in kody if kod.lower() == ogon or ogon.startswith(kod.lower() + "_")]
+    return max(kandydaci, key=len) if kandydaci else None
+
+
+def wiaz_napisy(
+    pula: dict[str, list[tuple[int, str]]],
+    nagrania: dict[str, set[str]],
+    kody: dict[str, set[int]],
+) -> tuple[list[dict], dict]:
+    """Napisy puli, dla których nazwa nagrania wskazuje dokładnie jedną cutscenę.
+
+    `pula`: znormalizowany tekst → [(wiersz `text_msg`, klucz przekładu)].
+    `nagrania`: znormalizowany tekst → nazwy nagrań z `sound_data`.
+    `kody`: kod filmu → numery cutscen.
+    """
+    wiazania: dict[int, tuple[str, int, str]] = {}
+    sprzeczne: set[int] = set()
+    bez_nagrania = bez_kodu = 0
+    for tekst, wiersze in pula.items():
+        nazwy = nagrania.get(tekst) or set()
+        if not nazwy:
+            bez_nagrania += len(wiersze)
             continue
-        mapa = _zbierz_wiazanie(baza, nazwa, para[0], para[1], cutsceny, napisy)
-        if not mapa:
+        cele: dict[int, str] = {}
+        for nazwa in nazwy:
+            kod = kod_z_nagrania(nazwa, kody)
+            if not kod:
+                continue
+            numery = kody[kod]
+            if len(numery) == 1:
+                cele[next(iter(numery))] = kod
+        if not cele:
+            bez_kodu += len(wiersze)
             continue
-        wynik["znalezione"] = {"tabela": nazwa, "cutscena": para[0], "napis": para[1]}
-        wynik["wiazania"] = {str(cut): wartosci for cut, wartosci in sorted(mapa.items())}
-        if postep:
-            postep(f"wiązanie w {nazwa}: {len(mapa)} cutscen")
-        break
+        for wiersz, klucz in wiersze:
+            if len(cele) > 1:
+                sprzeczne.add(wiersz)
+                continue
+            no, kod = next(iter(cele.items()))
+            wiazania[wiersz] = (klucz, no, kod)
+    wynik = [
+        {"no": no, "wiersz": wiersz, "k": klucz, "dowod": f"vo:{kod}"}
+        for wiersz, (klucz, no, kod) in wiazania.items()
+        if wiersz not in sprzeczne
+    ]
+    wynik.sort(key=lambda r: (r["no"], r["wiersz"]))
+    statystyka = {
+        "napisy_puli": sum(len(w) for w in pula.values()),
+        "wiazan": len(wynik),
+        "sprzecznych": len(sprzeczne),
+        "bez_nagrania": bez_nagrania,
+        "bez_kodu_filmu": bez_kodu,
+        "cutsceny": dict(Counter(r["no"] for r in wynik)),
+    }
+    return wynik, statystyka
+
+
+def metadane(wiersze, fenbao: dict[int, dict] | None = None) -> list[dict]:
+    """Cutscena → przestrzeń, czas trwania i plik filmu (tylko to, co jest w danych)."""
+    fenbao = fenbao or {}
+    wynik: list[dict] = []
+    for no, wiersz in wiersze:
+        if not isinstance(wiersz, dict):
+            continue
+        try:
+            numer = int(wiersz.get("no", no) or no)
+        except (TypeError, ValueError):
+            continue
+        przestrzen = wiersz.get("cutscene_space_no")
+        if isinstance(przestrzen, bool) or not isinstance(przestrzen, int):
+            przestrzen = None
+        elif przestrzen in (0, 255):
+            przestrzen = None
+        czas = wiersz.get("cine_duration")
+        if isinstance(czas, bool) or not isinstance(czas, (int, float)):
+            czas = None
+        wpis: dict = {"no": numer}
+        if przestrzen is not None:
+            wpis["przestrzen"] = przestrzen
+        if czas:
+            wpis["czas_s"] = round(float(czas), 1)
+        if isinstance(wiersz.get("cine_name"), str) and wiersz["cine_name"]:
+            wpis["film"] = wiersz["cine_name"]
+        pakiet = (fenbao.get(numer) or {}).get("fenbao")
+        if isinstance(pakiet, str) and pakiet:
+            wpis["pakiet"] = pakiet
+        if len(wpis) > 1:
+            wynik.append(wpis)
+    wynik.sort(key=lambda r: r["no"])
     return wynik
 
 
-def zapisz(wynik: dict, wyj: Path, index: Path) -> int:
-    """Zapisz wiązanie cutscena → wiersze napisów (JSONL, po jednym wierszu)."""
-    mapa = wynik.get("wiazania") or {}
-    if not isinstance(mapa, dict) or not mapa:
-        return 0
-    klucze: dict[int, str] = {}
-    plik = index / "cutsceny_kontekst.jsonl"
-    if plik.exists():
-        with plik.open(encoding="utf-8") as f:
-            for linia in f:
-                if not linia.strip():
-                    continue
-                wiersz = json.loads(linia)
-                if wiersz.get("typ") == "napis" and wiersz.get("wiersz"):
-                    klucze[int(wiersz["wiersz"])] = wiersz["k"]
-    wyj.parent.mkdir(parents=True, exist_ok=True)
-    zapisane = 0
-    with wyj.open("w", encoding="utf-8") as f:
-        for cut, wiersze in sorted(mapa.items()):
-            if not isinstance(wiersze, list) or not str(cut).isdigit():
+# --------------------------------------------------------------------------- baza
+
+
+def _wiersze_cutscen(baza):
+    for klucz, wiersz in baza.wiersze("cutscenes"):
+        yield klucz, wiersz
+
+
+def _nagrania(baza) -> dict[str, set[str]]:
+    """Tekst → nazwy nagrań (`sound_data`); tylko wiersze z tekstem i nagraniem."""
+    mapa: dict[str, set[str]] = defaultdict(set)
+    for _klucz, wiersz in baza.wiersze("sound_data"):
+        if not isinstance(wiersz, dict):
+            continue
+        tekst, nagranie = wiersz.get("text"), wiersz.get("audio_name")
+        if isinstance(tekst, str) and isinstance(nagranie, str) and tekst.strip() and nagranie:
+            mapa[norm(tekst)].add(nagranie)
+    return mapa
+
+
+def _fenbao(baza) -> dict[int, dict]:
+    mapa: dict[int, dict] = {}
+    for klucz, wiersz in baza.wiersze("fenbao_cutscene_info"):
+        if not isinstance(wiersz, dict):
+            continue
+        try:
+            mapa[int(wiersz.get("id", klucz))] = wiersz
+        except (TypeError, ValueError):
+            continue
+    return mapa
+
+
+def pula_z_wyciagu(index: str | Path) -> dict[str, list[tuple[int, str]]]:
+    """Tekst puli napisów → [(wiersz `text_msg`, klucz)] z wyciągu `index/`."""
+    katalog = Path(index)
+    zrodla = json.loads((katalog / "zrodla.json").read_text(encoding="utf-8"))
+    rzedy = {numer for numer, wpis in enumerate(zrodla)
+             if wpis and str(wpis[0]).split(".")[0] == "text_msg"}
+    if not rzedy:
+        raise CutscenyError("wyciąg nie ma źródła `text_msg` w `zrodla.json`")
+    wyciag = indeks_mod.wczytaj(katalog, teksty=True, sceny=False)
+    pula: dict[str, list[tuple[int, str]]] = defaultdict(list)
+    for klucz, tekst in wyciag.teksty.items():
+        w = tekst.w or ()
+        if len(w) < 2 or w[0] not in rzedy:
+            continue
+        try:
+            wiersz = int(w[1])
+        except (TypeError, ValueError):
+            continue
+        if not (PULA_NAPISOW[0] <= wiersz <= PULA_NAPISOW[1]):
+            continue
+        zh = norm(tekst.zrodlo)
+        if zh:
+            pula[zh].append((wiersz, klucz))
+    return dict(pula)
+
+
+def zbuduj(katalog: str | Path = "local/dane", index: str | Path = "index") -> dict:
+    """Policz wiązania i metadane, zapisz `index/cutsceny_napisy.jsonl` i `..._meta.jsonl`."""
+    baza = baza_gry.Baza([katalog])
+    pula = pula_z_wyciagu(index)
+    kody = kody_cutscen(_wiersze_cutscen(baza))
+    nagrania = _nagrania(baza)
+    napisy, statystyka = wiaz_napisy(pula, nagrania, kody)
+    meta = metadane(_wiersze_cutscen(baza), _fenbao(baza))
+
+    katalog_index = Path(index)
+    _zapisz_jsonl(katalog_index / "cutsceny_napisy.jsonl", napisy)
+    _zapisz_jsonl(katalog_index / "cutsceny_meta.jsonl", meta)
+    return {
+        "napisy": statystyka,
+        "kodow_filmowych": len(kody),
+        "meta": {"wpisow": len(meta),
+                 "z_przestrzenia": sum(1 for m in meta if m.get("przestrzen")),
+                 "z_czasem": sum(1 for m in meta if m.get("czas_s"))},
+    }
+
+
+def _zapisz_jsonl(sciezka: Path, wiersze: list[dict]) -> None:
+    sciezka.parent.mkdir(parents=True, exist_ok=True)
+    sciezka.write_text(
+        "".join(json.dumps(w, ensure_ascii=False, separators=(",", ":")) + "\n" for w in wiersze),
+        encoding="utf-8",
+    )
+
+
+# --------------------------------------------------------------------------- audyt
+
+
+def _chodz(wezel, funkcja, glebokosc: int = 0) -> None:
+    """Odwiedź wszystkie wartości (także wnętrza słowników i list)."""
+    if glebokosc > 8:
+        return
+    if isinstance(wezel, dict):
+        for wartosc in wezel.values():
+            if isinstance(wartosc, (dict, list)):
+                _chodz(wartosc, funkcja, glebokosc + 1)
+            else:
+                funkcja(wartosc)
+    elif isinstance(wezel, list):
+        for element in wezel:
+            if isinstance(element, (dict, list)):
+                _chodz(element, funkcja, glebokosc + 1)
+            else:
+                funkcja(element)
+
+
+def audyt(katalog: str | Path = "local/dane", index: str | Path = "index") -> dict:
+    """Sprawdź, czy napisy puli mają w bazie jakiekolwiek odwołanie — i wypisz dowody."""
+    baza = baza_gry.Baza([katalog])
+    pula = pula_z_wyciagu(index)
+
+    # content hash i numer wiersza każdego napisu puli
+    hashe: dict[int, int] = {}
+    wiersze_puli: set[int] = set()
+    for klucz, wartosc in baza.wiersze("text_msg"):
+        if isinstance(wartosc, dict) and isinstance(wartosc.get("content"), int):
+            if PULA_NAPISOW[0] <= klucz <= PULA_NAPISOW[1]:
+                hashe[wartosc["content"]] = klucz
+                wiersze_puli.add(klucz)
+    for klucz, wartosc in baza.wiersze("text_msg__grey"):
+        if isinstance(wartosc, dict) and isinstance(wartosc.get("content"), int):
+            if PULA_NAPISOW[0] <= klucz <= PULA_NAPISOW[1]:
+                hashe.setdefault(wartosc["content"], klucz)
+                wiersze_puli.add(klucz)
+
+    # Hash tekstu jest unikalny (64-bit), więc trafienie w niego cokolwiek znaczy.
+    # Numer wiersza to zwykła liczba — inne tabele mają własne identyfikatory
+    # w tym samym zakresie, więc takie trafienia zbieramy osobno jako przypadki.
+    rodziny_hash: Counter = Counter()
+    rodziny_id: Counter = Counter()
+    przyklady: list[tuple[str, str, object]] = []
+
+    def sprawdz(wartosc) -> None:
+        if isinstance(wartosc, bool):
+            return
+        if isinstance(wartosc, int):
+            if wartosc in hashe:
+                rodziny_hash[_rodzina] += 1
+                if len(przyklady) < 10:
+                    przyklady.append((_rodzina, _tabela, wartosc))
+            elif wartosc in wiersze_puli:
+                rodziny_id[_rodzina] += 1
+
+    _rodzina = _tabela = ""
+    for nazwa in sorted(baza.tabele):
+        if nazwa in ("text_msg", "text_msg__grey"):
+            continue
+        _rodzina = nazwa.split(".")[0]
+        _tabela = nazwa
+        try:
+            for _klucz, wartosc in baza.wiersze(nazwa):
+                _chodz(wartosc, sprawdz)
+        except baza_gry.BazaError:
+            continue    # pojedyncza nieczytelna tabela nie przerywa audytu
+
+    # osobno: osie czasu dialogów — identyfikatory i gotowe teksty
+    identyfikatory = 0
+    trafienia_id = 0
+    tekst_pula = set(pula)
+    trafienia_tekstu: Counter = Counter()
+
+    def licz_id(wartosc) -> None:
+        nonlocal identyfikatory, trafienia_id
+        if isinstance(wartosc, bool):
+            return
+        if isinstance(wartosc, int):
+            identyfikatory += 1
+            if wartosc in hashe:
+                trafienia_id += 1
+
+    for nazwa in baza.tabele:
+        if not nazwa.startswith("dialog_timelines."):
+            continue
+        for klucz, wartosc in baza.wiersze(nazwa):
+            if klucz != "timeline":
                 continue
-            for numer in sorted(wiersze):
-                klucz = klucze.get(int(numer))
-                if not klucz:
-                    continue
-                f.write(json.dumps({"no": int(cut), "wiersz": int(numer), "k": klucz},
-                                   ensure_ascii=False, separators=(",", ":")) + "\n")
-                zapisane += 1
-    return zapisane
+            _chodz(wartosc, licz_id)
+            for tekst in _teksty_osi(wartosc):
+                if norm(tekst) in tekst_pula:
+                    trafienia_tekstu[nazwa] += 1
+
+    return {
+        "napisy_puli": len(wiersze_puli),
+        "hashy_puli": len(hashe),
+        "odwolania_po_hashu": dict(rodziny_hash),
+        "odwolania_po_numerze_wiersza": dict(rodziny_id),
+        "przyklady_odwolan": przyklady,
+        "osie_dialogow_identyfikatory": identyfikatory,
+        "osie_dialogow_trafienia_id": trafienia_id,
+        "osie_dialogow_dialogi_z_tekstem_puli": len(trafienia_tekstu),
+        "osie_dialogow_najwiecej_w_dialogu": max(trafienia_tekstu.values(), default=0),
+        "osie_dialogow_trafien_tekstu": sum(trafienia_tekstu.values()),
+    }
+
+
+def _teksty_osi(wezel, glebokosc: int = 0) -> list[str]:
+    """Gotowe teksty (`formatted_text`) z osi czasu."""
+    if glebokosc > 8 or not isinstance(wezel, (dict, list)):
+        return []
+    wynik: list[str] = []
+    if isinstance(wezel, dict):
+        tekst = wezel.get("formatted_text")
+        if isinstance(tekst, str):
+            wynik.append(tekst)
+        for wartosc in wezel.values():
+            wynik.extend(_teksty_osi(wartosc, glebokosc + 1))
+    else:
+        for element in wezel:
+            wynik.extend(_teksty_osi(element, glebokosc + 1))
+    return wynik
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--katalog", action="append", required=True,
-                    help="katalog z MANIFEST, index* i (opcjonalnie) data*; można podać kilka")
-    ap.add_argument("--index", default="index", help="wyciąg z gry (numery cutscen i wiersze napisów)")
-    ap.add_argument("--wyj", default="index/cutsceny_napisy.jsonl")
-    ap.add_argument("--raport", help="zapisz raport (JSON) z tabelami i kolumnami")
-    ap.add_argument("--tylko-schematy", action="store_true",
-                    help="nie czytaj data* — wypisz same tabele i kolumny")
-    ap.add_argument("--min-pokrycie", type=float, default=0.9, dest="min_pokrycie")
-    a = ap.parse_args(argv)
+    parser = argparse.ArgumentParser(description="Napisy przerywników i metadane cutscen z bazy gry.")
+    parser.add_argument("--dane", default="local/dane", help="katalog z plikami bazy gry")
+    parser.add_argument("--index", default="index", help="katalog wyciągu (wynik trafia tutaj)")
+    parser.add_argument("--audyt", action="store_true",
+                        help="sprawdź odwołania do puli napisów w całej bazie (wolno: ~5 min)")
+    parser.add_argument("--raport", default="out/audyt_cutscen.json", help="gdzie zapisać wynik audytu")
+    args = parser.parse_args(argv)
 
-    wynik = szukaj([Path(k) for k in a.katalog], Path(a.index),
-                   min_pokrycie=a.min_pokrycie, tylko_schematy=a.tylko_schematy,
-                   postep=lambda tekst: print(tekst, file=sys.stderr))
-    if a.raport:
-        Path(a.raport).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.raport).write_text(json.dumps(wynik, ensure_ascii=False, indent=1), encoding="utf-8")
-    zapisane = 0
-    if wynik.get("znalezione"):
-        zapisane = zapisz(wynik, Path(a.wyj), Path(a.index))
-        wynik["zapisane"] = zapisane
-    print(json.dumps({k: v for k, v in wynik.items() if k != "wiazania"},
-                     ensure_ascii=False, indent=1))
-    return 0 if (wynik.get("znalezione") or a.tylko_schematy or wynik.get("blad")) else 1
+    try:
+        if args.audyt:
+            wynik = audyt(args.dane, args.index)
+            raport = Path(args.raport)
+            raport.parent.mkdir(parents=True, exist_ok=True)
+            raport.write_text(json.dumps(wynik, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print(json.dumps(wynik, ensure_ascii=False, indent=1))
+        statystyka = zbuduj(args.dane, args.index)
+    except (baza_gry.BazaError, CutscenyError) as blad:
+        print(f"błąd: {blad}", file=sys.stderr)
+        return 1
+    print(json.dumps(statystyka, ensure_ascii=False))
+    return 0
 
 
 if __name__ == "__main__":

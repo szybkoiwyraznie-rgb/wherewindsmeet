@@ -350,6 +350,28 @@ def _bloki_napisow(ix) -> list[dict]:
     return bloki
 
 
+def _przestrzen_cutscen(index: str | Path) -> dict[int, int]:
+    """Cutscena → przestrzeń, w której film się odgrywa (`index/cutsceny_meta.jsonl`).
+
+    Plik powstaje w `tools/cutsceny_z_bazy.py` z tabeli `cutscenes`
+    (kolumna `cutscene_space_no`). Dzięki niemu cutscena, której scena-kotwica
+    nie ma mapy, trafia do swojej krainy, a nie do sekcji „Sceny bez mapy”.
+    """
+    plik = Path(index) / "cutsceny_meta.jsonl"
+    if not plik.exists():
+        return {}
+    mapa: dict[int, int] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            wiersz = json.loads(linia)
+            no, przestrzen = wiersz.get("no"), wiersz.get("przestrzen")
+            if isinstance(no, int) and isinstance(przestrzen, int) and not isinstance(przestrzen, bool):
+                mapa[no] = przestrzen
+    return mapa
+
+
 def _napisy_z_bazy(index: str | Path) -> dict[int, list[str]]:
     """Cutscena → jej napisy z `index/cutsceny_napisy.jsonl`.
 
@@ -407,6 +429,33 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
     for jednostka in cutsceny_bez_grupy:
         cutsceny_wg_numeru[int(jednostka["n"])] = jednostka
 
+    # Gdzie cutscena naprawdę stoi: krainę daje scena-kotwica, a gdy ta nie ma
+    # mapy — własna przestrzeń cutsceny z bazy gry (`cutscene_space_no`).
+    mapa_kraina = {mapa: k["kraina"] for k in krainy for mapa in k["mapy"]}
+    przestrzen_cutscen = _przestrzen_cutscen(index)
+
+    def kraina_cutsceny(jednostka: dict, kotwica: str) -> str:
+        if kotwica != BEZ_MAPY or jednostka.get("t") != "cutscena":
+            return kotwica
+        no = jednostka.get("n")
+        if not isinstance(no, int):
+            return kotwica
+        kraina = mapa_kraina.get(przestrzen_cutscen.get(no))
+        return kraina if kraina in kolejnosc_krain else kotwica
+
+    wstawki: dict[tuple[str, int], list[dict]] = defaultdict(list)
+    przeniesione: dict[str, list[dict]] = defaultdict(list)
+    for numer, lista in przy_scenie.items():
+        kotwica = przypisanie.get(numer, BEZ_MAPY)
+        for jednostka in lista:
+            cel = kraina_cutsceny(jednostka, kotwica)
+            if cel == kotwica:
+                wstawki[(kotwica, numer)].append(jednostka)
+            else:
+                przeniesione[cel].append(jednostka)
+    for lista in przeniesione.values():
+        lista.sort(key=lambda j: j.get("n") or 0)
+
     z_bazy = _napisy_z_bazy(index)
     klucze_z_bazy = {k for klucze in z_bazy.values() for k in klucze}
     for no, klucze in z_bazy.items():
@@ -433,9 +482,11 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
 
     for kraina in kolejnosc_krain:
         for numer in (n for n in sceny if przypisanie.get(n) == kraina):
-            for jednostka in przy_scenie.get(numer, ()):
+            for jednostka in wstawki.get((kraina, numer), ()):
                 jednostki.append({**jednostka, "s": kraina})
             jednostki.append({"t": "scena", "n": numer, "s": kraina})
+        for jednostka in przeniesione.get(kraina, ()):
+            jednostki.append({**jednostka, "s": kraina})
 
     cutsceny_bez_grupy.sort(key=lambda j: j["n"])
     for jednostka in cutsceny_bez_grupy:
@@ -462,6 +513,7 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
                                     if j["t"] == "cutscena" and j["s"] != BEZ_GRUPY),
         "cutscen_bez_grupy": sum(1 for j in jednostki
                                  if j["t"] == "cutscena" and j["s"] == BEZ_GRUPY),
+        "cutscen_przeniesionych_do_krain": sum(len(v) for v in przeniesione.values()),
         "prolog": sum(1 for j in jednostki if j["t"] == "prolog"),
         "napisy_blokow": sum(1 for j in jednostki if j["t"] == "napisy"),
         "napisy_linii": sum(len(j.get("k") or []) for j in jednostki if j["t"] == "napisy"),

@@ -1,8 +1,10 @@
 """Wiązanie napis ↔ cutscena z bazy gry (`tools/cutsceny_z_bazy.py`).
 
-Dane w testach są wymyślone: budujemy małą bazę w formacie gry (MANIFEST,
-`index*`, `data*`) i sprawdzamy, że program znajduje tabelę wiążącą oraz że
-`chronologia` korzysta z wyniku.
+Dane w testach są wymyślone: podajemy funkcjom gotowe słowniki (tak, jakby przyszły
+z bazy), żeby sprawdzić samą regułę: numer cutsceny bierzemy **tylko** z kodu filmu
+w nazwie nagrania (`vo_…_cs_<kod>_<numer>` ↔ `cutscenes.cine_name` = `sq001_<kod>`).
+Druga klasa sprawdza, że `chronologia` kładzie cutscenę w krainie wskazanej przez
+jej własną przestrzeń, gdy scena-kotwica mapy nie ma.
 """
 
 from __future__ import annotations
@@ -13,87 +15,71 @@ import unittest
 from pathlib import Path
 
 from tools import chronologia, cutsceny_z_bazy
-from tests.test_baza_gry import (container, index_chunk, manifest_chunk, pad8,
-                                 schema_chunk, struct_row)
-
-KATALOG = Path(__file__).resolve().parent.parent
 
 
-def _baza(katalog: Path, *, z_danymi: bool = True) -> None:
-    """Baza z jedną tabelą `cutscene_subtitle(cutscene_no, text_id)`."""
-    wiersze = [(30161, 591141), (30161, 591149), (30177, 590000)]
-    if z_danymi:
-        wartosci = [pad8(struct_row([(0, cut), (1, tekst)])) for cut, tekst in wiersze]
-        dane = b"".join(wartosci)
-        offsety, pozycja = [], 0
-        for wartosc in wartosci:
-            offsety.append(pozycja)
-            pozycja += len(wartosc) // 8
-        (katalog / "data1").write_bytes(container([dane]))
-        (katalog / "index1").write_bytes(container([
-            index_chunk([(1, (1, 0, offsety[0], len(wartosci[0]) // 8)),
-                         (2, (1, 0, offsety[1], len(wartosci[1]) // 8)),
-                         (3, (1, 0, offsety[2], len(wartosci[2]) // 8))]),
-            schema_chunk(["cutscene_no", "text_id"]),
-        ]))
-    else:
-        (katalog / "index1").write_bytes(container([schema_chunk(["cutscene_no", "text_id"])]))
-    manifest = manifest_chunk([
-        {"name": "cutscene_subtitle", "rows": len(wiersze),
-         "parts": [(1, 0)] if z_danymi else [], "schema": (1, 1 if z_danymi else 0),
-         "flags": 0x400},
-    ])
-    (katalog / "MANIFEST").write_bytes(container([manifest]))
+class KodFilmu(unittest.TestCase):
+    def test_kod_cine_z_prefiksem_zadania(self):
+        self.assertEqual(cutsceny_z_bazy.kod_cine("sq001_zlxl"), "zlxl")
+        self.assertEqual(cutsceny_z_bazy.kod_cine("sq001_zlxl_mobile"), "zlxl_mobile")
+        self.assertEqual(cutsceny_z_bazy.kod_cine("huafang"), "huafang")
+        self.assertIsNone(cutsceny_z_bazy.kod_cine(None))
+        self.assertIsNone(cutsceny_z_bazy.kod_cine(""))
+
+    def test_kod_z_nagrania_bierze_najdluzszy_kandydat(self):
+        kody = {"zlxl": {30161}, "zlxl_mobile": {30663}}
+        self.assertEqual(cutsceny_z_bazy.kod_z_nagrania("vo_sm_sxdm4_cs_zlxl_hx_02", kody), "zlxl")
+        self.assertEqual(cutsceny_z_bazy.kod_z_nagrania("vo_sm_x_cs_zlxl_mobile_hx_02", kody),
+                         "zlxl_mobile")
+        self.assertIsNone(cutsceny_z_bazy.kod_z_nagrania("vo_ss_yypsm8p2_npc_82", kody))
 
 
-def _index(katalog: Path) -> None:
-    """Wyciąg z gry: numery cutscen i wiersze puli napisów."""
-    katalog.mkdir(parents=True, exist_ok=True)
-    (katalog / "przerywniki.jsonl").write_text(
-        json.dumps({"no": 30161, "streszczenie": "a"}) + "\n" +
-        json.dumps({"no": 30177, "streszczenie": "b"}) + "\n", encoding="utf-8")
-    (katalog / "cutsceny_kontekst.jsonl").write_text(
-        json.dumps({"typ": "napis", "wiersz": 591141, "k": "klucz1"}) + "\n" +
-        json.dumps({"typ": "napis", "wiersz": 591149, "k": "klucz2"}) + "\n" +
-        json.dumps({"typ": "napis", "wiersz": 590000, "k": "klucz3"}) + "\n",
-        encoding="utf-8")
-
-
-class SzukanieWiazania(unittest.TestCase):
+class WiazanieNapisow(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
-        self.dane = self.root / "dane"
-        self.dane.mkdir()
-        self.index = self.root / "index"
-        _index(self.index)
+        self.kody = {"zlxl": {30161}, "tsbd": {30707}, "wielokrotny": {1, 2}}
+        self.pula = {
+            "老大 你快醒醒啊": [(591149, "klucz1")],
+            "不是说好一起去将军祠吗": [(591150, "klucz2")],
+            "kwestia bez nagrania": [(591151, "klucz3")],
+            "kod niejednoznaczny": [(591152, "klucz4")],
+        }
+        self.nagrania = {
+            "老大 你快醒醒啊": {"vo_sm_sxdm4_cs_zlxl_hx_02"},
+            "不是说好一起去将军祠吗": {"vo_sm_sxdm4_cs_tsbd_hx_05"},
+            "kod niejednoznaczny": {"vo_sm_sxdm4_cs_wielokrotny_hx_01"},
+        }
 
-    def test_znajduje_tabele_i_zapisuje_wiazanie(self):
-        _baza(self.dane)
-        wyj = self.root / "cutsceny_napisy.jsonl"
-        wynik = cutsceny_z_bazy.szukaj([self.dane], self.index)
-        self.assertIsNotNone(wynik["znalezione"], wynik)
-        self.assertEqual(wynik["znalezione"]["tabela"], "cutscene_subtitle")
-        zapisane = cutsceny_z_bazy.zapisz(wynik, wyj, self.index)
-        self.assertEqual(zapisane, 3)
-        linie = [json.loads(x) for x in wyj.read_text(encoding="utf-8").splitlines()]
-        self.assertEqual([(x["no"], x["wiersz"], x["k"]) for x in linie],
-                         [(30161, 591141, "klucz1"), (30161, 591149, "klucz2"),
-                          (30177, 590000, "klucz3")])
+    def test_wiaze_po_kodzie_filmu(self):
+        napisy, statystyka = cutsceny_z_bazy.wiaz_napisy(self.pula, self.nagrania, self.kody)
+        self.assertEqual([(w["no"], w["wiersz"], w["k"], w["dowod"]) for w in napisy],
+                         [(30161, 591149, "klucz1", "vo:zlxl"),
+                          (30707, 591150, "klucz2", "vo:tsbd")])
+        self.assertEqual(statystyka["wiazan"], 2)
+        # bez nagrania: 1 napis, niejednoznaczny kod: 1 napis
+        self.assertEqual(statystyka["bez_nagrania"], 1)
+        self.assertEqual(statystyka["bez_kodu_filmu"], 1)
 
-    def test_same_schematy_wystarcza_do_wskazania_tabeli(self):
-        _baza(self.dane, z_danymi=False)
-        wynik = cutsceny_z_bazy.szukaj([self.dane], self.index, tylko_schematy=True)
-        self.assertEqual(wynik["tryb"], "schematy")
-        self.assertIn("cutscene_subtitle", wynik["podejrzanych"])
-        self.assertEqual(wynik["wiazania"], {})
+    def test_kod_wskazujacy_wiele_cutscen_jest_odrzucany(self):
+        napisy, statystyka = cutsceny_z_bazy.wiaz_napisy(
+            {"kod niejednoznaczny": [(591152, "klucz4")]}, self.nagrania, self.kody)
+        self.assertEqual(napisy, [])
+        self.assertEqual(statystyka["bez_kodu_filmu"], 1)
 
-    def test_bez_danych_nie_udaje_wiazania(self):
-        _baza(self.dane, z_danymi=False)
-        wynik = cutsceny_z_bazy.szukaj([self.dane], self.index)
-        self.assertIsNone(wynik["znalezione"])
-        self.assertIn("brak plików data*", wynik["blad"])
+
+class MetadaneCutscen(unittest.TestCase):
+    def test_bierze_przestrzen_i_czas(self):
+        wiersze = [
+            (30161, {"no": 30161, "cutscene_space_no": 501, "cine_duration": 78.664,
+                     "cine_name": "sq001_zlxl"}),
+            (30083, {"no": 30083, "cutscene_space_no": 255, "cine_duration": 0}),
+            (1, {"no": 1}),
+        ]
+        meta = cutsceny_z_bazy.metadane(wiersze, {30161: {"fenbao": "qinghe"}})
+        self.assertEqual(meta, [{"no": 30161, "przestrzen": 501, "czas_s": 78.7,
+                                 "film": "sq001_zlxl", "pakiet": "qinghe"}])
+
+    def test_bez_przestrzeni_nie_zgadujemy(self):
+        meta = cutsceny_z_bazy.metadane([(2, {"no": 2, "cutscene_space_no": 0})])
+        self.assertEqual(meta, [])
 
 
 class ChronologiaCzytaWiazanie(unittest.TestCase):
@@ -110,6 +96,21 @@ class ChronologiaCzytaWiazanie(unittest.TestCase):
     def test_brak_pliku_to_puste_wiazanie(self):
         with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(chronologia._napisy_z_bazy(Path(tmp)), {})
+
+
+class ChronologiaCzytaPrzestrzen(unittest.TestCase):
+    def test_przestrzen_cutsceny_z_meta(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            katalog = Path(tmp)
+            (katalog / "cutsceny_meta.jsonl").write_text(
+                json.dumps({"no": 30161, "przestrzen": 501, "czas_s": 78.7}) + "\n" +
+                json.dumps({"no": 30189, "film": "sq005_znwm"}) + "\n",
+                encoding="utf-8")
+            self.assertEqual(chronologia._przestrzen_cutscen(katalog), {30161: 501})
+
+    def test_brak_pliku_to_pusta_mapa(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(chronologia._przestrzen_cutscen(Path(tmp)), {})
 
 
 if __name__ == "__main__":

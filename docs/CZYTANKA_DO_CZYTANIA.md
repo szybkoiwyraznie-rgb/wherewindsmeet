@@ -42,17 +42,24 @@ Zasady kolejności:
    `# Cutsceny bez grupy zadań` — nie udajemy, że znamy ich miejsce,
 6. **napisy przerywników** (pula `text_msg`, 2 688 wierszy) nie leżą już w 03.
    Napis w danych gry **nie ma numeru cutsceny** — ma tylko identyfikator wiersza
-   i nazwę nagrania (`vo_sm_sxdm4_cs_zlxl_hx_07`). Dlatego:
-   * blok, którego scenę rozpoznajemy po sprawdzonej kotwicy
-     (`kontekst_cutscen.KOTWICE_SCEN_TM`) albo po prefiksie nagrania
-     (`VO_DOMENY`), dostaje numer cutsceny i stoi **w tej cutscenie** (pole `kn`,
-     przed streszczeniem) — tak `## Cutscena 30161` ma całą scenę przebudzenia
-     z Ruby („Wodzu, obudź się!”),
+   i czasem nazwę nagrania (`vo_sm_sxdm4_cs_zlxl_hx_07`). Sprawdzone na pakiecie
+   aktualizacji z 2026-11-13: osie czasu cutscen nie są w nim w ogóle, a osie
+   czasu dialogów (`dialog_timelines.*`) nie zawierają ani jednego napisu puli.
+   Dlatego:
+   * napis, którego nagranie niesie **kod filmu** (`cs_zlxl_` ↔ `cutscenes.cine_name`
+     `sq001_zlxl`), dostaje numer cutsceny i stoi w niej (pole `kn`, przed
+     streszczeniem); takich napisów jest 5 — 4 w `## Cutscena 30161` (scena
+     przebudzenia z Ruby, „Wodzu, obudź się!”), 1 w `## Cutscena 30707`
+     (`index/cutsceny_napisy.jsonl`, dowód w polu `dowod`),
+   * blok rozpoznany po sprawdzonej kotwicy (`kontekst_cutscen.KOTWICE_SCEN_TM`)
+     albo po prefiksie nagrania (`VO_DOMENY`) trafia do cutsceny tak jak dotąd,
    * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
      w kolejności wierszy, a nie alfabetycznie.
-   Gdy uda się znaleźć w bazie gry tabelę wiążącą napis z cutsceną
-   (`tools/cutsceny_z_bazy.py` → `index/cutsceny_napisy.jsonl`), chronologia
-   kładzie **każdy** napis w jego własnej cutscenie i bloki znikają.
+7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
+   z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
+   `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101
+   cutscen wcześniej odłożonych do „Scen bez przypisanej mapy” stoi w swojej
+   krainie (燕南 194 → 218, 河西 16 → 55, 不见 6 → 20 i mniejsze).
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.

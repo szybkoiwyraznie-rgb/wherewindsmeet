@@ -125,6 +125,38 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 | Pokrycie przekładu | `tools/pokrycie_tlumaczenia.py` mierzy z `index/` i `tlumaczenie/`, co w grze zostanie po angielsku: napisy cutscen `100%`, intro `100%`, napisy filmowe `100%` (film 2 i 3 też), prolog `100%`, sceny przerywników `11,8%`, zwykłe sceny `7,4%`, cały wyciąg `15,5%`. Tryby `--brak`, `--brak-przerywnikow`, `--arkusz`, `--szukaj`; testy w `tests/test_pokrycie_tlumaczenia.py`; pomiar bez plików gry. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
+### Baza gry o cutscenach: co ma, a czego nie ma (pakiet aktualizacji 2026-11-13)
+
+Pakiet `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f` (8 ZIP-ów, 54 pliki:
+`data*`, `index*`, `MANIFEST`, mapy `translate_words_map_zh_cn`/`_en` i `_diff`)
+rozpakowany do `local/dane` daje **114 925 tabel** i 10,2 mln wierszy. Sprawdzone
+narzędziem `tools/cutsceny_z_bazy.py`:
+
+- **osie czasu cutscen nie istnieją w tym pakiecie** — rodziny z osią czasu to
+  tylko `dialog_timelines.*` (75 007 tabel, po 4 wiersze: `timeline`,
+  `used_sound_bnk`, `dialog_config`) i `AL.*` (biblioteka animacji umiejętności);
+- `dialog_timelines.<dialog_no>` to osie czasu **dialogów** — każdy
+  `EntityTextSpan` ma `time`, `duration`, `source_id`, `text` i `formatted_text`
+  (gotowy chiński tekst), ale **napisy puli `text_msg` 590000–592694 nie
+  występują tam wcale** (0 trafień na 6 844 914 liczb w osiach; tekstowo pokrywa
+  się tylko 392 z 2 588 linii, rozsianych po 360 dialogach, najwyżej 8 w jednym);
+- **żadna tabela nie wskazuje wierszy puli ani ich hashy** `text_msg.content`
+  (0 trafień po hashu w całej bazie; trafienia po samym numerze wiersza są
+  przypadkowe — inne tabele mają własne identyfikatory w tym samym zakresie);
+- co jest: `sound_data` (tekst → nazwa nagrania; nagrania cutscen mają w nazwie
+  kod filmu `cs_<kod>_`, zgodny z `cutscenes.cine_name` = `sq001_<kod>`),
+  `cutscenes` (3 990 wierszy: `cine_name`, `cine_path`, `cine_duration`,
+  `cutscene_space_no`, `montage_num`, `mobile_replace`) i
+  `fenbao_cutscene_info` (224 wiersze z pakietem i plikiem `.cine`).
+
+Skutek w Czytance: `index/cutsceny_napisy.jsonl` ma 5 napisów z twardym śladem
+(4 w `## Cutscena 30161`, 1 w `## Cutscena 30707`), a `index/cutsceny_meta.jsonl`
+— przestrzeń i czas trwania 1 343 cutscen, z czego 1 310 ma przestrzeń; dzięki
+niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain.
+`--audyt` przelicza dowody negatywne i zapisuje `out/audyt_cutscen.json`.
+Żeby przypiąć resztę puli (2 683 napisy), trzeba **osie czasu cutscen** — pliki
+`.cine` albo tabelę, której ten pakiet nie zawiera. 487 testów zielonych.
+
 ## Otwarte ustalenia
 
 1. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
