@@ -1393,3 +1393,52 @@ cudzego kodu ani nie wymagają tej procedury.
   `docs/STATUS.md` (najnowsza paczka, 14 testów / 546),
   `docs/CZYTANKA_DO_CZYTANIA.md` (opis przerwy; v9-oznaczenie „kolejności
   z ekranu" zostaje jako historia), ten dziennik.
+
+### 2026-11-17 (4) — Powrót do porzuconego zadania: trzy indeksy z `.mpk` — badania + kit skanera
+
+- **Zadanie (właściciel, 2026-11-17):** ponownie podejść do porzuconego
+  zadania znalezienia w danych gry trzech brakujących powiązań: (1) scena →
+  następna scena (`## Scena 4700001` → `4700041` → `4700352`),
+  (2) aktywacja POI → start sceny, (3) osie czasu `.cine` cutscen.
+  Prawdopodobne miejsce: ~200 plików `Resources*.mpk` (1 GB/szt.), nie
+  pliki HD, które mamy.
+- **Badania publicznych źródeł (wnioski w `docs/MPK_FORMAT_RESEARCH.md`):**
+  * `Zhincore/wwm-messiah-tools` (MIT, aktywna, ostatni commit dziś):
+    `Resources.mpkinfo` (root) wskazuje `Resources.mpk` i `Resources<N>.mpk`
+    przez pole `packed >> 1` — ~200 `Resources*.mpk` to **części jednej
+    logicznej paczki**, a indeks podaje, który wpis siedzi w której.
+    Format `.mpkinfo` v3: `u32 3, u32 count`, wpisy 20 B
+    `(id_lo, id_hi, offset, size, packed)`, trailer 16 B; `file_id =
+    (MurmurHash3_x86_32(path) << 32) | lo32` (ogon ścieżki bez rozszerzenia;
+    ścieżki GUID-owe — fast path); bloki EZST (AES-256-ECB prefiks + zstd),
+    `ZSTD` (plain), LuaText (LZ4). `Patch.mpkdb` = SQLite, tabele
+    `info0`/`info1`, `v0` signed i64, `v6` offset.
+  * `mohebbiamin/WWM-MPK-Tool` — zamknięty unsigned exe; tylko potwierdza, że
+    paczki da się czytać; **nie wprowadzamy go do łańcucha**.
+  * `dest1yo/wwm_utils` — VirusTotal flag (Trojan) według wątku ResHax;
+    **zakazany**.
+- **Roadmapa:** `docs/ROADMAP_MPK_INDEKSY.md` — bramki 0–5 (badania + kit →
+  raport z 1. uruchomienia → wycinarka `.cine`/`.etsb` → analiza `.cine` →
+  analiza `.etsb` (następstwo scen, POI) → domknięcie). Dalsze sesje wykonują
+  kolejne bramki.
+- **Kit `WWM_MPK_Skaner_v1.zip` (`dist/`, 36 914 B, SHA-256
+  `1d27db14b2f7f2345cef5656e6bc629e86b732809502637b353b2f3144c87f16`):**
+  `tools/mpk_skaner.py` (stdlib, zero sieci, tylko odczyt — paczki, indeksy
+  i okienka po 4 KB), `SKANUJ.bat` (dwuklik, Python 3.10+ wbudowany,
+  bez pip), `narzedzia/kandydaci.jsonl` (`7 130` kandydatów: `174` realnych
+  ścieżek `client/dialogs/...` z `index/poi.jsonl` + `138` wariantów
+  `.ets↔.etsb`, `6 818` wzorców `.cine` z `cine_name` — wzorzec potwierdzony
+  przez `cine_path` z tabeli `cutscenes`, np. `Char/e_01_cutscene/qhrw/
+  sq001_zlxl/sq001_zlxl.cine`). Skaner haszuje kandydatów i szuka ich
+  **w indeksach** — od razu wiadomo, czy `.cine`/`.etsb` leżą w
+  `Resources*.mpk`, w `Patch*.mpk`, czy w ogóle nie leżą lokalnie.
+  Raport: `RAPORT.json` + `PODSUMOWANIE.txt`; całość jako
+  `WWM_MPK_Skaner_WYNIK.zip` (właściciel odsyła na Dysk; paczek `.mpk` NIE).
+- **Weryfikacja:** testy jednostkowe + integracyjne na danych syntetycznych
+  (`tests/test_mpk_skaner.py`, 14 testów) i pełny zestaw 560 zielony;
+  `tools/check_repository.py` OK. **Nie uruchamiano na maszynie właściciela**
+  — to sonda; nie zawiera i nie otwiera jeszcze prawdziwych paczek.
+- **Ograniczenia:** trafień wzorców `.cine` nie widzieliśmy na żywych danych
+  (wzorce to hipoteza z jednego znanego przykładu); `Patch.mpkdb` czytany
+  `mode=ro`; offsety mogą być niefizyczne dla „lite" instalacji (skaner to
+  wykrywa). Następna sesja: bramka 1 — odczyt wyniku od właściciela.

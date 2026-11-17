@@ -427,3 +427,15 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
 4. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
+5. **Odzyskanie trzech brakujących indeksów z `.mpk` (scena→scena, POI→scena,
+   osie `.cine`) — uruchomione 2026-11-17 w kolejnych sesjach wg
+   [ROADMAP_MPK_INDEKSY.md](ROADMAP_MPK_INDEKSY.md).** Zbudowano i opisano
+   [`MPK_FORMAT_RESEARCH.md`](MPK_FORMAT_RESEARCH.md) (format `.mpkinfo` v3,
+   `Patch.mpkdb`, `file_id`, EZST/ZSTD/LuaText — ze źródeł publicznych MIT) oraz
+   gotowy do wysłania kit `dist/WWM_MPK_Skaner_v1.zip` (`tools/mpk_skaner.py`,
+   `SKANUJ.bat`, `narzedzia/kandydaci.jsonl` — `7 130` kandydatów: `174` ścieżek
+   POI z `index/poi.jsonl` + warianty rozszerzenia, `6 818` wzorców `.cine`
+   z `cine_name`; tylko odczyt, zero sieci). Właściciel klika `SKANUJ.bat` na
+   maszynie z grą i odsyła `WWM_MPK_Skaner_WYNIK.zip` na Dysk Google.
+   Poparcie i granice: skaner jest jedynie sondą — nie wydobywa jeszcze
+   `.cine`/`.etsb` i niczego nie zakłada z góry.
