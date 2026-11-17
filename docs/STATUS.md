@@ -442,6 +442,12 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    (folder „Where Winds Meet”, id `1lhq0Ic8S7mIpwf2Jx7Du7rraHtLhwacE`,
    SHA-256 `92a2f7d7fa8d46bcc94a241c6ebac6c38ec0fe8703ff76d5f32a51f2c4d9b2c8`):
    sonda + wycinanie surowych bloków + `mpkdb_dump.json` (BLOB→hex), tylko
-   odczyt, zero sieci, bez instalowania bibliotek; v2 w koszu. Właściciel
-   uruchamia i odsyła wynik (~3 MB); potem dekoder EZST po naszej stronie
-   i analiza `.cine`.
+   odczyt, zero sieci, bez instalowania bibliotek; v2 w koszu. Wynik u
+   właściciela kompletny (14/14 `.cine`, 240/240 Lua LT1; SHA-256
+   `ca183784…`). **Dekodowane po naszej stronie** (publiczny algorytm
+   MIT): format `.cine` opisany; **reguła VFS `LuaText/` + debug_source
+   potwierdzona 240/240**; nasz `file_id` zwalidowany na danych gry.
+   Artefakty pochodne w `index/mpk/` (z opisem dla przyszłych agentów),
+   surowe bajty poza Git. **Kit v4** na Dysku (okno wyboru folderu gry +
+   kandydaci POI z prefiksami `LuaText/…`) — właściciel odpala i odsyła
+   wynik; następna Bramka 3: oś `.cine` i weryfikacja 30161.

@@ -110,3 +110,22 @@ zrzuceniu Lua (`LT1.mpk`).
 - Po naszej stronie: odkodowanie EZST, analiza `.cine` (podział bloków,
   zdarzenia), harvest ścieżek z Lua → kandydaci v2 → kolejne uruchomienie
   skanera.
+
+## 6. Przebieg v3 i dekodowanie (2026-11-17, po zwrocie)
+
+- **Wynik u właściciela:** `WWM_MPK_Skaner_WYNIK (1).zip` (2 207 306 B,
+  SHA-256 `ca1837849990344e97e0014b75c087ce864c7fceeaa1fcc25c2008515dec9936`);
+  wycięte 14/14 `.cine` (`106 800 B`) i 240/240 bloków LT1 (`2 568 577 B`);
+  `mpkdb_dump.json` OK.
+- **Dekodowanie (publiczny algorytm MIT `Zhincore/wwm-messiah-tools`):**
+  14/14 `.cine` OK (rozmiary jak w indeksie); format `c1 59 41 0d` + u64le
+  długość + u8 n + tabela pól null-terminated + binarna oś czasu.
+  240/240 LuaText OK → Lua 5.4 chunki.
+- **Reguła VFS potwierdzona: ścieżka = `LuaText/` + debug_source**
+  (240/240 file_id zgodnych). `pak` z `Patch.mpkdb` = `LT1.mpk`
+  (`2 097 152 + 471 425 = 2 568 577 B`); 6 wierszy-ścieżek `LuaText/patch/*`
+  spina mpkdb z paczką. Nasza implementacja `file_id` zwalidowana na
+  danych gry (5/5 + 240/240).
+- **Artefakty w repo:** `index/mpk/` (pochodne; surowe bajty poza Git —
+  patrz `index/mpk/README.md`). `POI storyline` dalej 0 trafień bez
+  prefiksu → kit v4 z kandydatami `LuaText/…`.

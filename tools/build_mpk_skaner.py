@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v3.zip` (bez danych gry).
+"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v4.zip` (bez danych gry).
 
-Od v3 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
+Od v4 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
 z `LT1.mpkinfo` do `wyciete/`, (b) zrzuca `Patch.mpkdb` (schema + wszystkie
 wiersze, kolumny BLOB jako hex) do `mpkdb_dump.json`. Bez dekodowania EZST —
 to robimy po swojej stronie. Krok 5 nigdy nie blokuje powstania ZIPa.
@@ -14,7 +14,7 @@ Eksportuje ze `status/index/`:
     znanego z danych przykładu `Char/e_01_cutscene/qhrw/sq001_zlxl/sq001_zlxl.cine`.
 
 Wynik: `kandydaci.jsonl` + `mpk_skaner.py` + `SKANUJ.bat` + `CZYTAJ_TO.txt`
-spakowane deterministycznie do `dist/WWM_MPK_Skaner_v3.zip`.
+spakowane deterministycznie do `dist/WWM_MPK_Skaner_v4.zip`.
 
 Kit NIE zawiera żadnych plików gry; kandydacje to same ścieżki (teksty),
 już obecne w publicznym repozytorium.
@@ -32,7 +32,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-WERSJA = "v3"
+WERSJA = "v4"
 NAZWA_ZIP = f"WWM_MPK_Skaner_{WERSJA}.zip"
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
@@ -57,8 +57,9 @@ JAK URUCHOMIĆ
    - Potrzebny jest Python 3.10 lub nowszy (https://www.python.org/downloads/ —
      podczas instalacji zaznacz "Add python.exe to PATH"). Nie pobiera żadnych
      bibliotek — wszystko, czego skaner używa, jest wbudowane w Pythona.
-   - Skrypt zapyta o ścieżkę do folderu gry (ten z folderami Package i
-     LocalData oraz plikami Resources*.mpk). Możesz też przeciągnąć folder
+   - Otworzy się OKNO WYBORU folderu gry (ten z folderami Package i
+     LocalData oraz plikami Resources*.mpk) — wskaż go kliknięciem.
+     Ścieżki NIE trzeba wpisywać. Alternatywnie możesz przeciągnąć folder
      gry na SKANUJ.bat.
 4. Poczekaj na komunikat GOTOWE. Powstanie folder MPK_SKANER_WYNIK i plik
    WWM_MPK_Skaner_WYNIK.zip.
@@ -82,7 +83,7 @@ CZEGO SKANER NIE ROBI
 - nie uruchamia gry i nie dotyka jej procesu,
 - nie modyfikuje żadnego pliku gry (otwiera je tylko do odczytu),
 - nie wysyła żadnych danych do sieci,
-- nie odszyfrowuje bloków — rozpoznaje wyłącznie ich obecność.
+- nie odszyfrowuje bloków EZST/ZSTD — wycina je w surowej postaci.
 """
 
 BAT_TEMPLATE = """@echo off
@@ -103,7 +104,13 @@ rem 2) python z PATH
 if not defined PYEXE python -c "import sys; assert sys.version_info >= (3,10)" >nul 2>&1 && set "PYEXE=python"
 rem 3) brak Pythona 3.10+ - instrukcja
 if not defined PYEXE goto no_python
-%PYEXE% "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK" %*
+if "%~1"=="" (
+  rem bez argumentow - skaner otworzy okno wyboru folderu gry
+  %PYEXE% "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK"
+) else (
+  rem przeciagniety na ikone folder gry
+  %PYEXE% "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK" --gra "%~1"
+)
 set "RESULT=%ERRORLEVEL%"
 echo.
 if "%RESULT%"=="0" goto done
@@ -160,6 +167,15 @@ def kandydaci(index_dir: Path) -> list[dict]:
                 wariant = _swap_ets(story)
                 if wariant:
                     dodaj(wariant, "poi_storyline_wariant_ext")
+                # Prefiksy VFS potwierdzone na naszej instalacji (LT1):
+                # bloki Lua leżą pod `LuaText/<sciezka-ze-zrodla-debug>`,
+                # np. `LuaText/patch/patch_context.lua` — 238/240+2/240 trafień file_id.
+                # POI storyline bez prefiksu nie trafiał nigdzie (0/312), więc kandydaci
+                # z prefiksami są absolutnie potrzebni.
+                for prefix in ("LuaText/", "LuaText/hexm/", "LuaText/hexm/client/storyline_data/"):
+                    dodaj(prefix + story, f"poi_storyline_prefiks:{prefix.rstrip('/')}")
+                    if wariant:
+                        dodaj(prefix + wariant, f"poi_storyline_prefiks_wariant_ext:{prefix.rstrip('/')}")
 
     meta = index_dir / "cutsceny_meta.jsonl"
     filmy: set[str] = set()
@@ -199,12 +215,14 @@ def build(output: Path, index_dir: Path) -> dict:
         json.dumps(k, ensure_ascii=False, separators=(",", ":")) + "\n" for k in kand
     ).encode("utf-8")
 
+    prefiksy = sum(v for k, v in pochodne.items() if k.startswith("poi_storyline_prefiks"))
     readme = (
         "Where Winds Meet — MPK Skaner\n"
         f"wersja: {WERSJA}\n"
         f"kandydatów ścieżek: {len(kand)} "
         f"(poi_storyline: {pochodne.get('poi_storyline', 0)}, "
         f"poi_storyline_wariant_ext: {pochodne.get('poi_storyline_wariant_ext', 0)}, "
+        f"poi_storyline_prefiks: {prefiksy}, "
         f"cine_wzorzec: {pochodne.get('cine_wzorzec', 0)})\n"
         "\n"
         + README_BODY_PL

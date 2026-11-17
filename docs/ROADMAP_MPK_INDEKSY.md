@@ -85,26 +85,30 @@ SHA-256 `0f80a219…`).
 **Wynik:** `docs/MPK_SKANER_RAPORT.md` + wpisy w
 [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md).
 
-## Bramka 2 — wycinarka `.cine` i `.etsb` (w trakcie 2026-11-17)
+## Bramka 2 — wycinarka `.cine` i `.etsb` (wykonana 2026-11-17, kit v4)
 
 **Wejście:** ustalenia z bramki 1 (14 trafień `.cine` w `Resources34.mpk`,
 240 bloków skryptowych `LT1.mpk`).
-**Zadania:**
+**Zadania (wykonane):**
 
-1. [x] Kit **`WWM_MPK_Skaner_v2.zip`** (`tools/mpk_skaner.py` od wersji
-   `wwm-mpk-skaner-v2`): sonda (jak v1) **+ wycinanie SUROWYCH bajtów**
-   trafionych kandydatów i wszystkich wpisów `LT1.mpkinfo` do `wyciete/`
-   (limity: 64 MB/blok, 512 MB łącznie) **+ `mpkdb_dump.json`**
-   (`LocalData/Patch/Patch.mpkdb`, tryb `mode=ro`, schema + wszystkie wiersze).
-   Dekodowanie EZST/ZSTD **po naszej stronie** — kit pozostaje stdlib-only,
-   bez instalacji bibliotek.
-2. [ ] Właściciel uruchamia kit v2, odsyła `WWM_MPK_Skaner_WYNIK.zip` (~3 MB).
-3. [ ] Odkodowanie EZST (`zstandard` + `pycryptodome`, prywatny venv poza
-   repozytorium): % poprawnych dekodowań `.cine`/bloków Lua, pierwsze bajty
-   `.cine` (nieznana magia — opisać, co widać).
-4. [ ] Harvest ścieżek `.cine`/`.etsb` z Lua → `kandydaci v2` → kolejne
-   uruchomienie skanera z nową listą (śledzenie regionów innych niż `qhrw`).
-**Wynik:** pierwsze prawdziwe `.cine` na stole + raport dekodowania.
+1. [x] Kit: sonda + wycinanie SUROWYCH bloków (limity 64 MB/blok,
+   512 MB łącznie) + `mpkdb_dump.json` (BLOB→hex w v3) + okno wyboru
+   folderu gry tkinter w v4 (zamiast wpisywania ścieżki z palca).
+2. [x] Przebieg właściciela na v3 → `WWM_MPK_Skaner_WYNIK (1).zip`
+   (14/14 `.cine`, 240/240 Lua LT1, dump mpkdb OK).
+3. [x] Dekodowanie EZST/LuaText (nasz `tools/mpk_artefakty.py`, publiczny
+   algorytm MIT): 14/14 `.cine` OK; 240/240 Lua OK; format `.cine`
+   opisany (magic `c1 59 41 0d`, u64le len, tabela identyfikatorów, oś
+   czasu binarnie).
+4. [x] Reguła VFS: **ścieżka = `LuaText/` + debug_source** — 240/240;
+   zwalidowany nasz `file_id` (5/5 + 240/240).
+5. [x] Artefakty pochodne commitowane: `index/mpk/` (+`README.md`),
+   generator `tools/mpk_artefakty.py`.
+6. [ ] Kit **v4** na Dysku — kandydaci POI z prefiksami `LuaText/…`;
+   właściciel uruchamia i odsyła wynik (bramka 2b — poszukiwanie prawdziwych
+   ścieżek `.etsb` POI).
+**Wynik:** pierwsze prawdziwe `.cine` na stole + raport dekodowania +
+zwalidowany hashing indeksu.
 
 ## Bramka 3 — analiza `.cine`: osie cutscen (sesja 4+)
 

@@ -34,7 +34,7 @@ potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 - [Baza danych gry (`MANIFEST` → `indexN` → `dataN`)](docs/BAZA_GRY.md)
 - [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher i one-click ze zwrotki](docs/PATCHER_WWM.md), [czytanki `.md` z fabuły i encyklopedii](docs/CZYTANKI_WWM.md), [czytanka w kolejności z gry](docs/CZYTANKA_KOLEJNOSC_GRY.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
 - [Dziennik eksperymentów](docs/EXPERIMENT_LOG.md) i [zestawienie dostaw z gry](docs/OVERSEA_INWENTARZ.md)
-- [Cine chronologia i indeksy `.mpk`](docs/MPK_FORMAT_RESEARCH.md) oraz [roadmapa odzyskania brakujących indeksów](docs/ROADMAP_MPK_INDEKSY.md)
+- [Cine chronologia i indeksy `.mpk`](docs/MPK_FORMAT_RESEARCH.md), [raport ze skanera](docs/MPK_SKANER_RAPORT.md), [artefakty `index/mpk/`](index/mpk/README.md) oraz [roadmapa odzyskania brakujących indeksów](docs/ROADMAP_MPK_INDEKSY.md)
 - [Plan etapów](docs/ROADMAP.md), [wykonalność i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows](docs/WINDOWS_OPTIONS.md), [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
   [zgłoszona instalacja Steam](docs/STEAM_REFERENCE.md),

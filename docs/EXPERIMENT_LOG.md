@@ -1545,3 +1545,46 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Uwaga:** wycięte bloki z nieudanego przebiegu v2
   (`MPK_SKANER_WYNIK\wyciete\*.bin`, 254 pliki) są po stronie właściciela —
   przebieg v3 wytnie je ponownie tak samo; nie trzeba ich robić ręcznie.
+
+### 2026-11-17 (8) — Sonda v3 wróciła z danymi: dekodowanie EZST i walidacja file_id
+
+- **Wejście:** `WWM_MPK_Skaner_WYNIK (1).zip` (`2 207 306 B`, SHA-256
+  `ca1837849990344e97e0014b75c087ce864c7fceeaa1fcc25c2008515dec9936`) —
+  pełny przebieg v3 u właściciela: 14/14 `.cine` wycięte, 240/240 Lua LT1,
+  `mpkdb_dump.json` OK (BLE → hex działa).
+- **Dekodowanie (nasz venv `/tmp`, zależności z publicznego repo MIT
+  `Zhincore/wwm-messiah-tools`):**
+  * **14/14 `.cine` zdekodowanych** — rozmiary zdekodowane == rozmiary z
+    indeksu (`match=True`). Format: magic `c1 59 41 0d` + u64le długość +
+    u8 liczba identyfikatorów + tabela pól null-terminated (np.
+    `StartTime`, `Entity`, `Camera`, `Montage`, `OverseaTag`…) + binarna
+    oś czasu. Rozmiary: 17 988–200 718 B.
+  * **240/240 LuaText zdekodowanych** — Lua 5.4 chunki; źródło
+    debuggingowe (`@<ścieżka>`) odnalezione w każdym wpisie.
+  * **REGUŁA VFS POTWIERDZONA: ścieżka VFS = `LuaText/` + debug_source** —
+    `file_id` zgadza się dla **240/240** (`match: True` we
+    `index/mpk/lt1_dekodowane.jsonl`). Dodatkowo 6 wierszy-ścieżek w
+    `Patch.mpkdb.info0` (`LuaText/patch/patch_context.lua` itd.) spina
+    pak z mpkdb: `pak = LT1.mpk` (2 097 152 + 471 425 = 2 568 577 B).
+  * **Walidacja naszego `file_id`:** `LuaText/patch/patch_context.lua` →
+    `092819317478651b` == blok `lt1_092819317478651b.bin`; analogicznie
+    consts/main/pre_check/download — 5/5. Hashing poprawny na danych gry.
+  * `Patch.mpkdb`: `info0` 854 wierszy (848 z file_id + 6 ścieżek
+    bootstrapu patchera), `info1` pusta (wierszy 0), `meta` zaciemnione
+    (rozmiar 6 B klucza / 130 B wartości; sha256 zanotowane, bajtów nie
+    zapisujemy), `v4/v5` = (0,0) ×848 + (0,1) ×6.
+- **Artefakty w repo (per instrukcja właściciela: „zapisuj wszystko jako
+  indeks i commituj od razu”):** `index/mpk/` — `README.md` (zasady dla
+  przyszłych agentów), `cine_dekodowane.jsonl`, `lt1_dekodowane.jsonl`,
+  `lt1_stringi.jsonl` (41 727 identyfikatorów z licznikami),
+  `patch_mpkdb_info0.jsonl`, `patch_mpkdb_pak.jsonl`,
+  `patch_mpkdb_meta.json`. Surowe/dekodowane bajty w `local/mpk_dekodowane/`
+  (gitignore). Generator: `tools/mpk_artefakty.py`.
+- **POI `storyline` nadal 0 trafień pod ścieżkami bez prefiksu** → kit v4
+  rozszerza kandydaci o prefiksy `LuaText/`, `LuaText/hexm/`,
+  `LuaText/hexm/client/storyline_data/` (i warianty rozszerzeń).
+  Kit **v4** (`wwm-mpk-skaner-v4`): okno wyboru folderu gry (tkinter,
+  jak w patcherze) zamiast wpisywania ścieżki z palca — uwaga właściciela
+  (1). Wyślij na Dysk per instrukcja.
+- **Dalej:** właściciel uruchamia v4, odsyła wynik; Bramka 3 = analiza
+  osi `.cine` (powiązanie z `cutsceny_meta`, weryfikacja 30161).

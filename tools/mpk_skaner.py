@@ -48,7 +48,7 @@ import sys
 import zipfile
 import hashlib
 
-WERSJA = "wwm-mpk-skaner-v3"
+WERSJA = "wwm-mpk-skaner-v4"
 DOMYSLNI_KANDYDACI = Path(__file__).resolve().parent / "kandydaci.jsonl"
 
 # Magie bloków rozpoznawane w paczkach Messiah (docs/MPK_FORMAT_RESEARCH.md §1.5).
@@ -887,10 +887,25 @@ def _posumowanie(raport: dict) -> str:
     return "\n".join(linie) + "\n"
 
 
+def _wybierz_folder_gui(tytul: str) -> str:
+    """Okno wyboru katalogu (jak w patcherze). Zwraca '' gdy niedostępne/anulowane."""
+    try:
+        import tkinter as tk  # noqa: PLC0415
+        from tkinter import filedialog  # noqa: PLC0415
+
+        root_tk = tk.Tk()
+        root_tk.withdraw()
+        selected = filedialog.askdirectory(title=tytul) or ""
+        root_tk.destroy()
+        return selected
+    except Exception:
+        return ""
+
+
 def main(argv: list[str] | None = None) -> int:
     _utf8()
     parser = argparse.ArgumentParser(description="Sonduje paczki *.mpk WWM bez rozpakowywania.")
-    parser.add_argument("--gra", default="", help="katalog instalacji gry")
+    parser.add_argument("--gra", default="", help="katalog instalacji gry (gdy podany, pomija okno wyboru)")
     parser.add_argument("--wyjscie", default="", help="folder wynikowy (domyślnie MPK_SKANER_WYNIK obok skryptu)")
     parser.add_argument("--kandydaci", default="", help="plik kandydaci.jsonl (domyślnie obok skryptu)")
     parser.add_argument("--probka", type=int, default=12, help="ile wejść próbkować na paczkę (domyślnie 12)")
@@ -902,9 +917,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.non_interactive:
             print("BŁĄD: w trybie --non-interactive podaj --gra <katalog gry>")
             return 2
-        try:
-            args.gra = input("Podaj ścieżkę do folderu gry Where Winds Meet: ").strip().strip('"')
-        except EOFError:
+        print("Otwieram okno wyboru folderu gry ... (zamknij okno, aby przerwać)")
+        args.gra = _wybierz_folder_gui("Wybierz główny folder Where Winds Meet")
+        if not args.gra:
+            print("Anulowano wybór folderu gry. Użycie ręczne: python mpk_skaner.py --gra <folder gry>")
             return 2
     return buduj_raport(args)
 
