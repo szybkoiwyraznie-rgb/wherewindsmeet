@@ -428,18 +428,16 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 4. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).
 5. **Odzyskanie trzech brakujących indeksów z `.mpk` (scena→scena, POI→scena,
-   osie `.cine`) — uruchomione 2026-11-17 w kolejnych sesjach wg
-   [ROADMAP_MPK_INDEKSY.md](ROADMAP_MPK_INDEKSY.md).** Zbudowano i opisano
-   [`MPK_FORMAT_RESEARCH.md`](MPK_FORMAT_RESEARCH.md) (format `.mpkinfo` v3,
-   `Patch.mpkdb`, `file_id`, EZST/ZSTD/LuaText — ze źródeł publicznych MIT) oraz
-   gotowy do wysłania kit `dist/WWM_MPK_Skaner_v1.zip` (`tools/mpk_skaner.py`,
-   `SKANUJ.bat`, `narzedzia/kandydaci.jsonl` — `7 130` kandydatów: `174` ścieżek
-   POI z `index/poi.jsonl` + warianty rozszerzenia, `6 818` wzorców `.cine`
-   z `cine_name`; tylko odczyt, zero sieci). Kit leży na Dysku Google
-   (folder „Where Winds Meet”, id `1dcU3_eqk6rME9l5HxE3R5qZlz3h0mcWC`,
-   SHA-256 `3a165d9841daa7b8c40c37ad441ec00dbab11b0cf961c41df0da152256ddce49`;
-   poprzednia paczka z błędem cudzysłowów w `SKANUJ.bat` w koszu).
-   Właściciel klika `SKANUJ.bat` na
-   maszynie z grą i odsyła `WWM_MPK_Skaner_WYNIK.zip` na Dysk Google.
-   Poparcie i granice: skaner jest jedynie sondą — nie wydobywa jeszcze
-   `.cine`/`.etsb` i niczego nie zakłada z góry.
+   osie `.cine`) — bramki 0–1 wykonane 2026-11-17; kit v2 (wycinarka) na Dysku.**
+   [ROADMAP_MPK_INDEKSY.md](ROADMAP_MPK_INDEKSY.md) /
+   [MPK_SKANER_RAPORT.md](MPK_SKANER_RAPORT.md) /
+   [MPK_FORMAT_RESEARCH.md](MPK_FORMAT_RESEARCH.md).
+   Z raportu właściciela: **489 `*.mpk` (211 GB); `Resources.mpkinfo` =
+   2 604 099 wpisów, offsety fizyczne wszędzie; trafień 14 × `.cine`
+   (`e_01_cutscene/qhrw/...`) w `Resources34.mpk`; 0 trafień `.etsb`;
+   `LT1.mpk` to paczka skryptowa; `Patch.mpkdb` = pełny spis łatki 2.4
+   (854 wpisy)**. Kit **`WWM_MPK_Skaner_v2.zip`** na Dysku (folder
+   „Where Winds Meet”): sonda + wycinanie surowych bloków trafień i wszystkich
+   240 bloków `LT1.mpkinfo` + `mpkdb_dump.json`; tylko odczyt, zero sieci,
+   bez instalowania bibliotek. Właściciel uruchamia i odsyła wynik (~3 MB);
+   potem dekoder EZST po naszej stronie i analiza `.cine`.

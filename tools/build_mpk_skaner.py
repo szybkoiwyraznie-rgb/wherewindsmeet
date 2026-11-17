@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v1.zip` (bez danych gry).
+"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v2.zip` (bez danych gry).
+
+Od v2 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
+z `LT1.mpkinfo` do `wyciete/`, (b) zrzuca `Patch.mpkdb` (schema + wszystkie
+wiersze) do `mpkdb_dump.json`. Bez dekodowania EZST — to robimy po swojej stronie.
 
 Eksportuje ze `status/index/`:
   * `index/poi.jsonl` → pole `storyline` — prawdziwe ścieżki klienta
@@ -9,7 +13,7 @@ Eksportuje ze `status/index/`:
     znanego z danych przykładu `Char/e_01_cutscene/qhrw/sq001_zlxl/sq001_zlxl.cine`.
 
 Wynik: `kandydaci.jsonl` + `mpk_skaner.py` + `SKANUJ.bat` + `CZYTAJ_TO.txt`
-spakowane deterministycznie do `dist/WWM_MPK_Skaner_v1.zip`.
+spakowane deterministycznie do `dist/WWM_MPK_Skaner_v2.zip`.
 
 Kit NIE zawiera żadnych plików gry; kandydacje to same ścieżki (teksty),
 już obecne w publicznym repozytorium.
@@ -27,7 +31,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-WERSJA = "v1"
+WERSJA = "v2"
 NAZWA_ZIP = f"WWM_MPK_Skaner_{WERSJA}.zip"
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
@@ -38,8 +42,11 @@ indeksy plików (`Resources.mpkinfo`, `LocalData/Patch/*.mpkinfo`,
 `Patch.mpkdb`) i czy któryś z indeksów zna już pliki, których szukamy:
 `.cine` (osie cutscen) oraz `.etsb` (skrypty klienta, np. dialog POI).
 
-Skaner NIE rozpakowuje paczek i NICZEGO nie zmienia w grze — czyta wyłącznie
-małe okienka (kilka KB na próbkę) i same indeksy.
+Skaner NIE zmienia NICZEGO w grze i paczek nie rozpakowuje. Oprócz sondy
+wycina SUROWE małe bloki: trafione przez sondaż (np. `.cine`) oraz WSZYSTKIE
+bloki z `LT1.mpkinfo` (skrypty klienta, ~2,5 MB) i zrzuca `Patch.mpkdb` do JSON
+(`mpkdb_dump.json`). Bloków NIE dekoduje — dekodowanie odbywa się po stronie
+repozytorium.
 
 JAK URUCHOMIĆ
 
@@ -65,6 +72,8 @@ CO SKANER ZAPISUJE (folder MPK_SKANER_WYNIK)
 
 - RAPORT.json      pełny raport maszynowy (paczki, indeksy, trafienia)
 - PODSUMOWANIE.txt  ten sam raport w skrócie po polsku
+- wyciete/         surowe bloki: trafienia sondaży + wszystkie z LT1.mpkinfo
+- mpkdb_dump.json  schema i wszystkie wiersze tabeli Patch.mpkdb
 - SHA256.txt       skrót wynikowego ZIP-a
 
 CZEGO SKANER NIE ROBI

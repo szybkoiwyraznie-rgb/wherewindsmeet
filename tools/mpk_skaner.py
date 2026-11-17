@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Skaner paczek Where Winds Meet dla Windows — sonduje `.mpk` BEZ rozpakowywania.
+"""Skaner paczek Where Winds Meet dla Windows — sonda `.mpk` + wycinanie małych bloków.
 
 Po co: powiązania "scena -> następna scena", "POI -> sceny" i osie `.cine` nie
 leżą w tabelach HD (`Package/HD/oversea`), tylko — przypuszczalnie — w paczkach
-VFS (`Resources*.mpk`, `LT*.mpk`, `Patch*.mpk`). Ten skrypt **nie odpakowuje**
-paczek; odpowiada na pytania:
+VFS (`Resources*.mpk`, `LT*.mpk`, `Patch*.mpk`). Ten skrypt odpowiada:
 
   1. jakie paczki i indeksy są w instalacji (ile `Resources*.mpk`, gdzie leży
      `Resources.mpkinfo` / `Patch.mpkdb`),
@@ -12,14 +11,19 @@ paczek; odpowiada na pytania:
   3. co leży pod próbkowanymi offsetami (magia EZST/ZSTD/..., entropia),
   4. czy znane kandydacje ścieżek (`client/dialogs/...` z `index/poi.jsonl`,
      wzorce `.cine` z `cine_name`) trafiają we wpisy indeksów — liczy `file_id`
-     i szuka go w indeksach.
+     i szuka go w indeksach,
+  5. (od v2) wycina SUROWE bajty trafionych bloków oraz **wszystkich** bloków
+     z `LT1.mpkinfo` (skrypty klienta) oraz zrzuca `Patch.mpkdb` do JSON —
+     do analizy po stronie narzędzi. Bez dekodowania EZST.
 
 Czego ten skrypt NIE robi:
   * nie uruchamia gry i nie dotyka jej procesu,
   * nie modyfikuje żadnego pliku gry (otwiera tylko do odczytu),
   * nie wysyła niczego do sieci,
-  * nie kopiuje paczek ani całych bloków (czyta kilka KB na próbkę),
-  * nie odszyfrowuje bloków EZST (tylko rozpoznaje ich obecność).
+  * nie rozpakowuje paczek — wycina tylko SUROWE bloki (`wyciete/`: trafienia
+    z sondażu i wszystkie wpisy `LT1.mpkinfo`, limity 64 MB/blok, 512 MB łącznie)
+    oraz zrzut `Patch.mpkdb` do JSON,
+  * nie dekoduje EZST/ZSTD — dekodowanie odbywa się po naszej stronie.
 
 Uruchomienie (dwuklik `SKANUJ.bat` albo ręcznie):
   python mpk_skaner.py --gra "C:\\...\\Where Winds Meet"
@@ -43,7 +47,7 @@ import sys
 import zipfile
 import hashlib
 
-WERSJA = "wwm-mpk-skaner-v1"
+WERSJA = "wwm-mpk-skaner-v2"
 DOMYSLNI_KANDYDACI = Path(__file__).resolve().parent / "kandydaci.jsonl"
 
 # Magie bloków rozpoznawane w paczkach Messiah (docs/MPK_FORMAT_RESEARCH.md §1.5).
@@ -489,8 +493,137 @@ def haszuj_kandydatow(
 
 
 # ---------------------------------------------------------------------------
-# Raport
+# Wycinanie surowych bloków (bramka 2) — bez dekodowania EZST/ZSTD
 # ---------------------------------------------------------------------------
+
+MAX_BLOK = 64 << 20
+MAX_RAZEM = 512 << 20
+
+
+def _wytnij_bloki(root: Path, pozycje: list[dict], cel: Path, etykieta: str) -> dict:
+    """Wytnij surowe bloki wg listy {nazwa_indeksu, pack_id, offset, size, file_id(hex)}.
+
+    Zwraca statystykę; każdy błąd pojedynczego bloku jest raportowany, ale nie
+    przerywa całości. Zapisane jako <etykieta>_<file_id>.bin w `cel/wyciete`.
+    """
+    wyciete = cel / "wyciete"
+    wyciete.mkdir(parents=True, exist_ok=True)
+    stat = {"etykieta": etykieta, "pozycji": len(pozycje), "ok": 0, "bledy": [], "bajtow": 0}
+    razem = 0
+    kontenery: dict[tuple[str, int], Path] = {}
+    for poz in pozycje:
+        try:
+            klucz = (poz["nazwa_indeksu"], int(poz["pack_id"]))
+            kontener = kontenery.get(klucz)
+            if kontener is None:
+                if poz.get("_indeks_sciezka"):
+                    fake_index = Path(poz["_indeks_sciezka"])
+                elif poz["nazwa_indeksu"] == "Resources.mpkinfo":
+                    fake_index = root / "Resources.mpkinfo"
+                elif (root / "LocalData" / "Patch" / poz["nazwa_indeksu"]).is_file():
+                    fake_index = root / "LocalData" / "Patch" / poz["nazwa_indeksu"]
+                else:
+                    fake_index = root / poz["nazwa_indeksu"]
+                kontener = _kontener_dla_indeksu(root, fake_index, int(poz["pack_id"]))
+                kontenery[klucz] = kontener
+            if not kontener.is_file():
+                stat["bledy"].append({"plik": poz.get("plik", "?"), "blad": f"brak kontenera {kontener}"})
+                continue
+            size = int(poz["size"])
+            if size <= 0 or size > MAX_BLOK:
+                stat["bledy"].append({"plik": poz.get("plik", "?"), "blad": f"podejrzany rozmiar {size}"})
+                continue
+            if razem + size > MAX_RAZEM:
+                stat["bledy"].append({"plik": poz.get("plik", "?"), "blad": "przekroczono limit 512 MB na uruchomienie"})
+                continue
+            with open(kontener, "rb") as fh:
+                fh.seek(int(poz["offset"]))
+                blok = fh.read(size)
+            if len(blok) != size:
+                stat["bledy"].append({"plik": poz.get("plik", "?"), "blad": f"krótki odczyt: {len(blok)}/{size}"})
+                continue
+            nazwa = f"{etykieta}_{int(poz['file_id']):016x}.bin"
+            (wyciete / nazwa).write_bytes(blok)
+            stat["ok"] += 1
+            stat["bajtow"] += len(blok)
+            razem += len(blok)
+        except (OSError, KeyError, ValueError) as e:
+            stat["bledy"].append({"plik": poz.get("plik", "?"), "blad": str(e)})
+    return stat
+
+
+def wytnij_trafienia(root: Path, wyjscie: Path, trafienia: list[dict]) -> dict:
+    pozycje = []
+    for t in trafienia:
+        if t.get("offset") is None or t.get("size") is None:
+            continue
+        pozycje.append(
+            {
+                "nazwa_indeksu": t.get("indeks", "Resources.mpkinfo"),
+                "pack_id": t["pack_id"],
+                "offset": t["offset"],
+                "size": t["size"],
+                "file_id": int(t["file_id"], 16) if isinstance(t.get("file_id"), str) else t.get("file_id"),
+                "plik": t.get("sciezka", "?"),
+                "_indeks_sciezka": None,
+            }
+        )
+    return _wytnij_bloki(root, pozycje, wyjscie, "trafienie")
+
+
+def wytnij_z_indeksu(root: Path, wyjscie: Path, nazwa_indeksu: str, prefiks: str) -> dict:
+    """Wytnij wszystkie wpisy wskazanego indeksu (np. LT1.mpkinfo)."""
+    patch_root = root / "LocalData" / "Patch"
+    indeks = patch_root / nazwa_indeksu if (patch_root / nazwa_indeksu).is_file() else root / nazwa_indeksu
+    if not indeks.is_file():
+        return {"etykieta": prefiks, "pozycji": 0, "ok": 0, "bledy": [{"blad": f"brak indeksu {nazwa_indeksu}"}], "bajtow": 0}
+    meta = parsuj_mpkinfo(root, indeks)
+    if not meta["ok"]:
+        return {"etykieta": prefiks, "pozycji": 0, "ok": 0, "bledy": [{"blad": f"indeks nieczytelny: {meta['powod']}"}], "bajtow": 0}
+    pozycje = []
+    for e in meta["_entries"]:
+        pozycje.append(
+            {
+                "nazwa_indeksu": meta["nazwa"],
+                "pack_id": e["pack_id"],
+                "offset": e["offset"],
+                "size": e["size"],
+                "file_id": e["file_id"],
+                "plik": meta["nazwa"],
+                "_indeks_sciezka": str(indeks),
+            }
+        )
+    return _wytnij_bloki(root, pozycje, wyjscie, prefiks)
+
+
+def zrzut_mpkdb(root: Path, wyjscie: Path) -> dict:
+    """Zrzut Patch.mpkdb do JSON (schema + wszystkie wiersze meta/pak + info0/info1)."""
+    db = root / "LocalData" / "Patch" / "Patch.mpkdb"
+    wynik: dict = {"plik": str(db), "ok": False, "powod": "", "tabele": {}}
+    if not db.is_file():
+        wynik["powod"] = "brak LocalData/Patch/Patch.mpkdb"
+        return wynik
+    try:
+        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        try:
+            tabele = [r[0] for r in con.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()]
+            for tabela in tabele:
+                kolumny = [k[1] for k in con.execute(f"PRAGMA table_info({tabela})").fetchall()]
+                wiersze = []
+                for row in con.execute(f"SELECT * FROM {tabela}"):
+                    wiersze.append(list(row))
+                wynik["tabele"][tabela] = {"kolumny": kolumny, "wiersze": wiersze}
+            wynik["ok"] = True
+        finally:
+            con.close()
+    except (sqlite3.DatabaseError, OSError) as e:
+        wynik["powod"] = str(e)
+    (wyjscie / "mpkdb_dump.json").write_text(
+        json.dumps(wynik, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+    return wynik
+
 
 def _zapisz_zip(zrodlo: Path, cel: Path) -> None:
     with zipfile.ZipFile(cel, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -523,12 +656,12 @@ def buduj_raport(args: argparse.Namespace) -> int:
     print(f"Wyniki do:   {wyjscie}")
     print()
 
-    print("[1/4] Szukam paczek *.mpk ...")
+    print("[1/5] Szukam paczek *.mpk ...")
     paczki = znajdz_paczki(root)
     suma_mpk = sum(p["rozmiar"] for p in paczki)
     print(f"      znaleziono {len(paczki)} paczek, razem {suma_mpk:,} B".replace(",", " "))
 
-    print("[2/4] Szukam indeksów (.mpkinfo / Patch.mpkdb) ...")
+    print("[2/5] Szukam indeksów (.mpkinfo / Patch.mpkdb) ...")
     indeksy = znajdz_indeksy(root)
     print(f"      .mpkinfo: {len(indeksy['mpkinfo'])}, Patch.mpkdb: {len(indeksy['mpkdb'])}")
 
@@ -580,7 +713,7 @@ def buduj_raport(args: argparse.Namespace) -> int:
             print(f"      {meta['nazwa']}: POMINIĘTY ({meta['powod']})")
         raport["mpkdb"].append(meta)
 
-    print("[3/4] Haszuję kandydatów ścieżek ...")
+    print("[3/5] Haszuję kandydatów ścieżek ...")
     kandydat_path = Path(args.kandydaci) if args.kandydaci else DOMYSLNI_KANDYDACI
     kandydaci = wczytaj_kandydatow(kandydat_path)
     raport["kandydaci_wczytani"] = len(kandydaci)
@@ -589,7 +722,34 @@ def buduj_raport(args: argparse.Namespace) -> int:
     raport["trafienia_kandydatow"] = trafienia
     print(f"      kandydatów {len(kandydaci)}, trafień {len(trafienia)}")
 
-    print("[4/4] Zapisuję wyniki ...")
+    wycinanie: list[dict] = []
+    if not args.bez_wycinania:
+        print("[4/5] Wycinam surowe bloki (trafienia + LT1.mpk) i zrzut Patch.mpkdb ...")
+        w1 = wytnij_trafienia(root, wyjscie, trafienia)
+        wycinanie.append(w1)
+        print(f"      trafienia: wycięto {w1['ok']}/{w1['pozycji']} ({w1['bajtow']} B)")
+        w2 = wytnij_z_indeksu(root, wyjscie, "LT1.mpkinfo", "lt1")
+        wycinanie.append(w2)
+        print(f"      LT1.mpkinfo: wycięto {w2['ok']}/{w2['pozycji']} ({w2['bajtow']} B)")
+        w3 = zrzut_mpkdb(root, wyjscie)
+        print(
+            "      Patch.mpkdb: "
+            + (
+                f"zrzucono {sum(len(t['wiersze']) for t in w3['tabele'].values())} wierszy"
+                if w3.get("ok")
+                else f"POMINIĘTY ({w3.get('powod')})"
+            )
+        )
+        raport["mpkdb_zrzut"] = (
+            {"ok": True, "tabele": {t: len(v["wiersze"]) for t, v in w3["tabele"].items()}}
+            if w3.get("ok")
+            else {"ok": False, "powod": w3.get("powod")}
+        )
+    else:
+        print("[4/5] (--bez-wycinania: pomijam wycinanie bloków)")
+    raport["wycinanie"] = wycinanie
+
+    print("[5/5] Zapisuję wyniki ...")
     raport_path = wyjscie / "RAPORT.json"
     raport_path.write_text(
         json.dumps(raport, ensure_ascii=False, indent=1), encoding="utf-8"
@@ -651,6 +811,18 @@ def _posumowanie(raport: dict) -> str:
     if not traf:
         a("  (brak — wzorce ścieżek nietrafione albo pliki są w paczkach bez indeksu)")
     a("")
+    if raport.get("wycinanie"):
+        a("Wycinanie surowych bloków (bez dekodowania EZST):")
+        for w in raport["wycinanie"]:
+            a(f"  {w['etykieta']}: wycięto {w['ok']}/{w['pozycji']} ({w['bajtow']} B)")
+            for b in w.get("bledy", []):
+                a(f"      błąd: {b}")
+        zrzut = raport.get("mpkdb_zrzut")
+        if zrzut and zrzut.get("ok"):
+            a(f"  Patch.mpkdb -> mpkdb_dump.json: {zrzut['tabele']}")
+        elif zrzut:
+            a(f"  Patch.mpkdb: POMINIĘTY ({zrzut.get('powod')})")
+        a("")
     a("Co dalej: ten ZIP wyślij na Dysk Google (folder 'Where Winds Meet').")
     a("Paczek .mpk NIE wysyłaj — wystarczy sam raport.")
     return "\n".join(linie) + "\n"
@@ -664,6 +836,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--kandydaci", default="", help="plik kandydaci.jsonl (domyślnie obok skryptu)")
     parser.add_argument("--probka", type=int, default=12, help="ile wejść próbkować na paczkę (domyślnie 12)")
     parser.add_argument("--non-interactive", action="store_true", help="bez pytań; brak --gra = błąd")
+    parser.add_argument("--bez-wycinania", action="store_true", help="pomiń krok wycinania surowych bloków")
     args = parser.parse_args(argv)
 
     if not args.gra:

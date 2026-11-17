@@ -32,10 +32,17 @@ z innych maszyn): indeksy są w **~200 `Resources*.mpk`** (+ ewentualnie
 - Nie zgadujemy numerów ani powiązań; to, czego dane nie powiedzą, zostaje
   jawnie opisane jako niewiadoma.
 
-## Bramka 0 — badania i przygotowanie kitu (ta sesja)
+## Bramka 0 — badania i przygotowanie kitu (wykonane 2026-11-17)
 
 **Wejście:** publiczne źródła (GitHub/ResHax), `index/`, `docs/`.
 **Wynik:**
+
+- [x] [MPK_FORMAT_RESEARCH.md](MPK_FORMAT_RESEARCH.md) — co już wie świat
+  (Zhincore/wwm-messiah-tools MIT, zamknięte narzędzie mohebbiaina, zakazany
+  dest1yo/wwm_utils), format `.mpkinfo` v3, `Patch.mpkdb`, `file_id`,
+  struktura bloków EZST/ZSTD/LuaText.
+- [x] Pierwszy raport z sondy (`docs/MPK_SKANER_RAPORT.md`), uruchomienie
+  właściciela na instalacji Steam — patrz bramka 1.
 
 - [x] [MPK_FORMAT_RESEARCH.md](MPK_FORMAT_RESEARCH.md) — co już wie świat
   (Zhincore/wwm-messiah-tools MIT, zamknięte narzędzie mohebbiaina, zakazany
@@ -57,38 +64,47 @@ z innych maszyn): indeksy są w **~200 `Resources*.mpk`** (+ ewentualnie
 (`MPK_SKANER_WYNIK/…` + `WWM_MPK_Skaner_WYNIK.zip`, zwykle kilka MB) wysłać na
 Dysk Google do folderu „Where Winds Meet". **Paczki `.mpk` nie wysyłamy.**
 
-## Bramka 1 — raport z pierwszego uruchomienia (sesja 2, po wyniku)
+## Bramka 1 — raport z pierwszego uruchomienia (wykonane 2026-11-17)
 
-**Wejście:** `WWM_MPK_Skaner_WYNIK.zip` od właściciela.
+**Wejście:** `WWM_MPK_Skaner_WYNIK.zip` od właściciela (`17 180 B`,
+SHA-256 `0f80a219…`).
+**Zadania (wykonane):**
+
+1. Odczytano `RAPORT.json`: **489 `*.mpk` (211 GB, 158 kontenerów z
+   `Resources.mpkinfo`, wszystkie istnieją, offsety fizyczne wszędzie)**.
+   Brak „lite" paków; 24 kontenery z pokryciem > 100 % — do audytu.
+2. Magia/entropia: raport próbkowania — do wykorzystania przy analizie EZST
+   (klucz publiczny AES-ECB; dekodujemy po swojej stronie).
+3. Trafienia: **14 × `.cine` z wzorca `e_01_cutscene/qhrw/...` — wszystkie
+   w `Resources34.mpk`**; **0 trafień `.etsb`** (POI `storyline` to najpewniej
+   cel skoku, nie plik VFS); LT1.mpk to paczka skryptowa (240 bloków),
+   Patch3109/3110 = duże zasoby łatki, pomijany.
+4. Decyzja: **bramka 2 — kit v2 wycina surowe bloki** (14 trafień + wszystkie
+   240 bloków LT1.mpkinfo + zrzut `Patch.mpkdb` do JSON, bez dekodowania).
+
+**Wynik:** `docs/MPK_SKANER_RAPORT.md` + wpisy w
+[EXPERIMENT_LOG.md](EXPERIMENT_LOG.md).
+
+## Bramka 2 — wycinarka `.cine` i `.etsb` (w trakcie 2026-11-17)
+
+**Wejście:** ustalenia z bramki 1 (14 trafień `.cine` w `Resources34.mpk`,
+240 bloków skryptowych `LT1.mpk`).
 **Zadania:**
 
-1. Odczytać `RAPORT.json`: lista paczek + rozmiary, indeksy, liczba wpisów,
-   `pack_id` → które `Resources<N>.mpk` mają ile wpisów, pokrycie (offset+rozmiar
-   vs rozmiar pliku; wykrycie „lite" packa), brakujące kontenery.
-2. Magia/entropia próbkowanych wejść: ile EZST / ZSTD / RAW / inne; czy paczki
-   w ogóle da się czytać bez klucza (EZST = AES-ECB na prefiksie — klucz publiczny).
-3. Tabela trafień kandydatów (`poi_storyline_*`, `cine_*`): które ścieżki
-   istnieją, w którym kontenerze, pod jakim offsetem.
-4. Decyzja dla bramki 2: pełny ekstractor `.cine`/`.etsb` (mała) czy najpierw
-   trzeba poszukać innych wzorców ścieżek (np. z Lua — gdyby `LT*.mpk` istniały).
-**Wynik:** wpis w dzienniku + `docs/MPK_SKANER_RAPORT.md` (wnioski, bez danych gry).
-**Blokujące:** bez paczki od właściciela bramka 1 nie ruszy.
-
-## Bramka 2 — wycinarka `.cine` i `.etsb` (sesja 3)
-
-**Wejście:** ustalenia z bramki 1 (dokładne kontenery/offsety/rozmiary trafień).
-**Zadania:**
-
-1. Rozszerzyć skaner albo osobne narzędzie o tryb `--wytnij`: dla wskazanych
-   `file_id` przepisać dokładnie `size` bajtów z offsetu kontenera i odkodować
-   blok (EZST/ZSTD → zstd; LuaText → LZ4; oba warianty w
-   [MPK_FORMAT_RESEARCH.md](MPK_FORMAT_RESEARCH.md) §1.5). Tylko wskazane
-   pliki (kilka–kilkaset małych binarek), nigdy cała paczka.
-2. Zweryfikować: % poprawnie odkodowanych trafień, rozmiary, pierwsze bajty
-   (`.cine` — nieznana magia, opisujemy co widać; `.etsb` — j.w.).
-3. Wynikowe pliki trzymać poza Git; do repo tylko skrót (lista `file_id`,
-   rozmiary, SHA-256) + wnioski.
-**Wynik:** pierwsze prawdziwe `.cine`/`.etsb` na stole + raport dekodowania.
+1. [x] Kit **`WWM_MPK_Skaner_v2.zip`** (`tools/mpk_skaner.py` od wersji
+   `wwm-mpk-skaner-v2`): sonda (jak v1) **+ wycinanie SUROWYCH bajtów**
+   trafionych kandydatów i wszystkich wpisów `LT1.mpkinfo` do `wyciete/`
+   (limity: 64 MB/blok, 512 MB łącznie) **+ `mpkdb_dump.json`**
+   (`LocalData/Patch/Patch.mpkdb`, tryb `mode=ro`, schema + wszystkie wiersze).
+   Dekodowanie EZST/ZSTD **po naszej stronie** — kit pozostaje stdlib-only,
+   bez instalacji bibliotek.
+2. [ ] Właściciel uruchamia kit v2, odsyła `WWM_MPK_Skaner_WYNIK.zip` (~3 MB).
+3. [ ] Odkodowanie EZST (`zstandard` + `pycryptodome`, prywatny venv poza
+   repozytorium): % poprawnych dekodowań `.cine`/bloków Lua, pierwsze bajty
+   `.cine` (nieznana magia — opisać, co widać).
+4. [ ] Harvest ścieżek `.cine`/`.etsb` z Lua → `kandydaci v2` → kolejne
+   uruchomienie skanera z nową listą (śledzenie regionów innych niż `qhrw`).
+**Wynik:** pierwsze prawdziwe `.cine` na stole + raport dekodowania.
 
 ## Bramka 3 — analiza `.cine`: osie cutscen (sesja 4+)
 

@@ -1469,3 +1469,47 @@ cudzego kodu ani nie wymagają tej procedury.
   (id `1dcU3_eqk6rME9l5HxE3R5qZlz3h0mcWC`). Weryfikacja integracyjna na
   syntetycznej instalacji z podziałem `Resources*.mpk` (pack_id 0/1/2) —
   wszystkie 3 kandydatów trafionych we właściwe kontenery.
+
+### 2026-11-17 (6) — Sonda u właściciela wróciła: 14 trafień `.cine`, kit v2 (wycinarka)
+
+- **Wejście:** `WWM_MPK_Skaner_WYNIK.zip` (`17 180 B`, SHA-256
+  `0f80a219aef87ae0ff7e82ad4378f7e42fe786bc7a1112cc0915b31d0012f225`) —
+  raport z maszyny właściciela (Steam, folder gry).
+- **Wynik liczbowy (bramka 1):**
+  * **489 `*.mpk`, `211 334 119 524 B`**; `Resources.mpkinfo`: **2 604 099
+    wpisów** (+46 063 placeholdery), 158 kontenerów, wszystkie istnieją,
+    offsety fizyczne wszędzie (0 niefizycznych, 0 brakujących); suma wpisów
+    `200 513 882 817 B`; 24 kontenery z pokryciem > 100 % (max `Resources80`
+    144,3 % / `Resources90` 132,9 %) — do audytu, nie blokuje; 4 kontenery
+    podejrzanie puste (`Resources145/146/149/115`) — może część pobierania
+    Steam, zasugerowano „Zweryfikuj spójność plików gry".
+  * `LT1.mpkinfo`: **240 wpisów** → `LT1.mpk` (`2 568 577 B`), pokrycie
+    100,0 % — paczka skryptowa.
+  * `Patch3109.mpkinfo` (22) i `Patch3110.mpkinfo` (24) — pokrycie 100,0 %,
+    bloki ~1,2 MB, duże zasoby łatki — **pomijamy**.
+  * `Patch.mpkdb` (SQLite): `info0` 854 wierszy (`v0` file_id i64,
+    `v6` offset), `info1` 0, `meta` 1, `pak` 2.
+  * **Trafienia kandydatów: 14** — wszystkie `.cine` z wzorca
+    `Char/e_01_cutscene/qhrw/<film>/<film>.cine`, **wszystkie w
+    `Resources34.mpk`** (4 177–23 174 B). Wzorzec potwierdzony na realnej
+    instalacji; rodzina `e_01_cutscene/qhrw` trafia w 100 % generowanych
+    ścieżek.
+  * **0 trafień `.etsb`/`.ets`** — 174 ścieżki POI `storyline` + warianty
+    NIE są plikami VFS pod tymi ścieżkami; najpewniej to cel skoku logicznego,
+    nie plik. Do ustalenia po harvest z Lua.
+- **Kit v2 (`dist/WWM_MPK_Skaner_v2.zip`, `39 045 B`, SHA-256
+  `2df898d5100e3ee04b64319991ec1011cffed06ee4a69d9ef44737b525366727`):**
+  sonda (jak v1) + wycinanie SUROWYCH bloków: trafione kandydatów i wszystkie
+  wpisy `LT1.mpkinfo` (limity 64 MB/blok, 512 MB łącznie) + `mpkdb_dump.json`
+  (`Patch.mpkdb` w trybie `mode=ro`, schema + wszystkie wiersze). Bez
+  dekodowania EZST — dekodujemy po swojej stronie. Jednoklik `SKANUJ.bat`;
+  zero bibliotek, żadnych nowych zależności. 17 testów jednostkowych +
+  integracyjny + pełny przepływ zbudowanego ZIPa na syntetycznej instalacji —
+  zielone. Wgrany na Dysk (folder „Where Winds Meet",
+  id `1WqyhL9M4GmEpder8puCF6EK994PcRqRc`, 2026-11-17);
+  poprzedni v1 (po naprawie bat) przeniesiony do kosza.
+- **Dokumenty:** `docs/MPK_SKANER_RAPORT.md` (pełny raport z wnioskami),
+  `docs/ROADMAP_MPK_INDEKSY.md` (bramki 0/1 ✅, bramka 2 w trakcie),
+  `docs/STATUS.md`.
+- **Następny krok:** właściciel uruchamia v2 i wysyła wynik (~3 MB);
+  potem dekoder EZST po stronie repo, analiza `.cine`, harvest ścieżek z Lua.

@@ -187,6 +187,18 @@ class TestIntegracja(unittest.TestCase):
                 + json.dumps({"sciezka": "client/brak.etsb", "pochodzenie": "cine_wzorzec"}, ensure_ascii=False) + "\n",
                 encoding="utf-8",
             )
+            # LT1.mpk: dwa surowe bloki EZST-like
+            lt1_blok_1 = b"EZST" + struct.pack("<I", 10) + b"\x11" * 64
+            lt1_blok_2 = b"ZSTD" + struct.pack("<I", 20) + b"\x22" * 128
+            (patch / "LT1.mpk").write_bytes(lt1_blok_1 + lt1_blok_2)
+            lt1_fid_1 = ms.file_id("client/scripts/a.lua")
+            lt1_fid_2 = ms.file_id("client/scripts/b.lua")
+            lt1_entries = [
+                (lt1_fid_1 & 0xFFFFFFFF, lt1_fid_1 >> 32, 0, len(lt1_blok_1), 1 << 1),
+                (lt1_fid_2 & 0xFFFFFFFF, lt1_fid_2 >> 32, len(lt1_blok_1), len(lt1_blok_2), 1 << 1),
+            ]
+            (patch / "LT1.mpkinfo").write_bytes(_mpkinfo_bytes(lt1_entries))
+
             wyjscie = Path(td) / "wynik"
             rc = ms.main(
                 ["--gra", str(root), "--wyjscie", str(wyjscie),
@@ -201,14 +213,26 @@ class TestIntegracja(unittest.TestCase):
             self.assertTrue((Path(td) / "WWM_MPK_Skaner_WYNIK.zip").is_file())
             podpis = (Path(td) / "WWM_MPK_Skaner_WYNIK.zip").read_bytes()
             self.assertTrue(podpis[:2] == b"PK")
+            # wycinanie: 1 blok z trafień (mpkdb nie ma offsetu) + 2 z LT1
+            wyciete = sorted((wyjscie / "wyciete").glob("*.bin"))
+            etykiety = sorted(p.name.split("_", 1)[0] for p in wyciete)
+            self.assertEqual(etykiety.count("trafienie"), 1)
+            self.assertEqual(etykiety.count("lt1"), 2)
+            surowy_lt1 = b"".join(p.read_bytes() for p in wyciete if p.name.startswith("lt1_"))
+            self.assertIn(lt1_blok_1, surowy_lt1)
+            self.assertIn(lt1_blok_2, surowy_lt1)
+            surowe_traf = [p for p in wyciete if p.name.startswith("trafienie_")]
+            self.assertEqual(surowe_traf[0].read_bytes(), b"EZST" + b"\0" * 96)
+            zrzut = json.loads((wyjscie / "mpkdb_dump.json").read_text(encoding="utf-8"))
+            self.assertTrue(zrzut["ok"])
+            self.assertEqual(len(zrzut["tabele"]["info0"]["wiersze"]), 1)
+            self.assertTrue(raport["wycinanie"][0]["ok"] >= 1)
+            self.assertTrue(raport["wycinanie"][1]["ok"] == 2)
+            self.assertTrue(raport["mpkdb_zrzut"]["ok"])
 
     def test_brak_katalogu_gry(self):
         rc = ms.main(["--gra", "/nie/istnieje/12345", "--non-interactive"])
         self.assertEqual(rc, 2)
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class TestSkanujBat(unittest.TestCase):
@@ -235,3 +259,7 @@ class TestSkanujBat(unittest.TestCase):
         idx_wyw = self.bat.index('%PYEXE% "narzedzia')
         self.assertLess(idx_py, idx_python)
         self.assertLess(idx_python, idx_wyw)
+
+
+if __name__ == "__main__":
+    unittest.main()
