@@ -71,10 +71,13 @@ i plan: `docs/CINE_KOLEJNOSC.md`.
 sceny`). **Podpisy mówców tylko pewne:** podpowiedzi `mowca_en` z `text_msg` nie są już
 używane (tak powstawało „Handlebar Hu” przy „Ech!” w Prologu 4), nazwy samych ról
 („审查士兵” → „Inspection Soldier”) i same okrzyki nie dostają podpisu.
-Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` (12 testów), całość 539 OK.
-Paczka: `dist/WWM_Czytanka_PL_v9.zip`, **6 771 018 B**, SHA-256 `e0b4125e1f3d81f78c6592e2ae72896c6bd0eeea91f1fb042ebee00a4d31e84a` —
-**nie wysłana** (czeka na decyzję właściciela); v8 (`1w-DOnDjN_NP3VbzAgmesl5eH4sdqhWkv`)
-leży na Dysku do jego decyzji.
+Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` (14 testów), całość 546 OK.
+Paczki: `dist/WWM_Czytanka_PL_v9.zip`, **6 771 018 B**, SHA-256 `e0b4125e1f3d81f78c6592e2ae72896c6bd0eeea91f1fb042ebee00a4d31e84a`,
+leży na Dysku (id `18y2NtKvl0Auv9HzjWlGJ1X8ET_Ez7QsI`); `v10` (2026-11-17,
+**6 771 033 B**, SHA-256 `6796e1d7a09875ad34715f1114b8d907d48a3819fd3532cea52975f393dbb85d`,
+id `10hgkAARQzpK2r8_2VyI9zCo-ZJtu2KG2`) to najnowsza — nowość względem v9: pusta
+linia przerwy po `### Streszczenie sceny` (szczegóły w
+[WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md)).
 
 **Baza gry jest kompletna — wyłącznie na potrzeby inwestygacji (2026-11-14).**
 Właściciel wgrał na Dysk brakujące binarki z `HD/oversea` i `patch/HD/oversea`
@@ -340,16 +343,19 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. **Paczki numerujemy, nie datujemy:** `dist/WWM_Czytanka_PL_v4.zip`
-   (`6 609 291 B`, SHA-256
-   `0fe0461f28e7d89a1b53b0f6e6b2e502965b79380a716d42f4a7d5daa6afd85c`),
-   Dysk Google id `1WzykudtneN3nrsjVMVxVxpU7vB-C2xT4` (v3 w koszu;
+   goły tekst. **Paczki numerujemy, nie datujemy:** najnowsza
+   `dist/WWM_Czytanka_PL_v10.zip`
+   (`6 771 033 B`, SHA-256
+   `6796e1d7a09875ad34715f1114b8d907d48a3819fd3532cea52975f393dbb85d`),
+   Dysk Google id `10hgkAARQzpK2r8_2VyI9zCo-ZJtu2KG2`, wgrana 2026-11-17 do
+   folderu „Where Winds Meet” (wcześniejsza `v4`,
+   id `1WzykudtneN3nrsjVMVxVxpU7vB-C2xT4`, pozostaje; v3 w koszu;
    wszystkie paczki z datą
    w nazwie są nieaktualne i leżą w koszu). Spis wersji:
    [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
    istniejącej paczki. Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
-   **Od 2026-11-17 (jeszcze nieopublikowane):** po `### Streszczenie sceny`
+   **Od 2026-11-17 (v10, na Dysku):** po `### Streszczenie sceny`
    stoi pusta linia przerwy przed kwestiami dialogu (`Jednostka.streszczenie`
    w `tools/czytanka_czysta.py`; 2 nowe testy, `tests/test_czytanka_kolejnosc_cutscen.py`).
    Sprawdzone przy okazji: otwierające cutsceny istnieją w danych jako numerowane

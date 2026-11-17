@@ -1367,3 +1367,29 @@ cudzego kodu ani nie wymagają tej procedury.
   Bez zgadywania numerów dla Prolog 1 i Prolog 4.
 - **CZYTANKA_DO_CZYTANIA.md:** poprawione nieaktualne opisy (streszczenie na
   początku, przerwa; opis „kolejności z ekranu” oznaczony jako usunięty w v9).
+
+### 2026-11-17 (3) — Czytanka `v10`: budowa, weryfikacja, wysłana na Dysk
+
+- **Żądanie właściciela (2026-11-17):** „Wygeneruj nową czytankę i wgraj na
+  drive". Wydanie **v10** — kolejny numer, paczka z datą w nazwie nie jest
+  tworzona; `--wersja 10` odmówiłby nadpisania istniejącej paczki.
+- **Budowa:** `python3 tools/czytanka_czysta.py --wyj out/czytanka --wersja 10`.
+  Wynik liczbowy: `75 331` jednostek, `29 536` linii, `pominiete` 0,
+  `reszta` 62 838, `kontekst` 503, `bez_przekladu` 160 751, `zbiory` 1 020,
+  `pamiatki` 120 (bez nazw 0), `poi` 2 948 (z dialogiem 368, bez nazwy 11).
+- **Paczka:** `dist/WWM_Czytanka_PL_v10.zip`, **6 771 033 B**, SHA-256
+  `6796e1d7a09875ad34715f1114b8d907d48a3819fd3532cea52975f393dbb85d`.
+  Zawartość: `01_sceny_i_cutsceny.md`, `02_kontekst_scen_i_cutscen.md`,
+  `03_reszta.md`, `README.md`. Jedyną zmianą względem v9 jest pusta linia
+  przerwy po `### Streszczenie sceny` (wpis `(2)` wyżej); prolog i cała
+  kolejność bez zmian. Sprawdzone w paczce: w `## Cutscena 30161` streszczenie
+  → pusta linia → kwestie.
+- **Dysk Google (folder „Where Winds Meet"):** `WWM_Czytanka_PL_v10.zip`,
+  id `10hgkAARQzpK2r8_2VyI9zCo-ZJtu2KG2`, 2026-11-17, 6 771 033 B — zgodny
+  rozmiar z lokalną paczką.
+- **Testy i kontrola:** `python3 tools/run_tests.py` — 546 OK;
+  `python3 tools/check_repository.py` OK; `git diff --check` czysty.
+- **Docs zsynchronizowane:** `docs/WERSJE_CZYTANKI.md` (wpis v10),
+  `docs/STATUS.md` (najnowsza paczka, 14 testów / 546),
+  `docs/CZYTANKA_DO_CZYTANIA.md` (opis przerwy; v9-oznaczenie „kolejności
+  z ekranu" zostaje jako historia), ten dziennik.
