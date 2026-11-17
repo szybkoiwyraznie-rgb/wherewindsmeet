@@ -209,3 +209,29 @@ class TestIntegracja(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSkanujBat(unittest.TestCase):
+    """Statyczna kontrola szablonu SKANUJ.bat (regresja: inwokacja bez cudzysłowów)."""
+
+    def setUp(self):
+        from tools import build_mpk_skaner as bmk
+
+        self.bmk = bmk
+        self.bat = bmk.BAT_TEMPLATE
+
+    def test_pyexe_nie_jest_w_cudzyslowach_przy_wywolaniu(self):
+        self.assertNotIn('"%PYEXE%"', self.bat)
+        self.assertIn('%PYEXE% "narzedzia\\mpk_skaner.py"', self.bat)
+
+    def test_bat_czysto_ascii_i_crlf(self):
+        surowe = self.bmk._windows_lines(self.bat)
+        surowe.decode("ascii")
+        self.assertNotIn(b"\n", surowe.replace(b"\r\n", b""))
+
+    def test_kolejnosc_odkrywania_pythona(self):
+        idx_py = self.bat.index("py -3 -c")
+        idx_python = self.bat.index("python -c")
+        idx_wyw = self.bat.index('%PYEXE% "narzedzia')
+        self.assertLess(idx_py, idx_python)
+        self.assertLess(idx_python, idx_wyw)

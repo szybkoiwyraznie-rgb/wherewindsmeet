@@ -1442,3 +1442,30 @@ cudzego kodu ani nie wymagają tej procedury.
   (wzorce to hipoteza z jednego znanego przykładu); `Patch.mpkdb` czytany
   `mode=ro`; offsety mogą być niefizyczne dla „lite" instalacji (skaner to
   wykrywa). Następna sesja: bramka 1 — odczyt wyniku od właściciela.
+
+### 2026-11-17 (5) — Kit MPK Skaner: błąd inwokacji Pythona i naprawa
+
+- **Zgłoszenie właściciela:** po dwukliku w `SKANUJ.bat` —
+  `'"py -3"' is not recognized as an internal or external command`.
+- **Przyczyna (moja):** wywołanie `"%PYEXE%" "narzedzia\mpk_skaner.py"` miało
+  `%PYEXE%` w cudzysłowach, więc Windows szukał programu dosłownie
+  `"py -3"` zamiast `py.exe -3`. Autodeteckja Pythona działała poprawnie —
+  padała sama linia startowa.
+- **Naprawa:** inwokacja bez cudzysłowów (`%PYEXE% "narzedzia\mpk_skaner.py" …`),
+  komentarze `rem` zamiast polegający na założeniu, że `py -3` istnieje
+  (najpierw `py -3`, potem `python`). Skaner pozostaje bez zależności — nie ma
+  żadnej biblioteki do instalowania, więc kit **nie tworzy venv**;
+  odkrywanie interpretera jest takie samo jak w patcherze (pylauncher →
+  PATH), bez etapu pip. Upewniono się, że ścieżka wywołania nie wprowadza
+  problemów ze spacjami (spacje może mieć tylko ścieżka skryptu, ta jest
+  cudzysłowowana).
+- **Regresja:** nowe testy statyczne w `tests/test_mpk_skaner.py`
+  (`TestSkanujBat`): brak wywołania `"%PYEXE%"`, kolejność wykrywania
+  py launcher → python, ASCII + CRLF. Całość 563 zielone.
+- **Paczka `WWM_MPK_Skaner_v1.zip` przebudowana:** `36 967 B`, SHA-256
+  `3a165d9841daa7b8c40c37ad441ec00dbab11b0cf961c41df0da152256ddce49`.
+  Stara (błędna) paczka na Dysku przeniesiona do kosza; naprawiona wgrana
+  tego samego dnia do folderu „Where Winds Meet"
+  (id `1dcU3_eqk6rME9l5HxE3R5qZlz3h0mcWC`). Weryfikacja integracyjna na
+  syntetycznej instalacji z podziałem `Resources*.mpk` (pack_id 0/1/2) —
+  wszystkie 3 kandydatów trafionych we właściwe kontenery.

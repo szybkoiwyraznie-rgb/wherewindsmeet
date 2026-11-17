@@ -86,11 +86,14 @@ echo WWM MPK SKANER - sondowanie paczek .mpk
 echo ===============================================
 echo.
 set "PYEXE="
+rem 1) py launcher (Python 3.10+)
 py -3 -c "import sys; assert sys.version_info >= (3,10)" >nul 2>&1
 if not errorlevel 1 set "PYEXE=py -3"
+rem 2) python z PATH
 if not defined PYEXE python -c "import sys; assert sys.version_info >= (3,10)" >nul 2>&1 && set "PYEXE=python"
+rem 3) brak Pythona 3.10+ - instrukcja
 if not defined PYEXE goto no_python
-"%PYEXE%" "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK" %*
+%PYEXE% "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK" %*
 set "RESULT=%ERRORLEVEL%"
 echo.
 if "%RESULT%"=="0" goto done

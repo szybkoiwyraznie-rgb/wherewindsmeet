@@ -435,7 +435,11 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    gotowy do wysłania kit `dist/WWM_MPK_Skaner_v1.zip` (`tools/mpk_skaner.py`,
    `SKANUJ.bat`, `narzedzia/kandydaci.jsonl` — `7 130` kandydatów: `174` ścieżek
    POI z `index/poi.jsonl` + warianty rozszerzenia, `6 818` wzorców `.cine`
-   z `cine_name`; tylko odczyt, zero sieci). Właściciel klika `SKANUJ.bat` na
+   z `cine_name`; tylko odczyt, zero sieci). Kit leży na Dysku Google
+   (folder „Where Winds Meet”, id `1dcU3_eqk6rME9l5HxE3R5qZlz3h0mcWC`,
+   SHA-256 `3a165d9841daa7b8c40c37ad441ec00dbab11b0cf961c41df0da152256ddce49`;
+   poprzednia paczka z błędem cudzysłowów w `SKANUJ.bat` w koszu).
+   Właściciel klika `SKANUJ.bat` na
    maszynie z grą i odsyła `WWM_MPK_Skaner_WYNIK.zip` na Dysk Google.
    Poparcie i granice: skaner jest jedynie sondą — nie wydobywa jeszcze
    `.cine`/`.etsb` i niczego nie zakłada z góry.
