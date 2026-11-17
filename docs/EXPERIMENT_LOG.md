@@ -1300,8 +1300,11 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Zgłoszenie właściciela:** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
   (`dist/`, SHA-256 `2bfdfc6285f1a7c26517c7d40617ca1233b166a4582a9181f96c2bd16ee92ad8`,
   na Dysku Google id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`) opiera się o najnowszą
-  zwrotkę tłumacza `WWM_PL2.zip` i została przetestowana w grze. **Działa —
-  to, co jest przetłumaczone, pojawia się w grze.**
+  zwrotkę tłumacza `WWM_PL2.zip` i została przetestowana w grze **na wersji gry
+  2.4**. **Działa — to, co jest przetłumaczone, pojawia się w grze.**
+- **Elementy z wersji 2.4:** dodatkowe elementy do tłumaczenia z Patcha 2.4
+  zostały wyciągnięte collectorem, dodane do najnowszego pakietu dla tłumacza
+  i przekazane do tłumaczenia.
 - **`v0.4.0` to stan pełny po imporcie `WWM_PL2.zip`:** `86 282` przekłady
   (`85 956` po kluczu + `326` wariantów płci; pomiar
   `tools/pokrycie_tlumaczenia.py` 2026-11-17: cały wyciąg `86 098`/`487 684`
@@ -1316,10 +1319,51 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Zaktualizowane dokumenty:** `README.md`, `docs/STATUS.md` (stan, tabela,
   pokrycie, otwarte ustalenia, następny krok), `docs/PATCHER_WWM.md`,
   `docs/TEST_W_GRZE.md`, `docs/PAKIET_TLUMACZA.md`.
-- **Granice:** zgłoszenie nie precyzuje buildu, na którym grano, ani zakresu
-  widzianych ekranów — do dziennika trafia jako raport właściciela "działa", nie
+- **Granice:** zgłoszenie nie precyzuje zakresu widzianych ekranów ani sposobu
+  instalacji — do dziennika trafia jako raport właściciela „działa na 2.4”, nie
   jako audyt każdego ekranu. Otwarte pozostaje m.in., skąd klient pobiera napisy
   filmów (`entry_collect_movie_subtitle_data` czy te same sceny), limity
   szerokości pól i zachowanie gry po cotygodniowej aktualizacji. Nadal
   obowiązuje zasada: tylko zmiany tekstu przy wyłączonej grze, bez wstrzykiwania
   i obchodzenia zabezpieczeń; projekt nie gwarantuje bezpieczeństwa konta.
+
+### 2026-11-17 (2) — Czytanka: przerwa po streszczeniu cutsceny + sprawdzenie prologu
+
+- **Przerwa po streszczeniu:** `01_sceny_i_cutsceny.md` — po `### Streszczenie sceny`
+  stoi pusta linia przed kwestiami dialogu (dziś kwestie szły od razu po
+  streszczeniu). Zmiana w `_plik_scen` (`tools/czytanka_czysta.py`): `Jednostka`
+  dostała pole `streszczenie` (liczba linii streszczenia na początku jednostki),
+  przerwa wstawia się tylko wtedy, gdy nagłówek i treść streszczenia faktycznie
+  wyemitowano. 2 nowe testy (`tests/test_czytanka_kolejnosc_cutscen.py`),
+  całość 546 zielonych. Sprawdzone na realnych danych: `## Cutscena 30161`
+  pokazuje streszczenie, pustą linię i dopiero kwestie. **Nieopublikowane** —
+  kolejna wersja paczki czytanki dopiero przy decyzji właściciela.
+- **Sprawdzenie prologu — czy numerowane cutsceny otwarcia są w danych:**
+  są, ale tylko częściowo i bez wiązania z transkryptem.
+  * Pakiet xinshou (otwarcie): `30032 sq006_cj_xia` (61,3 s), `30033
+    sq005_cjs_video` (84,7 s), `30147 sq002_wxhcc` (51,0 s), `30150
+    sq010_yshj_video` (124,7 s), `30151 sq001_zlhm_pc` (78,8 s) + bliźniaki
+    mobile (`30487`, `30495`, `30662`).
+  * Streszczenie w danych ma **tylko `30147`** („You rode in on horseback, and
+    fell from the startled horse… The Void King… troops emerge from the
+    courtyard…”; `synopsis_text_mobile`, znormalizowane na PL: „Wjeżdżasz
+    konno, koń się płoszy…”) i **`30150`** („A bug drifts past, seeping into
+    the corpse… The Void King strikes, then falls…” → PL „Robak przelatuje
+    i wnika w zwłoki…”). Obie jednostki renderują się **już dziś** standardowo
+    jako `## Cutscena 30147` / `## Cutscena 30150` + `### Streszczenie sceny`
+    (30147 w 燕南 — kotwica grupy zadań; 30150 w Prologu — dopasowanie
+    streszczenia z transkryptem).
+  * `30032`/`30033`/`30151` streszczenia nie mają (`cutscenes.synopsis_text_pc`
+    i `_mobile` puste); kandydaci bez potwierdzenia.
+  * Linie transkryptu żyją w puli `text_msg` (wiersze ~`590335–590355` itd.)
+    i w scenach `ui_type` 10 (`10167–10187`, `3900065/3900066`, `7530284`…);
+    klucze dopasowane z transkryptu to trafienia tekstowe, nie wiązanie.
+    Klasycznego wiązania napis ↔ numer cutsceny w danych nie ma (osie `.cine`
+    nie są w paczce — patrz `docs/CINE_KOLEJNOSC.md`).
+- **Decyzja właściciela (2026-11-17):** **niczego nie zmieniać.** `30147` to
+  osobna scena (wjazd konny, koń się płoszy) — nie podmienia prologu; `30150`
+  („robak leci…”) właściciel już ma. Prolog zostaje transkryptem
+  (`## Prolog 1–4`), numerowane cutsceny stoją tam, gdzie wskazuje chronologia.
+  Bez zgadywania numerów dla Prolog 1 i Prolog 4.
+- **CZYTANKA_DO_CZYTANIA.md:** poprawione nieaktualne opisy (streszczenie na
+  początku, przerwa; opis „kolejności z ekranu” oznaczony jako usunięty w v9).

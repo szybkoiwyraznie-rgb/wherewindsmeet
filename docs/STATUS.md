@@ -157,9 +157,11 @@ buildzie `25906190` (`tools/latka_testowa.py` w trybie binarnym) — klient Stea
 ustawieniach oraz napisach otwierającego prologu, a czcionki gry wyświetliły
 poprawnie wszystkie polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`);
 (2) **pełną łatkę `WWM_Spolszczenie_PL_v0.4.0.zip` (opartą na najnowszej zwrotce
-`WWM_PL2.zip`, `86 282` przekłady) — przetestowaną w grze; działa: co jest
-przetłumaczone, pojawia się w grze** (zgłoszenie właściciela, 2026-11-17).
-Tłumacz pracuje nad dalszymi przekładami.
+`WWM_PL2.zip`, `86 282` przekłady) — przetestowaną w grze na wersji gry 2.4;
+działa: co jest przetłumaczone, pojawia się w grze** (zgłoszenie właściciela,
+2026-11-17). **Dodatkowe elementy do tłumaczenia z wersji 2.4 zostały
+wyciągnięte collectorem, dodane do najnowszego pakietu dla tłumacza i
+przekazane do tłumaczenia.** Tłumacz pracuje nad dalszymi przekładami.
 
 ## Co wiadomo
 
@@ -347,6 +349,16 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    [WERSJE_CZYTANKI.md](WERSJE_CZYTANKI.md); `--wersja N` odmawia nadpisania
    istniejącej paczki. Opis formatu:
    [CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md).
+   **Od 2026-11-17 (jeszcze nieopublikowane):** po `### Streszczenie sceny`
+   stoi pusta linia przerwy przed kwestiami dialogu (`Jednostka.streszczenie`
+   w `tools/czytanka_czysta.py`; 2 nowe testy, `tests/test_czytanka_kolejnosc_cutscen.py`).
+   Sprawdzone przy okazji: otwierające cutsceny istnieją w danych jako numerowane
+   cutsceny paczki xinshou — ze streszczeniem **tylko** 30147 (zasadzka na
+   dziedzińcu; w 燕南) i 30150 (Król Bez Oblicza; w Prologu) — oba renderują się
+   standardowo; 30032/30033/30151 nie mają streszczenia, a wiązania między
+   transkryptem prologu a numerami cutscen w danych nie ma. **Decyzja
+   właściciela: niczego nie zmieniamy** — prolog zostaje transkryptem
+   (`## Prolog 1–4`), numerowane cutsceny stoją tam, gdzie wskazuje chronologia.
    **Stan po decyzjach właściciela z 2026-11-15:** (a) do pliku 02 wchodzą tylko
    hasła, które gra naprawdę opisuje — 8 891 jednostek ma kontekst, 65 351
    pozycji bez opisu przeniesiono do 03 (m.in. `江晏`/Jiang Yan, `镇冠珏`/Nefryt
@@ -399,9 +411,9 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    (np. powrót na zwiedzoną mapę), nie przez przestawianie całości.
 2. ~~Uruchomić w grze łatkę `v0.4.0` i sprawdzić prolog.~~ **Zrobione
    (2026-11-17):** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip` (najnowsza
-   zwrotka `WWM_PL2.zip`, `86 282` przekłady) została przetestowana w grze i
-   działa — przetłumaczone treści pojawiają się w grze (zgłoszenie
-   właściciela). Przed każdą diagnozą „coś jest po angielsku” uruchomić
+   zwrotka `WWM_PL2.zip`, `86 282` przekłady) została przetestowana w grze na
+   wersji gry 2.4 i działa — przetłumaczone treści pojawiają się w grze
+   (zgłoszenie właściciela). Przed każdą diagnozą „coś jest po angielsku” uruchomić
    `python3 tools/pokrycie_tlumaczenia.py` (`--brak`, `--brak-przerywnikow`,
    `--szukaj "<fragment zdania>"`).
 3. Oczekiwać na kolejne zwrotki od tłumacza (pracuje nad dalszymi przekładami)

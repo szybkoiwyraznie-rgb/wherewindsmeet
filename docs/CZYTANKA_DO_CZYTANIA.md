@@ -65,16 +65,15 @@ Zasady kolejności:
      wersjach), pierwszy zestaw jest treścią sceny, a pozostałe stoją pod
      `### Inny wariant napisów tej cutsceny (wiersze …)`; kwestie powtórzone
      w obu wariantach wypadają, więc nic nie czyta się dwa razy.
-   * **streszczenie sceny** stoi zawsze na końcu, pod własnym nagłówkiem
-     `### Streszczenie sceny` — nie udaje już ostatniej kwestii dialogu.
-   * **kolejność z ekranu gry** (`index/cutsceny_ekran.jsonl`): pliki gry nie mają osi
-     czasu cutscen (sprawdzone w `tools/cutsceny_z_bazy.py` — osie `.cine` nie są
-     w pakiecie, a `dialog_timelines.*` nie zawierają ani jednego napisu puli), więc
-     kolejności nie da się z nich odczytać. Tam, gdzie właściciel przepisał napisy
-     z ekranu, wiersze puli idą do tego pliku w kolejności z gry (pole `wiersze`,
-     uzasadnienie w `dowod`) i czytanka stawia je dokładnie tak, także wiersze spoza
-     pola `kn` (np. „Stój!” z wiersza 591170 w cutscenie 30161). Reszta wierszy sceny
-     schodzi wtedy pod `### Inny wariant napisów tej cutsceny (…)`, więc nic nie ginie.
+   * **streszczenie sceny** stoi zawsze na początku cutsceny, zaraz pod jej
+     nagłówkiem — a po nim **pusta linia przerwy** przed kwestiami dialogu
+     (od 2026-11-17; wcześniej kwestie szły od razu po streszczeniu).
+   * **kolejność z ekranu gry** nie jest odtwarzana: pliki gry nie mają osi czasu
+     cutscen (sprawdzone w `tools/cutsceny_z_bazy.py` — osie `.cine` nie są
+     w pakiecie, a `dialog_timelines.*` nie zawierają ani jednego napisu puli).
+     `index/cutsceny_ekran.jsonl` (przepisaną z ekranu kolejność) **usunięto**
+     decyzją właściciela 2026-11-14 — sceną rządzi najnowsza redakcja napisów
+     z danych (patrz `docs/WERSJE_CZYTANKI.md`, v9).
 7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
    z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
    `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101

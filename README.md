@@ -18,7 +18,8 @@ audyt aktualizacji i pakiet uzupełniający) działa i został przetestowany na 
 w kliencie bez problemu, a czcionki gry wyświetliły komplet polskich znaków diakrytycznych
 (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
 (oparta na najnowszej zwrotce tłumacza `WWM_PL2.zip`, `86 282` przekłady) została przetestowana
-w grze i działa — co jest przetłumaczone, pojawia się w grze** (zgłoszenie właściciela, 2026-11-17).
+w grze na wersji gry 2.4 i działa — co jest przetłumaczone, pojawia się w grze** (zgłoszenie właściciela, 2026-11-17).
+**Dodatkowe elementy do tłumaczenia z wersji 2.4 wyciągnięte collectorem dodano do najnowszego pakietu dla tłumacza i przekazano do tłumaczenia.**
 Tłumacz pracuje nad dalszymi przekładami; kolejne zwrotki trafią do magazynu obiegiem jak dotąd.
 Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`, przetestowany
 na 8-częściowej paczce z Patcha 2.4), bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu

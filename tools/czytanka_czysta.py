@@ -19,7 +19,8 @@ Cutsceny: kwestie w kolejności wierszy puli `text_msg` (a nie w kolejności z
 chronologii), bo tylko numer wiersza jest porządkiem gry. Gdy w plikach leżą dwa
 zestawy napisów tej samej cutsceny, pierwszy jest treścią, a pozostałe stoją pod
 nagłówkiem `### Inny wariant napisów tej cutsceny (wiersze …)`; powtórzone kwestie
-wypadają. Streszczenie sceny zawsze na końcu, pod `### Streszczenie sceny`.
+wypadają. Streszczenie sceny stoi zawsze na początku cutsceny, a po nim pusta
+linia przerwy przed kwestiami dialogu.
 
 Użycie:
     python3 tools/czytanka_czysta.py --wyj out/czytanka --zip dist/WWM_Czytanka.zip
@@ -375,6 +376,7 @@ class Jednostka:
     z_brakami: bool = False                                      # pokazuj kwestie bez przekładu
     podtytuly: dict[int, str] = field(default_factory=dict)      # numer linii → nagłówek nad nią
     zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
+    streszczenie: int = 0                                     # ile linii na początku to streszczenie
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -658,9 +660,11 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
             linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
                      for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
+            liczba_streszczenia = sum(1 for k in wiersz.get("k") or [] if k)
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
                                        linie, osoby=osoby, podtytuly=podtytuly,
-                                       zasloniete=tuple(powtorzone)))
+                                       zasloniete=tuple(powtorzone),
+                                       streszczenie=liczba_streszczenia))
         elif rodzaj == "napisy":
             linie = []
             for klucz in wiersz.get("k") or []:
@@ -953,6 +957,11 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         widziane_linie: set[str] = set()
         uzyte.update(jednostka.zasloniete)
         podtytuly = dict(jednostka.podtytuly)
+        # Przerwa po streszczeniu: pusty wiersz, zanim zaczną się kwestie dialogu.
+        granica_streszczenia = jednostka.streszczenie
+        przerwa_wstawiona = False
+        streszczenie_naglowek = False
+        streszczenie_tresc = 0
         for numer_linii, (mowca, klucz) in enumerate(jednostka.linie):
             uzyte.add(klucz)
             tekst = pl.get(klucz)
@@ -972,8 +981,18 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
             if gotowa in widziane_linie:
                 continue          # ta sama kwestia drugi raz w tej samej jednostce
             widziane_linie.add(gotowa)
+            if granica_streszczenia and numer_linii < granica_streszczenia:
+                streszczenie_tresc += 1
+            if (granica_streszczenia and not przerwa_wstawiona
+                    and numer_linii >= granica_streszczenia):
+                if streszczenie_naglowek and streszczenie_tresc:
+                    linie.append("")     # przerwa: streszczenie → kwestie
+                przerwa_wstawiona = True
             for indeks in sorted(i for i in podtytuly if i <= numer_linii):
-                linie.append(f"### {podtytuly.pop(indeks)}")
+                naglowek = f"### {podtytuly.pop(indeks)}"
+                linie.append(naglowek)
+                if naglowek == "### Streszczenie sceny":
+                    streszczenie_naglowek = True
             linie.append(gotowa)
         if not linie:
             continue
