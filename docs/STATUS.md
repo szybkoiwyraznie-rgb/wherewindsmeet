@@ -436,8 +436,12 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    2 604 099 wpisów, offsety fizyczne wszędzie; trafień 14 × `.cine`
    (`e_01_cutscene/qhrw/...`) w `Resources34.mpk`; 0 trafień `.etsb`;
    `LT1.mpk` to paczka skryptowa; `Patch.mpkdb` = pełny spis łatki 2.4
-   (854 wpisy)**. Kit **`WWM_MPK_Skaner_v2.zip`** na Dysku (folder
-   „Where Winds Meet”): sonda + wycinanie surowych bloków trafień i wszystkich
-   240 bloków `LT1.mpkinfo` + `mpkdb_dump.json`; tylko odczyt, zero sieci,
-   bez instalowania bibliotek. Właściciel uruchamia i odsyła wynik (~3 MB);
-   potem dekoder EZST po naszej stronie i analiza `.cine`.
+   (854 wpisy)**. Z pierwszego przebiegu v2: wycięcie **14/14 `.cine`
+   (106 800 B)** i **240/240 bloków LT1 (2 568 577 B)** zakończone OK; zrzut
+   `Patch.mpkdb` padł na kolumnach BLOB (fix: hex). **Kit v3** na Dysku
+   (folder „Where Winds Meet”, id `1lhq0Ic8S7mIpwf2Jx7Du7rraHtLhwacE`,
+   SHA-256 `92a2f7d7fa8d46bcc94a241c6ebac6c38ec0fe8703ff76d5f32a51f2c4d9b2c8`):
+   sonda + wycinanie surowych bloków + `mpkdb_dump.json` (BLOB→hex), tylko
+   odczyt, zero sieci, bez instalowania bibliotek; v2 w koszu. Właściciel
+   uruchamia i odsyła wynik (~3 MB); potem dekoder EZST po naszej stronie
+   i analiza `.cine`.

@@ -96,6 +96,10 @@ zrzuceniu Lua (`LT1.mpk`).
 
 ## 5. Dalej (bramka 2 w [ROADMAP_MPK_INDEKSY.md](ROADMAP_MPK_INDEKSY.md))
 
+- **Aktualizacja 2026-11-17:** przebieg v2 właściciela wyciął 14/14 `.cine`
+  i 240/240 LT1, ale `mpkdb_dump.json` padł na kolumnach BLOB → kit
+  **`WWM_MPK_Skaner_v3.zip`** (id `1lhq0Ic8S7mIpwf2Jx7Du7rraHtLhwacE`),
+  BLOB jako hex; reszta bez zmian.
 - Kit **`WWM_MPK_Skaner_v2.zip`**: ta sama sonda +
   a) wycinanie SUROWYCH bloków trafionych kandydatów (14 `.cine`),
   b) wycinanie wszystkich 240 bloków `LT1.mpkinfo` (~2,5 MB),

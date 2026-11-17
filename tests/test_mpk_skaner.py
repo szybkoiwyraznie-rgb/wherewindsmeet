@@ -230,6 +230,42 @@ class TestIntegracja(unittest.TestCase):
             self.assertTrue(raport["wycinanie"][1]["ok"] == 2)
             self.assertTrue(raport["mpkdb_zrzut"]["ok"])
 
+    def test_patch_mpkdb_z_blobami_nie_wywraca_json(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "gra"
+            root.mkdir()
+            (root / "Resources.mpk").write_bytes(b"EZST" + b"\0" * 32)
+            fid = ms.file_id("client/x.etsb")
+            entry = (fid & 0xFFFFFFFF, fid >> 32, 0, 36, 0)
+            (root / "Resources.mpkinfo").write_bytes(_mpkinfo_bytes([entry]))
+            patch = root / "LocalData" / "Patch"
+            patch.mkdir(parents=True)
+            db = patch / "Patch.mpkdb"
+            con = sqlite3.connect(db)
+            con.execute("CREATE TABLE meta (key TEXT, val BLOB)")
+            con.execute("INSERT INTO meta VALUES ('version', ?)", (b"\xde\xad\xbe\xef" * 40,))
+            con.execute("CREATE TABLE pak (v0 INTEGER, v1 BLOB, v2 INTEGER)")
+            con.execute("INSERT INTO pak VALUES (?, ?, 3109)", ((1 << 63) - 1, b"\x01" * 300))
+            con.commit()
+            con.close()
+
+            wyjscie = Path(td) / "wynik"
+            rc = ms.main(["--gra", str(root), "--wyjscie", str(wyjscie), "--non-interactive"])
+            self.assertEqual(rc, 0)
+            zrzut = json.loads((wyjscie / "mpkdb_dump.json").read_text(encoding="utf-8"))
+            self.assertTrue(zrzut["ok"])
+            val = zrzut["tabele"]["meta"]["wiersze"][0][1]
+            self.assertTrue(val["__bytes__"])
+            self.assertEqual(val["rozmiar"], 160)
+            self.assertEqual(bytes.fromhex(val["hex"]), b"\xde\xad\xbe\xef" * 40)
+            pak_blob = zrzut["tabele"]["pak"]["wiersze"][0][1]
+            self.assertTrue(pak_blob["__bytes__"])
+            self.assertTrue(pak_blob["uciniete"])
+            self.assertEqual(pak_blob["rozmiar"], 300)
+            self.assertTrue((Path(td) / "WWM_MPK_Skaner_WYNIK.zip").is_file())
+
     def test_brak_katalogu_gry(self):
         rc = ms.main(["--gra", "/nie/istnieje/12345", "--non-interactive"])
         self.assertEqual(rc, 2)

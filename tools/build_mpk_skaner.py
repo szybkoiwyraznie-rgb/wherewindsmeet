@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v2.zip` (bez danych gry).
+"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v3.zip` (bez danych gry).
 
-Od v2 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
+Od v3 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
 z `LT1.mpkinfo` do `wyciete/`, (b) zrzuca `Patch.mpkdb` (schema + wszystkie
-wiersze) do `mpkdb_dump.json`. Bez dekodowania EZST — to robimy po swojej stronie.
+wiersze, kolumny BLOB jako hex) do `mpkdb_dump.json`. Bez dekodowania EZST —
+to robimy po swojej stronie. Krok 5 nigdy nie blokuje powstania ZIPa.
 
 Eksportuje ze `status/index/`:
   * `index/poi.jsonl` → pole `storyline` — prawdziwe ścieżki klienta
@@ -13,7 +14,7 @@ Eksportuje ze `status/index/`:
     znanego z danych przykładu `Char/e_01_cutscene/qhrw/sq001_zlxl/sq001_zlxl.cine`.
 
 Wynik: `kandydaci.jsonl` + `mpk_skaner.py` + `SKANUJ.bat` + `CZYTAJ_TO.txt`
-spakowane deterministycznie do `dist/WWM_MPK_Skaner_v2.zip`.
+spakowane deterministycznie do `dist/WWM_MPK_Skaner_v3.zip`.
 
 Kit NIE zawiera żadnych plików gry; kandydacje to same ścieżki (teksty),
 już obecne w publicznym repozytorium.
@@ -31,7 +32,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-WERSJA = "v2"
+WERSJA = "v3"
 NAZWA_ZIP = f"WWM_MPK_Skaner_{WERSJA}.zip"
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 

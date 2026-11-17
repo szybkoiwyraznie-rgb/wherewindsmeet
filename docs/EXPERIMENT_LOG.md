@@ -1513,3 +1513,35 @@ cudzego kodu ani nie wymagają tej procedury.
   `docs/STATUS.md`.
 - **Następny krok:** właściciel uruchamia v2 i wysyła wynik (~3 MB);
   potem dekoder EZST po stronie repo, analiza `.cine`, harvest ścieżek z Lua.
+
+### 2026-11-17 (7) — MPK Skaner v2: awaria `json.dumps` na BLOB-ach w Patch.mpkdb → v3
+
+- **Zgłoszenie właściciela (7:35, Python 3.14):** skaner dotarł do kroku 5 —
+  wyciął **14/14 `.cine` (106 800 B)** i **240/240 bloków LT1 (2 568 577 B)**,
+  potem padło:
+  `TypeError: Object of type bytes is not JSON serializable` —
+  kolumna BLOB w tabeli `meta` (i potencjalnie inne). Awaria przed
+  `_zapisz_zip` → `WWM_MPK_Skaner_WYNIK.zip` **nie powstał**.
+- **Przyczyna (moja):** `zrzut_mpkdb` ładował wiersze wprost do `json.dumps`;
+  SQLite zwraca `bytes` dla BLOB-ów. Test integracyjny miał BLOB-free tabelę
+  `meta`, więc regresję przegapiłem.
+- **Naprawa (v3):**
+  * `_json_safe`: bytes/bytearray/memoryview → `{"__bytes__": true,
+    "rozmiar": N, "hex": "..."}` (hex pełny do 256 B, powyżej podgląd
+    + `uciniete: true`); inne typy → `str(val)`.
+  * `zrzut_mpkdb`: błąd pojedynczej tabeli łapany do pola `blad`,
+    ok=false tylko gdy którakolwiek tabela padła; zapisuje zawsze
+    `mpkdb_dump.json` (ostatnia linia obrony: `_zapisz_mpkdb_dump`).
+  * krok 4/5 opakowany w `try/except` — błąd wycinania/zrzutu nie blokuje
+    powstania `RAPORT.json`/ZIP-a.
+  * test regresji: `test_patch_mpkdb_z_blobami_nie_wywraca_json` (meta z BLOB
+    160 B, pak z BLOB 300 B) — 18 testów skanera, całość zielona.
+- **Kit v3:** `dist/WWM_MPK_Skaner_v3.zip` (`39 793 B`, SHA-256
+  `92a2f7d7fa8d46bcc94a241c6ebac6c38ec0fe8703ff76d5f32a51f2c4d9b2c8`),
+  zweryfikowany na syntetycznej instalacji z BLOB-ami
+  (`mpkdb_dump.json` poprawny, ZIP powstaje, wycięcie trafień i LT1 OK).
+  Na Dysku (folder „Where Winds Meet", id `1lhq0Ic8S7mIpwf2Jx7Du7rraHtLhwacE`);
+  v2 przeniesiona do kosza (id `1WqyhL9M4GmEpder8puCF6EK994PcRqRc`).
+- **Uwaga:** wycięte bloki z nieudanego przebiegu v2
+  (`MPK_SKANER_WYNIK\wyciete\*.bin`, 254 pliki) są po stronie właściciela —
+  przebieg v3 wytnie je ponownie tak samo; nie trzeba ich robić ręcznie.

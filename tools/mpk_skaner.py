@@ -14,7 +14,8 @@ VFS (`Resources*.mpk`, `LT*.mpk`, `Patch*.mpk`). Ten skrypt odpowiada:
      i szuka go w indeksach,
   5. (od v2) wycina SUROWE bajty trafionych bloków oraz **wszystkich** bloków
      z `LT1.mpkinfo` (skrypty klienta) oraz zrzuca `Patch.mpkdb` do JSON —
-     do analizy po stronie narzędzi. Bez dekodowania EZST.
+     do analizy po stronie narzędzi. Bez dekodowania EZST. Kolumny BLOB
+     kodowane jako hex; błąd pojedynczej tabeli/kroku nie blokuje wyniku.
 
 Czego ten skrypt NIE robi:
   * nie uruchamia gry i nie dotyka jej procesu,
@@ -47,7 +48,7 @@ import sys
 import zipfile
 import hashlib
 
-WERSJA = "wwm-mpk-skaner-v2"
+WERSJA = "wwm-mpk-skaner-v3"
 DOMYSLNI_KANDYDACI = Path(__file__).resolve().parent / "kandydaci.jsonl"
 
 # Magie bloków rozpoznawane w paczkach Messiah (docs/MPK_FORMAT_RESEARCH.md §1.5).
@@ -596,32 +597,81 @@ def wytnij_z_indeksu(root: Path, wyjscie: Path, nazwa_indeksu: str, prefiks: str
     return _wytnij_bloki(root, pozycje, wyjscie, prefiks)
 
 
+def _json_safe(val):
+    """Wartość SQLite → coś, co zawsze przejdzie przez json.dumps.
+
+    Kolumny BLOB (bytes/bytearray/memoryview) — np. w tabeli `meta` — kodujemy
+    jako hex; duże bloki tylko podglądem początku + rozmiarem.
+    """
+    if isinstance(val, (bytes, bytearray, memoryview)):
+        raw = bytes(val)
+        limit = 256
+        opis = {
+            "__bytes__": True,
+            "rozmiar": len(raw),
+            "hex": raw[:limit].hex(),
+        }
+        if len(raw) > limit:
+            opis["uciniete"] = True
+        return opis
+    if isinstance(val, (int, float, str, bool)) or val is None:
+        return val
+    return str(val)
+
+
 def zrzut_mpkdb(root: Path, wyjscie: Path) -> dict:
-    """Zrzut Patch.mpkdb do JSON (schema + wszystkie wiersze meta/pak + info0/info1)."""
+    """Zrzut Patch.mpkdb do JSON (schema + wszystkie wiersze meta/pak + info0/info1).
+
+    Błąd pojedynczej tabeli nie wywraca całości; funkcja nigdy nie rzuca
+    wyjątku (błąd trafia do wynik["tabele"][tabela]["blad"]).
+    """
     db = root / "LocalData" / "Patch" / "Patch.mpkdb"
     wynik: dict = {"plik": str(db), "ok": False, "powod": "", "tabele": {}}
     if not db.is_file():
         wynik["powod"] = "brak LocalData/Patch/Patch.mpkdb"
-        return wynik
+        return _zapisz_mpkdb_dump(wyjscie, wynik)
     try:
         con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
         try:
             tabele = [r[0] for r in con.execute(
                 "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()]
             for tabela in tabele:
-                kolumny = [k[1] for k in con.execute(f"PRAGMA table_info({tabela})").fetchall()]
-                wiersze = []
-                for row in con.execute(f"SELECT * FROM {tabela}"):
-                    wiersze.append(list(row))
-                wynik["tabele"][tabela] = {"kolumny": kolumny, "wiersze": wiersze}
-            wynik["ok"] = True
+                wpis: dict = {}
+                try:
+                    kolumny = [k[1] for k in con.execute(f'PRAGMA table_info("{tabela}")').fetchall()]
+                    wiersze = [
+                        [_json_safe(v) for v in row]
+                        for row in con.execute(f'SELECT * FROM "{tabela}"')
+                    ]
+                    wpis = {"kolumny": kolumny, "wiersze": wiersze}
+                except (sqlite3.DatabaseError, OSError, ValueError) as e:
+                    wpis = {"blad": str(e)}
+                wynik["tabele"][tabela] = wpis
+            wynik["ok"] = all("blad" not in v for v in wynik["tabele"].values())
+            if not wynik["ok"]:
+                wynik["powod"] = "część tabel nieodczytana — patrz pola 'blad'"
         finally:
             con.close()
     except (sqlite3.DatabaseError, OSError) as e:
         wynik["powod"] = str(e)
-    (wyjscie / "mpkdb_dump.json").write_text(
-        json.dumps(wynik, ensure_ascii=False, indent=1), encoding="utf-8"
-    )
+    return _zapisz_mpkdb_dump(wyjscie, wynik)
+
+
+def _zapisz_mpkdb_dump(wyjscie: Path, wynik: dict) -> dict:
+    try:
+        (wyjscie / "mpkdb_dump.json").write_text(
+            json.dumps(wynik, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
+    except (OSError, TypeError, ValueError) as e:
+        # ostatnia linia obrony: zawsze zapisz coś, żeby diagnoza była możliwa
+        (wyjscie / "mpkdb_dump.json").write_text(
+            json.dumps(
+                {"ok": False, "powod": f"serializacja nieudana: {e}", "sciezka": wynik.get("plik")},
+                ensure_ascii=False, indent=1,
+            ),
+            encoding="utf-8",
+        )
+        wynik = {"ok": False, "powod": str(e), "tabele": {}}
     return wynik
 
 
@@ -724,27 +774,36 @@ def buduj_raport(args: argparse.Namespace) -> int:
 
     wycinanie: list[dict] = []
     if not args.bez_wycinania:
-        print("[4/5] Wycinam surowe bloki (trafienia + LT1.mpk) i zrzut Patch.mpkdb ...")
-        w1 = wytnij_trafienia(root, wyjscie, trafienia)
-        wycinanie.append(w1)
-        print(f"      trafienia: wycięto {w1['ok']}/{w1['pozycji']} ({w1['bajtow']} B)")
-        w2 = wytnij_z_indeksu(root, wyjscie, "LT1.mpkinfo", "lt1")
-        wycinanie.append(w2)
-        print(f"      LT1.mpkinfo: wycięto {w2['ok']}/{w2['pozycji']} ({w2['bajtow']} B)")
-        w3 = zrzut_mpkdb(root, wyjscie)
-        print(
-            "      Patch.mpkdb: "
-            + (
-                f"zrzucono {sum(len(t['wiersze']) for t in w3['tabele'].values())} wierszy"
-                if w3.get("ok")
-                else f"POMINIĘTY ({w3.get('powod')})"
+        try:
+            print("[4/5] Wycinam surowe bloki (trafienia + LT1.mpk) i zrzut Patch.mpkdb ...")
+            w1 = wytnij_trafienia(root, wyjscie, trafienia)
+            wycinanie.append(w1)
+            print(f"      trafienia: wycięto {w1['ok']}/{w1['pozycji']} ({w1['bajtow']} B)")
+            w2 = wytnij_z_indeksu(root, wyjscie, "LT1.mpkinfo", "lt1")
+            wycinanie.append(w2)
+            print(f"      LT1.mpkinfo: wycięto {w2['ok']}/{w2['pozycji']} ({w2['bajtow']} B)")
+        except Exception as e:  # nigdy nie blokuj powstania ZIPa z tym, co już jest
+            wycinanie.append({"etykieta": "wycinanie", "pozycji": 0, "ok": 0,
+                              "bledy": [{"blad": f"krok wycinania przerwany: {e}"}], "bajtow": 0})
+            print(f"      UWAGA: krok wycinania przerwany: {e}")
+        try:
+            w3 = zrzut_mpkdb(root, wyjscie)
+            print(
+                "      Patch.mpkdb: "
+                + (
+                    f"zrzucono {sum(len(t.get('wiersze', [])) for t in w3['tabele'].values())} wierszy"
+                    if w3.get("ok")
+                    else f"POMINIĘTY ({w3.get('powod')})"
+                )
             )
-        )
-        raport["mpkdb_zrzut"] = (
-            {"ok": True, "tabele": {t: len(v["wiersze"]) for t, v in w3["tabele"].items()}}
-            if w3.get("ok")
-            else {"ok": False, "powod": w3.get("powod")}
-        )
+            raport["mpkdb_zrzut"] = (
+                {"ok": True, "tabele": {t: len(v.get("wiersze", [])) for t, v in w3["tabele"].items()}}
+                if w3.get("ok")
+                else {"ok": False, "powod": w3.get("powod")}
+            )
+        except Exception as e:
+            raport["mpkdb_zrzut"] = {"ok": False, "powod": f"wyjątek: {e}"}
+            print(f"      UWAGA: zrzut Patch.mpkdb przerwany: {e}")
     else:
         print("[4/5] (--bez-wycinania: pomijam wycinanie bloków)")
     raport["wycinanie"] = wycinanie
