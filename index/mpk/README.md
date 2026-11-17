@@ -30,6 +30,7 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
 | `patch_mpkdb_info0.jsonl` | 854 wierszy `info0` (848 z `file_id_hex` + 6 wierszy-ścieżek `LuaText/patch/...`) |
 | `patch_mpkdb_pak.jsonl` | 2 wiersze `pak` (pak = `LT1.mpk`: `2 097 152 + 471 425 = 2 568 577 B`) |
 | `patch_mpkdb_meta.json` | 1 wiersz `meta` — tylko rozmiary i sha256 (bajty to zaciemniona konfiguracja; NIE zapisujemy) |
+| `storyline_graphs.jsonl` | 14 grafów `Storyline` z dekodowanych bloków: liczby typów węzłów oraz wybrane identyfikatory zadań, transferów, przestrzeni, cutscen/QTE i ścieżki zagnieżdżonych storyline; bez tekstu, pozycji, payloadów ani krawędzi grafu |
 
 ## Reguły VFS — potwierdzone na danych gry (2026-11-17)
 
@@ -49,7 +50,16 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
    pliku** + u8 `n` + `n` identyfikatorów pól null-terminated + binarna
    oś czasu (rekordy ze wskaźnikami do tabeli identyfikatorów; pole `"25"`/
    `"27"` przy `1e 02` powtarzają się — analiza w Bramce 3).
-4. **`Patch.mpkdb`** = spis łatki: `info0` (v0 `file_id` signed i64 **albo
+4. **Storyline — przykład referencji do cutsceny (2026-11-17):**
+   blok `5_a31638d0356c7433` ma `DialogCutsceneSequenceNode` z ID `2560507`
+   (znalezione jako `d` w `index/sceny_3.jsonl`) i `32474` typu 2
+   (w `index/cutsceny_meta.jsonl`: `sq001_qzpk_male`, 10,5 s).
+   To potwierdza ścieżkę **graf Storyline → dialog/cutscene ID**, ale nie
+   wskazuje POI, które uruchamia ten graf. W `5_2a40efe1316c7433` występują
+   `TrackTaskNode` 380493/380494, a łańcuch `pre/post` zadań istnieje w
+   `index/zadania.jsonl`; są to kotwice do dalszego mapowania, nie dowód
+   ogólnej kolejności scen.
+5. **`Patch.mpkdb`** = spis łatki: `info0` (v0 `file_id` signed i64 **albo
    ścieżka** dla 6 plików bootstrapu paczki, v1 rozmiar, v2 `pack_id`,
    v3 hash treści, v4/v5 flagi, v6 offset), `info1` (puste),
    `pak` (repozytorium łatki podzielone na 2 klocki 2 MB + 471 425 B —
@@ -57,10 +67,13 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
 
 ## Czego tu nadal NIE WIEMY
 
-- nastepstw scen (`4700001 → 4700041 → …`) i podpięcia POI → `.etsb`:
-  POI `storyline` NIE jest ścieżką VFS bez prefiksu; czekamy na wyniki
-  kitu **v4** (kandydaci z prefiksami `LuaText/…`).
-- pełnego formatu `.cine` (oś czasu, powiązanie z `cutsceny_meta.cine_name`) —
+- Następstwa scen (`4700001 → 4700041 → …`) ani wiarygodnego klucza
+  POI → start sceny. `storyline_graphs.jsonl` ujawnia przykłady powiązań
+  grafów z łańcuchem zadań i cutsceną, ale nie wiąże grafu z wierszem POI;
+  hashowanie 174 unikalnych storyline-ścieżek (warianty prefiksu i `.ets/.etsb`)
+  dało 0 trafień w 848 Patch `info0` i 240 LT1. Wynik v4 właściciela miał
+  14/8 066 trafień kandydujących, wszystkie `.cine` z pack-34, bez POI.
+- Pełnego formatu `.cine` (oś czasu i mapowanie rekordów na kwestie) —
   Bramka 3.
 
 ## Regeneracja
@@ -72,6 +85,13 @@ python3 -m venv /tmp/ezst && /tmp/ezst/bin/pip install zstandard pycryptodome lz
 ```
 
 Surowe bloki wypada potem trzymać poza repo (`local/mpk_dekodowane/`).
+Indeks grafów wymaga już zdekodowanych bloków JSON (np. z
+`local/patch_karwedane/`):
+
+```bash
+python3 tools/index_storyline_graphs.py local/patch_karwedane \
+    --output index/mpk/storyline_graphs.jsonl
+```
 
 ## Zasady dla przyszłych agentów
 

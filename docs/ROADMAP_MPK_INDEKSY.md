@@ -104,11 +104,33 @@ SHA-256 `0f80a219…`).
    zwalidowany nasz `file_id` (5/5 + 240/240).
 5. [x] Artefakty pochodne commitowane: `index/mpk/` (+`README.md`),
    generator `tools/mpk_artefakty.py`.
-6. [ ] Kit **v4** na Dysku — kandydaci POI z prefiksami `LuaText/…`;
-   właściciel uruchamia i odsyła wynik (bramka 2b — poszukiwanie prawdziwych
-   ścieżek `.etsb` POI).
+6. [x] Kit **v4** na Dysku; właścicielski wynik: 8 066 kandydatów, 14
+   trafień — wszystkie `.cine` pack-34, **0 trafień ścieżek POI/storyline**.
+   Patch3109/3110 mają 22/24 wpisy w lokalnych indeksach, ale te bloki nie
+   zostały wycięte w v4.
 **Wynik:** pierwsze prawdziwe `.cine` na stole + raport dekodowania +
 zwalidowany hashing indeksu.
+
+## Bramka 2.5 — strukturalne bloki `hex_world` i grafy Storyline (2026-11-17)
+
+**Wynik dotychczasowy:**
+
+- 8 bloków `hex_world` z packów 7/8; w czterech z nich 14 200 wystąpień
+  rekordów `Resource` (13 151 unikalnych 16-bajtowych GUID-ów). ID są binarne,
+  nie tekstowe; 2 wystąpienia `POI` są przypadkowymi bajtami w identyfikatorach.
+  Brak wspólnego klucza z tekstowymi GUID-ami `index/`.
+- Dodany indeks pochodny `index/mpk/storyline_graphs.jsonl` (14 grafów) i
+  generator `tools/index_storyline_graphs.py`. Znaleziony potwierdzony most
+  Storyline → cutscene: `5_a31638d0356c7433` ma sekwencję `2560507` (dialog)
+  → `32474` (cutscene `sq001_qzpk_male`, 10,5 s). Inny graf wiąże zadania
+  380493/380494 z łańcuchem `pre/post` w `index/zadania.jsonl`.
+- To **nie** identyfikuje POI uruchamiającego graf ani uniwersalnego
+  klucza scena→scena. Pełna para repozytorium nazw/plików bazowych i parser
+  `.cine` pozostają poza tym checkpointem. Szczegóły i ujemne wyniki:
+  [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis 2026-11-17 (9).
+
+**Następny krok:** wyjaśnić, skąd pobrać/odczytać pełne resource repository
+(names + data) dla bieżącej instalacji; nie zgadywać mapowania GUID→POI.
 
 ## Bramka 3 — analiza `.cine`: osie cutscen (sesja 4+)
 

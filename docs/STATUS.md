@@ -448,6 +448,10 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    MIT): format `.cine` opisany; **reguła VFS `LuaText/` + debug_source
    potwierdzona 240/240**; nasz `file_id` zwalidowany na danych gry.
    Artefakty pochodne w `index/mpk/` (z opisem dla przyszłych agentów),
-   surowe bajty poza Git. **Kit v4** na Dysku (okno wyboru folderu gry +
-   kandydaci POI z prefiksami `LuaText/…`) — właściciel odpala i odsyła
-   wynik; następna Bramka 3: oś `.cine` i weryfikacja 30161.
+   surowe bajty poza Git. **Kit v4** na Dysku; wynik właściciela: 8 066
+   kandydatów, 14 trafień wyłącznie `.cine` pack-34, 0 trafień POI-storyline.
+   W Bramce 2.5 sprawdzono też 14 grafów Storyline: znaleziono most graf →
+   dialog/cutscene ID oraz kotwice do łańcuchów zadań, ale nie POI → graf.
+   Pochodne podsumowanie: `index/mpk/storyline_graphs.jsonl`; log:
+   [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis (9). Bramka 3 (oś `.cine`,
+   weryfikacja 30161) nadal otwarta.

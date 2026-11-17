@@ -1588,3 +1588,53 @@ cudzego kodu ani nie wymagają tej procedury.
   (1). Wyślij na Dysk per instrukcja.
 - **Dalej:** właściciel uruchamia v4, odsyła wynik; Bramka 3 = analiza
   osi `.cine` (powiązanie z `cutsceny_meta`, weryfikacja 30161).
+
+### 2026-11-17 (9) — Storyline-grafy jako most do zadań i cutscen; POI nadal bez wiązania
+
+- **Wejście:** 14 dekodowanych bloków JSON z `Storyline.NodeBuffer` w
+  lokalnym `local/patch_karwedane/` (surowe/dekodowane bloki pozostają poza Git),
+  `index/poi.jsonl`, `index/zadania.jsonl`, `index/sceny_*.jsonl`,
+  `index/cutsceny_meta.jsonl`, `index/chronologia.jsonl`; formaty sprawdzone
+  względem publicznego `Zhincore/wwm-messiah-tools` (`codecs.py`,
+  `repository.py`). W `codecs.py` nie ma parsera `.cine`.
+- **Metoda:** przejście po `NodeBuffer` i `ConnectData`, weryfikacja wybranych
+  ID w indeksach tekstowych; wyliczenie podsumowań pozbawionych tekstu, pozycji,
+  payloadów i krawędzi grafu. Dodano generator
+  `tools/index_storyline_graphs.py`.
+- **Wyniki dodatnie:**
+  * `5_2a40efe1316c7433` (68 węzłów) zawiera `TrackTaskNode` 380493/380494;
+    zadania 380492–380499 tworzą łańcuch przez pola `pre`/`post` w
+    `index/zadania.jsonl`. Graf ma też transfery 30019/30020 w przestrzeni
+    31003 i dwukrotnie ścieżkę `client/guanqia/fxds/paoku/lighting2.ets`.
+  * `5_a31638d0356c7433` zawiera `DialogCutsceneSequenceNode`:
+    ID 2560507 (typ 1) → 32474 (typ 2), oba z `auto_preload_next=true`.
+    2560507 istnieje jako `d` w `index/sceny_3.jsonl`; 32474 istnieje w
+    `index/cutsceny_meta.jsonl` jako `sq001_qzpk_male` (10,5 s, przestrzeń
+    31003). To jest potwierdzony most **graf Storyline → dialog/cutscene**,
+    nie POI → graf.
+  * `5_dfacb22a326c7433` zawiera `TrackTaskNode` 380497 oraz QTE 219/220.
+    Grafy nie dają na tym etapie kompletnej ani ogólnej chronologii scen.
+  * Podsumowanie 14 grafów zapisane w `index/mpk/storyline_graphs.jsonl`
+    (8 699 B); odtwarzanie: `python3 tools/index_storyline_graphs.py
+    local/patch_karwedane --output index/mpk/storyline_graphs.jsonl`.
+- **Wyniki ujemne / ostrożność:**
+  * `chronologia.jsonl.p` jest numerem pozycji na liście chronologii, nie
+    kluczem transferu. Pozorna zbieżność `p=30019` z `transfer_no=30019` jest
+    przypadkowa; nie używać tego jako wiązania.
+  * 13 151 unikalnych 16-bajtowych GUID-ów `Resource` w blokach `hex_world`
+    nie trafia w tekstowe GUID-y indeksów (poza zerowym false positive).
+    Dwa GUID-y z bajtami `POI` są fragmentami losowo wyglądających binarnych
+    identyfikatorów, nie markerem tabeli.
+  * `1_patch_repository.bin` po zdjęciu 4-bajtowego prefiksu `CCCC` dekoduje
+    się z EZST do listy 51 typów zasobów, ale jej nagłówek nie zgadza się z
+    formatem names-file opisanym w `repository.py`; sam ten blok nie mapuje
+    GUID-ów `hex_world` na ścieżki/nazwy.
+  * 174 unikalne ścieżki `poi.storyline` z wariantami prefiksu i `.ets/.etsb`
+    dały **0/848** trafień w Patch `info0` i **0/240** w LT1. Właścicielski
+    wynik v4: **14/8 066** kandydatów — wyłącznie `.cine` pack-34, żadnych
+    POI-storyline trafień.
+- **Wniosek / następny krok:** POI→scena nie jest w Patch `info0`, LT1 ani
+  dotychczas zidentyfikowanych blokach `hex_world` w czytelnym, bezpośrednim
+  formacie. Poszukiwać pełnej pary names/data repository albo źródła bazowego
+  pakietu; nie przypisywać jeszcze żadnego POI do grafu. Dla Bramki 3
+  kontynuować parsowanie osi `.cine`; publiczny codec jej nie opisuje.
