@@ -1294,3 +1294,32 @@ cudzego kodu ani nie wymagają tej procedury.
   `WWM_Czytanka_PL_2026-11-14.zip`, `1 523 414 B`, id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
   Poprzednie trzy paczki czytanek przeniesione do kosza Dysku.
 - **Testy:** `439` (doszło `9` w `TestCzytankaDoCzytania`).
+
+## 2026-11-17 — `v0.4.0` przetestowane w grze: działa (zgłoszenie właściciela)
+
+- **Zgłoszenie właściciela:** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
+  (`dist/`, SHA-256 `2bfdfc6285f1a7c26517c7d40617ca1233b166a4582a9181f96c2bd16ee92ad8`,
+  na Dysku Google id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`) opiera się o najnowszą
+  zwrotkę tłumacza `WWM_PL2.zip` i została przetestowana w grze. **Działa —
+  to, co jest przetłumaczone, pojawia się w grze.**
+- **`v0.4.0` to stan pełny po imporcie `WWM_PL2.zip`:** `86 282` przekłady
+  (`85 956` po kluczu + `326` wariantów płci; pomiar
+  `tools/pokrycie_tlumaczenia.py` 2026-11-17: cały wyciąg `86 098`/`487 684`
+  = `17,7%`). Import `WWM_PL2.zip` dodał `+9 443` klucze i `+244` warianty płci;
+  `15` konfliktów nadpisano na korzyść tłumacza (raport:
+  `zwrotki/raport_scalenia_WWM_PL2.json`). Wcześniejsze „`v0.4.0` nie testowano
+  w grze” z wpisu z 2026-11-14 jest **nieaktualne**.
+- **Tłumacz pracuje nad dalszymi przekładami** — kolejne zwrotki trafią do
+  magazynu zwykłym obiegiem (`tools/import_zwrotki.py` → commit `tlumaczenie/`
+  → kolejne wydania). Poprzednie wydanie `v0.1.0` (`WWM_PL1.zip`, `75 685`
+  przekładów) jest nieaktualne; nie ma sensu go potwierdzać w grze.
+- **Zaktualizowane dokumenty:** `README.md`, `docs/STATUS.md` (stan, tabela,
+  pokrycie, otwarte ustalenia, następny krok), `docs/PATCHER_WWM.md`,
+  `docs/TEST_W_GRZE.md`, `docs/PAKIET_TLUMACZA.md`.
+- **Granice:** zgłoszenie nie precyzuje buildu, na którym grano, ani zakresu
+  widzianych ekranów — do dziennika trafia jako raport właściciela "działa", nie
+  jako audyt każdego ekranu. Otwarte pozostaje m.in., skąd klient pobiera napisy
+  filmów (`entry_collect_movie_subtitle_data` czy te same sceny), limity
+  szerokości pól i zachowanie gry po cotygodniowej aktualizacji. Nadal
+  obowiązuje zasada: tylko zmiany tekstu przy wyłączonej grze, bez wstrzykiwania
+  i obchodzenia zabezpieczeń; projekt nie gwarantuje bezpieczeństwa konta.

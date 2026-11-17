@@ -1,6 +1,6 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-14**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-17**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
 **Dane z gry na Dysku Google:** 8 części `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`
@@ -130,8 +130,10 @@ porządek questów w 03) ma plan i kolejność w
 ## Gdzie jesteśmy
 
 **Wyciąg `index/` w repozytorium jest już zaktualizowany do Patcha 2.4
-(`build 26592996`, dane z `2026-11-13`), do `tlumaczenie/` zaimportowano pierwszą
-zwrotkę tłumacza (`WWM_PL1.zip`: `75 685` przekładów = `15,46%` gry), a na Dysk
+(`build 26592996`, dane z `2026-11-13`), do `tlumaczenie/` zaimportowano dwie
+zwrotki tłumacza (`WWM_PL1.zip`: `75 685` przekładów = `15,46%` gry;
+`WWM_PL2.zip`: `+9 443` klucze i `+244` warianty płci, magazyn `86 282` przekłady
+= `17,7%` gry), a na Dysk
 Google wysłano zregenerowany pakiet `v4`** (`paczka_dla_tlumacza_wwm_v4.zip`,
 `422 248` miejsc `PL:`, w tym `75 683` przeniesionych jako aktywne `PL: tekst`,
 `346 565` pustych `PL:` — albo `253 693` po pominięciu tabel UI/meta — oraz
@@ -149,17 +151,15 @@ instalator Windows z kopią zapasową i przywracaniem** (`patcher_wwm.py` w tryb
 standalone oraz `instalator/` w trybie binarnym) oraz **plan małej próby UI
 i polskich znaków** ([TEST_W_GRZE.md](TEST_W_GRZE.md), `tools/latka_testowa.py`).
 
-**W grze zweryfikowano dotąd pierwszy mały test na poprzednim buildzie `25906190`
-(`tools/latka_testowa.py` w trybie binarnym):** klient Steam (Windows) przyjął
-przepisane mapy `translate_words_map_en*` w menu głównym, ustawieniach oraz
-napisach otwierającego prologu, a czcionki gry wyświetliły poprawnie wszystkie
-polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
-**Nie sprawdzono jeszcze w oknie gry:** zachowania klienta na nowym Patchu 2.4
-(`26592996`), nowego samowystarczalnego wrappera `patcher_wwm.py` uruchomionego
-bezpośrednio na komputerze z grą (na kopii plików `26592996` w piaskownicy
-przeszedł pełny cykl `instaluj → stan → przywroc` z dokładnym odtworzeniem
-SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
-(`75 685` przekładów w `tlumaczenie/`).
+**W grze zweryfikowano dwie rzeczy:** (1) pierwszy mały test na poprzednim
+buildzie `25906190` (`tools/latka_testowa.py` w trybie binarnym) — klient Steam
+(Windows) przyjął przepisane mapy `translate_words_map_en*` w menu głównym,
+ustawieniach oraz napisach otwierającego prologu, a czcionki gry wyświetliły
+poprawnie wszystkie polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`);
+(2) **pełną łatkę `WWM_Spolszczenie_PL_v0.4.0.zip` (opartą na najnowszej zwrotce
+`WWM_PL2.zip`, `86 282` przekłady) — przetestowaną w grze; działa: co jest
+przetłumaczone, pojawia się w grze** (zgłoszenie właściciela, 2026-11-17).
+Tłumacz pracuje nad dalszymi przekładami.
 
 ## Co wiadomo
 
@@ -186,7 +186,12 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
   `485 047` miejsc `PL:`, wysłany `v3` (`--tylko-z-en`, build `25906190`)
   `418 773` miejsc `PL:`. Z pierwszej zwrotki (`WWM_PL1.zip`) zaimportowano
   **`75 685` przekładów** (`82` warianty płci + `75 603` po kluczu = `15,46%`
-  tekstów gry) do `tlumaczenie/`. Po aktualizacji `index/` do Patcha 2.4
+  tekstów gry) do `tlumaczenie/`. Z drugiej, najnowszej zwrotki (`WWM_PL2.zip`)
+  zaimportowano **`+9 443` klucze i `+244` warianty płci** (`15` konfliktów
+  nadpisanych na korzyść tłumacza; raport: `zwrotki/raport_scalenia_WWM_PL2.json`)
+  — magazyn liczy **`86 282` przekłady** (`85 956` po kluczu + `326` wariantów
+  płci = `17,7%` tekstów gry; pomiar `tools/pokrycie_tlumaczenia.py`,
+  2026-11-17). Po aktualizacji `index/` do Patcha 2.4
   wysłano zregenerowany pełny pakiet **`v4`** (`--wypelnij-pl`): `422 248` miejsc
   `PL:` (`75 683` przeniesionych jako aktywne `PL: tekst`, `346 565` pustych
   `PL:` lub **`253 693` po odjęciu tabel UI/meta**), uzupełniony o
@@ -203,15 +208,16 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
   2026-11-14 własną sekcję `cutsceny/04_sceny_cinematiczne_NN.md` (wcześniej
   mieszały się z `186` tys. zwykłych kwestii w `sceny/`), a w scenach został
   odsyłacz „tłumaczysz raz”. Szczegóły i liczby: [dziennik](EXPERIMENT_LOG.md).
-- **Pokrycie przekładu (2026-11-14, po imporcie zwrotki prologu;
-  `tools/pokrycie_tlumaczenia.py`):** magazyn ma `75 916` przekładów
-  (`75 834` po kluczu + `82` warianty płci): napisy cutscen
+- **Pokrycie przekładu (2026-11-17, po imporcie `WWM_PL2.zip`;
+  `tools/pokrycie_tlumaczenia.py`):** magazyn ma `86 282` przekłady
+  (`85 956` po kluczu + `326` warianty płci): napisy cutscen
   `text_msg 590000–592694` — `2 688`/`2 688` (`100%`), intro `9`/`9`, napisy
   filmowe `47`/`47` (w tym film 2 `钗头凤` `13`/`13` i film 3 `中渡桥之战`
-  `21`/`21`), **blok prologu `10094–10188` bez braków**, sceny przerywników
-  `1 382`/`11 678` (`11,8%`), zwykłe dialogi scen `13 880`/`187 598` (`7,4%`),
-  cały wyciąg `75 834`/`487 684` (`15,5%`). Druga warstwa napisów
-  (`text_msg__grey`, mówca wpisany w treść) ma `675`/`1 203` — brakujące wiersze
+  `21`/`21`), blok prologu `10094–10188` bez braków, sceny przerywników
+  `2 225`/`11 678` (`19,1%`), zwykłe dialogi scen
+  `25 627`/`187 598` (`13,7%`), cały wyciąg `86 098`/`487 684` (`17,7%`).
+  Druga warstwa napisów
+  (`text_msg__grey`, mówca wpisany w treść) ma `675`/`1 203` (`56,1%`) — brakujące wiersze
   cutscen dziedziczą przekład z wiersza głównego o tym samym numerze
   (`tlumaczenie.doloz_blizniaki`, tylko w pamięci). Wcześniejsze napisy po angielsku
   wynikały **z braków w magazynie, nie z podmiany pliku przez łatkę**; hipotezę
@@ -243,10 +249,10 @@ SHA-256) oraz rozbudowanej łatki z zaimportowanej zwrotki `WWM_PL1.zip`
 | Odczyt plików gry | Baza tabel, dialogi, mapy tekstów z warstwami (z obsługą zastępowania `Package/.../_diff` przez `LocalData/Patch/.../_diff`) — sprawdzone na Patchu 2.4 (`26592996`). |
 | Wyciąg i powiązania | `index/` w Git (`wwm-indeks-v2`, Patch 2.4 `26592996`), deterministyczny, ze stałym podziałem plików. |
 | Pakiet tłumacza i Czytanki | Pakiety (`--tylko-z-en`; od `v5` z osobną sekcją scen przerywników `cutsceny/04_sceny_cinematiczne_*`), w tym paczki uzupełniające `--tylko-sloty`) i trzyplikowe Czytanki `wwm-czytanki-v2` (`epizody.md`, `kontekst_scen.md`, `dodatkowe.md` pod limitem `<5 MB/część`, 100% pokrycia) budują się **100% standalone z `index/`** (zero binarek gry). |
-| Import zwrotki | Gotowy i zweryfikowany produkcyjnie na `WWM_PL1.zip` (`tools/import_zwrotki.py`: `75 685` zaimportowanych przekładów w `tlumaczenie/`, `0` błędów formatu/tokenów, `21` kluczy odrzuconych z powodu usunięcia w Patchu 2.4). |
-| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` na `25906190`) **zweryfikowana w uruchomionej grze Steam**; pełna łatka fabularna i test `patcher_wwm.py` na Patchu 2.4 (`26592996`) w realnym oknie gry czekają na sprawdzenie. |
+| Import zwrotki | Gotowy i zweryfikowany produkcyjnie na `WWM_PL1.zip` i `WWM_PL2.zip` (`tools/import_zwrotki.py`: `75 685` + `+9 443` klucze i `+244` warianty płci = magazyn `86 282` przekłady, `0` błędów formatu/tokenów, `21` kluczy odrzuconych z powodu usunięcia w Patchu 2.4). |
+| Łatka i instalator Windows | **Domyślnie standalone (`tools/one_click_patch.py`, `tools/latka_testowa.py` → `tools/build_standalone_patcher.py` + `tools/patcher_wwm.py`):** buduje `WWM_LATKA_PL.zip` wyłącznie z `index/` i `tlumaczenie/` (czysty `plan_latki.json` + lokalny patcher z kopią oryginałów, zero binarek gry). Opcjonalny tryb binarny (`instalator/`) zachowany dla jawnych flag `--dane-gry`/`--mapa`. Mała łatka testowa (`latka_testowa.py` na `25906190`) **zweryfikowana w uruchomionej grze Steam**; **pełna łatka fabularna `WWM_Spolszczenie_PL_v0.4.0.zip` (zwrotka `WWM_PL2.zip`, `86 282` przekłady) przetestowana w grze — działa, przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela, 2026-11-17). |
 | Aktualizacje gry | `collector/URUCHOM_AKTUALIZACJE.bat` (format `wwm-collection-v2`, przetestowany 8-częściowy zrzut 516 MB z Patcha 2.4), dzielenie paczek w `spakuj_dane.ps1`, `audyt_aktualizacji.py` i pakiet uzupełniający działają. |
-| Pokrycie przekładu | `tools/pokrycie_tlumaczenia.py` mierzy z `index/` i `tlumaczenie/`, co w grze zostanie po angielsku: napisy cutscen `100%`, intro `100%`, napisy filmowe `100%` (film 2 i 3 też), prolog `100%`, sceny przerywników `11,8%`, zwykłe sceny `7,4%`, cały wyciąg `15,5%`. Tryby `--brak`, `--brak-przerywnikow`, `--arkusz`, `--szukaj`; testy w `tests/test_pokrycie_tlumaczenia.py`; pomiar bez plików gry. |
+| Pokrycie przekładu | `tools/pokrycie_tlumaczenia.py` mierzy z `index/` i `tlumaczenie/`, co w grze zostanie po angielsku: napisy cutscen `100%`, intro `100%`, napisy filmowe `100%` (film 2 i 3 też), prolog `100%`, sceny przerywników `19,1%`, zwykłe sceny `13,7%`, cały wyciąg `17,7%` (2026-11-17, po `WWM_PL2.zip`). Tryby `--brak`, `--brak-przerywnikow`, `--arkusz`, `--szukaj`; testy w `tests/test_pokrycie_tlumaczenia.py`; pomiar bez plików gry. |
 | Starsze prototypy | `translation_bundle`, `audit_translation_*`, modele przywracania i skaner plików ([TRANSLATION_BUNDLE.md](TRANSLATION_BUNDLE.md), [UPDATES_AND_RESTORE.md](UPDATES_AND_RESTORE.md), [TWO_APPLICATIONS.md](TWO_APPLICATIONS.md)) działają tylko na wymyślonych danych i **nie są częścią obiegu** opisanego wyżej. |
 
 ### Baza gry o cutscenach: co ma, a czego nie ma (pakiet aktualizacji 2026-11-13)
@@ -283,12 +289,13 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 
 ## Otwarte ustalenia
 
-1. **Test w grze na Patchu 2.4 (`26592996`), `patcher_wwm.py` i pełnej łatki** —
-   mała łatka UI + prolog (`latka_testowa.py`) potwierdziła już na buildzie
+1. ~~**Test w grze na Patchu 2.4 (`26592996`) i pełnej łatki**~~ — **zamknięte
+   2026-11-17:** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip` (najnowsza zwrotka
+   `WWM_PL2.zip`, `86 282` przekłady) została przetestowana w grze i działa —
+   przetłumaczone treści pojawiają się w grze (zgłoszenie właściciela). Wcześniej
+   mała łatka UI + prolog (`latka_testowa.py`) potwierdziła na buildzie
    `25906190` przyjmowanie przepisanych map `translate_words_map_en*` i poprawne
    wyświetlanie wszystkich polskich znaków (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
-   Nadal czekają na test w oknie gry: powtórzenie próby na Patchu 2.4 (`26592996`)
-   z nowym wrapperem `patcher_wwm.py` oraz pełna fabuła po zwrotce tłumacza.
 2. **Który język klienta zastępujemy.** Łatka przepisuje pliki podane
    w `--cel`; dotąd sprawdzono mapę angielską.
 3. **Chronologia** nie była sprawdzana w grze. 12 341 scen bez wpisu zadania
@@ -303,13 +310,14 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    odcięto w `index/`, a wśród pozostałych `1 294` tekstów bez `EN` ponad 70%
    to etykiety testowe, zaślepki i wpisy wycofane (`测试`, `废弃`, `占坑`).
    Zakres tłumaczenia wyznacza `--tylko-z-en` (patrz [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)).
-7. **Napisy kinowe są przetłumaczone w magazynie, ale nie w grze.** Prolog
+7. **Napisy kinowe — po teście `v0.4.0` w grze (2026-11-17): co jest przetłumaczone, pojawia się w grze.** Prolog
    (`10094–10188`), napisy `text_msg` i filmy 2–3 mają przekład po stronie
-   `tlumaczenie/`; czy klient pokaże je po polsku, rozstrzygnie dopiero łatka
-   u właściciela — nie wiadomo też, czy napisy filmów idą
+   `tlumaczenie/` i potwierdzono działanie pełnej łatki w grze (zgłoszenie
+   właściciela). Nadal nie wiadomo, czy napisy filmów idą
    z `entry_collect_movie_subtitle_data`, czy z tych samych scen. Poza
-   prologiem nadal `10 296` wierszy scen przerywników i `173 718` zwykłych
-   kwestii czeka na przekład (`tools/pokrycie_tlumaczenia.py --arkusz`).
+   prologiem nadal `9 453` wierszy scen przerywników i `161 971` zwykłych
+   kwestii czeka na przekład (`tools/pokrycie_tlumaczenia.py --arkusz`,
+   pomiar 2026-11-17).
 8. `21` pustych tabel rozmieszczeń `spaces.*` z Patcha 2.4 (`0x00`) jest bez
    tekstów i trafia do rejestru błędów w `index/manifest.json`.
 9. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.
@@ -389,24 +397,15 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    Właściciel czyta
    i zgłasza punkty, w których gra pokazuje treść inaczej — poprawiamy je punktowo
    (np. powrót na zwiedzoną mapę), nie przez przestawianie całości.
-2. **Uruchomić w grze gotową łatkę `v0.4.0` i sprawdzić prolog.** Wysłana na
-   Dysk Google `WWM_Spolszczenie_PL_v0.4.0.zip` (`5 330 079 B`, SHA-256
-   `2bfdfc62…2ad8`, `86 282` przekłady) zawiera napisy
-   prologu z obu zwrotek (`zwrotki/2026-11-14_prolog_pl.md`, `232` klucze;
-   `zwrotki/2026-11-14_prolog_2_pl.md`, `4` klucze) oraz `675` wierszy warstwy
-   `text_msg__grey` przejętych z wierszy głównych.
-   Jedno uruchomienie gry — najlepiej od nowej postaci do kreacji — powie, czy
-   prolog jest polski i czy napisy filmów 2–3 idą z tej samej treści.
-   **Do tego czasu nie twierdzimy, że cinematic jest już polski w grze.**
-   Przed każdą diagnozą „coś jest po angielsku” uruchomić
+2. ~~Uruchomić w grze łatkę `v0.4.0` i sprawdzić prolog.~~ **Zrobione
+   (2026-11-17):** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip` (najnowsza
+   zwrotka `WWM_PL2.zip`, `86 282` przekłady) została przetestowana w grze i
+   działa — przetłumaczone treści pojawiają się w grze (zgłoszenie
+   właściciela). Przed każdą diagnozą „coś jest po angielsku” uruchomić
    `python3 tools/pokrycie_tlumaczenia.py` (`--brak`, `--brak-przerywnikow`,
    `--szukaj "<fragment zdania>"`).
-3. Potwierdzić w oknie gry (Patch 2.4 `26592996`) opublikowane na Dysku Google
-   pierwsze wydanie samowystarczalnego spolszczenia **`WWM_Spolszczenie_PL_v0.1.0.zip`**
-   (`75 685` przekładów z `tlumaczenie/`, ok. `4,3 MB`, `tools/one_click_patch.py
-   --tylko-magazyn --wydanie v0.1.0 --wyj-zip dist/WWM_Spolszczenie_PL_v0.1.0.zip`).
-4. Oczekiwać na zwrotki ze zregenerowanego pakietu `v4` (`paczka_dla_tlumacza_wwm_v4.zip`)
+3. Oczekiwać na kolejne zwrotki od tłumacza (pracuje nad dalszymi przekładami)
    → `tools/import_zwrotki.py` → commit `tlumaczenie/` → kolejne wydania
    Czytanek (`tools/buduj_czytanki.py`) i kolejne wydania `WWM_Spolszczenie_PL_v*.zip`.
-5. Po każdym kolejnym patchu gry: właściciel klika
+4. Po każdym kolejnym patchu gry: właściciel klika
    `collector/URUCHOM_AKTUALIZACJE.bat`, następnie obieg z [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md).

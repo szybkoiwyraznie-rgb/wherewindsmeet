@@ -129,17 +129,18 @@ przepakowuje tabele z nowymi offsetami i weryfikuje wynik przed zapisem.
 
 ## Co jest już potwierdzone, a co jeszcze czeka na test
 
-- **Potwierdzone w uruchomionej grze (Steam Windows):** mała łatka testowa (`tools/latka_testowa.py`, oparta na tym samym formacie map `translate_words_map_en*`) załadowała się w kliencie bez błędu, a wbudowane czcionki gry wyświetlają poprawnie wszystkie polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`) zarówno w UI, jak i w napisach prologu.
-- **Wciąż czeka na sprawdzenie w grze:** pełna łatka fabularna (po spłynięciu zwrotki tłumacza do `tlumaczenie/`), limity szerokości dłuższych napisów interfejsu oraz zachowanie po cotygodniowej aktualizacji gry.
+- **Potwierdzone w uruchomionej grze (Steam Windows):** mała łatka testowa (`tools/latka_testowa.py`, oparta na tym samym formacie map `translate_words_map_en*`) załadowała się w kliencie bez błędu, a wbudowane czcionki gry wyświetlają poprawnie wszystkie polskie znaki diakrytyczne (`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`) zarówno w UI, jak i w napisach prologu. **Pełna łatka fabularna `WWM_Spolszczenie_PL_v0.4.0.zip` (najnowsza zwrotka tłumacza `WWM_PL2.zip`, `86 282` przekłady) została przetestowana w grze i działa — przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela, 2026-11-17).
+- **Nadal czekają na sprawdzenie:** limity szerokości dłuższych napisów interfejsu oraz zachowanie po cotygodniowej aktualizacji gry.
 - **Angielski, który zostaje po nałożeniu łatki, to zwykle brak przekładu, a nie
   błąd patchera.** Zanim szuka się przyczyny w plikach, trzeba zmierzyć pokrycie:
   `python3 tools/pokrycie_tlumaczenia.py` (tabela sekcji) oraz
   `--szukaj "<fragment zdania>"` (klucz, miejsce w grze, tabela źródłowa, stan
-  przekładu). Pomiar z 2026-11-14: napisy cutscen `96,8%`, napisy filmowe
-  `27,7%`, sceny `7,1%` — opis w [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)
+  przekładu). Pomiar z 2026-11-17 (po imporcie `WWM_PL2.zip`): napisy cutscen
+  `100%`, napisy filmowe `100%`, sceny `13,7%`, cały wyciąg `17,7%` — opis
+  w [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)
   i [dzienniku](EXPERIMENT_LOG.md).
 - **Nie wybrano docelowo zastępowanego języka klienta** poza sprawdzoną dotąd mapą angielską.
-- **Skrypty instalatora i przywracania (`patcher_wwm.py` w trybie standalone oraz `instalator/` w trybie binarnym)** przeszły automatyczne testy na Linuksie i w Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, wykrywanie aktualizacji gry, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie); nowy wrapper `patcher_wwm.py` produkuje identyczny format binarny map jak sprawdzony tryb testowy, lecz nie był jeszcze odpalony bezpośrednio w oknie gry właściciela ([TEST_W_GRZE.md](TEST_W_GRZE.md)).
+- **Skrypty instalatora i przywracania (`patcher_wwm.py` w trybie standalone oraz `instalator/` w trybie binarnym)** przeszły automatyczne testy na Linuksie i w Windows CI na fikcyjnej instalacji (kopia oryginałów poza grą, wykrywanie aktualizacji gry, sprawdzanie SHA-256 i buildu Steam, transakcyjny zapis z cofnięciem błędu, bezpieczne przywracanie); pełna łatka zbudowana tym obiegiem (`WWM_Spolszczenie_PL_v0.4.0.zip`) została dodatkowo przetestowana w realnej grze i działa (zgłoszenie właściciela, 2026-11-17) — patrz [TEST_W_GRZE.md](TEST_W_GRZE.md).
 
 ## Wynik na realnych mapach w piaskownicy
 
