@@ -1907,7 +1907,7 @@ utrwalona jako źródło „gra" (potwierdzenie przebiegiem).
 
 Nowe artefakty: `index/mpk/nastepstwa_subsequent.jsonl` (8 011 krawędzi
 z `branch_dialog_subsequent`), `index/mpk/sceny_ambient_kity.jsonl`
-(129 247 wierszy; 43 877 scen z pozycją XYZ w świecie),
+(53 601 unikalnych wierszy scena+kit+pozycja; 43 877 scen z pozycją XYZ),
 `index/mpk/nastepstwa_z_gry.jsonl` (3 krawędzie benchmarku). Kanoniczny
 `nastepstwa_scen.jsonl`: **18 625 krawędzi z pięciu źródeł**.
 

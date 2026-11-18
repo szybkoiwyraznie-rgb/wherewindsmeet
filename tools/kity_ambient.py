@@ -8,9 +8,10 @@ w przestrzeni; `spaces.<s>.spawn_kit` niesie pozycję kitu. NPC ambientowy
 (drzewo zachowań `u_common_qifen`) wchodzi w kit i gra scenę o numerze
 seryjnym kitu, gdy gracz jest w pobliżu.
 
-Wyjście: index/mpk/sceny_ambient_kity.jsonl —
-  {"scena": nr, "space": "s501", "kit_no": …, "kit_pos_id": …,
-   "pozycja": [x,y,z] | null}
+Wyjście: index/mpk/sceny_ambient_kity.jsonl — jeden wiersz na unikalne
+(scena, kit_no, pozycja), z listą przestrzeni:
+  {"scena": nr, "kit_no": …, "pozycja": [x,y,z] | null,
+   "spaces": ["s501", "s701", …]}
 
 Wymaga bazy gry w `local/dane` (poza Gitem).
 """
@@ -46,7 +47,7 @@ def main() -> int:
         if m:
             przestrzenie[m.group(1)] = nazwa
 
-    wiersze = []
+    wiersze = {}
     for space, tab_sid in sorted(przestrzenie.items()):
         # pozycje kitów: spawn_kit ma id→(kit_pos, kit_serial_id);
         # spawn_kit_id2no mapuje kit_pos_id→kit_no
@@ -74,20 +75,20 @@ def main() -> int:
                 if not isinstance(kit_no, int):
                     continue
                 pos_id = no2id.get(kit_no)
-                wiersze.append({
-                    "scena": scena,
-                    "space": space,
-                    "kit_no": kit_no,
-                    "kit_pos_id": pos_id,
-                    "pozycja": pozycje.get(pos_id),
-                })
+                poz = pozycje.get(pos_id)
+                klucz = (scena, kit_no, tuple(poz) if poz else None)
+                wiersze.setdefault(klucz, set()).add(space)
 
-    wiersze.sort(key=lambda w: (w["scena"], w["space"], w["kit_no"]))
     out = ROOT / "index" / "mpk" / "sceny_ambient_kity.jsonl"
     with open(out, "w", encoding="utf-8") as fh:
-        for w in wiersze:
-            fh.write(json.dumps(w, ensure_ascii=False) + "\n")
-    sceny = {w["scena"] for w in wiersze}
+        for (scena, kit_no, poz) in sorted(wiersze, key=lambda k: (k[0], k[1])):
+            fh.write(json.dumps({
+                "scena": scena,
+                "kit_no": kit_no,
+                "pozycja": list(poz) if poz else None,
+                "spaces": sorted(wiersze[(scena, kit_no, poz)]),
+            }, ensure_ascii=False) + "\n")
+    sceny = {k[0] for k in wiersze}
     print(json.dumps({"wierszy": len(wiersze), "scen": len(sceny),
                       "przestrzeni": len(przestrzenie),
                       "plik": str(out.relative_to(ROOT))}, ensure_ascii=False))

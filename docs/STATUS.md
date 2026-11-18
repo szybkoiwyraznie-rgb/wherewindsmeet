@@ -504,7 +504,7 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
   1632220065 i (`new_npc_task_data`) wysyła NPC 15000023 (Ruby) do kitu
   4700041. Wyzwalacz riposty gracza 4700352 siedzi po stronie serwera
   (brak w danych klienta) — krawędź utrwalona jako źródło „gra".
-  Nowy indeks `index/mpk/sceny_ambient_kity.jsonl`: 43 877 scen
+  Nowy indeks `index/mpk/sceny_ambient_kity.jsonl` (53 601 wierszy): 43 877 scen
   ambientowych z pozycją XYZ — do grupowania czytanki wg miejsc.
 - **Następny krok:** (a) czytanka v12 na `nastepstwa_scen.jsonl` +
   przeplocie scena↔cutscena — najpierw krótka propozycja zmian układu dla
