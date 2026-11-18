@@ -146,6 +146,20 @@ przerywniki z `cutscenes.cine_path`.
 
 ## Bramka 4 — analiza `.etsb`: następstwo scen i POI → sceny (sesja 5+)
 
+**Wynik częściowy z danych `index/` (2026-11-17, priorytet 1):**
+`index/nastepstwa_scen.jsonl` (generator `tools/nastepstwa_scen.py`) —
+16 946 krawędzi „koniec → początek” z pięciu źródeł: tabela następstw
+`branch_dialog_subsequent` (7 680, `pewne`), wybory gracza (6 912, `pewne`),
+opcje NPC (292, `pewne`), koniec zadania → początek następnego w łańcuchu
+`pre/post` (1 071, `z łańcucha zadań`) i porządek ról wewnątrz zadania
+(991, `z ról zadania`). Odrzucone jako dowód: kolejność zadań w
+`grupy_zadan.zadania` (listy posortowane numerycznie — przynależność, nie
+kolejność), `zamiany_dialogow` (zastępowanie) i pozycja `chronologia.p`
+(porządek pozycyjny). Granica: łańcuch `4700001 → 4700041 → 4700352` w tych
+danych nie występuje (brak `x`, brak zadań dla 4700041/4700352) — pełne
+następstwo i POI → scena nadal wymagają `.etsb`/MPK. Szczegóły:
+[EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis 2026-11-17 (10).
+
 **Wejście:** wydobyte `.etsb` z trafień POI (bramka 1/2) i ewentualne skrypty
 z `LT*.mpk` (gdyby istniały i były czytelne).
 **Zadania:** format tabel klienta (ETSB — przypuszczalnie skompilowana tablica

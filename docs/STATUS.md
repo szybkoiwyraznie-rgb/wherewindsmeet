@@ -114,11 +114,17 @@ bez rozpakowywania i bez dotykania procesu gry (nagłówek i ogon, entropia,
 magia kompresji, szukanie nazw ścieżek, okienka bajtów). Nie jest do niczego
 wymagany — czytanka v6 stoi bez niego.
 
-**Następstwo scen (D) jest nieudowalne z zebranych danych.** W 28 727 tabelach
-ze schematem nie ma kolumny „następna scena”, drzewo `dialog_timelines.4700001`
-nie zawiera 4700041 ani 4700352, żaden wiersz bazy nie ma dwóch z tych trzech
-numerów, a 4700001 jest tylko `finish_dialogs` zadań 220003 i 10000220003.
-Następstwo siedzi w plikach klienta `.etsb`, których nie zbieramy.
+**Następstwo scen (D): częściowe, z danych `index/`.** Jawne następniki dialogów
+(`branch_dialog_subsequent`, pole `x` sceny) istnieją dla 5 765 dialogów
+(7 680 krawędzi); do tego wybory gracza, opcje NPC, koniec zadania → początek
+następnego w łańcuchu `pre/post` oraz porządek ról wewnątrz zadania — razem
+**16 946 krawędzi z oceną pewności** w `index/nastepstwa_scen.jsonl`
+(generator `tools/nastepstwa_scen.py`, testy `tests/test_nastepstwa_scen.py`).
+Ale przykładowy łańcuch `4700001 → 4700041 → 4700352` w tych danych **nie
+występuje**: 4700001 nie ma `x`, a 4700041/4700352 nie są wskazywane przez
+żadne zadanie (4700001 jest tylko `finish_dialogs` zadań 220003 i 10000220003).
+Pełne następstwo nadal siedzi w plikach klienta `.etsb`, których nie zbieramy,
+a POI → scena pozostaje otwarte (priorytet 2).
 
 **Kwestie gracza z wariantem płci były po angielsku** w czytankach, choć przekład
 jest w `tlumaczenie/pl_warianty.jsonl` — czytanka nie łączyła `id` wariantu

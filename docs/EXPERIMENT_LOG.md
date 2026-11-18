@@ -1638,3 +1638,43 @@ cudzego kodu ani nie wymagają tej procedury.
   formacie. Poszukiwać pełnej pary names/data repository albo źródła bazowego
   pakietu; nie przypisywać jeszcze żadnego POI do grafu. Dla Bramki 3
   kontynuować parsowanie osi `.cine`; publiczny codec jej nie opisuje.
+
+### 2026-11-17 (10) — Następstwa scen z danych `index/`: 16 946 krawędzi z oceną pewności (priorytet 1)
+
+- **Wejście:** wyłącznie `index/` (bez skanera, bez MPK): `sceny_*.jsonl`
+  (pole `x`), `zadania.jsonl` (`pre`/`post`, momenty dialogów i cutscen),
+  `wybory.jsonl`, `opcje_npc.jsonl`. Priorytety właściciela: (1) kolejność
+  scen jedna po drugiej, (2) POI → scena, (3) kolejność kwestii w cutscenach.
+- **Metoda:** `tools/nastepstwa_scen.py` zbiera krawędzie „koniec → początek”
+  z pięciu źródeł, każde z oceną pewności; węzeł to `{"t": "d"|"c", "n": …}`
+  (dialog z `sceny_*` albo cutscena wskazywana przez zadanie). Pętle własne
+  i cele spoza `sceny_*` wypadają (liczone w podsumowaniu). Wynik:
+  `index/nastepstwa_scen.jsonl` (16 946 wierszy, ~2,2 MB), testy
+  `tests/test_nastepstwa_scen.py` (syntetyczne + zgodność z zapisanym plikiem,
+  jak `test_chronologia.py`).
+- **Wyniki:** `nastepstwo` 7 680 (`branch_dialog_subsequent`, 5 765 dialogów
+  źródłowych — jawne następniki), `wybor` 6 912 (prawie wszystkie już w tabeli
+  następstw — tylko 1 krawędź nowa), `opcja_npc` 292, `zadanie` 1 071
+  (koniec zadania → początek następnego w łańcuchu; tylko 2 z tych par scen
+  pokrywa się z tabelą następstw — to realnie nowe wiązania), `zadanie_wewnatrz`
+  991 (role `przyjecie → rozmowa → zakonczenie`; wewnątrz roli kolejności nie
+  wymyślamy — iloczyn kartezjański między kolejnymi rolami). Pominięte:
+  159 celów spoza `sceny_*`, 5 371 pętli własnych (ten sam dialog w kilku
+  rolach zadania).
+- **Wyniki ujemne / odrzucone hipotezy:**
+  * `grupy_zadan.zadania` to listy **posortowane numerycznie** (884/884 grup
+    z ≥2 zadaniami) — to przynależność, nie kolejność; krawędzie „kolejne
+    w grupie” odrzucone (58% zgodności z `pre/post` to artefakt rosnących
+    numerów w łańcuchu).
+  * Przykładowy łańcuch `4700001 → 4700041 → 4700352` w danych `index/`
+    **nie występuje**: 4700001 nie ma `x`; 4700041 i 4700352 nie są
+    wskazywane przez żadne zadanie (4700001 to tylko `finish_dialogs` zadań
+    220003 i 10000220003). Teza STATUS „pełne następstwo siedzi w `.etsb`”
+    dla tego łańcucha nadal prawdziwa.
+  * `zamiany_dialogow` (zastępowanie dialogu wariantami) i pozycja
+    `chronologia.p` (porządek pozycyjny krain, nie przyczynowy) — nie są
+    dowodem następstwa; nie użyte.
+- **Wniosek / następny krok:** priorytet 1 jest częściowo domknięty z danych
+  `index/` (jawne następniki + łańcuch zadań). Priorytet 2 (POI → scena)
+  nadal wymaga `.etsb`/MPK albo pełnego repository nazw — bez zgadywania
+  mapowania GUID→POI. Priorytet 3 (oś `.cine`) bez zmian: Bramka 3.
