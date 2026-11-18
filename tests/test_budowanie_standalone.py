@@ -108,6 +108,7 @@ class BudowanieBezDanychZPozaRepo(unittest.TestCase):
             "baza_gry.py", "szukaj_w_bazie.py", "cutsceny_z_bazy.py", "kolejnosc_gry.py",
             "pamiatki_z_bazy.py", "poi_z_bazy.py", "wyciag.py", "zrodla_tekstow.py",
             "sprawdz_baze.py", "sciezki_vfs.py", "zadania_sceny.py", "dialog_subsequent.py", "kity_ambient.py",
+            "cine_sciezka_audio.py",
         }
         self.assertTrue(with_bazy)
         self.assertLessEqual(with_bazy, dozwolone, f"nowe zależności: {sorted(with_bazy - dozwolone)}")

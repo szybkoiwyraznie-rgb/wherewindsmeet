@@ -335,14 +335,16 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 
 ## Następny krok
 
-**ROADMAPA (zlecenie właściciela 2026-11-18): chronologia tekstów W cutscenach.**
-Dziś tylko niewielka część cutscen ma kolejność kwestii (bloki puli `text_msg`
-po numerze wiersza + nieliczne napisy przypisane z bazy); większość cutscen
-w czytance ma wyłącznie streszczenie, bez dialogów. Zadanie: znaleźć w danych
-gry nośnik kolejności kwestii cutscen (osie czasu cutscen nie są w pakiecie
-aktualizacji; `dialog_timelines.*` nie zawierają napisów puli — patrz dziennik;
-kandydaci do zbadania: pliki .cine/bnk audio, `voice_data_ai`-podobne tabele
-dla cutscen, grafy MESSIAH cutscen w pełnym kliencie) i wpiąć ją w chronologię.
+**ROADMAPA WYKONANA (2026-11-18, wpis 10 w EXPERIMENT_LOG): chronologia
+tekstów W cutscenach — ZNALEZIONA.** Nośnik kolejności to ścieżka audio
+głównego pliku `.cine` cutsceny (wpisy `czas:id_sound_data`), czytana przez
+`tools/cine_sciezka_audio.py` z korpusu MPK_SKANER_WYNIK i tłumaczona na
+wiersze puli `text_msg` przez `tools/cutsceny_kolejnosc_kwestii.py`
+(benchmark 30161 — ręczny zapis gracza — odtworzony w 100%, 36/36 kwestii).
+Czytanka od v15 renderuje cutsceny w tej kolejności (215 cutscen z pełnym
+przeplotem). Dalsza praca opcjonalna: pokrycie pozostałych cutscen
+(334 z 549 mają kwestie w `.cine`, ale segmentacja nie znalazła okna puli —
+głównie sceny bez napisów w puli albo z tekstami tylko w `sound_data`).
 
 
 0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** Trzy pliki

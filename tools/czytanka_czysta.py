@@ -514,18 +514,22 @@ def _dialog_sceny(blok: list[str], bloki: list[list[str]], wiersze: dict[str, in
 
 
 def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
-                     audio: dict[int, str] | None = None
+                     audio: dict[int, str] | None = None,
+                     kolejnosc: list[list[dict]] | None = None
                      ) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
-    Kolejność bierzemy z numerów wierszy puli `text_msg` — to jedyna oś porządku, jaką
-    gra podaje dla napisów przerywnika (`kn` w chronologii miesza napisy przypisane
-    wprost z tabeli gry z blokami puli). Ten sam przerywnik leży w puli kilka razy:
-    starsza i nowsza wersja napisów (np. 590153–590179 i 591148–591169 w cutscenie
-    30161). Grany jest **najnowszy** blok (najwyższe numery wierszy, patrz
-    `_podziel_na_bloki`), a w nim najpierw dialog sceny, potem treść bez bliźniaka
-    (`_kwestie_sceny`). Starsze wersje schodzą pod nagłówek, żeby nic nie ginęło,
-    ale czytelnik nie dostał dwóch scen splątanych w jedną.
+    Kolejność kwestii, gdy jest, bierzemy ze ścieżki audio pliku `.cine`
+    (`index/cutsceny_kolejnosc_kwestii.jsonl`, patrz
+    `tools/cutsceny_kolejnosc_kwestii.py`) — to pełny przeplot bloków puli
+    `text_msg` (Ruby i gracz w 30161 leżą w dwóch sąsiednich zakresach, a mówią
+    na przemian). Chronologia potrafi też **doczepić** wiersze, których `kn`
+    cutsceny nie znało (blok gracza 591170–591183 leżał dotąd w „Napisach
+    przerywnika"). Dla kwestii spoza chronologii zostaje porządek numerów
+    wierszy puli. Ten sam przerywnik leży w puli kilka razy: starsza i nowsza
+    wersja napisów (np. 590153–590179 i 591148–591169 w 30161). Grany jest
+    **najnowszy** blok, a starsze wersje schodzą pod nagłówek wariantu, żeby
+    nic nie ginęło, ale czytelnik nie dostał dwóch scen splątanych w jedną.
 
     Streszczenie sceny (`k`) stoi **na początku**, zaraz pod nagłówkiem cutsceny.
     """
@@ -534,15 +538,25 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     for numer, klucz in enumerate(napisy):
         pozycja.setdefault(klucz, numer)
 
+    bloki_chrono: list[list[str]] = []
+    pokryte: set[str] = set()
+    for blok in kolejnosc or []:
+        klucze_bloku = [r["k"] for r in blok if r.get("k")]
+        if klucze_bloku:
+            bloki_chrono.append(klucze_bloku)
+            pokryte.update(klucze_bloku)
+    bloki_chrono.sort(key=lambda b: _najwyzszy(b, wiersze), reverse=True)
+
     def do_sortowania(klucz: str) -> tuple:
         numer = wiersze.get(klucz)
         return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
 
-    bloki = _podziel_na_bloki(sorted(pozycja, key=do_sortowania), wiersze)
-    if len(bloki) > 1:
-        kolejnosc = sorted(range(len(bloki)), key=lambda i: _najwyzszy(bloki[i], wiersze),
-                           reverse=True)
-        bloki = [bloki[i] for i in kolejnosc]
+    luzem = [k for k in sorted(pozycja, key=do_sortowania) if k not in pokryte]
+    bloki = bloki_chrono + (_podziel_na_bloki(luzem, wiersze) if luzem else [])
+    if not bloki_chrono and len(bloki) > 1:
+        porzadek_blokow = sorted(range(len(bloki)),
+                                 key=lambda i: _najwyzszy(bloki[i], wiersze), reverse=True)
+        bloki = [bloki[i] for i in porzadek_blokow]
         sygnatury = _sygnatury([k for blok in bloki for k in blok], pl)
         dialog, obce = _dialog_sceny(bloki[0], bloki, wiersze, sygnatury)
         bloki = [dialog] + ([obce] if obce else []) + bloki[1:]
@@ -581,6 +595,24 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     return klucze, podtytuly, powtorzone
 
 
+def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
+    """Chronologia kwestii cutscen ze ścieżek audio `.cine` (gdy indeks istnieje).
+
+    `index/cutsceny_kolejnosc_kwestii.jsonl` buduje
+    `tools/cutsceny_kolejnosc_kwestii.py`; bez niego czytanka wraca do
+    porządku numerów wierszy puli.
+    """
+    plik = Path(index) / "cutsceny_kolejnosc_kwestii.jsonl"
+    if not plik.exists():
+        return {}
+    wynik: dict[int, list[list[dict]]] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            wpis = json.loads(linia)
+            wynik[int(wpis["no"])] = wpis.get("bloki") or []
+    return wynik
+
+
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                              krainy: list[dict] | None = None,
                              index: str | Path | None = None) -> list[Jednostka]:
@@ -598,6 +630,12 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
     wiersze_napisow = _wiersze_napisow(ix, porzadek)
     klucze_wierszy = {w["wiersz"]: w["k"] for w in ix.cutsceny_kontekst.get("napis", [])
                       if w.get("wiersz") and w.get("k")}
+    kolejnosc_cutscen = _kolejnosc_kwestii_cutscen(index) if index else {}
+    numery_cutscen = {int(w["n"]) for w in chronologia if w["t"] == "cutscena"}
+    # wiersze przejęte przez chronologię cutscen znikają z „Napisów przerywnika"
+    przejete = {r["k"] for numer, bloki in kolejnosc_cutscen.items()
+                if numer in numery_cutscen
+                for blok in bloki for r in blok if r.get("k")}
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -660,7 +698,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
-                                                            audio_napisow)
+                                                            audio_napisow,
+                                                            kolejnosc_cutscen.get(numer))
             linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
                      for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
@@ -672,13 +711,25 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         elif rodzaj == "napisy":
             linie = []
             for klucz in wiersz.get("k") or []:
+                if klucz in przejete:
+                    continue        # kwestia poszła do swojej cutsceny (chronologia `.cine`)
                 if linie and linie[-1][1] == klucz:
                     continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 linie.append((mowca, klucz))
+            if not linie:
+                continue            # cały blok przejęty przez cutsceny
+            etykieta = wiersz.get("e") or "Napisy przerywnika"
+            if przejete and etykieta.startswith("Napisy przerywnika — wiersze "):
+                numery = sorted(wiersze_napisow[k] for _m, k in linie
+                                if k in wiersze_napisow)
+                if numery:      # po oddaniu kwestii cutscenom zakres bywa węższy
+                    etykieta = (f"Napisy przerywnika — wiersze {numery[0]}–{numery[-1]}"
+                                if numery[0] != numery[-1]
+                                else f"Napisy przerywnika — wiersz {numery[0]}")
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             jednostki.append(Jednostka(
-                "napisy", wiersz.get("e") or "Napisy przerywnika",
+                "napisy", etykieta,
                 "# Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)",
                 linie, osoby=osoby))
     return jednostki

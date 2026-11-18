@@ -1975,3 +1975,41 @@ na Dysku.
 ROADMAPA (następne duże zadanie od właściciela): **chronologia tekstów
 W cutscenach** — większość cutscen ma dziś tylko streszczenie, bez kwestii;
 szczegóły w docs/STATUS.md (sekcja „Następny krok").
+
+## 2026-11-18 (10) — PRZEŁOM: chronologia kwestii w cutscenach ze ścieżki audio `.cine`
+
+Zadanie z roadmapy rozwiązane. Brakujący przeplot bloków puli napisów
+(`text_msg`) **nie leży w żadnej tabeli bazy** — leży w głównym pliku
+`.cine` cutsceny (kontener ujęć `sXXX`), jako tekstowe wpisy ścieżki
+dźwiękowej `czas:id_sound_data:a:b;c` (np. `3.399:7151014:0:0;0`).
+
+Droga do odkrycia (ślepe uliczki po drodze — patrz niżej):
+1. nazwy nagrań (`vo_sm_sxdm4_cs_zlxl_*`) w bazie ma TYLKO `sound_data`
+   ({id, audio_name, text, duration}) — ale bez kolejności;
+2. kod filmu `zlxl` znają tylko `cutscenes` (cine_path!) i `fenbao_…`;
+3. `cutscenes.cine_path` → `file_id` (murmur3) → artefakt w korpusie
+   MPK_SKANER_WYNIK: **wszystkie 1109 cutscen mają swój `.cine` w
+   korpusie**, 996 z wpisami audio, 549 z kwestiami mówionymi;
+4. wpisy posortowane po czasie = pełna chronologia kwestii; teksty
+   scenariuszowe `sound_data.text` tną się na wiersze puli napisów
+   (segmentacja zachłanna + warianty partykuł 啦/了, 欸/哎, 呀/啊).
+
+Nowe narzędzia i indeksy:
+- `tools/cine_sciezka_audio.py` → `index/cutsceny_sciezka_audio.jsonl`
+  (549 cutscen, 2 030 kwestii z czasem, id, audio i tekstem zh);
+- `tools/cutsceny_kolejnosc_kwestii.py` → `index/cutsceny_kolejnosc_kwestii.jsonl`
+  (215 cutscen, 232 bloki wariantów, 2 452 wiersze puli w kolejności
+  odtwarzania); okna klastrowe oddzielają pokolenia (590xxx/591xxx);
+- `czytanka_czysta.py`: cutsceny renderują kwestie w tej kolejności,
+  przejmują wiersze z „Napisów przerywnika" (591170–591183 wróciły do
+  30161), nagłówki przerywników przeliczają zakres po oddaniu kwestii.
+
+**Benchmark: ręczny zapis gracza cutsceny 30161 odtworzony w 100%** —
+36/36 kwestii w dokładnie tej kolejności (przeplot Ruby/gracz).
+Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` 17 testów
+(`BENCHMARK_30161` wprost w teście), całość 591 OK.
+
+Ślepe uliczki tej sesji: szukanie referencji id wierszy puli
+(591148/591170) po tabelach — tylko `text_msg`/`text_msg__grey`;
+`ccs_text_msg` to UI; nazwy audio nie występują plaintext poza
+`sound_data`; trafienia u32 w skompresowanych Lua to przypadkowe zbitki.

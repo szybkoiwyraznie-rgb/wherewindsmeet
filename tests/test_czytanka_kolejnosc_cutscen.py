@@ -231,3 +231,73 @@ class TestCutscena30161(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Pełny ręczny zapis gracza cutsceny 30161 (benchmark z rozmowy) — numery
+# wierszy puli `text_msg` w kolejności wyświetlania w grze. Przeplot bloków
+# Ruby (591148–591169) i gracza (591170–591183) pochodzi ze ścieżki audio
+# pliku `.cine` (tools/cutsceny_kolejnosc_kwestii.py).
+BENCHMARK_30161 = [
+    591148, 591149, 591170, 591150, 591151, 591171, 591152, 591153, 591154,
+    591172, 591173, 591174, 591155, 591156, 591175, 591157, 591158, 591159,
+    591160, 591176, 591177, 591161, 591162, 591163, 591164, 591165, 591178,
+    591179, 591180, 591166, 591167, 591168, 591169, 591181, 591182, 591183,
+]
+
+
+class TestChronologiaCine(unittest.TestCase):
+    """Przeplot kwestii cutscen ze ścieżki audio `.cine` (indeks i render)."""
+
+    @classmethod
+    def setUpClass(cls):
+        plik = INDEX / "cutsceny_kolejnosc_kwestii.jsonl"
+        if not plik.exists():
+            raise unittest.SkipTest("brak index/cutsceny_kolejnosc_kwestii.jsonl")
+        cls.kolejnosc = {}
+        with plik.open(encoding="utf-8") as f:
+            for linia in f:
+                wpis = json.loads(linia)
+                cls.kolejnosc[int(wpis["no"])] = wpis.get("bloki") or []
+
+    def test_indeks_odtwarza_zapis_gracza_30161(self):
+        """Nowszy blok 30161 w indeksie = pełny ręczny zapis rozgrywki."""
+        bloki = self.kolejnosc.get(30161)
+        self.assertTrue(bloki, "brak cutsceny 30161 w indeksie kolejności")
+        nowe = [b for b in bloki if min(r["w"] for r in b) >= 591148]
+        self.assertEqual(len(nowe), 1)
+        self.assertEqual([r["w"] for r in nowe[0]], BENCHMARK_30161)
+
+    def test_render_30161_w_kolejnosci_benchmarku(self):
+        """`_napisy_cutsceny` z chronologią zaczyna od pełnego przeplotu."""
+        wiersz = None
+        with (INDEX / "chronologia.jsonl").open(encoding="utf-8") as f:
+            for linia in f:
+                wpis = json.loads(linia)
+                if wpis.get("t") == "cutscena" and wpis.get("n") == 30161:
+                    wiersz = wpis
+                    break
+        self.assertIsNotNone(wiersz)
+        bloki = self.kolejnosc[30161]
+        wiersze = {r["k"]: r["w"] for b in bloki for r in b}
+        with (INDEX / "cutsceny_kontekst.jsonl").open(encoding="utf-8") as f:
+            for linia in f:
+                wpis = json.loads(linia)
+                if wpis.get("typ") == "napis" and wpis.get("k"):
+                    wiersze.setdefault(wpis["k"], wpis["wiersz"])
+        klucze, _, _ = cz._napisy_cutsceny(wiersz, wiersze, {}, None, bloki)
+        numery = [wiersze[k] for k in klucze if k in wiersze]
+        poczatek = [n for n in numery if 591148 <= n <= 591183]
+        self.assertEqual(poczatek[:len(BENCHMARK_30161)], BENCHMARK_30161)
+
+    def test_chronologia_przeplata_a_luzem_idzie_do_wariantu(self):
+        """Syntetycznie: przeplot z chronologii + kwestie spoza niej jako wariant."""
+        wiersz = {"t": "cutscena", "n": 7, "kn": ["r1", "r2", "stare"], "k": []}
+        wiersze = _wiersze(r1=100, r2=101, g1=110, stare=50)
+        pl = {"r1": "Raz.", "r2": "Dwa.", "g1": "Trzy.", "stare": "Cztery."}
+        # chronologia: r1, g1 (spoza kn!), r2 — przeplot dwóch zakresów puli
+        bloki = [[{"w": 100, "k": "r1", "t": 0.5},
+                  {"w": 110, "k": "g1", "t": 1.0},
+                  {"w": 101, "k": "r2", "t": 2.0}]]
+        klucze, podtytuly, powtorzone = cz._napisy_cutsceny(wiersz, wiersze, pl, None, bloki)
+        self.assertEqual(klucze, ["r1", "g1", "r2", "stare"])
+        self.assertEqual(podtytuly, {3: "Inny wariant napisów tej cutsceny (wiersz 50)"})
+        self.assertEqual(powtorzone, [])
