@@ -205,12 +205,18 @@ class TestCutscena30161(unittest.TestCase):
                         cls.pl[wpis["k"]] = wpis["pl"]
 
     def test_scena_zaczyna_sie_od_zbudzenia_a_nie_od_bebna_ani_wiersza(self):
+        """Pierwsze kwestie to blok zbudzenia (wiersze puli 591148–591151,
+        nagrania `vo_sm_sxdm4_cs_zlxl_hx_*`), nie bęben ani wiersz ze starszego
+        wariantu (wiersze 590xxx). Porównujemy numery wierszy puli, nie brzmienie
+        przekładu — tłumacz może zmieniać tekst, kolejność jest z danych gry."""
         klucze, _, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl, self.audio)
-        tresc = [self.pl[k].strip() for k in klucze[1:] if k in self.pl]   # [0] to streszczenie
-        self.assertEqual(tresc[:3], ["Szefie! Szefie!", "Wodzu, obudź się!",
-                                     "Miałaś iść ze mną do Kaplicy Generała!"])
-        self.assertEqual(tresc[3], "Jak można tak zasnąć?")
-        self.assertNotIn("Ten bęben… czemu bije coraz głośniej?", tresc[:4])
+        wiersze = [self.wiersze[k] for k in klucze[1:]   # [0] to streszczenie
+                   if k in self.pl and k in self.wiersze]
+        self.assertEqual(wiersze[:4], [591148, 591149, 591150, 591151])
+        audio_bloku = self.audio.get(591150, "")
+        self.assertTrue(audio_bloku.startswith("vo_sm_sxdm4_cs_zlxl_hx"), audio_bloku)
+        self.assertFalse([w for w in wiersze[:4] if w < 591000],
+                         "starszy wariant napisów (590xxx) wszedł przed zbudzenie")
 
     def test_streszczenie_jest_pierwsze_i_pod_naglowkiem(self):
         klucze, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl, self.audio)
