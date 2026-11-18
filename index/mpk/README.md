@@ -31,6 +31,7 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
 | `patch_mpkdb_pak.jsonl` | 2 wiersze `pak` (pak = `LT1.mpk`: `2 097 152 + 471 425 = 2 568 577 B`) |
 | `patch_mpkdb_meta.json` | 1 wiersz `meta` — tylko rozmiary i sha256 (bajty to zaciemniona konfiguracja; NIE zapisujemy) |
 | `storyline_graphs.jsonl` | 14 grafów `Storyline` z dekodowanych bloków: liczby typów węzłów oraz wybrane identyfikatory zadań, transferów, przestrzeni, cutscen/QTE i ścieżki zagnieżdżonych storyline; bez tekstu, pozycji, payloadów ani krawędzi grafu |
+| `sciezki_vfs.jsonl` | 11 278 unikalnych ścieżek/nazw plików VFS z bazy gry (974 `.cine`, 3 011 `.graph`, 926 `.etsb`, 6 367 `.ets`; 10 559 z katalogiem): kolumny `cutscenes.cine_path`, `fenbao_cutscene_info.resources`/`.cutscene_graph` (z numerami cutscen w polu `cutsceny`) + surowy skan chunków `dataN`; generator `tools/sciezki_vfs.py` — to są kandydaci file_id dla skanera v7 |
 
 ## Reguły VFS — potwierdzone na danych gry (2026-11-17)
 
