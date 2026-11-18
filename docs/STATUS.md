@@ -461,3 +461,11 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    Pochodne podsumowanie: `index/mpk/storyline_graphs.jsonl`; log:
    [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis (9). Bramka 3 (oś `.cine`,
    weryfikacja 30161) nadal otwarta.
+
+## Handoff — stan po WYNIKv6 i czytankach v11 (2026-11-18)
+
+- **Priorytet 1 (scena → scena)**: `WYNIKv6` wyciągnął 1 066 krawędzi z nieskompresowanych grafów JSON w `Resources*.mpk` (`index/mpk/storyline_nastepstwa.jsonl`), ale **benchmark `4700001 → 4700041 → 4700352` ma w nich 0 trafień** — w czytankach `WWM_Czytanka_PL_v11.zip` układ dla tych scen nadal idzie po numerach.
+- **Priorytet 2 (POI → scena)**: `index/mpk/poi_sceny.jsonl` ma 1 307 bezpośrednich powiązań z `poi.dialog`, ale **benchmark `Dragon Pattern Mark → 4700001` (`client/dialogs/hjt/sxd_longwenbiaoji.etsb`) ma 0 trafień** w `lt1_stringi.jsonl` i w `WYNIKv6`.
+- **Priorytet 3 (kolejność kwestii w cutscenach)**: `index/mpk/cine_dekodowane.jsonl` ma tylko 14 sztuk z sondy `Resources34` (w grze jest ich kilkaset).
+- **Przyczyna**: brakujące grafy, skrypty `.etsb` i osie `.cine` leżą w `Resources*.mpk` w blokach skompresowanych/zaszyfrowanych (`EZST`) oraz pod sygnaturą `.cine` (`c159410d`), których nieskompresowane wyszukiwanie JSON-ów nie widzi.
+- **Następny krok**: skaner v7, który w `Resources*.mpk` dekoduje/wycina bloki `EZST` (pod priorytet 1 i 2, w tym benchmark `4700001` i `.etsb`) oraz bloki `.cine` (`c159410d`, pod priorytet 3).
