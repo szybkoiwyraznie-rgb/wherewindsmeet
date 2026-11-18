@@ -130,7 +130,7 @@ class ZapisanyPlikTests(unittest.TestCase):
     def test_plik_jest_w_repo_i_ma_wszystkie_zrodla(self):
         self.assertTrue(self.plik.exists())
         zrodla = {w["zrodlo"] for w in self.wiersze}
-        self.assertEqual(zrodla, {"nastepstwo", "wybor", "opcja_npc", "zadanie", "zadanie_wewnatrz"})
+        self.assertEqual(zrodla, {"nastepstwo", "wybor", "opcja_npc", "storyline", "zadanie", "zadanie_wewnatrz"})
         for wiersz in self.wiersze:
             self.assertEqual(wiersz["pewnosc"], nastepstwa_scen.PEWNOSC[wiersz["zrodlo"]])
             self.assertNotEqual(wiersz["z"], wiersz["do"])

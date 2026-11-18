@@ -21,6 +21,7 @@ z innych maszyn): indeksy są w **~200 `Resources*.mpk`** (+ ewentualnie
 
 ## Zasady stałe
 
+- **NIE przechodzimy do priorytetu 2 (POI → scena) ani priorytetu 3 (kolejność kwestii w cutscenach), dopóki nie zrealizujemy priorytetu 1 (powiązanie kolejności scen, w którym koniec jednej sceny uruchamia kolejną).**
 - Skaner i wszelkie narzędzia **tylko czytają**; gra nie jest uruchamiana,
   proces nie jest dotykany; nic nie jest wysyłane do sieci.
 - Duże dane (`*.mpk`, `*.mpkinfo`, `Patch.mpkdb`, wydobyte `.cine`/`.etsb`)

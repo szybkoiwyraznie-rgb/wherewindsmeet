@@ -597,6 +597,90 @@ def wytnij_z_indeksu(root: Path, wyjscie: Path, nazwa_indeksu: str, prefiks: str
     return _wytnij_bloki(root, pozycje, wyjscie, prefiks)
 
 
+def skanuj_storyline_w_paczkach(root: Path, wyjscie: Path, limit_bajtow: int = 80 * 1024 * 1024) -> dict:
+    """Skanuje Resources*.mpk pod kątem kompletnych grafów JSON Storyline (priorytet 1)."""
+    wyciete = wyjscie / "wyciete"
+    wyciete.mkdir(parents=True, exist_ok=True)
+    jsonl_path = wyciete / "storyline_wyciete.jsonl"
+    wzorce = (
+        b"GameLevelStorylineDialogsPlayNode",
+        b"DialogCutsceneSequenceNode",
+        b"DialogNode",
+        b"BranchDialog",
+        b"TrackTaskNode",
+    )
+    marker = b'{"Variables":'
+    przeszukano = 0
+    grafow = 0
+    zapisano_b = 0
+    decoder = json.JSONDecoder()
+    with jsonl_path.open("w", encoding="utf-8") as out_f:
+        for pak in sorted(root.rglob("Resources*.mpk")):
+            przeszukano += 1
+            try:
+                rozmiar = pak.stat().st_size
+                with pak.open("rb") as f:
+                    okno = 8 * 1024 * 1024
+                    zakladka = 512 * 1024
+                    offset = 0
+                    poprzedni_koniec = b""
+                    widziane_off = set()
+                    while offset < rozmiar:
+                        blok = f.read(okno)
+                        if not blok:
+                            break
+                        bufor = poprzedni_koniec + blok
+                        baza = offset - len(poprzedni_koniec)
+                        pos = 0
+                        while True:
+                            idx = bufor.find(marker, pos)
+                            if idx == -1:
+                                break
+                            pos = idx + len(marker)
+                            abs_off = baza + idx
+                            if abs_off in widziane_off:
+                                continue
+                            # Szybki filtr przed dekodowaniem JSON
+                            okno_podgladu = bufor[idx:idx + 262144]
+                            if not any(w in okno_podgladu for w in wzorce):
+                                continue
+                            try:
+                                tekst = okno_podgladu.decode("utf-8", errors="ignore")
+                                obj, _ = decoder.raw_decode(tekst)
+                            except Exception:
+                                continue
+                            widziane_off.add(abs_off)
+                            linia = json.dumps(
+                                {"paczka": pak.name, "offset": abs_off, "graf": obj},
+                                ensure_ascii=False,
+                            ) + "\n"
+                            lb = len(linia.encode("utf-8"))
+                            if zapisano_b + lb > limit_bajtow:
+                                return {
+                                    "ok": True,
+                                    "przeszukano_paczek": przeszukano,
+                                    "trafien": grafow,
+                                    "zapisano_bajtow": zapisano_b,
+                                    "limit_osiagniety": True,
+                                    "lista": [],
+                                }
+                            out_f.write(linia)
+                            zapisano_b += lb
+                            grafow += 1
+                        poprzedni_koniec = bufor[-zakladka:] if len(bufor) >= zakladka else bufor
+                        offset += len(blok)
+            except Exception:
+                pass
+    return {
+        "ok": True,
+        "przeszukano_paczek": przeszukano,
+        "trafien": grafow,
+        "zapisano_bajtow": zapisano_b,
+        "limit_osiagniety": False,
+        "lista": [],
+    }
+
+
 def _json_safe(val):
     """Wartość SQLite → coś, co zawsze przejdzie przez json.dumps.
 
@@ -800,6 +884,13 @@ def buduj_raport(args: argparse.Namespace) -> int:
                 {"ok": True, "tabele": {t: len(v.get("wiersze", [])) for t, v in w3["tabele"].items()}}
                 if w3.get("ok")
                 else {"ok": False, "powod": w3.get("powod")}
+            )
+            w4 = skanuj_storyline_w_paczkach(root, wyjscie)
+            wycinanie["resources_storyline"] = {k: v for k, v in w4.items() if k != "lista"}
+            wycinanie["resources_storyline_trafienia"] = w4.get("lista", [])[:200]
+            print(
+                f"      Resources*.mpk (storyline/sceny): przeszukano {w4['przeszukano_paczek']} paczek, "
+                f"trafień {w4['trafien']} ({w4['zapisano_bajtow']} B)"
             )
         except Exception as e:
             raport["mpkdb_zrzut"] = {"ok": False, "powod": f"wyjątek: {e}"}

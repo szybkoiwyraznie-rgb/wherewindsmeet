@@ -52,6 +52,7 @@ PEWNOSC = {
     "nastepstwo": "pewne",
     "wybor": "pewne",
     "opcja_npc": "pewne",
+    "storyline": "pewne",
     "zadanie": "z łańcucha zadań",
     "zadanie_wewnatrz": "z ról zadania",
 }
@@ -172,6 +173,22 @@ def zbuduj_krawedzie(sceny: dict, zadania: dict, wybory: dict, opcje_npc: dict) 
                 for do in węzły_do:
                     dodaj(z, do, "zadanie_wewnatrz",
                           {"zadanie": numer, "moment_z": moment_z, "moment_do": moment_do})
+
+    storyline_sciezka = Path(__file__).resolve().parent.parent / "index" / "mpk" / "storyline_nastepstwa.jsonl"
+    if storyline_sciezka.is_file():
+        with storyline_sciezka.open(encoding="utf-8") as f:
+            for linia in f:
+                if not linia.strip():
+                    continue
+                w = json.loads(linia)
+                z, do = w["z"], w["do"]
+                if z["t"] == "d" and z["n"] not in sceny:
+                    pominięte["spoza_scen"] += 1
+                    continue
+                if do["t"] == "d" and do["n"] not in sceny:
+                    pominięte["spoza_scen"] += 1
+                    continue
+                dodaj(z, do, "storyline", {"paczka": w.get("paczka"), "offset": w.get("offset")})
 
     posortowane = sorted(
         krawedzie.values(),

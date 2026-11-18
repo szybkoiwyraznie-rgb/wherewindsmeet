@@ -32,7 +32,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-WERSJA = "v4"
+WERSJA = "v6"
 NAZWA_ZIP = f"WWM_MPK_Skaner_{WERSJA}.zip"
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
