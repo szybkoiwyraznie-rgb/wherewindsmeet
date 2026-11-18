@@ -1749,3 +1749,61 @@ cudzego kodu ani nie wymagają tej procedury.
   `WWM_MPK_Skaner_WYNIK.zip`. Po wyniku: dekodowanie `ezst_*.bin`
   (`mpk_artefakty`), mapowanie `.cine` → cutsceny po `sciezki_vfs.jsonl`
   (pole `cutsceny`), Bramka 3 (oś 30161) i grafy Storyline pod priorytet 1/2.
+
+### 2026-11-18 (3) — Przebieg skanera v7: reguła `Storyline/`, benchmark POI potwierdzony, ujęcia `.cine`
+
+- **Wejście:** `MPK_SKANER_WYNIK.zip` + `.z01–.z07` z Dysku (split-zip,
+  razem 189 608 873 B; MD5 części zgodne z Dyskiem; scalenie `zip -s 0`,
+  CRC całości czyste). Przebieg właściciela: 2 601 198 sondowanych wpisów
+  `Resources.mpkinfo` (backend `compression.zstd`, Python 3.14), **36 545
+  trafień sondy EZST** (25 179 `cine_magic`, 11 305 `storyline_json`,
+  2 775 `storyline_node`, 47+3 etsb, 31 benchmark), **3 113 trafień
+  kandydatów** po prawdziwych ścieżkach (978 `.cine`, 2 135 `.graph`),
+  0 błędów, limit niewyczerpany. Po stronie repo zdekodowano **wszystkie
+  39 888 bloków bez jednego błędu** (AES+zstd, `mpk_artefakty`; 11 586
+  bloków było gołych).
+- **Odkrycie 1 — master `.cine` wylicza pod-ujęcia w kolejności
+  odtwarzania.** Każdy master (np. `sq001_gdjh.cine`) zawiera uporządkowaną
+  listę ścieżek dzieci (`…_010.cine → _020 → …`). Z 974 masterów wyszły
+  5 022 unikalne dzieci; **5 021 z nich odnaleziono w trafieniach sondy
+  po `file_id`** (dzieci sondy nie były kandydatami — to czysta wygrana
+  sondy treści). Benchmark 30161 (`sq001_zlxl`): 17 ujęć
+  `s010…s130, s130a, s140…s160` w kolejności gry.
+- **Odkrycie 2 — reguła VFS `Storyline/<ścieżka>.etsb`.** Ścieżek
+  `client/dialogs/...` nie było w trafieniach kandydatów, bo w VFS leżą
+  z prefiksem `Storyline/`. Wydedukowane z dolnych 32 bitów `file_id`
+  bloku grającego scenę 4700001 (długość 46 = 10 + 36, końcówka `oji`)
+  i potwierdzone pełnym `file_id`:
+  **`Storyline/client/dialogs/hjt/sxd_longwenbiaoji.etsb` →
+  `322e2635696a6f2e` → graf `StartEvent → StorylineDialogsPlayNode
+  (dialogs_no=4700001) → EndEvent`. BENCHMARK PRIORYTETU 2 (Dragon
+  Pattern Mark → scena 4700001) POTWIERDZONY wprost z danych.**
+  Regułą rozwiązano hurtowo **6 961 skryptów** (6 774 z `sciezki_vfs` +
+  208/240 `storyline_path` cytowanych w grafach, po dedup).
+- **Odkrycie 3 — `.etsb` to skompilowane grafy Storyline** (ten sam JSON
+  `{"Variables":…,"Storyline":…}`), a `ClientRunStorylineNode.storyline_path`
+  spina grafy między sobą.
+- **Nowe indeksy** (`tools/wynik7_indeksy.py`, committed `782c319`):
+  `cine_ujecia.jsonl` (978 masterów + uporządkowane ujęcia),
+  `etsb_storyline.jsonl` (6 961 skryptów z faktami grafów),
+  `storyline_sceny.jsonl` (8 948 grafów po dedup: 5 121 unikalnych scen,
+  576 cutscen, 4 518 następstw przez węzły pośrednie — w tym **1 508
+  unikalnych krawędzi scena→scena** vs 13 z WYNIKv6, 235 cutscena→scena,
+  182 scena→cutscena, 192 cutscena→cutscena).
+- **Uczciwie (negatywy):**
+  * `4700041` i `4700352` **nie występują nigdzie** w zdekodowanym korpusie
+    (ani ASCII, ani u32le) — łańcuch benchmarku priorytetu 1 nadal
+    niepotwierdzony; korpus to tylko bloki trafione głową sondy (16 KiB
+    wejścia / 64 KiB treści), więc nieobecność ≠ dowód nieistnienia,
+  * trafienia `benchmark_4700001(_u32)` poza grafami to przypadkowe bajty
+    (RIFF/WAVE, heightmapy, materiały) — sonda, nie dowód,
+  * osie `.cine` (master i ujęcia) **nie zawierają** nazw nagrań
+    (`vo_sm_sxdm4_cs_zlxl_*`), ich hashy Wwise (FNV-1 32), id `sound_data`
+    (7150686…) ani numerów wierszy napisów — kolejność **kwestii** nadal
+    nie wynika wprost z `.cine`; kolejność **ujęć** już tak,
+  * 519/7 293 `.etsb`/`.ets` i 32/240 `storyline_path` nierozwiązane
+    (brak trafienia głowy sondy albo inna reguła ścieżki).
+- **Następny krok:** krzyżówka nowych indeksów z `index/` (czytanka:
+  następstwa scena→scena + przeplot scena↔cutscena); mapowanie POI →
+  `.etsb` → scena wymaga kolumny POI ze ścieżką skryptu z bazy gry
+  (baza w `local/` do ponownego pobrania z Dysku w przyszłej sesji).

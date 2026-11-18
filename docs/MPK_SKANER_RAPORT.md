@@ -145,5 +145,17 @@ zrzuceniu Lua (`LT1.mpk`).
   `wyciete/ezst_*.bin` + `ezst_trafienia.jsonl`; naprawione gubienie
   `resources_storyline` w `RAPORT.json`. Szczegóły:
   `docs/EXPERIMENT_LOG.md`, wpis 2026-11-18 (2).
-- Ten rozdział zostanie uzupełniony po otrzymaniu `WWM_MPK_Skaner_WYNIK.zip`
-  z przebiegu v7.
+- **Przebieg v7 odebrany (2026-11-18):** `MPK_SKANER_WYNIK.zip` + `.z01–.z07`
+  (split-zip, 189 608 873 B łącznie, 39 896 plików; rozpakowane 402 MB).
+  Sonda EZST: 2 601 198 wpisów sondowanych (2 891 pominiętych > 4 MB),
+  magie `gole` 1 581 491 / `EZST` 1 019 706 / `ZSTD` 1, **36 545 trafień**
+  (storyline_json 11 305, storyline_node 2 775, cine_magic 25 179,
+  etsb_ext 47, etsb_sciezka 3, benchmark 22+9), zapisano 215 570 048 B,
+  0 błędów, limit niewyczerpany, backend `compression.zstd` (Python 3.14 —
+  autoinstalacja z SKANUJ.bat nie była potrzebna). Trafienia kandydatów:
+  **978 `.cine` + 2 135 `.graph`** (z 25 451 kandydatów). Skan goły
+  storyline: 10 667 trafień / 72 706 473 B.
+- Wnioski i indeksy pochodne (reguła `Storyline/`, benchmark POI 4700001,
+  ujęcia `.cine`): `docs/EXPERIMENT_LOG.md` wpis 2026-11-18 (3);
+  `index/mpk/cine_ujecia.jsonl`, `etsb_storyline.jsonl`,
+  `storyline_sceny.jsonl`.

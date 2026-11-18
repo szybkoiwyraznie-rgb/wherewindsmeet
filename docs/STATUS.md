@@ -462,7 +462,34 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis (9). Bramka 3 (oś `.cine`,
    weryfikacja 30161) nadal otwarta.
 
-## Handoff — skaner v7 na Dysku, czeka na przebieg właściciela (2026-11-18)
+## Handoff — WYNIK v7 przerobiony: reguła `Storyline/`, benchmark POI potwierdzony (2026-11-18)
+
+- **Przebieg v7 właściciela odebrany i przetworzony** (8 części na Dysku,
+  189,6 MB; 36 545 trafień sondy EZST + 3 113 trafień kandydatów, 0 błędów;
+  wszystkie 39 888 bloków zdekodowane po stronie repo bez błędu).
+- **Priorytet 2 — benchmark POTWIERDZONY:** odkryta reguła VFS
+  `Storyline/<ścieżka>.etsb`; `Storyline/client/dialogs/hjt/
+  sxd_longwenbiaoji.etsb` → graf grający `dialogs_no 4700001`
+  (Dragon Pattern Mark → scena, wprost z danych). Rozwiązano 6 961
+  skryptów → `index/mpk/etsb_storyline.jsonl`. Do pełnego POI→scena
+  brakuje tylko kolumny POI→ścieżka skryptu z bazy gry (baza do
+  ponownego pobrania do `local/` — sandbox ją czyści).
+- **Priorytet 1 — duży skok:** `index/mpk/storyline_sceny.jsonl` — 8 948
+  grafów, 5 121 unikalnych scen, **1 508 unikalnych krawędzi scena→scena**
+  (było 13 z WYNIKv6) + przeplot 235 cutscena→scena / 182 scena→cutscena.
+  Uczciwie: `4700041`/`4700352` nie występują w korpusie — łańcuch
+  benchmarku nadal niepotwierdzony (korpus = tylko głowy bloków).
+- **Priorytet 3 — połowa drogi:** `index/mpk/cine_ujecia.jsonl` — 978
+  masterów `.cine` z uporządkowanymi 5 022 pod-ujęciami (benchmark 30161:
+  17 ujęć w kolejności gry). Uczciwie: osie `.cine` NIE zawierają nazw
+  nagrań ani napisów — kolejność kwestii nadal nie wynika wprost.
+- **Następny krok:** krzyżówka `storyline_sceny` z czytanką (następstwa
+  + przeplot); pobrać ponownie bazę z Dysku i wyciągnąć POI→ścieżka
+  skryptu; zbadać, skąd gra bierze kolejność kwestii w przerywniku
+  (nie z `.cine`, nie z bazy — może montage/bnk). Szczegóły:
+  [dziennik](EXPERIMENT_LOG.md), wpis 2026-11-18 (3).
+
+## Handoff (nieaktualny) — skaner v7 na Dysku, czekał na przebieg właściciela (2026-11-18)
 
 - **Priorytet 1 (scena → scena)**: `WYNIKv6` wyciągnął 1 066 krawędzi z nieskompresowanych grafów JSON w `Resources*.mpk` (`index/mpk/storyline_nastepstwa.jsonl`), ale **benchmark `4700001 → 4700041 → 4700352` ma w nich 0 trafień** — w czytankach `WWM_Czytanka_PL_v11.zip` układ dla tych scen nadal idzie po numerach.
 - **Priorytet 2 (POI → scena)**: `index/mpk/poi_sceny.jsonl` ma 1 307 bezpośrednich powiązań z `poi.dialog`, ale **benchmark `Dragon Pattern Mark → 4700001` (`client/dialogs/hjt/sxd_longwenbiaoji.etsb`) ma 0 trafień** w `lt1_stringi.jsonl` i w `WYNIKv6`.
