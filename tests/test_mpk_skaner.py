@@ -513,6 +513,49 @@ class TestSkanujBat(unittest.TestCase):
         self.assertLess(idx_py, idx_python)
         self.assertLess(idx_python, idx_wyw)
 
+    def test_bat_sam_doinstalowuje_zstandard(self):
+        # właściciel nie uruchamia nic ręcznie: bat sprawdza moduł zstd
+        # i w razie braku doinstalowuje pakiet zstandard
+        self.assertIn("--sprawdz-zstd", self.bat)
+        self.assertIn("%PYEXE% -m pip install --user zstandard", self.bat)
+        # kontrola PRZED właściwym skanem
+        idx_sprawdz = self.bat.index("--sprawdz-zstd")
+        idx_pip = self.bat.index("pip install --user zstandard")
+        idx_skan = self.bat.index('--wyjscie "%~dp0MPK_SKANER_WYNIK"')
+        self.assertLess(idx_sprawdz, idx_pip)
+        self.assertLess(idx_pip, idx_skan)
+        # nieudana instalacja NIE przerywa skanu (po UWAGA nie ma goto finish)
+        ogon = self.bat[self.bat.index("UWAGA"):self.bat.index(":zstd_ok")]
+        self.assertNotIn("goto finish", ogon)
+        self.assertNotIn("exit", ogon)
+
+    def test_czytaj_to_bez_recznych_polecen_pip(self):
+        czytaj = self.bmk.README_BODY_PL
+        self.assertNotIn("py -3 -m pip", czytaj)
+        self.assertIn("doinstaluje go SAM", czytaj)
+
+
+class TestSprawdzZstd(unittest.TestCase):
+    """Flaga --sprawdz-zstd: kod 0 gdy moduł zstd jest, 1 gdy go brak."""
+
+    def test_kod_zero_gdy_backend_jest(self):
+        import zlib
+
+        stary = ms._zstd_backend
+        ms._zstd_backend = lambda: zlib
+        try:
+            self.assertEqual(ms.main(["--sprawdz-zstd"]), 0)
+        finally:
+            ms._zstd_backend = stary
+
+    def test_kod_jeden_gdy_backendu_brak(self):
+        stary = ms._zstd_backend
+        ms._zstd_backend = lambda: None
+        try:
+            self.assertEqual(ms.main(["--sprawdz-zstd"]), 1)
+        finally:
+            ms._zstd_backend = stary
+
 
 if __name__ == "__main__":
     unittest.main()

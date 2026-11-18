@@ -132,9 +132,11 @@ zrzuceniu Lua (`LT1.mpk`).
 
 ## 8. Kit v7 (2026-11-18) — czeka na przebieg właściciela
 
-- `WWM_MPK_Skaner_v7.zip` (160 459 B, SHA-256
-  `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`)
-  na Dysku; kity v4–v6 wycofane do kosza.
+- `WWM_MPK_Skaner_v7.zip` (160 860 B, SHA-256
+  `81431bf2b46c7f678b1214104a3a47fc6c5e3d9cd11220a64cb071d1d529e338`)
+  na Dysku; kity v4–v6 i pierwsze wydanie v7 wycofane do kosza.
+  `SKANUJ.bat` sam doinstalowuje pakiet `zstandard`, gdy Pythonowi brakuje
+  modułu zstd (flaga `--sprawdz-zstd`); bez ręcznych kroków właściciela.
 - Zmiany vs v4–v6: kandydaci z `index/mpk/sciezki_vfs.jsonl` (25 451
   prawdziwych ścieżek + warianty, w tym 974 pełnych `.cine` z bazy gry)
   zamiast zgadywanych wzorców; **sonda zawartości bloków EZST** w

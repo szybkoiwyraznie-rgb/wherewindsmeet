@@ -68,13 +68,12 @@ JAK URUCHOMIĆ
 2. Rozpakuj CAŁY ten ZIP do jednego nowego folderu poza grą (np. na Pulpicie).
 3. Kliknij dwa razy SKANUJ.bat.
    - Potrzebny jest Python 3.10 lub nowszy (https://www.python.org/downloads/ —
-     podczas instalacji zaznacz "Add python.exe to PATH"). Nie pobiera żadnych
-     bibliotek — wszystko, czego skaner używa, jest wbudowane w Pythona.
-   - Sonda EZST daje NAJWIĘCEJ, gdy Python ma moduł zstd: Python 3.14+
-     ma go wbudowanego; dla starszych wersji opcjonalnie zainstaluj pakiet
-     poleceniem:  py -3 -m pip install zstandard
-     Bez tego skaner też zadziała — po prostu pominie dekompresję treści
-     i napisze to w raporcie.
+     podczas instalacji zaznacz "Add python.exe to PATH").
+   - Niczego więcej nie musisz instalować: jeśli Pythonowi brakuje modułu
+     zstd (potrzebnego sondzie EZST), SKANUJ.bat doinstaluje go SAM
+     (jednorazowe pobranie małego pakietu "zstandard"). Gdy to się nie uda
+     (np. brak internetu), skan i tak ruszy — sonda sprawdzi wtedy tylko
+     bloki nieskompresowane i uczciwie zapisze to w raporcie.
    - Otworzy się OKNO WYBORU folderu gry (ten z folderami Package i
      LocalData oraz plikami Resources*.mpk) — wskaż go kliknięciem.
      Ścieżki NIE trzeba wpisywać. Alternatywnie możesz przeciągnąć folder
@@ -104,7 +103,9 @@ CZEGO SKANER NIE ROBI
 
 - nie uruchamia gry i nie dotyka jej procesu,
 - nie modyfikuje żadnego pliku gry (otwiera je tylko do odczytu),
-- nie wysyła żadnych danych do sieci,
+- nie wysyła żadnych danych do sieci (jedyny kontakt z siecią to ewentualne
+  jednorazowe POBRANIE pakietu "zstandard" przez SKANUJ.bat, zanim skan
+  ruszy — sam skaner niczego nie wysyła),
 - nie zapisuje zdekodowanej treści bloków — sygnatur szuka w pamięci,
   a na dysk trafiają wyłącznie SUROWE bloki.
 """
@@ -127,6 +128,18 @@ rem 2) python z PATH
 if not defined PYEXE python -c "import sys; assert sys.version_info >= (3,10)" >nul 2>&1 && set "PYEXE=python"
 rem 3) brak Pythona 3.10+ - instrukcja
 if not defined PYEXE goto no_python
+rem Sonda EZST dziala w pelni tylko z modulem zstd - sprawdz i w razie
+rem braku doinstaluj pakiet zstandard automatycznie (jedyne pobranie z sieci).
+%PYEXE% "narzedzia\\mpk_skaner.py" --sprawdz-zstd >nul 2>&1
+if not errorlevel 1 goto zstd_ok
+echo Dolaczam modul zstd do sondy EZST (jednorazowo, pakiet zstandard)...
+%PYEXE% -m pip install --user zstandard
+%PYEXE% "narzedzia\\mpk_skaner.py" --sprawdz-zstd >nul 2>&1
+if not errorlevel 1 goto zstd_ok
+echo UWAGA: nie udalo sie dolaczyc modulu zstd. Skan ruszy mimo to,
+echo ale sonda EZST sprawdzi tylko bloki nieskompresowane (bedzie to w raporcie).
+:zstd_ok
+echo.
 if "%~1"=="" (
   rem bez argumentow - skaner otworzy okno wyboru folderu gry
   %PYEXE% "narzedzia\\mpk_skaner.py" --wyjscie "%~dp0MPK_SKANER_WYNIK"

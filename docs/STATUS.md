@@ -474,17 +474,17 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
   2 429 hashowalnych `.graph`, w tym `Char/graph/cutscene/*` z
   `fenbao_cutscene_info.cutscene_graph`, 804 `.etsb` z benchmarkiem
   `sxd_longwenbiaoji.etsb`); (b) **skaner v7** (`WWM_MPK_Skaner_v7.zip`,
-  160 459 B, SHA-256 `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`,
-  Dysk id `1J0Nw4Bmw-S9XLP7S9R_CM10XBVQ_nemO`; kity v4–v6 w koszu):
+  160 860 B, SHA-256 `81431bf2b46c7f678b1214104a3a47fc6c5e3d9cd11220a64cb071d1d529e338`,
+  Dysk id `12X8MPOLISbOnEeeAy8i5yJiKRt1DPaZu`; kity v4–v6 w koszu):
   25 451 kandydatów z realnych ścieżek + **sonda zawartości bloków EZST**
   (AES-ECB prefiks w czystym Pythonie + początek ramki zstd, sygnatury
-  `c159410d`/Storyline/`client/dialogs`/`4700001`; bez modułu zstd —
-  Python 3.14+ albo `pip install zstandard` — sonda treści jest jawnie
-  pomijana). Szczegóły i ograniczenia: [dziennik](EXPERIMENT_LOG.md),
-  wpis 2026-11-18 (2).
+  `c159410d`/Storyline/`client/dialogs`/`4700001`; brakujący moduł zstd
+  `SKANUJ.bat` doinstalowuje SAM — właściciel nie uruchamia nic ręcznie;
+  bez niego sonda treści jest jawnie pomijana). Szczegóły i ograniczenia:
+  [dziennik](EXPERIMENT_LOG.md), wpis 2026-11-18 (2).
 - **Następny krok**: właściciel uruchamia `WWM_MPK_Skaner_v7.zip`
-  (`SKANUJ.bat`, zalecane `py -3 -m pip install zstandard`; skan może potrwać
-  do ~1 h) i odsyła `WWM_MPK_Skaner_WYNIK.zip` na Dysk. Po wyniku:
+  (tylko dwuklik na `SKANUJ.bat`; skan może potrwać do ~1 h) i odsyła
+  `WWM_MPK_Skaner_WYNIK.zip` na Dysk. Po wyniku:
   dekodowanie `ezst_*.bin` (`tools/mpk_artefakty.py`), mapowanie `.cine` →
   cutsceny po `sciezki_vfs.jsonl` (pole `cutsceny`), Bramka 3 (weryfikacja
   osi 30161) i grafy Storyline pod priorytety 1–2.

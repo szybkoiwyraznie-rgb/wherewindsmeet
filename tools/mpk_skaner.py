@@ -1427,7 +1427,17 @@ def main(argv: list[str] | None = None) -> int:
                         help="sonduj tylko wpisy do tylu MB (domyślnie 4; większe to tekstury/dźwięk)")
     parser.add_argument("--ezst-limit-mb", type=int, default=256,
                         help="łączny limit MB na surowe bloki wycięte przez sondę EZST (domyślnie 256)")
+    parser.add_argument("--sprawdz-zstd", action="store_true",
+                        help="tylko sprawdź dostępność modułu zstd dla sondy EZST (kod 0 = jest, 1 = brak)")
     args = parser.parse_args(argv)
+
+    if args.sprawdz_zstd:
+        backend = _zstd_backend()
+        if backend is None:
+            print("zstd: BRAK (sonda EZST sprawdzi tylko bloki nieskompresowane)")
+            return 1
+        print(f"zstd: OK ({getattr(backend, '__name__', 'moduł')})")
+        return 0
 
     if not args.gra:
         if args.non_interactive:

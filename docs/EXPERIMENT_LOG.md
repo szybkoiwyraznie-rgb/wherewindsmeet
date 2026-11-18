@@ -1734,12 +1734,18 @@ cudzego kodu ani nie wymagają tej procedury.
   wyłącznie bloki gołe; benchmark ASCII `4700001` może trafić przypadkowe
   teksty (to sonda, nie dowód). Trafienia kandydatów w `PODSUMOWANIE.txt`
   ucięte do 300 pozycji (pełna lista w `RAPORT.json`).
-- **Paczka:** `dist/WWM_MPK_Skaner_v7.zip`, **160 459 B**, SHA-256
-  `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`,
-  na Dysku (folder „Where Winds Meet”, id `1J0Nw4Bmw-S9XLP7S9R_CM10XBVQ_nemO`);
-  kity v4–v6 przeniesione do kosza (wyniki `WYNIK*` zostają).
-- **Następny krok:** właściciel uruchamia v7 (`SKANUJ.bat`; opcjonalnie
-  `py -3 -m pip install zstandard` dla pełnej sondy) i odsyła
+- **Poprawka po uwadze właściciela** („bat ma to robić sam, ja nic nie
+  odpalam”): `SKANUJ.bat` sam sprawdza moduł zstd (nowa flaga skanera
+  `--sprawdz-zstd`) i w razie braku **sam doinstalowuje** pakiet `zstandard`
+  (`pip install --user`, jedyny kontakt z siecią — uczciwie opisany w
+  CZYTAJ_TO); gdy instalacja się nie uda, skan rusza mimo to w trybie
+  gołych bloków. Z CZYTAJ_TO usunięte wszystkie ręczne polecenia.
+- **Paczka:** `dist/WWM_MPK_Skaner_v7.zip`, **160 860 B**, SHA-256
+  `81431bf2b46c7f678b1214104a3a47fc6c5e3d9cd11220a64cb071d1d529e338`,
+  na Dysku (folder „Where Winds Meet”, id `12X8MPOLISbOnEeeAy8i5yJiKRt1DPaZu`);
+  kity v4–v6 i pierwsze wydanie v7 (bez autoinstalacji) w koszu
+  (wyniki `WYNIK*` zostają).
+- **Następny krok:** właściciel uruchamia v7 (tylko `SKANUJ.bat`) i odsyła
   `WWM_MPK_Skaner_WYNIK.zip`. Po wyniku: dekodowanie `ezst_*.bin`
   (`mpk_artefakty`), mapowanie `.cine` → cutsceny po `sciezki_vfs.jsonl`
   (pole `cutsceny`), Bramka 3 (oś 30161) i grafy Storyline pod priorytet 1/2.
