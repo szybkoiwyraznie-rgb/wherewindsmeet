@@ -2089,3 +2089,27 @@ martwe funkcje (`_plik_kontekstu`, `_karta*`, `_tekst`, `_tozsamosc`,
 `_etykieta_hasla`, `_dodaj`) i import `powiazania_czytanek` z czytanki.
 Testy: −3 testy pliku 02, +1 strażnik „02 nie istnieje"; całość 601 OK.
 Docs: `CZYTANKA_DO_CZYTANIA.md` bez sekcji o 02.
+
+## 2026-11-18 (14) — śledztwo: właściciele bloków „Napisy sąsiadujące"
+
+Pytanie właściciela: skoro bloki sąsiadujące to nie warianty, to czyje są?
+Trzy tropy: treść vs 549 scenariuszy `.cine`, nazwy nagrań z kontekstu,
+tabele wiążące (binaria odpadają — wiersze bez audio nie mają id
+`sound_data`, a skan id wierszy puli po MPK to znany fałszywy trop).
+
+Wyniki: (1) wiersze **591126–591127** mają nagrania
+`vo_ss_axnzgzgcm9_cs_nzgzcj_*` — to **cutscena 30435** (opowieść
+poboczna; dowód twardy, audio 1:1 ze scenariuszem). (2) Recytacja
+o Ośmiu Wspaniałych (591128–591147) nie występuje w ŻADNYM scenariuszu
+`.cine` i nie ma nagrań — hipoteza (bez dowodu w danych): to śniony
+teatr otwierający 30161, bo starszy wariant bloku (590153–590155) trzyma
+linie bębnów snu tuż przed zbudzeniem; w czytance NIE przypisujemy.
+(3) Pozostałe bloki: dopasowania treści rozmyte (24/51 ex aequo 30627 i
+30374 dla 590381–590431; 11/20 dla 30845/30207), nagrania to placeholdery
+wielu cutscen — bez rozstrzygnięcia. `kn` przypisuje te wiersze heurystyką
+bloków (jedyna tabela wiążąca, `cutsceny_napisy.jsonl`, ma 5 wierszy).
+
+Nowe: `_wlasciciele_nagran` w czytance (rdzeń nagrania → cutscena, tylko
+rdzenie jednoznaczne po zwinięciu klonów `no % 10**8`); nagłówek bloku
+sąsiedniego wskazuje właściciela, gdy nagranie go zdradza:
+„… (są tu nagrania cutsceny 30435)". Testy: +3, całość 604 OK.

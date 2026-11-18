@@ -431,3 +431,31 @@ class TestNaglowekSasiadow(unittest.TestCase):
                                               kolejnosc=self.kolejnosc)
         self.assertFalse([n for n in podtytuly.values()
                           if n.startswith("Napisy sąsiadujące")])
+
+
+class TestWlascicieleNagran(unittest.TestCase):
+    """Rdzeń nagrania wskazuje cudzą cutscenę tylko, gdy jest jednoznaczny."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mapa = cz._wlasciciele_nagran("index")
+
+    def test_nagranie_nzgzcj_nalezy_do_30435(self):
+        self.assertEqual(self.mapa.get("vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz"), 30435)
+
+    def test_placeholdery_wielu_cutscen_odpadaja(self):
+        self.assertNotIn("vo_sm_sxdm7_npc", self.mapa)
+
+    def test_naglowek_wskazuje_wlasciciela(self):
+        zh_map = {"a1": "不是说好一起去将军祠吗", "o1": "像你这样的人哪怕多救一人",
+                  "o2": "只怕南北之势多救一人便多伤一人"}
+        wiersz = {"n": 30161, "kn": ["a1", "o1", "o2"], "k": []}
+        wiersze = {"a1": 591148, "o1": 591126, "o2": 591127}
+        pl = {k: f"PL {k}" for k in zh_map}
+        audio = {591126: "vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz"}
+        kolejnosc = [[{"w": 591148, "k": "a1", "t": 1.0}]]
+        _, podtytuly, _ = cz._napisy_cutsceny(wiersz, wiersze, pl, audio, kolejnosc,
+                                              zh=zh_map.get,
+                                              wlasciciele={"vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz": 30435})
+        self.assertTrue(any("nagrania cutsceny 30435" in n for n in podtytuly.values()),
+                        list(podtytuly.values()))

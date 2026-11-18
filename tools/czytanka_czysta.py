@@ -492,7 +492,9 @@ def _dialog_sceny(blok: list[str], bloki: list[list[str]], wiersze: dict[str, in
 def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
                      audio: dict[int, str] | None = None,
                      kolejnosc: list[list[dict]] | None = None,
-                     zh=None) -> tuple[list[str], dict[int, str], list[str]]:
+                     zh=None,
+                     wlasciciele: dict[str, int] | None = None
+                     ) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
     Kolejność kwestii, gdy jest, bierzemy ze ścieżki audio pliku `.cine`
@@ -578,6 +580,14 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
                 if normy and trafione * 10 < len(normy) * 3:
                     naglowek = (f"Napisy sąsiadujące w puli przerywników ({opis}) — "
                                 "zapewne inna scena w pobliżu")
+                    # gdy nazwa nagrania któregoś wiersza zdradza cudzą cutscenę,
+                    # wskazujemy ją wprost (dowód z danych, nie zgadywanie)
+                    cudze = {wlasciciele.get(kontekst_cutscen_mod.rdzen_audio(
+                                 (audio or {}).get(wiersze.get(k)) or ""))
+                             for k in blok} - {None} if wlasciciele else set()
+                    cudze -= {int(wiersz.get("n") or 0) % 10**8}
+                    if len(cudze) == 1:
+                        naglowek += f" (są tu nagrania cutsceny {cudze.pop()})"
         czeka_na_naglowek = bool(naglowek)
         for klucz in blok:
             tekst = pl.get(klucz)
@@ -652,6 +662,30 @@ def _mowcy_cutsceny(klucze: list[str], ix, pl, porzadek,
     return mowcy
 
 
+def _wlasciciele_nagran(index: str | Path) -> dict[str, int]:
+    """Rdzeń nazwy nagrania → cutscena, której scenariusz `.cine` go używa.
+
+    Tylko rdzenie jednoznaczne (jedna cutscena po zwinięciu klonów
+    `no % 10**8`: 40000030246 → 30246). Dzięki temu blok „Napisy
+    sąsiadujące" może uczciwie wskazać właściciela, gdy któryś wiersz
+    niesie nagranie cudzej cutsceny (591126 `…_cs_nzgzcj_dqgz` → 30435).
+    Rdzenie wielu cutscen (placeholdery `…_npc`, domeny `vo_shenxiandu_*`)
+    odpadają — nie identyfikują sceny.
+    """
+    plik = Path(index) / "cutsceny_sciezka_audio.jsonl"
+    if not plik.exists():
+        return {}
+    rdzenie: dict[str, set[int]] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            wpis = json.loads(linia)
+            for kwestia in wpis.get("kwestie") or []:
+                rdzen = kontekst_cutscen_mod.rdzen_audio(kwestia.get("audio") or "")
+                if rdzen:
+                    rdzenie.setdefault(rdzen, set()).add(int(wpis["no"]) % 10**8)
+    return {rdzen: nums.pop() for rdzen, nums in rdzenie.items() if len(nums) == 1}
+
+
 def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
     """Chronologia kwestii cutscen ze ścieżek audio `.cine` (gdy indeks istnieje).
 
@@ -688,6 +722,7 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
     klucze_wierszy = {w["wiersz"]: w["k"] for w in ix.cutsceny_kontekst.get("napis", [])
                       if w.get("wiersz") and w.get("k")}
     kolejnosc_cutscen = _kolejnosc_kwestii_cutscen(index) if index else {}
+    wlasciciele_nagran = _wlasciciele_nagran(index) if index else {}
     numery_cutscen = {int(w["n"]) for w in chronologia if w["t"] == "cutscena"}
     # wiersze przejęte przez chronologię cutscen znikają z „Napisów przerywnika"
     przejete = {r["k"] for numer, bloki in kolejnosc_cutscen.items()
@@ -763,7 +798,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
             kolejnosc = kolejnosc_cutscen.get(numer)
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
                                                             audio_napisow, kolejnosc,
-                                                            zh=ix.zh)
+                                                            zh=ix.zh,
+                                                            wlasciciele=wlasciciele_nagran)
             audio_kluczy = {r["k"]: r["a"] for blok in kolejnosc or []
                             for r in blok if r.get("k") and r.get("a")}
             mowcy = _mowcy_cutsceny(klucze, ix, pl, porzadek,
