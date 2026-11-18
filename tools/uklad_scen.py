@@ -22,6 +22,8 @@ pozostałe dialogi według projektu i numeru.
 """
 
 from __future__ import annotations
+import json
+from pathlib import Path
 
 from collections import defaultdict
 from dataclasses import dataclass, field
