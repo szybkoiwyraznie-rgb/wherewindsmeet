@@ -8,8 +8,11 @@ uruchomieniu.
 | plik | zawartość | wiersze |
 |---|---|---|
 | `01_sceny_i_cutsceny.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 189 566 kwestii |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w **tej samej** kolejności: kto mówi, postacie z encyklopedii, frakcje, miejsca, przedmioty, sztuki walki | 601 pozycji w 502 jednostkach |
-| `03_reszta.md` | wszystko, czego nie ma w 01 ani w 02, pogrupowane według rodzaju danych | 59 624 |
+| `03_reszta.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych | 89 071 pozycji |
+
+Plik `02_kontekst_scen_i_cutscen.md` (kontekst do jednostek z 01) został
+**zlikwidowany na życzenie właściciela** (2026-11-18) — wszystko, co pokazywał,
+jest w 03; żadne hasło nie jest już „zużywane" przez kontekst.
 
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 
@@ -149,7 +152,7 @@ Zasady:
 - **jedna kwestia = jedna linia**, bez odstępu między kwestiami; pusty wiersz
   oddziela tylko jednostki (scenę, cutscenę),
 - **bez punktora w ogóle — w każdym pliku:** kwestia to `**Mówca:** tekst`,
-  a gdy mówcy nie ma — goły tekst. Ten sam układ w 02 (hasła) i 03 (reszta):
+  a gdy mówcy nie ma — goły tekst. Ten sam układ w 03 (reszta):
   `**Nazwa:** opis`. Punktor nic nie wnosił, a przy łamanych zdaniach mylił,
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
@@ -198,29 +201,6 @@ Zasady:
 - **tabliczka krainy nie jest kwestią:** linia z `cutscene_text_oversea`
   („QINGHE - VERDANT WILDS”) otwiera nową sekcję prologu, a nie linię dialogu.
 
-Zasady pliku 02 (kontekst):
-
-- **tylko hasła, które gra naprawdę opisuje.** Nazwa bez opisu to za mało —
-  takie hasła zostają w pliku 03, a jednostka, w której nie ma nic do pokazania,
-  nie dostaje nagłówka w 02. Dzięki temu 02 to kontekst, a nie lista imion
-  (wcześniej 91 tys. kart z samą nazwą, m.in. `**玩家**`, `**0**`,
-  `**Entity轨道组**` — wycięte),
-- **opis to definicja, nie opowieść.** Bierzemy kolumny opisowe z danych gry:
-  `describe`, `describe_str`, `introduction`, `description`, `npc_desc`,
-  `job_info` — czyli przedmioty, frakcje, miejsca, sztuki walki, opisy NPC.
-  Świadomie **nie** bierzemy `content`, `talk_content`, `page_*`, `story_*`,
-  `tips`, `jianwen_text` — to dialogi, księgi, mails i streszczenia cudzych opowieści,
-- **postać dostaje krótką tożsamość z encyklopedii** (`tozsamosc`), np.
-  „Chen Zixi: Master of the Vernal Hall”, „Jiang Wulang: The Traitor”.
-  Rozdziałów fabularnych encyklopedii (`historie`) **nie pokazujemy** — to
-  streszczenia scen, nie opisy postaci; zostają w pliku 03,
-- **hasło pojawia się raz.** Powtórki nie wchodzą w ogóle (wcześniej było przy
-  nich samo imię — puste imię bez treści to szum),
-- **opis dłuższy niż 600 znaków jest ucinany wielokropkiem**; pełny tekst zostaje
-  w pliku 03,
-- **karta bez polskiego przekładu ma gwiazdkę** i tekst z gry, tak samo jak
-  kwestie w 01.
-
 ## Liczby (2026-11-15, po wycięciu haseł bez opisu)
 
 - 75 287 jednostek w pliku 01 (8 910 scen z polskim dialogiem, 1 597 cutscen,
@@ -231,11 +211,8 @@ Zasady pliku 02 (kontekst):
 - **0 kwestii z chińską etykietą mówcy** i 0 z samym numerem; 4 713 etykiet
   chińskich przeszło na łacinkę (tabela 3 156 znaków),
 - 3 pieśni (na końcu), 4 sekcje prologu, 38 sekcji krain,
-- **501 jednostek ma kontekst w pliku 02** — tylko te, w których jest co pokazać,
-  i tylko z prawdziwym opisem (178 kart, każda raz). Reszta haseł (65 420 pozycji)
-  jest w pliku 03, bo gra nie daje im definicji — m.in. Jiang Yan (`江晏`),
-  Nefryt Zhenguan (`镇冠珏`), Hojna Wiosna (`丰厚醇`), Dawne Przymierze Yanbei
-  (`燕北旧盟`), a także rozdziały fabularne encyklopedii,
+- plik 02 zlikwidowany (2026-11-18); wszystkie hasła, karty i rozdziały
+  fabularne encyklopedii są w pliku 03,
 - 704 karty bez polskiego przekładu mają tekst z gry z gwiazdką (biogramy
   encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
   to opisy bez nazwy, więc idą gołym tekstem,
@@ -256,21 +233,9 @@ python3 tools/czytanka_czysta.py --wyj out/czytanka \
 Wszystko, co potrzebne, jest w gicie: `index/`, `tlumaczenie/` i transkrypt
 prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
 
-## Jak powstaje kontekst (02)
-
-Dla każdej jednostki z pliku 01 zbierane jest to samo, co widać w scenie:
-
-- **kto mówi** — obsada sceny z `index/sceny_*.jsonl`; imię z tabeli postaci,
-  a gdy postaci nie ma w tabeli, imię z obsady; biogram z encyklopedii, jeśli jest,
-- **hasła z tekstu** — nazwy z tabel kontekstowych (`world_view_person_info`,
-  `school`, `equip_items`, `kongfu`, `task_*`, `manual_items`…), dopasowane
-  automatem Aho-Corasick po tekście chińskim, z filtrem nazw pospolitych,
-- **pełna karta przy pierwszym wystąpieniu**, przy kolejnych samo imię albo nazwa —
-  dzięki temu widać, kto i co wraca w danej scenie, bez powtarzania biogramów.
-
 ## Czym to się różni od zestawu technicznego
 
 `tools/zbuduj_czytanke_pelna.py` (trzy warstwy: chronologia, fabuła, kontekst)
 i `tools/buduj_czytanke_gry.py` (sceny w tabelach z chińskim i angielskim)
 zostają jako narzędzia robocze do weryfikacji i audytu — ale **nie są czytanką
-dla właściciela**. Czytanka to trzy pliki opisane wyżej.
+dla właściciela**. Czytanka to dwa pliki treści (01 i 03) plus README.

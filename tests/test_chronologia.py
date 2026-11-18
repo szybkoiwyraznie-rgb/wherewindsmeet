@@ -292,11 +292,9 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
                       "kwestie bez przekładu poza prologiem idą z gwiazdką")
         self.assertNotIn("[brak przekładu]", poza_prologiem)
 
-    def test_kontekst_bez_polskiego_ma_gwiazdke(self):
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        self.assertNotIn("*(EN)*", tekst)
-        if "# Prolog" in tekst:
-            self.assertIn("\\*", tekst, "karta bez polskiego opisu idzie z gwiazdką")
+    def test_pliku_kontekstu_nie_ma(self):
+        """Plik 02 zlikwidowany na życzenie właściciela — hasła idą do 03 reszta."""
+        self.assertFalse((Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").exists())
 
     def test_mowca_po_lacince(self):
         """Etykiety mówców nie mogą zostać po chińsku ani jako same numery."""
@@ -308,18 +306,6 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
             self.assertIsNone(re.search(r"[\u3400-\u9fff]", mowca),
                               f"mówca po chińsku: {mowca}")
             self.assertFalse(mowca.isdigit(), f"mówca to samo id: {mowca}")
-
-    def test_kontekst_bez_golych_nazw(self):
-        """W 02 nie ma kart z samą nazwą — hasło bez opisu zostaje w 03."""
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        for trafienie in re.finditer(r"^\*\*([^*]+)\*\*$", tekst, re.M):
-            self.fail(f"hasło bez opisu w kontekście: {trafienie[1]}")
-
-    def test_kontekst_bez_opowiesci_z_encyklopedii(self):
-        """Rozdziały fabularne encyklopedii to nie opisy postaci — nie wchodzą do 02."""
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        self.assertNotIn("At Blissful Retreat, Jiang Wulang drank alone", tekst)
-        self.assertNotIn("opened his eyes to pitch darkness", tekst)
 
     def test_streszczenie_cutsceny_stoi_w_prologu(self):
         """Streszczenie cutsceny z transkryptu jest w prologu, między Prolog 3 i Prolog 4."""

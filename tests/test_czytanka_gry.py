@@ -311,10 +311,10 @@ class TestCzytankaDoCzytania(unittest.TestCase):
     def czytaj(self, nazwa: str) -> str:
         return (self.wyj / nazwa).read_text(encoding="utf-8")
 
-    def test_trzy_pliki_po_jednym_na_rodzaj(self):
+    def test_dwa_pliki_tresci_bez_kontekstu(self):
+        """Plik 02 zlikwidowany — zostają 01, 03 i README."""
         self.assertEqual(sorted(p.name for p in self.wyj.glob("*.md")),
-                         ["01_sceny_i_cutsceny.md", "02_kontekst_scen_i_cutscen.md", "03_reszta.md",
-                          "README.md"])
+                         ["01_sceny_i_cutsceny.md", "03_reszta.md", "README.md"])
 
     def test_kwestia_ma_mowce_i_tekst_w_jednej_linii(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")

@@ -2076,3 +2076,16 @@ inna scena w pobliżu" zamiast "Inny wariant". 5 bloków przemianowanych
 w jaskini 590381–590431 przy 30413 — zweryfikowane treścią).
 
 Testy: +6 (`TestMowcyCutsceny`, `TestNaglowekSasiadow`), całość 603 OK.
+
+## 2026-11-18 (13) — likwidacja pliku 02 (kontekst scen) na życzenie właściciela
+
+Czytanka wraca do dwóch plików treści: `01_sceny_i_cutsceny.md` +
+`03_reszta.md` (+ README). Plik 02 przestał być generowany, a hasła nie są
+już „zużywane" przez kontekst — **komplet informacji dodatkowych**
+(przedmioty, encyklopedia, kompendium, POI, pamiątki, wszystko co
+tłumaczone, a nie weszło do 01) jest w 03: reszta urosła z 88 146 do
+**89 071 pozycji** (+925 kart, które 02 wcześniej zabierał). Usunięte
+martwe funkcje (`_plik_kontekstu`, `_karta*`, `_tekst`, `_tozsamosc`,
+`_etykieta_hasla`, `_dodaj`) i import `powiazania_czytanek` z czytanki.
+Testy: −3 testy pliku 02, +1 strażnik „02 nie istnieje"; całość 601 OK.
+Docs: `CZYTANKA_DO_CZYTANIA.md` bez sekcji o 02.

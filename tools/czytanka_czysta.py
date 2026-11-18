@@ -5,12 +5,10 @@
    filmy otwierające, prolog w kolejności sprawdzonej z transkryptem, potem krainy
    w kolejności odwiedzania (sceny w porządku grafu następstw), na końcu pozostałe pule
    napisów przerywników.
-2. `02_kontekst_scen_i_cutscen.md` — kontekst do tych samych jednostek i w tej
-   samej kolejności: postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki
-   walki — wszystko, co pada w danej scenie. Hasło ma pełną kartę przy pierwszym
-   wystąpieniu.
-3. `03_reszta.md` — cała reszta przekładów, której nie ma w 01 ani w 02,
-   pogrupowana według rodzaju danych.
+2. `03_reszta.md` — komplet informacji dodatkowych: cała reszta przekładów,
+   której nie ma w 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowana
+   według rodzaju danych. (Plik 02 z kontekstem scen zlikwidowany na życzenie
+   właściciela — wszystko, co pokazywał, trafia do 03.)
 
 Format kwestii w 01: jedna linia `**Mówca:** tekst` (bez punktora), bez czasów,
 kluczy i tabel; kwestia bez mówcy to goły tekst.
@@ -42,10 +40,9 @@ from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
 from tools import kontekst_cutscen as kontekst_cutscen_mod  # noqa: E402
 from tools import cutsceny_kolejnosc_kwestii as kolejnosc_mod  # noqa: E402
-from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
+from tools import kolejnosc_gry, kolejnosc_zadan, pinyin_slownik  # noqa: E402
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
-DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 PROG_WARIANTU = 48
 PROG_NAGLOWKA_REDAKCJI = 3   # ile kwestii przed pierwszym bliźniakiem należy jeszcze do dialogu sceny
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
@@ -189,29 +186,6 @@ def _imie_do_etykiety(nazwa: str) -> str:
 
 
 _ZH = re.compile(r"[\u3400-\u9fff]")
-
-
-def _etykieta_hasla(ix, nazwa: str) -> str:
-    """Nazwa hasła do pokazania w kontekście (albo pustka, gdy hasło nic nie wnosi).
-
-    Z danych wpadają śmieci: gracz zapisany jako `玩家`/`0`, techniczne
-    „Entity轨道组”, chińskie role („中年男人”). Gracz nie dostaje karty,
-    techniczne śmieci też nie, a chińskie role idą przez słownik nazw mówców.
-    """
-    nazwa = (nazwa or "").strip()
-    if not nazwa or _GRACZ_LAT.match(nazwa) or nazwa.lower() in GRACZ:
-        return ""
-    if nazwa in TECHNICZNE or nazwa.lower() in {t.lower() for t in TECHNICZNE}:
-        return ""
-    if not _ZH.search(nazwa) and not re.search(r"[A-Za-z]", nazwa):
-        return ""            # „0”, myślniki, cyfry
-    if _ZH.search(nazwa):
-        en = _nazwy_en(ix).get(nazwa) or _glosariusz().get(nazwa) or ""
-        if en:
-            nazwa = en
-    if not _dobre_imie(nazwa):
-        return ""
-    return _imie_do_etykiety(nazwa)
 
 
 def _nazwy_en(ix) -> dict[str, str]:
@@ -1200,199 +1174,6 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
     return out, uzyte, zrobione
 
 
-def _tekst(ix, pl: dict[str, str], klucz: str | None) -> tuple[str, bool]:
-    """(tekst, czy_polski) — polski z magazynu, a gdy brak, angielski z danych gry."""
-    if not klucz:
-        return "", True
-    if klucz in pl:
-        return pl[klucz], True
-    tekst = ix.teksty.get(klucz)
-    if tekst is None:
-        return "", True
-    return _czysty(tekst.en or tekst.zrodlo or ""), False
-
-
-def _tozsamosc(ix, pl, wpis: dict) -> tuple[str, bool]:
-    """Krótkie „kim jest” z encyklopedii (`tozsamosc`), a nie opowieść.
-
-    Wpisy encyklopedii mają tylko rozdziały fabularne (`historie`) — to streszczenia
-    scen, nie opisy postaci, więc ich nie bierzemy. Zostaje etykieta tożsamości,
-    np. „回春堂主人” → „Master of the Vernal Hall”, „叛徒” → „The Traitor”.
-    """
-    czesci: list[str] = []
-    opis_pl = True
-    for klucz in wpis.get("tozsamosc") or []:
-        tekst, jest_pl = _tekst(ix, pl, klucz)
-        if tekst and tekst not in czesci:
-            czesci.append(tekst)
-            opis_pl = opis_pl and jest_pl
-    return " · ".join(czesci), opis_pl
-
-
-def _karta_encyklopedii(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
-    """Hasło encyklopedii: imię i tożsamość. Rozdziałów fabularnych nie pokazujemy."""
-    row = ix.encyklopedia.get(int(pid)) if str(pid).isdigit() else None
-    if not row:
-        return "", "", True
-    nazwa, _ = _tekst(ix, pl, row.get("nazwa"))
-    if not nazwa:
-        nazwa, _ = _tekst(ix, pl, row.get("inna_nazwa"))
-    opis, opis_pl = _tozsamosc(ix, pl, row)
-    return nazwa, opis, opis_pl
-
-
-def _karta_osoby(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
-    """Postać mówiąca: imię z danych gry i tożsamość z encyklopedii, jeśli jest."""
-    row = ix.postacie.get(int(pid)) if str(pid).isdigit() else None
-    if not row:
-        return "", "", True
-    nazwa, _ = _tekst(ix, pl, row.get("n"))
-    wpis = baza.encyklopedia_po_kluczu.get(row.get("n")) or {}
-    opis, opis_pl = _tozsamosc(ix, pl, wpis)
-    return nazwa, opis, opis_pl
-
-
-def _karta_nazwy(ix, pl, nazwa: str, encje: dict) -> tuple[str, str, bool]:
-    """Postać znana tylko z imienia w obsadzie: imię plus tożsamość z encyklopedii."""
-    wpis = encje.get(nazwa) or {}
-    opis, opis_pl = _tozsamosc(ix, pl, wpis)
-    return nazwa, opis, opis_pl
-
-
-def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, str, bool]:
-    """Karta hasła: nazwa, opis i informacja, czy opis jest po polsku."""
-    if tabela == "encyklopedia":
-        return _karta_encyklopedii(baza, ix, pl, rid)
-    if tabela == "osoba":
-        return _karta_osoby(baza, ix, pl, rid)
-    kolumny = (baza.tabele.get(tabela) or {}).get(rid) or {}
-    nazwa, opis, opis_pl = "", "", True
-    for kolumna, klucze in kolumny.items():
-        for klucz in klucze:
-            tekst, jest_pl = _tekst(ix, pl, klucz)
-            if tekst and not nazwa and _NAZWA.search(kolumna):
-                nazwa = tekst
-    if tabela not in _NARRACYJNE:
-        opisowe = [k for k in kolumny if _OPIS.search(k)]
-        opisowe.sort(key=lambda k: _OPIS_KOLEJNOSC.index(k) if k in _OPIS_KOLEJNOSC else len(_OPIS_KOLEJNOSC))
-        for kolumna in opisowe:
-            for klucz in kolumny[kolumna]:
-                tekst, jest_pl = _tekst(ix, pl, klucz)
-                if tekst and len(tekst) > len(opis):
-                    opis, opis_pl = tekst, jest_pl
-                    break
-            if opis:
-                break
-    if nazwa and opis and (opis in nazwa or nazwa in opis):
-        opis = ""
-    return nazwa, opis, opis_pl
-
-
-def _dodaj(karty: list[str], linia: str) -> None:
-    """Dopisuje kartę, ale nie powtarza jej, gdy ta sama linia stoi już wyżej."""
-    if linia and (not karty or karty[-1] != linia):
-        karty.append(linia)
-
-
-def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
-                    zrobione: set[str] | None = None) -> tuple[list[str], set[str], int]:
-    """Kontekst do każdej jednostki w kolejności z pliku 01.
-
-    Hasło dostaje pełną kartę przy pierwszym wystąpieniu, a przy kolejnych —
-    samo imię lub nazwę, żeby dało się prześledzić, kto i co wraca w scenie.
-    Kolejność w obrębie jednostki: najpierw mówiący, potem hasła z tekstu.
-    """
-    teksty = {}
-    for numer, jednostka in enumerate(jednostki):
-        if not jednostka.linie:
-            continue
-        zrodla = [ix.zh(klucz) for _m, klucz in jednostka.linie]
-        teksty[f"u{numer}"] = ("\n".join(z for z in zrodla if z), jednostka.przestrzenie)
-    wzmianki = powiazania_czytanek.skanuj_wzmianki_w_scenach(baza, teksty)
-    encje_po_zh: dict[str, dict] = {}
-    for wiersz in ix.encyklopedia.values():
-        for pole in ("nazwa", "inna_nazwa"):
-            klucz = wiersz.get(pole)
-            for wariant in (ix.zh(klucz), ix.en(klucz), pl.get(klucz or "")):
-                if wariant:
-                    encje_po_zh.setdefault(wariant, wiersz)
-
-    out: list[str] = []
-    widziane: dict[tuple[str, str], bool] = {}
-    pokazane_nazwy: dict[str, bool] = {}
-    uzyte: set[str] = set()
-    ostatnia_sekcja = None
-    ktory = 0
-    for numer, jednostka in enumerate(jednostki):
-        if not jednostka.linie:
-            continue
-        if zrobione is not None and jednostka.etykieta not in zrobione:
-            continue
-        hasla: list[tuple[str, str]] = [
-            ("osoba", pid) if pid and pid.isdigit() and int(pid) in ix.postacie else ("nazwa", imie or pid)
-            for pid, imie in jednostka.osoby]
-        for tabela, ridy in (wzmianki.get(f"u{numer}") or {}).items():
-            hasla.extend((tabela, rid) for rid in ridy)
-        karty: list[str] = []
-        for para in hasla:
-            if para[0] == "nazwa":
-                nazwa, opis, opis_pl = _karta_nazwy(ix, pl, para[1], encje_po_zh)
-            else:
-                nazwa, opis, opis_pl = _karta(baza, ix, pl, *para)
-            nazwa = _etykieta_hasla(ix, nazwa)
-            if not opis:
-                # bez opisu nie ma czego pokazać — hasło zostaje w pliku 03
-                continue
-            # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa);
-            # powtórka nie wnosi treści, więc się nie pojawia
-            if nazwa and nazwa in pokazane_nazwy:
-                continue
-            if para in widziane:
-                continue
-            widziane[para] = True
-            if nazwa:
-                pokazane_nazwy[nazwa] = True
-            skrocony = len(opis) > DLUGOSC_KARTY
-            tresc_opisu = opis
-            if skrocony:
-                # w kontekście tylko zajawka; pełny tekst zostaje w pliku 03
-                tresc_opisu = opis[:DLUGOSC_KARTY].rsplit(" ", 1)[0] + "…"
-            if not opis_pl and tresc_opisu:
-                tresc_opisu = f"\\*{tresc_opisu}"
-            # hasła zużywamy z pliku 03 tylko wtedy, gdy pokazaliśmy pełny opis
-            if not skrocony:
-                if para[0] == "nazwa":
-                    uzyte.update(k for grupa in (encje_po_zh.get(para[1]) or {}).get("historie", [])
-                                 for k in grupa)
-                elif para[0] == "osoba":
-                    wiersz = ix.postacie.get(int(para[1])) or {}
-                    if wiersz.get("n"):
-                        uzyte.add(wiersz["n"])
-                    wpis = baza.encyklopedia_po_kluczu.get(wiersz.get("n")) or {}
-                    for klucz in (wpis.get("nazwa"), wpis.get("inna_nazwa")):
-                        if klucz:
-                            uzyte.add(klucz)
-                    for grupa in wpis.get("historie") or []:
-                        uzyte.update(k for k in grupa if k)
-                else:
-                    kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
-                    uzyte.update(k for klucze in kolumny.values() for k in klucze)
-            if nazwa and tresc_opisu:
-                _dodaj(karty, f"**{nazwa}:** {tresc_opisu}")
-            elif nazwa:
-                _dodaj(karty, f"**{nazwa}**")
-            else:
-                _dodaj(karty, tresc_opisu)
-        if not karty:
-            continue
-        ktory += 1
-        if jednostka.sekcja != ostatnia_sekcja:
-            out += [jednostka.sekcja, ""]
-            ostatnia_sekcja = jednostka.sekcja
-        out += [f"## {jednostka.etykieta}", ""] + karty + [""]
-    return out, uzyte, ktory
-
-
 def _haslo(nazwa: str, opisy: list[str]) -> str:
     opis = " · ".join(opisy)
     return f"**{nazwa}:** {opis}" if opis else f"**{nazwa}**"
@@ -1486,10 +1267,10 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
 
     wyj.mkdir(parents=True, exist_ok=True)
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
-                  "kontekst": 0, "bez_przekladu": 0}
+                  "bez_przekladu": 0}
 
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
-    tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
+    tresc, uzyte, _zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",
                   "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
@@ -1498,25 +1279,13 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
         encoding="utf-8")
     statystyka["plikow"] += 1
 
-    baza = powiazania_czytanek.zbuduj_baze(ix)
-    tresc_kontekstu, uzyte_kontekstu, ktore = _plik_kontekstu(ix, jednostki, pl, baza, zrobione)
-    statystyka["kontekst"] = ktore
-    (wyj / "02_kontekst_scen_i_cutscen.md").write_text(
-        _naglowek("Kontekst scen i cutscen",
-                  "Te same jednostki i ta sama kolejność co w pliku 01: postacie, encyklopedia, "
-                  "frakcje, miejsca, przedmioty i sztuki walki wymienione w scenie. Wchodzą tylko "
-                  "hasła, które gra naprawdę opisuje; pełna karta stoi przy pierwszym wystąpieniu, "
-                  "przy kolejnych samo imię albo nazwa. Opis dłuższy niż "
-                  f"{DLUGOSC_KARTY} znaków jest ucinany wielokropkiem — całość zostaje w pliku 03.") + "\n".join(tresc_kontekstu) + "\n",
-        encoding="utf-8")
-    statystyka["plikow"] += 1
-
-    tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
-    tresc_reszty += _zbiory(ix, pl, uzyte | uzyte_kontekstu, statystyka)
-    tresc_reszty += _pamiatki(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
-    tresc_reszty += _poi(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
+    tresc_reszty = _reszta(ix, pl, uzyte, statystyka, krainy)
+    tresc_reszty += _zbiory(ix, pl, uzyte, statystyka)
+    tresc_reszty += _pamiatki(ix, pl, uzyte, statystyka, index)
+    tresc_reszty += _poi(ix, pl, uzyte, statystyka, index)
     (wyj / "03_reszta.md").write_text(
-        _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
+        _naglowek("Reszta", "Komplet informacji dodatkowych: wszystkie przekłady, "
+                  "których nie ma w pliku 01, pogrupowane rodzajem.")
         + "\n".join(tresc_reszty) + "\n", encoding="utf-8")
     statystyka["plikow"] += 1
 
@@ -1535,8 +1304,7 @@ def _readme(statystyka: dict, zakres: str) -> str:
 | plik | zawartość |
 |---|---|
 | `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: tylko hasła, które gra naprawdę opisuje — pełna karta raz, powtórki się nie powtarzają, bez punktora |
-| `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem; tu też hasła bez opisu i pełne teksty kart uciętych w 02 |
+| `03_reszta.md` | komplet informacji dodatkowych: wszystkie przekłady spoza 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowane rodzajem |
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
 i tabel; kwestia bez mówcy to goły tekst.
@@ -1547,7 +1315,7 @@ Etykiety mówców zapisane w grze tylko po chińsku są transliterowane na łaci
 Zakres: **{zakres}**.
 
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
-{statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
+{statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
 {statystyka.get('zbiory', 0)} kart zbiorów, {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) i {statystyka.get('poi', 0)} punktów na mapie (POI — z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.

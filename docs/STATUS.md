@@ -342,7 +342,9 @@ głównego pliku `.cine` cutsceny (wpisy `czas:id_sound_data`), czytana przez
 wiersze puli `text_msg` przez `tools/cutsceny_kolejnosc_kwestii.py`
 (benchmark 30161 — ręczny zapis gracza — odtworzony w 100%, 36/36 kwestii).
 Czytanka od v15 renderuje cutsceny w tej kolejności (215 cutscen z pełnym
-przeplotem). Dokończone 2026-11-18 (wpisy 11–12): tryb zapasowy pokrył 132 krótkie
+przeplotem). Czytanka od 2026-11-18 (wpis 13) ma dwa pliki treści: 01 sceny i cutsceny
++ 03 reszta (komplet informacji dodatkowych); plik 02 kontekst zlikwidowany
+na życzenie właściciela. Dokończone 2026-11-18 (wpisy 11–12): tryb zapasowy pokrył 132 krótkie
 cutsceny (indeks: 347 cutscen, 2 826 kwestii); czytanka podpisuje mówców
 z nazw nagrań (gracz → Youxia, kody `_cs_`) z propagacją po plikach
 nagrań w obrębie cutsceny (30161 podpisana w 100 %), a bloki puli bez
