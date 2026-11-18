@@ -462,10 +462,29 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis (9). Bramka 3 (oś `.cine`,
    weryfikacja 30161) nadal otwarta.
 
-## Handoff — stan po WYNIKv6 i czytankach v11 (2026-11-18)
+## Handoff — skaner v7 na Dysku, czeka na przebieg właściciela (2026-11-18)
 
 - **Priorytet 1 (scena → scena)**: `WYNIKv6` wyciągnął 1 066 krawędzi z nieskompresowanych grafów JSON w `Resources*.mpk` (`index/mpk/storyline_nastepstwa.jsonl`), ale **benchmark `4700001 → 4700041 → 4700352` ma w nich 0 trafień** — w czytankach `WWM_Czytanka_PL_v11.zip` układ dla tych scen nadal idzie po numerach.
 - **Priorytet 2 (POI → scena)**: `index/mpk/poi_sceny.jsonl` ma 1 307 bezpośrednich powiązań z `poi.dialog`, ale **benchmark `Dragon Pattern Mark → 4700001` (`client/dialogs/hjt/sxd_longwenbiaoji.etsb`) ma 0 trafień** w `lt1_stringi.jsonl` i w `WYNIKv6`.
 - **Priorytet 3 (kolejność kwestii w cutscenach)**: `index/mpk/cine_dekodowane.jsonl` ma tylko 14 sztuk z sondy `Resources34` (w grze jest ich kilkaset).
 - **Przyczyna**: brakujące grafy, skrypty `.etsb` i osie `.cine` leżą w `Resources*.mpk` w blokach skompresowanych/zaszyfrowanych (`EZST`) oraz pod sygnaturą `.cine` (`c159410d`), których nieskompresowane wyszukiwanie JSON-ów nie widzi.
-- **Następny krok**: skaner v7, który w `Resources*.mpk` dekoduje/wycina bloki `EZST` (pod priorytet 1 i 2, w tym benchmark `4700001` i `.etsb`) oraz bloki `.cine` (`c159410d`, pod priorytet 3).
+- **Zrobione w tej sesji (2026-11-18, druga część):** (a) `tools/sciezki_vfs.py`
+  → `index/mpk/sciezki_vfs.jsonl` — **11 278 prawdziwych ścieżek VFS z bazy**
+  (974 pełnych `.cine` z `cutscenes.cine_path` — wzorzec `qhrw` trafiał tylko 14,
+  2 429 hashowalnych `.graph`, w tym `Char/graph/cutscene/*` z
+  `fenbao_cutscene_info.cutscene_graph`, 804 `.etsb` z benchmarkiem
+  `sxd_longwenbiaoji.etsb`); (b) **skaner v7** (`WWM_MPK_Skaner_v7.zip`,
+  160 459 B, SHA-256 `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`,
+  Dysk id `1J0Nw4Bmw-S9XLP7S9R_CM10XBVQ_nemO`; kity v4–v6 w koszu):
+  25 451 kandydatów z realnych ścieżek + **sonda zawartości bloków EZST**
+  (AES-ECB prefiks w czystym Pythonie + początek ramki zstd, sygnatury
+  `c159410d`/Storyline/`client/dialogs`/`4700001`; bez modułu zstd —
+  Python 3.14+ albo `pip install zstandard` — sonda treści jest jawnie
+  pomijana). Szczegóły i ograniczenia: [dziennik](EXPERIMENT_LOG.md),
+  wpis 2026-11-18 (2).
+- **Następny krok**: właściciel uruchamia `WWM_MPK_Skaner_v7.zip`
+  (`SKANUJ.bat`, zalecane `py -3 -m pip install zstandard`; skan może potrwać
+  do ~1 h) i odsyła `WWM_MPK_Skaner_WYNIK.zip` na Dysk. Po wyniku:
+  dekodowanie `ezst_*.bin` (`tools/mpk_artefakty.py`), mapowanie `.cine` →
+  cutsceny po `sciezki_vfs.jsonl` (pole `cutsceny`), Bramka 3 (weryfikacja
+  osi 30161) i grafy Storyline pod priorytety 1–2.

@@ -1684,3 +1684,62 @@ cudzego kodu ani nie wymagają tej procedury.
 - Z `WWM_MPK_Skaner_WYNIKv5.zip` (162 wycinki `res_*.bin` z `Resources*.mpk`) wyodrębniono **1 106 kompletnych grafów JSON Storyline** (`{"Variables":...,"Storyline":{...,"NodeBuffer":[...]}}`).
 - Węzły `GameLevelStorylineDialogsPlayNode` (274 wystąpienia) zawierają bezpośrednio `dialogs_no` (numer sceny) oraz `ConnectData` (`srcNodeID` → `dstNodeID`). Już z tego wycinka wyciągnięto **13 bezpośrednich krawędzi `dialog → dialog`** (m.in. `13200326 -> 13200327 -> 13200328`, `13200283 -> 13200278`, `24000036 -> 24000021`).
 - `WYNIKv5` zapełnił limit 30 MB oknami binarnymi wokół `StartDialog`/`TrackTaskNode`. Zbudowano **skaner v6** (`WWM_MPK_Skaner_v6.zip`), który wycina z `Resources*.mpk` wyłącznie oczyszczone kompletne obiekty JSON Storyline zawierające węzły scen/cutscen (`GameLevelStorylineDialogsPlayNode`, `DialogCutsceneSequenceNode`, `DialogNode`, `BranchDialog`, `TrackTaskNode`) do `wyciete/storyline_wyciete.jsonl`.
+
+### 2026-11-18 (2) — Ścieżki VFS z bazy + skaner v7 (kandydaci realne, sonda EZST)
+
+- **Wejście:** baza gry Patch 2.4 (`26592996`) rozpakowana z części 1, 3–8
+  paczki `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f` (SHA-256 wszystkich
+  części zgodne z `index/paczki.json`; część 2 to tylko mapa EN — pominięta);
+  `index/` z repo; publiczny format EZST/`.mpkinfo` z
+  [MPK_FORMAT_RESEARCH.md](MPK_FORMAT_RESEARCH.md).
+- **Przyczyna:** v4 trafiał tylko 14 `.cine`, bo kandydaci byli zgadywani ze
+  wzorca `Char/e_01_cutscene/qhrw/<film>/<film>.cine` — a środkowy katalog
+  (`qhrw`/`fsbd`/`zqkyw`/…) jest nie do zgadnięcia. Tymczasem tabela
+  `cutscenes` ma kolumnę `cine_path` z **pełną ścieżką** (3 990 wierszy,
+  1 109 z `cine_path`, 974 unikalnych), `fenbao_cutscene_info` ma `resources`
+  (`.cine`) i `cutscene_graph` (`Char/graph/cutscene/*.graph` — kandydaci na
+  pliki grafów Storyline), a surowe chunki `dataN` zawierają łącznie 11 278
+  nazw/ścieżek `.cine`/`.graph`/`.etsb`/`.ets` (10 559 z katalogiem, w tym
+  benchmark POI `client/dialogs/hjt/sxd_longwenbiaoji.etsb`).
+- **Nowy generator:** `tools/sciezki_vfs.py` → `index/mpk/sciezki_vfs.jsonl`
+  (11 278 wierszy; źródła kolumnowe z numerami cutscen w polu `cutsceny` +
+  `skan_dataN`). Do Git idą wyłącznie teksty ścieżek.
+- **Skaner v7** (`tools/mpk_skaner.py` `wwm-mpk-skaner-v7`,
+  `tools/build_mpk_skaner.py` kit v7):
+  * kandydaci z `sciezki_vfs.jsonl` (wszystkie ścieżki z katalogiem +
+    warianty `.ets`↔`.etsb`): **25 451 kandydatów** (v4: 8 066), w tym
+    974 realnych `.cine`, 2 429 `.graph`, 804 `.etsb`;
+  * **sonda EZST**: AES-256-ECB w czystym Pythonie (klucz publiczny; zgodność
+    z wektorami NIST SP 800-38A i `pycryptodome` sprawdzona testem) +
+    dekompresja początku ramki zstd (`compression.zstd` Python 3.14+ albo
+    pakiet `zstandard`; bez nich sonda treści jest jawnie pomijana).
+    Dla każdego wpisu `Resources.mpkinfo` ≤ 4 MB czyta 16 KiB głowy,
+    dekoduje do 64 KiB treści w pamięci i szuka sygnatur: magic `.cine`
+    `c159410d`, `{"Variables":`/węzły Storyline, `client/dialogs`/`.etsb`,
+    benchmark `4700001` (ASCII i u32le). Trafienia wycina SUROWO
+    (`wyciete/ezst_<pack>_<fileid>.bin` + `ezst_trafienia.jsonl`,
+    limit 256 MB; `--bez-ezst`, `--ezst-max-blok-mb`, `--ezst-limit-mb`);
+  * naprawiony zgubiony wynik skanu storyline w raporcie
+    (`isinstance(wycinanie, dict)` zawsze fałszywe → teraz
+    `raport["resources_storyline"]`).
+- **Weryfikacja:** syntetyczna instalacja z prawdziwymi blokami EZST
+  (zstd + AES) — sonda trafiła 3/4 bloków (storyline, cine, benchmark w gołym
+  bloku; blok zerowy poprawnie bez trafienia), a wycięte bloki dekodują się
+  po stronie repo `mpk_artefakty.ezst_decode` bajt w bajt. Czas AES prefiksu:
+  ~1,2 ms/blok → ~50 min na 2,6 mln wpisów (szacunek; filtr ≤ 4 MB zdejmie
+  duże zasoby). Testy stdlib-only (CI bez zstd używa atrapy zlib o tym samym
+  kontrakcie): 583 testy OK.
+- **Ograniczenia / uczciwie:** sonda czyta tylko głowę bloku — sygnatura
+  głęboko w pliku nie zostanie zauważona; bez modułu zstd sprawdzane są
+  wyłącznie bloki gołe; benchmark ASCII `4700001` może trafić przypadkowe
+  teksty (to sonda, nie dowód). Trafienia kandydatów w `PODSUMOWANIE.txt`
+  ucięte do 300 pozycji (pełna lista w `RAPORT.json`).
+- **Paczka:** `dist/WWM_MPK_Skaner_v7.zip`, **160 459 B**, SHA-256
+  `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`,
+  na Dysku (folder „Where Winds Meet”, id `1J0Nw4Bmw-S9XLP7S9R_CM10XBVQ_nemO`);
+  kity v4–v6 przeniesione do kosza (wyniki `WYNIK*` zostają).
+- **Następny krok:** właściciel uruchamia v7 (`SKANUJ.bat`; opcjonalnie
+  `py -3 -m pip install zstandard` dla pełnej sondy) i odsyła
+  `WWM_MPK_Skaner_WYNIK.zip`. Po wyniku: dekodowanie `ezst_*.bin`
+  (`mpk_artefakty`), mapowanie `.cine` → cutsceny po `sciezki_vfs.jsonl`
+  (pole `cutsceny`), Bramka 3 (oś 30161) i grafy Storyline pod priorytet 1/2.

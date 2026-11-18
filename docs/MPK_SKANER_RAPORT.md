@@ -129,3 +129,19 @@ zrzuceniu Lua (`LT1.mpk`).
 - **Artefakty w repo:** `index/mpk/` (pochodne; surowe bajty poza Git —
   patrz `index/mpk/README.md`). `POI storyline` dalej 0 trafień bez
   prefiksu → kit v4 z kandydatami `LuaText/…`.
+
+## 8. Kit v7 (2026-11-18) — czeka na przebieg właściciela
+
+- `WWM_MPK_Skaner_v7.zip` (160 459 B, SHA-256
+  `ed361e6224679ca27fec5c81ed0631c6fadaff930cb6c5deda6252fc4ea1faa7`)
+  na Dysku; kity v4–v6 wycofane do kosza.
+- Zmiany vs v4–v6: kandydaci z `index/mpk/sciezki_vfs.jsonl` (25 451
+  prawdziwych ścieżek + warianty, w tym 974 pełnych `.cine` z bazy gry)
+  zamiast zgadywanych wzorców; **sonda zawartości bloków EZST** w
+  `Resources.mpkinfo` (AES-ECB prefiks + początek ramki zstd, sygnatury
+  `.cine`/Storyline/`.etsb`/`4700001`) z wycinaniem surowych trafień do
+  `wyciete/ezst_*.bin` + `ezst_trafienia.jsonl`; naprawione gubienie
+  `resources_storyline` w `RAPORT.json`. Szczegóły:
+  `docs/EXPERIMENT_LOG.md`, wpis 2026-11-18 (2).
+- Ten rozdział zostanie uzupełniony po otrzymaniu `WWM_MPK_Skaner_WYNIK.zip`
+  z przebiegu v7.
