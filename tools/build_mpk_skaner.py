@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
-"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v4.zip` (bez danych gry).
+"""Buduje samowystarczalny kit Windows `WWM_MPK_Skaner_v7.zip` (bez danych gry).
 
 Od v4 kit: (a) wycina SUROWE bloki trafionych kandydatów i WSZYSTKIE bloki
 z `LT1.mpkinfo` do `wyciete/`, (b) zrzuca `Patch.mpkdb` (schema + wszystkie
-wiersze, kolumny BLOB jako hex) do `mpkdb_dump.json`. Bez dekodowania EZST —
-to robimy po swojej stronie. Krok 5 nigdy nie blokuje powstania ZIPa.
+wiersze, kolumny BLOB jako hex) do `mpkdb_dump.json`. Od v6 wycina
+nieskompresowane grafy JSON Storyline z `Resources*.mpk`. Od v7 dodatkowo:
+(c) kandydaci to PRAWDZIWE ścieżki VFS z bazy gry
+(`index/mpk/sciezki_vfs.jsonl`: pełne `cutscenes.cine_path`,
+`fenbao_cutscene_info.resources`/`.cutscene_graph`, ścieżki `.etsb`/`.ets`/
+`.graph` z chunków `dataN`), (d) SONDA EZST — czysto-Pythonowy AES-ECB
+odszyfrowuje prefiksy bloków EZST, a początek ramki zstd (Python 3.14+ albo
+pakiet `zstandard`, opcjonalnie) jest dekompresowany w pamięci i przeszukiwany
+pod sygnatury `.cine`/Storyline/`.etsb`/benchmark `4700001`; trafienia są
+wycinane SUROWO. Pełne dekodowanie nadal po naszej stronie. Żaden krok
+wycinania nie blokuje powstania ZIPa.
 
 Eksportuje ze `status/index/`:
-  * `index/poi.jsonl` → pole `storyline` — prawdziwe ścieżki klienta
-    (np. `client/dialogs/hjt/sxd_lingwei.etsb`) i ich warianty rozszerzenia
-    (`.ets` ↔ `.etsb`),
-  * `index/cutsceny_meta.jsonl` → `film` — wzorce ścieżek `.cine` na podstawie
-    znanego z danych przykładu `Char/e_01_cutscene/qhrw/sq001_zlxl/sq001_zlxl.cine`.
+  * `index/mpk/sciezki_vfs.jsonl` → wszystkie ścieżki z katalogiem
+    (+ warianty `.ets` ↔ `.etsb`),
+  * `index/poi.jsonl` → pole `storyline` — ścieżki klienta
+    (np. `client/dialogs/hjt/sxd_lingwei.etsb`) i ich warianty,
+  * `index/cutsceny_meta.jsonl` → `film` — stare wzorce `.cine` (zostają
+    jako uzupełnienie; realne ścieżki idą z `sciezki_vfs.jsonl`).
 
 Wynik: `kandydaci.jsonl` + `mpk_skaner.py` + `SKANUJ.bat` + `CZYTAJ_TO.txt`
-spakowane deterministycznie do `dist/WWM_MPK_Skaner_v4.zip`.
+spakowane deterministycznie do `dist/WWM_MPK_Skaner_v7.zip`.
 
 Kit NIE zawiera żadnych plików gry; kandydacje to same ścieżki (teksty),
 już obecne w publicznym repozytorium.
@@ -32,7 +42,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-WERSJA = "v6"
+WERSJA = "v7"
 NAZWA_ZIP = f"WWM_MPK_Skaner_{WERSJA}.zip"
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
@@ -44,10 +54,13 @@ indeksy plików (`Resources.mpkinfo`, `LocalData/Patch/*.mpkinfo`,
 `.cine` (osie cutscen) oraz `.etsb` (skrypty klienta, np. dialog POI).
 
 Skaner NIE zmienia NICZEGO w grze i paczek nie rozpakowuje. Oprócz sondy
-wycina SUROWE małe bloki: trafione przez sondaż (np. `.cine`) oraz WSZYSTKIE
-bloki z `LT1.mpkinfo` (skrypty klienta, ~2,5 MB) i zrzuca `Patch.mpkdb` do JSON
-(`mpkdb_dump.json`). Bloków NIE dekoduje — dekodowanie odbywa się po stronie
-repozytorium.
+wycina SUROWE małe bloki: trafione przez sondaż (teraz z PRAWDZIWYMI
+ścieżkami .cine/.graph/.etsb z bazy gry, nie zgadywanymi), WSZYSTKIE bloki
+z `LT1.mpkinfo` (skrypty klienta, ~2,5 MB), zrzuca `Patch.mpkdb` do JSON
+(`mpkdb_dump.json`) i — NOWOŚĆ w v7 — sonduje ZAWARTOŚĆ małych bloków EZST:
+odszyfrowuje w pamięci sam początek bloku i szuka w nim sygnatur osi cutscen
+(.cine), grafów scen (Storyline) i skryptów dialogów. Trafione bloki wycina
+w SUROWEJ postaci — pełne dekodowanie odbywa się po stronie repozytorium.
 
 JAK URUCHOMIĆ
 
@@ -57,12 +70,19 @@ JAK URUCHOMIĆ
    - Potrzebny jest Python 3.10 lub nowszy (https://www.python.org/downloads/ —
      podczas instalacji zaznacz "Add python.exe to PATH"). Nie pobiera żadnych
      bibliotek — wszystko, czego skaner używa, jest wbudowane w Pythona.
+   - Sonda EZST daje NAJWIĘCEJ, gdy Python ma moduł zstd: Python 3.14+
+     ma go wbudowanego; dla starszych wersji opcjonalnie zainstaluj pakiet
+     poleceniem:  py -3 -m pip install zstandard
+     Bez tego skaner też zadziała — po prostu pominie dekompresję treści
+     i napisze to w raporcie.
    - Otworzy się OKNO WYBORU folderu gry (ten z folderami Package i
      LocalData oraz plikami Resources*.mpk) — wskaż go kliknięciem.
      Ścieżki NIE trzeba wpisywać. Alternatywnie możesz przeciągnąć folder
      gry na SKANUJ.bat.
-4. Poczekaj na komunikat GOTOWE. Powstanie folder MPK_SKANER_WYNIK i plik
-   WWM_MPK_Skaner_WYNIK.zip.
+4. Poczekaj na komunikat GOTOWE. Sonda EZST czyta początki setek tysięcy
+   małych bloków, więc całość może potrwać od kilkunastu minut do ponad
+   godziny (dysk + procesor). Postęp wypisuje się na bieżąco po każdej
+   paczce. Powstanie folder MPK_SKANER_WYNIK i plik WWM_MPK_Skaner_WYNIK.zip.
 
 CO ODESŁAĆ
 
@@ -75,6 +95,8 @@ CO SKANER ZAPISUJE (folder MPK_SKANER_WYNIK)
 - RAPORT.json      pełny raport maszynowy (paczki, indeksy, trafienia)
 - PODSUMOWANIE.txt  ten sam raport w skrócie po polsku
 - wyciete/         surowe bloki: trafienia sondaży + wszystkie z LT1.mpkinfo
+                   + trafienia sondy EZST (ezst_*.bin, ezst_trafienia.jsonl)
+                   + nieskompresowane grafy scen (storyline_wyciete.jsonl)
 - mpkdb_dump.json  schema i wszystkie wiersze tabeli Patch.mpkdb
 - SHA256.txt       skrót wynikowego ZIP-a
 
@@ -83,7 +105,8 @@ CZEGO SKANER NIE ROBI
 - nie uruchamia gry i nie dotyka jej procesu,
 - nie modyfikuje żadnego pliku gry (otwiera je tylko do odczytu),
 - nie wysyła żadnych danych do sieci,
-- nie odszyfrowuje bloków EZST/ZSTD — wycina je w surowej postaci.
+- nie zapisuje zdekodowanej treści bloków — sygnatur szuka w pamięci,
+  a na dysk trafiają wyłącznie SUROWE bloki.
 """
 
 BAT_TEMPLATE = """@echo off
@@ -176,6 +199,28 @@ def kandydaci(index_dir: Path) -> list[dict]:
                     dodaj(prefix + story, f"poi_storyline_prefiks:{prefix.rstrip('/')}")
                     if wariant:
                         dodaj(prefix + wariant, f"poi_storyline_prefiks_wariant_ext:{prefix.rstrip('/')}")
+
+    # Od v7: PRAWDZIWE ścieżki VFS z bazy gry (tools/sciezki_vfs.py) —
+    # pełne `cutscenes.cine_path` (974 .cine; wzorzec qhrw trafiał tylko 14),
+    # `fenbao_cutscene_info.resources`/`.cutscene_graph` oraz ścieżki
+    # .etsb/.ets/.graph znalezione w chunkach dataN. Hashowalne są tylko
+    # wpisy z katalogiem w ścieżce.
+    sciezki_vfs = index_dir / "mpk" / "sciezki_vfs.jsonl"
+    if sciezki_vfs.is_file():
+        with open(sciezki_vfs, encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    wpis = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                sciezka = str(wpis.get("sciezka") or "").strip()
+                if "/" not in sciezka:
+                    continue
+                ext = str(wpis.get("ext") or "")
+                dodaj(sciezka, f"vfs_{ext}")
+                wariant = _swap_ets(sciezka)
+                if wariant:
+                    dodaj(wariant, f"vfs_{ext}_wariant_ext")
 
     meta = index_dir / "cutsceny_meta.jsonl"
     filmy: set[str] = set()

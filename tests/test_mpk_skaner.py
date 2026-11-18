@@ -229,6 +229,11 @@ class TestIntegracja(unittest.TestCase):
             self.assertTrue(raport["wycinanie"][0]["ok"] >= 1)
             self.assertTrue(raport["wycinanie"][1]["ok"] == 2)
             self.assertTrue(raport["mpkdb_zrzut"]["ok"])
+            # sonda EZST (v7) przebiegła po jedynym wpisie Resources.mpkinfo
+            # (wynik zależy od dostępności zstd, ale sondowanie — nie)
+            self.assertEqual(raport["ezst_sonda"]["sondowanych"], 1)
+            self.assertEqual(raport["ezst_sonda"]["magie"], {"EZST": 1})
+            self.assertIn("ezst_sonda", json.loads(json.dumps(raport)))
 
     def test_patch_mpkdb_z_blobami_nie_wywraca_json(self):
         import tempfile
@@ -269,6 +274,218 @@ class TestIntegracja(unittest.TestCase):
     def test_brak_katalogu_gry(self):
         rc = ms.main(["--gra", "/nie/istnieje/12345", "--non-interactive"])
         self.assertEqual(rc, 2)
+
+
+class TestAesEzst(unittest.TestCase):
+    """AES-256-ECB w czystym Pythonie (prefiks bloków EZST, sonda v7)."""
+
+    def test_wektor_nist_aes256_ecb(self):
+        # NIST SP 800-38A, F.1.5/F.1.6 (ECB-AES256)
+        klucz = bytes.fromhex(
+            "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4"
+        )
+        jawny = bytes.fromhex("6bc1bee22e409f96e93d7e117393172a")
+        szyfr = bytes.fromhex("f3eed1bdb5d2a03c064b5a7e3db181f8")
+        rundy = ms._aes256_klucze_rund(klucz)
+        self.assertEqual(ms._aes_blok_szyfruj(jawny, rundy), szyfr)
+        self.assertEqual(ms._aes_blok_odszyfruj(szyfr, rundy), jawny)
+
+    def test_prefiks_ezst_tam_i_z_powrotem(self):
+        for dlugosc in (0, 7, 16, 100, 256, 300, 1000):
+            payload = bytes(range(256))[:dlugosc] if dlugosc <= 256 else bytes(
+                i % 251 for i in range(dlugosc)
+            )
+            zaszyfrowany = ms.ezst_zaszyfruj_prefiks(payload)
+            self.assertEqual(ms.ezst_odszyfruj_prefiks(zaszyfrowany), payload)
+            n = min(len(payload) // 16 * 16, 256)
+            # część poza prefiksem zostaje nietknięta
+            self.assertEqual(zaszyfrowany[n:], payload[n:])
+            if n:
+                self.assertNotEqual(zaszyfrowany[:n], payload[:n])
+
+
+class TestSondaEzst(unittest.TestCase):
+    """Sonda zawartości bloków EZST (v7) — dane syntetyczne, bez prawdziwego zstd.
+
+    CI nie ma modułu zstd, więc dekompresję podstawiamy zlib-ową atrapą
+    o tym samym interfejsie (dane, max_wyjscie) -> bytes. Prawdziwy backend
+    (`compression.zstd` / `zstandard`) ma identyczny kontrakt.
+    """
+
+    def _instalacja(self, td: str, bloki: list[bytes]):
+        root = Path(td) / "gra"
+        root.mkdir()
+        pak = b"".join(bloki)
+        (root / "Resources.mpk").write_bytes(pak)
+        entries = []
+        offset = 0
+        for i, blok in enumerate(bloki):
+            fid = ms.file_id(f"syn/blk{i}.bin")
+            entries.append((fid & 0xFFFFFFFF, fid >> 32, offset, len(blok), 0))
+            offset += len(blok)
+        (root / "Resources.mpkinfo").write_bytes(_mpkinfo_bytes(entries))
+        meta = ms.parsuj_mpkinfo(root, root / "Resources.mpkinfo")
+        return root, meta, meta.pop("_entries")
+
+    def _ezst_zlib(self, tresc: bytes) -> bytes:
+        import zlib
+
+        skompresowane = zlib.compress(tresc, 6)
+        return b"EZST" + struct.pack("<I", len(tresc)) + ms.ezst_zaszyfruj_prefiks(
+            skompresowane
+        )
+
+    def test_sonda_z_atrapa_backendu(self):
+        import tempfile
+        import zlib
+
+        def atrapa_backend():
+            def dek(dane: bytes, max_wyjscie: int) -> bytes:
+                try:
+                    return zlib.decompressobj().decompress(dane, max_wyjscie)
+                except zlib.error:
+                    return b""
+
+            return ("zlib-atrapa", dek)
+
+        bloki = [
+            self._ezst_zlib(b'{"Variables": {"a": 1}} GameLevelStorylineDialogsPlayNode' + b" " * 500),
+            self._ezst_zlib(bytes.fromhex("c159410d") + b"\x02Entity\x00Camera\x00" + b"\xab" * 300),
+            self._ezst_zlib(b"\x00" * 400),  # bez sygnatur
+            b"RAWW" + struct.pack("<I", 4700001) * 4,  # goły blok z benchmarkiem
+        ]
+        oryginalny = ms._zstd_backend
+        ms._zstd_backend = atrapa_backend
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                root, meta, entries = self._instalacja(td, bloki)
+                wyjscie = Path(td) / "wynik"
+                wynik = ms.skanuj_ezst_w_indeksie(root, wyjscie, meta, entries)
+                self.assertEqual(wynik["backend_zstd"], "zlib-atrapa")
+                self.assertEqual(wynik["sondowanych"], 4)
+                self.assertEqual(wynik["magie"], {"EZST": 3, "gole": 1})
+                self.assertEqual(wynik["trafien"], 3)
+                self.assertEqual(wynik["wycietych"], 3)
+                self.assertIn("cine_magic", wynik["sygnatury"])
+                self.assertIn("storyline_json", wynik["sygnatury"])
+                self.assertIn("benchmark_4700001_u32", wynik["sygnatury"])
+                # wycięte bloki są SUROWE (bajt w bajt jak w paczce)
+                wyciete = {
+                    p.name: p.read_bytes()
+                    for p in (wyjscie / "wyciete").glob("ezst_*.bin")
+                }
+                self.assertEqual(len(wyciete), 3)
+                self.assertIn(bloki[0], wyciete.values())
+                self.assertIn(bloki[1], wyciete.values())
+                self.assertIn(bloki[3], wyciete.values())
+                linie = (wyjscie / "wyciete" / "ezst_trafienia.jsonl").read_text(
+                    encoding="utf-8"
+                ).strip().splitlines()
+                self.assertEqual(len(linie), 3)
+                for linia in linie:
+                    wpis = json.loads(linia)
+                    self.assertTrue(wpis["wyciety"])
+                    self.assertTrue(wpis["sygnatury"])
+        finally:
+            ms._zstd_backend = oryginalny
+
+    def test_sonda_bez_backendu_sprawdza_tylko_gole(self):
+        import tempfile
+
+        bloki = [
+            self._ezst_zlib(bytes.fromhex("c159410d") + b"\xab" * 300),  # niewidoczny bez zstd
+            b"GOLY" + b"client/dialogs/hjt/sxd_longwenbiaoji.etsb" + b"\x00" * 50,
+        ]
+        oryginalny = ms._zstd_backend
+        ms._zstd_backend = lambda: None
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                root, meta, entries = self._instalacja(td, bloki)
+                wyjscie = Path(td) / "wynik"
+                wynik = ms.skanuj_ezst_w_indeksie(root, wyjscie, meta, entries)
+        finally:
+            ms._zstd_backend = oryginalny
+        self.assertIsNone(wynik["backend_zstd"])
+        self.assertEqual(wynik["sondowanych"], 2)
+        self.assertEqual(wynik["trafien"], 1)
+        self.assertEqual(sorted(wynik["sygnatury"]), ["etsb_ext", "etsb_sciezka"])
+
+    def test_duze_wpisy_pominiete_a_limit_zapisu_honorowany(self):
+        import tempfile
+
+        bloki = [
+            b"GOLY" + b".etsb" + b"\x01" * 100,
+            b"GOLY" + b".etsb" + b"\x02" * 100,
+            b"GOLY" + b"\x03" * (2 << 20),  # za duży dla max_blok_sondy=1 MB
+        ]
+        oryginalny = ms._zstd_backend
+        ms._zstd_backend = lambda: None
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                root, meta, entries = self._instalacja(td, bloki)
+                wyjscie = Path(td) / "wynik"
+                wynik = ms.skanuj_ezst_w_indeksie(
+                    root, wyjscie, meta, entries,
+                    max_blok_sondy=1 << 20, limit_zapisu=120,
+                )
+                self.assertEqual(wynik["pominietych_duzych"], 1)
+                self.assertEqual(wynik["sondowanych"], 2)
+                self.assertEqual(wynik["trafien"], 2)
+                # limit 120 B pozwala wyciąć tylko pierwszy blok (109 B)
+                self.assertEqual(wynik["wycietych"], 1)
+                self.assertTrue(wynik["limit_osiagniety"])
+                linie = (wyjscie / "wyciete" / "ezst_trafienia.jsonl").read_text(
+                    encoding="utf-8"
+                ).strip().splitlines()
+                self.assertEqual(len(linie), 2)
+                self.assertEqual(
+                    [json.loads(l)["wyciety"] for l in linie], [True, False]
+                )
+        finally:
+            ms._zstd_backend = oryginalny
+
+
+class TestKandydaciV7(unittest.TestCase):
+    """Kandydaci kitu v7 — prawdziwe ścieżki VFS ze `sciezki_vfs.jsonl`."""
+
+    def test_sciezki_vfs_wchodza_do_kandydatow(self):
+        import tempfile
+
+        from tools import build_mpk_skaner as bmk
+
+        with tempfile.TemporaryDirectory() as td:
+            index_dir = Path(td)
+            (index_dir / "mpk").mkdir()
+            (index_dir / "poi.jsonl").write_text(
+                json.dumps({"storyline": "client/dialogs/hjt/sxd_lingwei.etsb"}) + "\n",
+                encoding="utf-8",
+            )
+            (index_dir / "mpk" / "sciezki_vfs.jsonl").write_text(
+                json.dumps({"sciezka": "Char/e_01_cutscene/fgd/sq003_cqck/sq003_cqck.cine",
+                            "ext": "cine", "zrodla": ["cutscenes.cine_path"]}) + "\n"
+                + json.dumps({"sciezka": "Char/graph/cutscene/fsbd.graph",
+                              "ext": "graph", "zrodla": ["fenbao_cutscene_info.cutscene_graph"]}) + "\n"
+                + json.dumps({"sciezka": "client/dialogs/hjt/horse_move.etsb",
+                              "ext": "etsb", "zrodla": ["skan_dataN"]}) + "\n"
+                + json.dumps({"sciezka": "goly_bez_katalogu.ets",
+                              "ext": "ets", "zrodla": ["skan_dataN"]}) + "\n",
+                encoding="utf-8",
+            )
+            kandydaci = bmk.kandydaci(index_dir)
+        sciezki = {k["sciezka"]: k["pochodzenie"] for k in kandydaci}
+        self.assertEqual(
+            sciezki["Char/e_01_cutscene/fgd/sq003_cqck/sq003_cqck.cine"], "vfs_cine"
+        )
+        self.assertEqual(sciezki["Char/graph/cutscene/fsbd.graph"], "vfs_graph")
+        self.assertEqual(sciezki["client/dialogs/hjt/horse_move.etsb"], "vfs_etsb")
+        # wariant rozszerzenia .etsb -> .ets
+        self.assertEqual(
+            sciezki["client/dialogs/hjt/horse_move.ets"], "vfs_etsb_wariant_ext"
+        )
+        # nazwy bez katalogu nie są hashowalne — nie wchodzą
+        self.assertNotIn("goly_bez_katalogu.ets", sciezki)
+        # stare źródła zostają (poi_storyline)
+        self.assertIn("client/dialogs/hjt/sxd_lingwei.etsb", sciezki)
 
 
 class TestSkanujBat(unittest.TestCase):

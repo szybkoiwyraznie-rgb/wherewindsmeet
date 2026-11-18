@@ -14,17 +14,28 @@ VFS (`Resources*.mpk`, `LT*.mpk`, `Patch*.mpk`). Ten skrypt odpowiada:
      i szuka go w indeksach,
   5. (od v2) wycina SUROWE bajty trafionych bloków oraz **wszystkich** bloków
      z `LT1.mpkinfo` (skrypty klienta) oraz zrzuca `Patch.mpkdb` do JSON —
-     do analizy po stronie narzędzi. Bez dekodowania EZST. Kolumny BLOB
-     kodowane jako hex; błąd pojedynczej tabeli/kroku nie blokuje wyniku.
+     do analizy po stronie narzędzi. Kolumny BLOB kodowane jako hex; błąd
+     pojedynczej tabeli/kroku nie blokuje wyniku,
+  6. (od v6) wyszukuje w `Resources*.mpk` nieskompresowane grafy JSON
+     Storyline i zapisuje je do `wyciete/storyline_wyciete.jsonl`,
+  7. (od v7) SONDA EZST: dla każdego małego wpisu `Resources.mpkinfo`
+     odszyfrowuje AES-owy prefiks bloku EZST (czysty Python, klucz publiczny)
+     i dekompresuje POCZĄTEK ramki zstd (gdy dostępny moduł zstd: Python 3.14+
+     albo pakiet `zstandard`), po czym szuka sygnatur treści: magii `.cine`
+     (`c159410d`), grafów Storyline, ścieżek `client/dialogs`/`.etsb`
+     i benchmarku `4700001`. Trafione bloki wycina SUROWO do `wyciete/`
+     (`ezst_*.bin` + `ezst_trafienia.jsonl`).
 
 Czego ten skrypt NIE robi:
   * nie uruchamia gry i nie dotyka jej procesu,
   * nie modyfikuje żadnego pliku gry (otwiera tylko do odczytu),
   * nie wysyła niczego do sieci,
   * nie rozpakowuje paczek — wycina tylko SUROWE bloki (`wyciete/`: trafienia
-    z sondażu i wszystkie wpisy `LT1.mpkinfo`, limity 64 MB/blok, 512 MB łącznie)
-    oraz zrzut `Patch.mpkdb` do JSON,
-  * nie dekoduje EZST/ZSTD — dekodowanie odbywa się po naszej stronie.
+    z sondażu, wszystkie wpisy `LT1.mpkinfo` i trafienia sondy EZST; limity
+    64 MB/blok, 512 MB łącznie + 256 MB na sondę EZST),
+  * nie zapisuje zdekodowanej treści bloków — odszyfrowany prefiks i początek
+    dekompresji służą WYŁĄCZNIE sondowaniu sygnatur w pamięci; pełne
+    dekodowanie odbywa się po naszej stronie.
 
 Uruchomienie (dwuklik `SKANUJ.bat` albo ręcznie):
   python mpk_skaner.py --gra "C:\\...\\Where Winds Meet"
@@ -48,7 +59,7 @@ import sys
 import zipfile
 import hashlib
 
-WERSJA = "wwm-mpk-skaner-v4"
+WERSJA = "wwm-mpk-skaner-v7"
 DOMYSLNI_KANDYDACI = Path(__file__).resolve().parent / "kandydaci.jsonl"
 
 # Magie bloków rozpoznawane w paczkach Messiah (docs/MPK_FORMAT_RESEARCH.md §1.5).
@@ -494,6 +505,356 @@ def haszuj_kandydatow(
 
 
 # ---------------------------------------------------------------------------
+# AES-256-ECB (czysty Python, tylko stdlib) — prefiks bloków EZST
+# ---------------------------------------------------------------------------
+# Format EZST (docs/MPK_FORMAT_RESEARCH.md §1.5, publiczny algorytm MIT
+# z Zhincore/wwm-messiah-tools): `EZST` + u32 raw_size + payload, w którym
+# pierwsze floor16(min(len, 256)) bajtów jest zaszyfrowane AES-256-ECB,
+# a reszta to zwykła ramka zstd. Klucz jest opublikowany w tym repo (to
+# "drzwi frontowe", nie kryptografia). Do sondowania zawartości wystarczy
+# odszyfrować prefiks i zdekompresować początek ramki.
+
+EZST_KLUCZ = struct.pack(
+    "<4Q", 0x556A586E32723575, 0x38782F913F152867, 0x2D3B615062536756, 0x6B59703373367639
+)
+
+_SBOX = bytes.fromhex(
+    "637c777bf26b6fc53001672bfed7ab76ca82c97dfa5947f0add4a2af9ca472c0"
+    "b7fd9326363ff7cc34a5e5f171d8311504c723c31896059a071280e2eb27b275"
+    "09832c1a1b6e5aa0523bd6b329e32f8453d100ed20fcb15b6acbbe394a4c58cf"
+    "d0efaafb434d338545f9027f503c9fa851a3408f929d38f5bcb6da2110fff3d2"
+    "cd0c13ec5f974417c4a77e3d645d197360814fdc222a908846eeb814de5e0bdb"
+    "e0323a0a4906245cc2d3ac629195e479e7c8376d8dd54ea96c56f4ea657aae08"
+    "ba78252e1ca6b4c6e8dd741f4bbd8b8a703eb5664803f60e613557b986c11d9e"
+    "e1f8981169d98e949b1e87e9ce5528df8ca1890dbfe6426841992d0fb054bb16"
+)
+_INV_SBOX = bytearray(256)
+for _i, _s in enumerate(_SBOX):
+    _INV_SBOX[_s] = _i
+_INV_SBOX = bytes(_INV_SBOX)
+
+
+def _gf_mul(a: int, b: int) -> int:
+    wynik = 0
+    while b:
+        if b & 1:
+            wynik ^= a
+        a <<= 1
+        if a & 0x100:
+            a ^= 0x11B
+        b >>= 1
+    return wynik
+
+
+_MUL = {n: bytes(_gf_mul(n, x) for x in range(256)) for n in (2, 3, 9, 11, 13, 14)}
+_RCON = (0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C)
+
+
+def _aes256_klucze_rund(klucz: bytes) -> list[bytes]:
+    """Rozwinięcie klucza AES-256: 15 kluczy rund po 16 B."""
+    slowa = [klucz[4 * i : 4 * i + 4] for i in range(8)]
+    for i in range(8, 60):
+        temp = slowa[i - 1]
+        if i % 8 == 0:
+            temp = bytes(
+                (
+                    _SBOX[temp[1]] ^ _RCON[i // 8 - 1],
+                    _SBOX[temp[2]],
+                    _SBOX[temp[3]],
+                    _SBOX[temp[0]],
+                )
+            )
+        elif i % 8 == 4:
+            temp = bytes(_SBOX[b] for b in temp)
+        slowa.append(bytes(x ^ y for x, y in zip(slowa[i - 8], temp)))
+    return [b"".join(slowa[4 * r : 4 * r + 4]) for r in range(15)]
+
+
+_SHIFT = (0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11)
+_INV_SHIFT = (0, 13, 10, 7, 4, 1, 14, 11, 8, 5, 2, 15, 12, 9, 6, 3)
+
+
+def _aes_blok_szyfruj(blok: bytes, rundy: list[bytes]) -> bytes:
+    """Szyfrowanie pojedynczego bloku (potrzebne tylko testom syntetycznym)."""
+    stan = bytes(x ^ y for x, y in zip(blok, rundy[0]))
+    m2, m3 = _MUL[2], _MUL[3]
+    for r in range(1, 14):
+        stan = bytes(_SBOX[stan[_SHIFT[i]]] for i in range(16))
+        nowy = bytearray(16)
+        for c in range(4):
+            a0, a1, a2, a3 = stan[4 * c : 4 * c + 4]
+            nowy[4 * c + 0] = m2[a0] ^ m3[a1] ^ a2 ^ a3
+            nowy[4 * c + 1] = a0 ^ m2[a1] ^ m3[a2] ^ a3
+            nowy[4 * c + 2] = a0 ^ a1 ^ m2[a2] ^ m3[a3]
+            nowy[4 * c + 3] = m3[a0] ^ a1 ^ a2 ^ m2[a3]
+        stan = bytes(x ^ y for x, y in zip(nowy, rundy[r]))
+    stan = bytes(_SBOX[stan[_SHIFT[i]]] for i in range(16))
+    return bytes(x ^ y for x, y in zip(stan, rundy[14]))
+
+
+def _aes_blok_odszyfruj(blok: bytes, rundy: list[bytes]) -> bytes:
+    stan = bytes(x ^ y for x, y in zip(blok, rundy[14]))
+    m9, m11, m13, m14 = _MUL[9], _MUL[11], _MUL[13], _MUL[14]
+    for r in range(13, 0, -1):
+        stan = bytes(_INV_SBOX[stan[_INV_SHIFT[i]]] for i in range(16))
+        stan = bytes(x ^ y for x, y in zip(stan, rundy[r]))
+        nowy = bytearray(16)
+        for c in range(4):
+            a0, a1, a2, a3 = stan[4 * c : 4 * c + 4]
+            nowy[4 * c + 0] = m14[a0] ^ m11[a1] ^ m13[a2] ^ m9[a3]
+            nowy[4 * c + 1] = m9[a0] ^ m14[a1] ^ m11[a2] ^ m13[a3]
+            nowy[4 * c + 2] = m13[a0] ^ m9[a1] ^ m14[a2] ^ m11[a3]
+            nowy[4 * c + 3] = m11[a0] ^ m13[a1] ^ m9[a2] ^ m14[a3]
+        stan = bytes(nowy)
+    stan = bytes(_INV_SBOX[stan[_INV_SHIFT[i]]] for i in range(16))
+    return bytes(x ^ y for x, y in zip(stan, rundy[0]))
+
+
+_RUNDY_EZST: list[bytes] | None = None
+
+
+def ezst_odszyfruj_prefiks(payload: bytes) -> bytes:
+    """Odszyfruj AES-owy prefiks payloadu EZST (floor16(min(len, 256)) bajtów)."""
+    global _RUNDY_EZST
+    if _RUNDY_EZST is None:
+        _RUNDY_EZST = _aes256_klucze_rund(EZST_KLUCZ)
+    n = min(len(payload) // 16 * 16, 256)
+    kawalki = [
+        _aes_blok_odszyfruj(payload[i : i + 16], _RUNDY_EZST) for i in range(0, n, 16)
+    ]
+    return b"".join(kawalki) + payload[n:]
+
+
+def ezst_zaszyfruj_prefiks(payload: bytes) -> bytes:
+    """Odwrotność `ezst_odszyfruj_prefiks` — wyłącznie dla testów syntetycznych."""
+    global _RUNDY_EZST
+    if _RUNDY_EZST is None:
+        _RUNDY_EZST = _aes256_klucze_rund(EZST_KLUCZ)
+    n = min(len(payload) // 16 * 16, 256)
+    kawalki = [
+        _aes_blok_szyfruj(payload[i : i + 16], _RUNDY_EZST) for i in range(0, n, 16)
+    ]
+    return b"".join(kawalki) + payload[n:]
+
+
+def _zstd_backend():
+    """Backend zstd do sondy zawartości: (nazwa, dekompresuj(dane, max_wyjscie)).
+
+    Zwraca None, gdy w Pythonie właściciela nie ma ani `compression.zstd`
+    (Python 3.14+), ani pakietu `zstandard`. Sonda zawartości EZST jest wtedy
+    uczciwie pomijana — kit nadal niczego nie pobiera z sieci.
+    Ucięte wejście jest normalne (czytamy tylko głowę bloku): backend ma
+    zwracać tyle wyjścia, ile się da.
+    """
+    try:
+        from compression import zstd as _z  # Python 3.14+
+
+        def _dek_stdlib(dane: bytes, max_wyjscie: int) -> bytes:
+            try:
+                return _z.ZstdDecompressor().decompress(dane, max_wyjscie)
+            except _z.ZstdError:
+                return b""
+
+        return ("compression.zstd", _dek_stdlib)
+    except ImportError:
+        pass
+    try:
+        import io
+
+        import zstandard as _zs
+
+        def _dek_zstandard(dane: bytes, max_wyjscie: int) -> bytes:
+            try:
+                czytnik = _zs.ZstdDecompressor().stream_reader(io.BytesIO(dane))
+                return czytnik.read(max_wyjscie)
+            except _zs.ZstdError:
+                return b""
+            except OSError:
+                return b""
+
+        return ("zstandard", _dek_zstandard)
+    except ImportError:
+        return None
+
+
+# Sygnatury szukane w ZDEKODOWANEJ głowie bloku (i w blokach gołych):
+SYGNATURY_TRESCI: tuple[tuple[str, bytes], ...] = (
+    # oś czasu cutsceny — magic dekodowanego pliku .cine (priorytet 3)
+    ("cine_magic", bytes.fromhex("c159410d")),
+    # grafy Storyline (priorytet 1) — jak w skanie JSON nieskompresowanym
+    ("storyline_json", b'{"Variables":'),
+    ("storyline_node", b"GameLevelStorylineDialogsPlayNode"),
+    ("storyline_cutscene", b"DialogCutsceneSequenceNode"),
+    # skrypty klienta wskazywane przez POI (priorytet 2)
+    ("etsb_sciezka", b"client/dialogs"),
+    ("etsb_ext", b".etsb"),
+    # benchmark priorytetu 1: łańcuch scen 4700001 -> 4700041 -> 4700352
+    ("benchmark_4700001", b"4700001"),
+    ("benchmark_4700001_u32", struct.pack("<I", 4700001)),
+)
+
+
+def skanuj_ezst_w_indeksie(
+    root: Path,
+    wyjscie: Path,
+    meta_mpkinfo: dict,
+    entries: list[dict],
+    max_blok_sondy: int = 4 << 20,
+    limit_zapisu: int = 256 << 20,
+    glowa_wejscia: int = 16 * 1024,
+    glowa_wyjscia: int = 64 * 1024,
+) -> dict:
+    """Sonda zawartości bloków EZST/ZSTD wpisów indeksu + wycinanie trafień (v7).
+
+    Dla każdego wpisu `Resources.mpkinfo` (z pominięciem wpisów > max_blok_sondy —
+    duże zasoby to tekstury/dźwięk, a szukane pliki są małe):
+      1. czyta głowę bloku spod offsetu,
+      2. EZST: odszyfrowuje prefiks AES (czysty Python) i dekompresuje początek
+         ramki zstd; ZSTD/zstd-frame: dekompresuje wprost; inne magie: patrzy
+         na gołe bajty,
+      3. szuka sygnatur treści (`SYGNATURY_TRESCI`),
+      4. trafienia zapisuje SUROWO do `wyciete/ezst_<pack>_<fileid>.bin`
+         i do `wyciete/ezst_trafienia.jsonl`.
+
+    Bez backendu zstd (patrz `_zstd_backend`) sonda treści EZST/ZSTD jest
+    pomijana; sprawdzane są wtedy tylko bloki gołe, a raport mówi to wprost.
+    """
+    wynik: dict = {
+        "ok": True,
+        "indeks": meta_mpkinfo.get("nazwa"),
+        "backend_zstd": None,
+        "wpisow": len(entries),
+        "sondowanych": 0,
+        "pominietych_duzych": 0,
+        "magie": {},
+        "trafien": 0,
+        "wycietych": 0,
+        "zapisano_bajtow": 0,
+        "limit_osiagniety": False,
+        "sygnatury": {},
+        "bledy": 0,
+    }
+    backend = _zstd_backend()
+    if backend is not None:
+        wynik["backend_zstd"] = backend[0]
+    dekompresuj = backend[1] if backend is not None else None
+
+    wyciete = wyjscie / "wyciete"
+    wyciete.mkdir(parents=True, exist_ok=True)
+    jsonl = wyciete / "ezst_trafienia.jsonl"
+    magie: Counter = Counter()
+    sygnatury: Counter = Counter()
+    zapisano = 0
+
+    kontenery = {
+        int(pid): Path(k["sciezka"])
+        for pid, k in meta_mpkinfo.get("kontenery", {}).items()
+        if k.get("istnieje")
+    }
+    # Sekwencyjny odczyt: wpisy po (kontener, offset).
+    plan: dict[int, list[dict]] = {}
+    for e in entries:
+        if e["size"] > max_blok_sondy:
+            wynik["pominietych_duzych"] += 1
+            continue
+        plan.setdefault(e["pack_id"], []).append(e)
+
+    with jsonl.open("w", encoding="utf-8") as out_f:
+        for pack_id in sorted(plan):
+            kontener = kontenery.get(pack_id)
+            if kontener is None or not kontener.is_file():
+                continue
+            wpisy = sorted(plan[pack_id], key=lambda e: e["offset"])
+            try:
+                with kontener.open("rb") as fh:
+                    for e in wpisy:
+                        try:
+                            fh.seek(e["offset"])
+                            glowa = fh.read(min(e["size"], glowa_wejscia))
+                        except OSError:
+                            wynik["bledy"] += 1
+                            continue
+                        if len(glowa) < 8:
+                            continue
+                        wynik["sondowanych"] += 1
+                        magia = glowa[:4]
+                        tresc = b""
+                        if magia == b"EZST":
+                            magie["EZST"] += 1
+                            if dekompresuj is not None:
+                                tresc = dekompresuj(
+                                    ezst_odszyfruj_prefiks(glowa[8:]), glowa_wyjscia
+                                )
+                                if not tresc:
+                                    # prefiks krótszy niż floor16(256) — spróbuj bez AES
+                                    tresc = dekompresuj(glowa[8:], glowa_wyjscia)
+                        elif magia == b"ZSTD":
+                            magie["ZSTD"] += 1
+                            if dekompresuj is not None:
+                                tresc = dekompresuj(glowa[8:], glowa_wyjscia)
+                        elif magia == b"\x28\xb5\x2f\xfd":
+                            magie["zstd-frame"] += 1
+                            if dekompresuj is not None:
+                                tresc = dekompresuj(glowa, glowa_wyjscia)
+                        else:
+                            magie["gole"] += 1
+                            tresc = glowa
+                        if not tresc:
+                            continue
+                        trafione = [n for n, syg in SYGNATURY_TRESCI if syg in tresc]
+                        if not trafione:
+                            continue
+                        wynik["trafien"] += 1
+                        for n in trafione:
+                            sygnatury[n] += 1
+                        wpis_raportu = {
+                            "indeks": meta_mpkinfo.get("nazwa"),
+                            "kontener": kontener.name,
+                            "pack_id": pack_id,
+                            "offset": e["offset"],
+                            "size": e["size"],
+                            "file_id": f"{e['file_id']:016x}",
+                            "magia": magia.decode("ascii", "replace")
+                            if magia in (b"EZST", b"ZSTD")
+                            else magia.hex(),
+                            "sygnatury": trafione,
+                            "wyciety": False,
+                        }
+                        if (
+                            zapisano + e["size"] <= limit_zapisu
+                            and e["size"] <= MAX_BLOK
+                        ):
+                            try:
+                                fh.seek(e["offset"])
+                                blok = fh.read(e["size"])
+                                if len(blok) == e["size"]:
+                                    nazwa = f"ezst_{pack_id}_{e['file_id']:016x}.bin"
+                                    (wyciete / nazwa).write_bytes(blok)
+                                    zapisano += len(blok)
+                                    wynik["wycietych"] += 1
+                                    wpis_raportu["wyciety"] = True
+                                    wpis_raportu["plik"] = nazwa
+                            except OSError:
+                                wynik["bledy"] += 1
+                        else:
+                            wynik["limit_osiagniety"] = wynik["limit_osiagniety"] or (
+                                zapisano + e["size"] > limit_zapisu
+                            )
+                        out_f.write(json.dumps(wpis_raportu, ensure_ascii=False) + "\n")
+            except OSError:
+                wynik["bledy"] += 1
+                continue
+            print(
+                f"        {kontener.name}: wpisów {len(wpisy)}, "
+                f"trafień dotąd {wynik['trafien']}, wyciętych {wynik['wycietych']}"
+            )
+    wynik["magie"] = dict(magie)
+    wynik["sygnatury"] = dict(sygnatury)
+    wynik["zapisano_bajtow"] = zapisano
+    return wynik
+
+
+# ---------------------------------------------------------------------------
 # Wycinanie surowych bloków (bramka 2) — bez dekodowania EZST/ZSTD
 # ---------------------------------------------------------------------------
 
@@ -813,10 +1174,13 @@ def buduj_raport(args: argparse.Namespace) -> int:
 
     mpkinfo_lookup: list[tuple[str, dict[int, dict]]] = []
     probki: dict[str, dict] = {}
+    ezst_cel: tuple[dict, list[dict]] | None = None
 
     for mpkinfo_path in indeksy["mpkinfo"]:
         meta = parsuj_mpkinfo(root, Path(mpkinfo_path))
         entries = meta.pop("_entries", [])
+        if meta.get("ok") and meta.get("nazwa") == "Resources.mpkinfo":
+            ezst_cel = (meta, entries)
         lookup = {e["file_id"]: e for e in entries}
         mpkinfo_lookup.append((meta["nazwa"], lookup))
         if meta["ok"]:
@@ -890,15 +1254,49 @@ def buduj_raport(args: argparse.Namespace) -> int:
             print(f"      UWAGA: zrzut Patch.mpkdb przerwany: {e}")
         try:
             w4 = skanuj_storyline_w_paczkach(root, wyjscie)
-            if isinstance(wycinanie, dict):
-                wycinanie["resources_storyline"] = {k: v for k, v in w4.items() if k != "lista"}
-                wycinanie["resources_storyline_trafienia"] = w4.get("lista", [])[:200]
+            raport["resources_storyline"] = {k: v for k, v in w4.items() if k != "lista"}
             print(
                 f"      Resources*.mpk (storyline/sceny): przeszukano {w4['przeszukano_paczek']} paczek, "
                 f"trafień {w4['trafien']} ({w4['zapisano_bajtow']} B)"
             )
         except Exception as e:
+            raport["resources_storyline"] = {"ok": False, "powod": str(e)}
             print(f"      UWAGA: skanowanie Resources*.mpk przerwane: {e}")
+        if args.bez_ezst:
+            raport["ezst_sonda"] = {"ok": False, "powod": "--bez-ezst"}
+            print("      (--bez-ezst: pomijam sondę zawartości bloków EZST)")
+        elif ezst_cel is None:
+            raport["ezst_sonda"] = {"ok": False, "powod": "brak czytelnego Resources.mpkinfo"}
+            print("      UWAGA: brak czytelnego Resources.mpkinfo — sonda EZST pominięta")
+        else:
+            try:
+                backend = _zstd_backend()
+                if backend is None:
+                    print(
+                        "      UWAGA: brak modułu zstd (Python 3.14+ albo pakiet 'zstandard')\n"
+                        "             — sonda EZST obejmie tylko bloki gołe (bez dekompresji)."
+                    )
+                print(
+                    "      Sonda EZST (Resources*.mpk): to potrwa — czytam głowy wszystkich "
+                    f"małych wpisów (≤ {args.ezst_max_blok_mb} MB) ..."
+                )
+                w5 = skanuj_ezst_w_indeksie(
+                    root,
+                    wyjscie,
+                    ezst_cel[0],
+                    ezst_cel[1],
+                    max_blok_sondy=args.ezst_max_blok_mb << 20,
+                    limit_zapisu=args.ezst_limit_mb << 20,
+                )
+                raport["ezst_sonda"] = w5
+                print(
+                    f"      Sonda EZST: sondowanych {w5['sondowanych']}, trafień {w5['trafien']}, "
+                    f"wyciętych {w5['wycietych']} ({w5['zapisano_bajtow']} B), "
+                    f"backend zstd: {w5['backend_zstd'] or 'BRAK'}"
+                )
+            except Exception as e:
+                raport["ezst_sonda"] = {"ok": False, "powod": f"wyjątek: {e}"}
+                print(f"      UWAGA: sonda EZST przerwana: {e}")
     else:
         print("[4/5] (--bez-wycinania: pomijam wycinanie bloków)")
     raport["wycinanie"] = wycinanie
@@ -959,12 +1357,30 @@ def _posumowanie(raport: dict) -> str:
     a(f"Kandydaci wczytani: {raport['kandydaci_wczytani']}")
     traf = raport["trafienia_kandydatow"]
     a(f"Trafień w indeksach: {len(traf)}")
-    for t in traf:
+    for t in traf[:300]:
         a(f"  {t['sciezka']}")
         a(f"      -> {t['indeks']}, pack {t['pack_id']}, offset {t['offset']}, size {t['size']}")
+    if len(traf) > 300:
+        a(f"  ... oraz {len(traf) - 300} dalszych (pełna lista w RAPORT.json)")
     if not traf:
         a("  (brak — wzorce ścieżek nietrafione albo pliki są w paczkach bez indeksu)")
     a("")
+    sonda = raport.get("ezst_sonda")
+    if sonda:
+        a("Sonda zawartości bloków EZST (v7):")
+        if sonda.get("sondowanych") is not None:
+            a(f"  backend zstd: {sonda.get('backend_zstd') or 'BRAK (sonda tylko bloków gołych)'}")
+            a(f"  sondowanych wpisów: {sonda.get('sondowanych')} "
+              f"(pominięto dużych: {sonda.get('pominietych_duzych')})")
+            a(f"  magie bloków: {sonda.get('magie')}")
+            a(f"  trafień treści: {sonda.get('trafien')}; "
+              f"wyciętych bloków: {sonda.get('wycietych')} ({sonda.get('zapisano_bajtow')} B)")
+            a(f"  sygnatury: {sonda.get('sygnatury')}")
+            if sonda.get("limit_osiagniety"):
+                a("  UWAGA: osiągnięto limit zapisu — część trafień tylko w ezst_trafienia.jsonl")
+        else:
+            a(f"  POMINIĘTA — {sonda.get('powod')}")
+        a("")
     if raport.get("wycinanie"):
         a("Wycinanie surowych bloków (bez dekodowania EZST):")
         for w in raport["wycinanie"]:
@@ -1006,6 +1422,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--probka", type=int, default=12, help="ile wejść próbkować na paczkę (domyślnie 12)")
     parser.add_argument("--non-interactive", action="store_true", help="bez pytań; brak --gra = błąd")
     parser.add_argument("--bez-wycinania", action="store_true", help="pomiń krok wycinania surowych bloków")
+    parser.add_argument("--bez-ezst", action="store_true", help="pomiń sondę zawartości bloków EZST (v7)")
+    parser.add_argument("--ezst-max-blok-mb", type=int, default=4,
+                        help="sonduj tylko wpisy do tylu MB (domyślnie 4; większe to tekstury/dźwięk)")
+    parser.add_argument("--ezst-limit-mb", type=int, default=256,
+                        help="łączny limit MB na surowe bloki wycięte przez sondę EZST (domyślnie 256)")
     args = parser.parse_args(argv)
 
     if not args.gra:
