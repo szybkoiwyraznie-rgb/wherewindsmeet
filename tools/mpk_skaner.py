@@ -885,16 +885,20 @@ def buduj_raport(args: argparse.Namespace) -> int:
                 if w3.get("ok")
                 else {"ok": False, "powod": w3.get("powod")}
             )
+        except Exception as e:
+            raport["mpkdb_zrzut"] = {"ok": False, "powod": f"wyjątek: {e}"}
+            print(f"      UWAGA: zrzut Patch.mpkdb przerwany: {e}")
+        try:
             w4 = skanuj_storyline_w_paczkach(root, wyjscie)
-            wycinanie["resources_storyline"] = {k: v for k, v in w4.items() if k != "lista"}
-            wycinanie["resources_storyline_trafienia"] = w4.get("lista", [])[:200]
+            if isinstance(wycinanie, dict):
+                wycinanie["resources_storyline"] = {k: v for k, v in w4.items() if k != "lista"}
+                wycinanie["resources_storyline_trafienia"] = w4.get("lista", [])[:200]
             print(
                 f"      Resources*.mpk (storyline/sceny): przeszukano {w4['przeszukano_paczek']} paczek, "
                 f"trafień {w4['trafien']} ({w4['zapisano_bajtow']} B)"
             )
         except Exception as e:
-            raport["mpkdb_zrzut"] = {"ok": False, "powod": f"wyjątek: {e}"}
-            print(f"      UWAGA: zrzut Patch.mpkdb przerwany: {e}")
+            print(f"      UWAGA: skanowanie Resources*.mpk przerwane: {e}")
     else:
         print("[4/5] (--bez-wycinania: pomijam wycinanie bloków)")
     raport["wycinanie"] = wycinanie
