@@ -3,7 +3,7 @@
 
 1. `01_sceny_i_cutsceny.md` — sceny **i** cutsceny razem, chronologicznie:
    filmy otwierające, prolog w kolejności sprawdzonej z transkryptem, potem krainy
-   w kolejności odwiedzania (sceny po numerze dialogu), na końcu pozostałe pule
+   w kolejności odwiedzania (sceny w porządku grafu następstw), na końcu pozostałe pule
    napisów przerywników.
 2. `02_kontekst_scen_i_cutscen.md` — kontekst do tych samych jednostek i w tej
    samej kolejności: postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki

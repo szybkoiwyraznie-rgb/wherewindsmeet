@@ -19,7 +19,15 @@ Zasady kolejności (te same, co w ustaleniach):
 
 1. filmy i pieśni (1–3) — na końcu, bo w grze nie ma ich na początku,
 2. prolog w kolejności transkryptu — napisy i dialogi przemieszane,
-3. krainy w kolejności odwiedzania, w krainie sceny po numerze dialogu,
+3. krainy w kolejności odwiedzania; **w krainie sceny w porządku grafu
+   następstw** (`index/mpk/nastepstwa_scen.jsonl`: POI→scena, graf zadań,
+   `branch_dialog_subsequent`, przebieg z gry) — łańcuch połączonych scen
+   stoi w całości, scena po scenie, tak jak widzi go gracz; sceny bez
+   krawędzi w grafie stoją między łańcuchami po numerze dialogu; cykle
+   w grafie rwiemy deterministycznie na najmniejszym numerze,
+3a. cutsceny z grafu następstw stoją **dokładnie między swoimi scenami**
+   (np. 4700385 → cutscena 30162 → 30165 → scena 4700068); dopiero gdy graf
+   ich nie zna, działa dotychczasowa kotwica grupy zadań (pkt 4),
 4. cutsceny **przypisane do grupy zadań** (tabela powtórek: `no` → `grupa`,
    a grupa ma zakres numerów dialogów) stoją przy scenie, od której ta grupa
    się zaczyna — dzięki temu przerywniki są przemieszane ze scenami, choć same
@@ -87,6 +95,141 @@ def _kraina_scen(ix, krainy: list[dict]) -> tuple[dict[int, str], list[str]]:
         przypisanie[numer] = next((mapa_kraina[m] for m in mapy if m in mapa_kraina), BEZ_MAPY)
     kolejnosc = [k["kraina"] for k in krainy] + [BEZ_MAPY]
     return przypisanie, kolejnosc
+
+
+def _graf_nastepstw(index: str | Path) -> tuple[dict[tuple[int, int], set[str]],
+                                                dict[int, list[int]],
+                                                dict[int, list[int]]]:
+    """Graf następstw z `index/mpk/nastepstwa_scen.jsonl`.
+
+    Zwraca:
+    * krawędzie scena→scena ze źródłami (z kontrakcją cutscen:
+      scena→cutsceny*→scena daje krawędź scena→scena, żeby porządek scen
+      szanował też łańcuchy przechodzące przez przerywniki),
+    * cutsceny bezpośrednio po scenie (scena → posortowana lista cutscen),
+    * cutsceny po cutscenie (cutscena → posortowana lista cutscen).
+    """
+    plik = Path(index) / "mpk" / "nastepstwa_scen.jsonl"
+    krawedzie: dict[tuple[int, int], set[str]] = {}
+    po_scenie: dict[int, set[int]] = defaultdict(set)
+    po_cucie: dict[int, set[int]] = defaultdict(set)
+    cut_do_scen: dict[int, set[int]] = defaultdict(set)
+    if not plik.exists():
+        return krawedzie, {}, {}
+    for linia in plik.open(encoding="utf-8"):
+        wiersz = json.loads(linia)
+        (tz, nz), (td, nd) = wiersz["z"], wiersz["do"]
+        zrodla = set(wiersz.get("zrodla") or [])
+        if tz == "scena" and td == "scena":
+            if nz != nd:
+                krawedzie.setdefault((int(nz), int(nd)), set()).update(zrodla)
+        elif tz == "scena" and td == "cutscena":
+            po_scenie[int(nz)].add(int(nd))
+        elif tz == "cutscena" and td == "cutscena":
+            if nz != nd:
+                po_cucie[int(nz)].add(int(nd))
+        elif tz == "cutscena" and td == "scena":
+            cut_do_scen[int(nz)].add(int(nd))
+    # kontrakcja: scena → (cutsceny)* → scena
+    for scena, cuty in po_scenie.items():
+        widziane: set[int] = set()
+        stos = list(cuty)
+        while stos:
+            cut = stos.pop()
+            if cut in widziane:
+                continue
+            widziane.add(cut)
+            for cel in cut_do_scen.get(cut, ()):
+                if cel != scena:
+                    krawedzie.setdefault((scena, cel), set()).add("zadania")
+            stos.extend(po_cucie.get(cut, ()))
+    return (krawedzie,
+            {s: sorted(c) for s, c in po_scenie.items()},
+            {c: sorted(n) for c, n in po_cucie.items()})
+
+
+def _porzadek_scen(numery: list[int],
+                   krawedzie: dict[tuple[int, int], set[str]]) -> list[int]:
+    """Porządek scen w krainie: topologiczny po grafie następstw.
+
+    Deterministyczny i czytelny dla czytelnika:
+    * graf jest rzutowany na sceny krainy — krawędź przechodząca przez scenę
+      spoza zbioru (pustą albo z innej krainy) nie znika, tylko łączy jej
+      sąsiadów (kontrakcja ścieżki),
+    * scena czeka, aż wszystkie jej poprzedniki z grafu już stoją,
+    * po wyemitowaniu sceny jej świeżo odblokowany następnik wchodzi
+      **natychmiast** (łańcuchy są ciągłe, jak w grze); przy rozwidleniu
+      pierwszeństwo ma krawędź potwierdzona przebiegiem z gry („gra"),
+      potem najmniejszy numer,
+    * gdy żaden łańcuch nie czeka, wchodzi najmniejszy wolny numer,
+    * cykl w grafie rwiemy na najmniejszym zablokowanym numerze.
+    """
+    import heapq
+
+    zbior = set(numery)
+    pelne: dict[int, dict[int, set[str]]] = defaultdict(dict)
+    for (a, b), zrodla in krawedzie.items():
+        stare = pelne[a].get(b)
+        pelne[a][b] = (stare | zrodla) if stare else set(zrodla)
+
+    # rzutowanie na zbiór: omiń węzły spoza krainy, dziedzicząc źródła ścieżki
+    nastepniki: dict[int, dict[int, set[str]]] = {n: {} for n in numery}
+    stopien = {n: 0 for n in numery}
+    for a in numery:
+        widziane: set[int] = set()
+        stos = [(b, zrodla) for b, zrodla in pelne.get(a, {}).items()]
+        while stos:
+            b, zrodla = stos.pop()
+            if b == a:
+                continue
+            if b in zbior:
+                if b not in nastepniki[a]:
+                    nastepniki[a][b] = set(zrodla)
+                    stopien[b] += 1
+                else:
+                    nastepniki[a][b] |= zrodla
+            elif b not in widziane:
+                widziane.add(b)
+                for c, dalsze in pelne.get(b, {}).items():
+                    stos.append((c, zrodla | dalsze))
+
+    def _priorytet(zrodla: set[str], numer: int) -> tuple[int, int]:
+        return (0 if "gra" in zrodla else 1, numer)
+
+    gotowe = [n for n in numery if stopien[n] == 0]
+    heapq.heapify(gotowe)
+    zablokowane = {n for n in numery if stopien[n] > 0}
+    wynik: list[int] = []
+
+    while gotowe or zablokowane:
+        if not gotowe:
+            # cykl: uwolnij najmniejszy zablokowany numer
+            numer = min(zablokowane)
+            zablokowane.discard(numer)
+            stopien[numer] = 0
+            heapq.heappush(gotowe, numer)
+            continue
+        numer = heapq.heappop(gotowe)
+        while numer is not None:
+            if stopien[numer] != 0:       # wyemitowany albo uwolniony podwójnie
+                break
+            wynik.append(numer)
+            stopien[numer] = -1
+            swiezo: list[tuple[tuple[int, int], int]] = []
+            for nastepny, zrodla in nastepniki.get(numer, {}).items():
+                if stopien[nastepny] > 0:
+                    stopien[nastepny] -= 1
+                    if stopien[nastepny] == 0:
+                        zablokowane.discard(nastepny)
+                        swiezo.append((_priorytet(zrodla, nastepny), nastepny))
+            if swiezo:
+                swiezo.sort()
+                numer = swiezo[0][1]       # kontynuuj łańcuch
+                for _, pozostaly in swiezo[1:]:
+                    heapq.heappush(gotowe, pozostaly)
+            else:
+                numer = None
+    return wynik
 
 
 def _zrodlo_tabeli(ix, klucz: str) -> str | None:
@@ -480,16 +623,52 @@ def zbuduj(*, index: str = "index", magazyn: str = "tlumaczenie", wyj: Path = DO
             osobne_napisy.append({"t": "napisy", "e": blok["e"],
                                   "s": PULA_NAPISOW, "k": klucze})
 
+    # Graf następstw: porządek scen w krainie + cutsceny między swoimi scenami.
+    krawedzie, cuty_po_scenie, cuty_po_cucie = _graf_nastepstw(index)
+    sceny_zbior = set(sceny)
+
+    def _lancuch_cutscen(start: list[int]) -> list[int]:
+        """Cutsceny po scenie, w kolejności łańcucha z grafu (potem numer)."""
+        wynik, stos, widziane = [], sorted(start, reverse=True), set()
+        while stos:
+            cut = stos.pop()
+            if cut in widziane:
+                continue
+            widziane.add(cut)
+            wynik.append(cut)
+            stos.extend(sorted(cuty_po_cucie.get(cut, ()), reverse=True))
+        return wynik
+
+    # cutsceny, które graf stawia po konkretnej scenie — wyjmij je ze starych
+    # miejsc (kotwica grupy zadań / koniec krainy / bez grupy)
+    cuty_z_grafu: set[int] = set()
+    for numer_sceny, cuty in cuty_po_scenie.items():
+        if numer_sceny in sceny_zbior:
+            cuty_z_grafu.update(c for c in _lancuch_cutscen(cuty)
+                                if c in cutsceny_wg_numeru)
+
+    cut_umieszczone: set[int] = set()
     for kraina in kolejnosc_krain:
-        for numer in (n for n in sceny if przypisanie.get(n) == kraina):
+        numery = [n for n in sceny if przypisanie.get(n) == kraina]
+        for numer in _porzadek_scen(numery, krawedzie):
             for jednostka in wstawki.get((kraina, numer), ()):
+                if jednostka["n"] in cuty_z_grafu:
+                    continue
                 jednostki.append({**jednostka, "s": kraina})
             jednostki.append({"t": "scena", "n": numer, "s": kraina})
+            for cut in _lancuch_cutscen(cuty_po_scenie.get(numer, [])):
+                if cut in cuty_z_grafu and cut not in cut_umieszczone:
+                    cut_umieszczone.add(cut)
+                    jednostki.append({**cutsceny_wg_numeru[cut], "s": kraina})
         for jednostka in przeniesione.get(kraina, ()):
+            if jednostka["n"] in cuty_z_grafu:
+                continue
             jednostki.append({**jednostka, "s": kraina})
 
     cutsceny_bez_grupy.sort(key=lambda j: j["n"])
     for jednostka in cutsceny_bez_grupy:
+        if jednostka["n"] in cuty_z_grafu:
+            continue
         jednostki.append({**jednostka, "s": BEZ_GRUPY})
 
     # napisy bez rozpoznanej cutsceny — w kolejności z pliku gry, nie alfabetycznie

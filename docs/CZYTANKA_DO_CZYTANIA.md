@@ -28,8 +28,14 @@ Zasady kolejności:
 2. **prolog** w kolejności transkryptu właściciela (sekcje numerowane
    `Prolog 1…4`; komentarze z transkryptu to notatki dla nas, nie nazwy scen)
    (`zwrotki/prolog_transkrypt_z_gry.txt`, w repo) — napisy i dialogi przemieszane,
-3. **krainy** w kolejności odwiedzania (`index/prowincje.json`), w krainie **sceny
-   po numerze dialogu**,
+3. **krainy** w kolejności odwiedzania (`index/prowincje.json`); w krainie **sceny
+   w porządku grafu następstw** (`index/mpk/nastepstwa_scen.jsonl` — POI→scena,
+   graf zadań, `branch_dialog_subsequent`, przebieg z gry): łańcuch połączonych
+   scen stoi w całości, scena po scenie, tak jak widzi go gracz (benchmark:
+   `4700037 → 4700001 → 4700041 → 4700352 → 4700002 → …`); sceny bez krawędzi
+   stoją między łańcuchami po numerze dialogu; cutsceny znane grafowi stoją
+   **dokładnie między swoimi scenami** (`4700385 → cutscena 30162 → 30165 →
+   4700068`), a kotwica grupy zadań działa dopiero dla pozostałych,
 4. **cutsceny przypisane do grupy zadań** stoją przy scenie, od której ich grupa
    się zaczyna (tabela powtórek daje `no` przerywnika → `grupa`, a grupa ma
    zakres numerów dialogów). Kotwicą jest **pierwsza scena grupy z przypisaną

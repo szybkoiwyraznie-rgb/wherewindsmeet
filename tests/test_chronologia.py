@@ -62,21 +62,55 @@ class TestZapisanaChronologia(unittest.TestCase):
                 kolejnosc.append(kraina)
         self.assertEqual(len(kolejnosc), len(set(kolejnosc)), "kraina wraca po innej")
 
-    def test_sceny_po_numerze_w_krainie(self):
+    def test_sceny_wg_grafu_nastepstw(self):
+        """Porządek scen w krainie szanuje graf następstw; sceny bez krawędzi
+        stoją między łańcuchami po numerze dialogu."""
+        pozycja: dict[tuple[str, int], int] = {}
+        for i, j in enumerate(self.jednostki):
+            if j["t"] in ("scena", "cutscena") and j.get("n") is not None:
+                pozycja.setdefault((j["t"], int(j["n"])), i)
+        krawedzie, _, _ = chronologia._graf_nastepstw(KATALOG / "index")
+        w_grafie = {n for a, b in krawedzie for n in (a, b)}
+        # sceny spoza grafu rosną numerem wewnątrz krainy
         ostatnia, poprzedni = None, None
         for jednostka in self.jednostki:
-            if jednostka["t"] != "scena":
+            if jednostka["t"] != "scena" or int(jednostka["n"]) in w_grafie:
                 continue
             if jednostka["s"] == poprzedni:
                 self.assertGreater(int(jednostka["n"]), int(ostatnia))
             poprzedni, ostatnia = jednostka["s"], jednostka["n"]
 
+    def test_benchmark_przebiegu_z_gry(self):
+        """Potwierdzony w grze ciąg z POI Dragon Pattern Mark stoi w całości,
+        scena po scenie, z cutscenami między swoimi scenami."""
+        pozycja: dict[tuple[str, int], int] = {}
+        for i, j in enumerate(self.jednostki):
+            if j.get("n") is not None:
+                pozycja.setdefault((j["t"], int(j["n"])), i)
+        lancuch = [("scena", 4700037), ("scena", 4700001), ("scena", 4700041),
+                   ("scena", 4700352), ("scena", 4700002), ("scena", 4700003),
+                   ("scena", 4700005), ("scena", 4700377), ("scena", 4700384),
+                   ("scena", 4700385), ("cutscena", 30162), ("cutscena", 30165),
+                   ("scena", 4700068)]
+        pozycje = [pozycja.get(w) for w in lancuch]
+        self.assertNotIn(None, pozycje, f"brak jednostek łańcucha: {lancuch}")
+        self.assertEqual(pozycje, sorted(pozycje), "łańcuch z gry nie rośnie")
+        self.assertEqual(pozycje[-1] - pozycje[0], len(lancuch) - 1,
+                         "łańcuch z gry nie jest ciągły")
+
     def test_cutsceny_przy_scenie_swojej_grupy(self):
+        """Cutscena w krainie stoi albo przy scenie swojej grupy zadań (`g`),
+        albo w miejscu wskazanym przez graf następstw (scena → cutscena)."""
+        _, cuty_po_scenie, cuty_po_cucie = chronologia._graf_nastepstw(
+            KATALOG / "index")
+        z_grafu = ({c for cuty in cuty_po_scenie.values() for c in cuty}
+                   | {c for cuty in cuty_po_cucie.values() for c in cuty})
         przypisane = [j for j in self.jednostki
                       if j["t"] == "cutscena" and j["s"] not in (chronologia.BEZ_GRUPY, "Prolog")]
         self.assertGreater(len(przypisane), 100)
         for jednostka in przypisane:
-            self.assertIn("g", jednostka)
+            self.assertTrue("g" in jednostka or int(jednostka["n"]) in z_grafu,
+                            f"cutscena bez grupy i bez miejsca w grafie: {jednostka}")
             self.assertTrue(jednostka.get("k"))
 
     def test_cutscena_w_prologu_ma_streszczenie(self):

@@ -506,9 +506,11 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
   (brak w danych klienta) — krawędź utrwalona jako źródło „gra".
   Nowy indeks `index/mpk/sceny_ambient_kity.jsonl` (53 601 wierszy): 43 877 scen
   ambientowych z pozycją XYZ — do grupowania czytanki wg miejsc.
-- **Następny krok:** (a) czytanka v12 na `nastepstwa_scen.jsonl` +
-  przeplocie scena↔cutscena — najpierw krótka propozycja zmian układu dla
-  właściciela; (b) kolejność KWESTII wewnątrz sceny: osie
+- **Czytanka v12 DOWIEZIONA (wpis (7)):** chronologia liczona topologicznie
+  z grafu następstw (łańcuchy scen w całości, cutsceny między swoimi scenami,
+  pierwszeństwo krawędzi „gra"); benchmark właściciela stoi ciągiem;
+  `dist/WWM_Czytanka_PL_v12.zip` na Dysku.
+- **Następny krok:** (a) uwagi właściciela do układu v12; (b) kolejność KWESTII wewnątrz sceny: osie
   `dialog_timelines.<scena>` istnieją w bazie (TimelinePObject z trackami
   per postać) — do przebadania; (c) kit v8: jawni kandydaci
   `Storyline/<ścieżka>` (75 POI + 519 `.etsb`/`.ets` + 32 `storyline_path`)

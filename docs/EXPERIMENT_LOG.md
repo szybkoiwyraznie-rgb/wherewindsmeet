@@ -1916,3 +1916,25 @@ benchmarku; tabele `npc_dialog_select`/`scene_dialog_data`/`npc_tag_dialog`
 itd. bez śladu 4700352; trafienie `npc_dialog_select.14900115` to substring
 34700001; graf `duanqiao.ets` i cały korpus grafów nie niosą numerów scen
 ambientowych.
+
+## 2026-11-18 (7) — chronologia z grafu następstw: czytanka v12
+
+`tools/chronologia.py` układa teraz sceny w krainie **topologicznie po grafie
+następstw** (`index/mpk/nastepstwa_scen.jsonl`, 18 625 krawędzi), nie po
+numerze dialogu. Zasady: łańcuch połączonych scen emitowany w całości (świeżo
+odblokowany następnik wchodzi natychmiast); przy rozwidleniu pierwszeństwo ma
+krawędź ze źródłem „gra"; graf rzutowany na sceny krainy z kontrakcją ścieżek
+(scena pusta/z innej krainy nie rwie mostu — np. 4700346 bez treści łączyła
+4700001→4700002); cutsceny znane grafowi stoją dokładnie między swoimi
+scenami; cykle rwane deterministycznie na najmniejszym numerze; sceny bez
+krawędzi jak dotąd po numerze.
+
+Benchmark właściciela w `index/chronologia.jsonl` stoi ciągiem (pozycje
+8063–8075): `4700037 → 4700001 → 4700041 → 4700352 → 4700002 → 4700003 →
+4700005 → 4700377 → 4700384 → 4700385 → [cutscena 30162] → [30165] →
+4700068` — dokładnie przebieg z gry. Pilnuje tego nowy test
+`test_benchmark_przebiegu_z_gry`; test porządku numerycznego zawężony do scen
+spoza grafu; cutsceny w krainie mogą stać z grafu (bez pola `g`).
+
+Czytanka v12: `dist/WWM_Czytanka_PL_v12.zip` (6,8 MB) z tej chronologii —
+dostarczona na Dysk. 588 testów OK.
