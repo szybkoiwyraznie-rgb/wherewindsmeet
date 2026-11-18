@@ -35,6 +35,7 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
 | `cine_ujecia.jsonl` | **978 masterów `.cine`** z przebiegu v7: ścieżka, numery cutscen, **uporządkowana lista pod-ujęć** (5 022 dzieci, 5 021 potwierdzone w paczkach po `file_id`) — kolejność ujęć przerywnika wprost z osi czasu gry; generator `tools/wynik7_indeksy.py` |
 | `etsb_storyline.jsonl` | **6 961 rozwiązanych skryptów `Storyline/<ścieżka>.etsb`** (reguła VFS: prefiks `Storyline/`): file_id, kontener + fakty z grafu (sceny `dialogs_no`, cutsceny, zadania, zagnieżdżone skrypty); zawiera benchmark POI `Storyline/client/dialogs/hjt/sxd_longwenbiaoji.etsb → scena 4700001` |
 | `storyline_sceny.jsonl` | **8 948 grafów Storyline** z przebiegu v7 (bloki EZST + kandydaci + skan goły, dedup): sceny/cutsceny/zadania/skrypty w grafie + `nastepstwa` — krawędzie przez węzły pośrednie: 3 909 scena→scena (1 508 unikalnych), 235 cutscena→scena, 182 scena→cutscena, 192 cutscena→cutscena |
+| `poi_storyline_sceny.jsonl` | **191 POI z `interact_storyline`** (`index/poi.jsonl`) skrzyżowane z `etsb_storyline.jsonl`: 61 ze sceną (w tym benchmark POI 200046001 → `sxd_longwenbiaoji.etsb` → scena 4700001), 55 bez scen w grafie, 75 nierozwiązanych (głowa sondy nie trafiła — kandydaci do kitu v8); generator `tools/poi_storyline_sceny.py` |
 
 ## Reguły VFS — potwierdzone na danych gry (2026-11-17)
 

@@ -1,0 +1,191 @@
+{"poi": 102, "status": "nierozwiazany", "storyline": "client/interact/npc_interact"}
+{"file_id": "2c8e1cd26f616937", "poi": 100125, "sceny": [1702110], "status": "sceny", "storyline": "client/wanfa/MSD_ST/TBG_ST/TBG_shuzhou_mudiao.ets"}
+{"file_id": "c20281df676f6c3c", "poi": 100129, "sceny": [1702062], "status": "sceny", "storyline": "client/wanfa/MSD_ST/TBG_ST/TBG_shuzhou_dizi_dialog.etsb"}
+{"file_id": "5869367a676e6939", "poi": 100131, "sceny": [1702112], "status": "sceny", "storyline": "client/wanfa/MSD_ST/TBG_ST/TBG_shuzhou_juziling.ets"}
+{"poi": 160002, "status": "nierozwiazany", "storyline": "client/interact/compound_fire.ets"}
+{"poi": 160003, "status": "nierozwiazany", "storyline": "client/interact/compound_fire.ets"}
+{"poi": 160004, "status": "nierozwiazany", "storyline": "client/interact/compound_platform.ets"}
+{"file_id": "dc66deab7265742f", "poi": 160023, "sceny": [4700233], "status": "sceny", "storyline": "client/dialogs/gfz/langshumiji_letter.etsb"}
+{"poi": 290007, "status": "nierozwiazany", "storyline": "client/wanfa/fsbd/baowenxu_fsbd_huahai"}
+{"file_id": "dfc511ac315f3127", "poi": 360085, "sceny": [3401669, 9200416], "status": "sceny", "storyline": "client/guanqia/ymg_cc/ymg_1_1.ets"}
+{"poi": 360086, "status": "nierozwiazany", "storyline": "client/guanqia/ymg_cc/ymg_cc_chuansong_2597.ets"}
+{"poi": 360087, "status": "nierozwiazany", "storyline": "client/guanqia/ymg_cc/ymg_cc_chuansong_2598.ets"}
+{"poi": 360088, "status": "nierozwiazany", "storyline": "client/guanqia/ymg_cc/ymg_cc_chuansong_2599.ets"}
+{"poi": 360090, "status": "nierozwiazany", "storyline": "client/guanqia/ymg_cc/ymg_cc_chuansong_2609.ets"}
+{"poi": 1000003, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"poi": 1000301, "status": "nierozwiazany", "storyline": "client/interact/steal_npc"}
+{"file_id": "e31a0e4b6965622f", "poi": 1002023, "sceny": [1010318], "status": "sceny", "storyline": "client/interact/yumenguan_luotuomubei.etsb"}
+{"poi": 5003901, "status": "nierozwiazany", "storyline": "client/interact/xuanshang_board"}
+{"cutsceny": [90035], "file_id": "6df258b775796f33", "poi": 7010301, "status": "bez_scen", "storyline": "client/wanfa/jiayuan/jiayuan_yinru_diaoyu.ets"}
+{"poi": 7010601, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"poi": 15017900, "status": "nierozwiazany", "storyline": "client/wanfa/tianshanglai/down_zhedieti"}
+{"file_id": "a428cbf56e696a2c", "poi": 18029800, "sceny": [2560485, 2560486], "status": "sceny", "storyline": "client/guanqia/QZ_chonger/gp_mojin.ets"}
+{"file_id": "dcb2a4e532306e2e", "poi": 18029900, "sceny": [2560485, 2560488], "status": "sceny", "storyline": "client/guanqia/QZ_chonger/gp_mojin02.ets"}
+{"file_id": "f59cdf2c33306e2e", "poi": 18030000, "sceny": [2560485, 2560490], "status": "sceny", "storyline": "client/guanqia/QZ_chonger/gp_mojin03.ets"}
+{"cutsceny": [32430], "file_id": "33fb6aeb65747130", "poi": 18030100, "sceny": [2560492, 2560494], "status": "sceny", "storyline": "client/guanqia/QZ_chonger/gp_mojin_qte.ets"}
+{"poi": 21002000, "status": "nierozwiazany", "storyline": "client/interact/look_at_diaoxiang"}
+{"file_id": "22775dc4676e6132", "poi": 31007000, "sceny": [1023002, 1025100], "status": "sceny", "storyline": "client/dialogs/rz/task_kongzhongbaoxiang.etsb"}
+{"file_id": "0d64a8777568732f", "poi": 31007100, "status": "bez_scen", "storyline": "client/dialogs/shs/wulinlu_baiqingshu.etsb"}
+{"poi": 31007300, "status": "nierozwiazany", "storyline": "client/wanfa/wulinlu/tj_qishu"}
+{"file_id": "23b0f7ff696a6929", "poi": 31007400, "status": "bez_scen", "storyline": "client/dialogs/shs/wulinlu_biji.etsb"}
+{"file_id": "2215eefe6e616931", "poi": 32000200, "status": "bez_scen", "storyline": "client/dialogs/hjt/zhuiyi_zhizixiaojian.etsb"}
+{"poi": 32001400, "status": "nierozwiazany", "storyline": "client/wanfa/ptkh/ptkh_qiaogu_01"}
+{"poi": 32001500, "status": "nierozwiazany", "storyline": "client/wanfa/ptkh/ptkh_qiaogu_02"}
+{"poi": 32001600, "status": "nierozwiazany", "storyline": "client/wanfa/ptkh/ptkh_qiaogu_03"}
+{"poi": 32006700, "status": "nierozwiazany", "storyline": "client/guanqia/xiaozhang/xzzs_zaobei_cc_01"}
+{"poi": 32006800, "status": "nierozwiazany", "storyline": "client/guanqia/xiaozhang/xzzs_zaobei_cc_02"}
+{"poi": 32006900, "status": "nierozwiazany", "storyline": "client/guanqia/xiaozhang/xzzs_zaobei_cc_03"}
+{"poi": 32007000, "status": "nierozwiazany", "storyline": "client/guanqia/xiaozhang/xzzs_yishu_cc_01"}
+{"poi": 32007400, "status": "nierozwiazany", "storyline": "client/guanqia/dyl_xch/tls_task_360767"}
+{"poi": 41000000, "status": "nierozwiazany", "storyline": "client/interact/shijianshi"}
+{"poi": 41000901, "status": "nierozwiazany", "storyline": "client/interact/shitiDailog"}
+{"poi": 43003801, "status": "nierozwiazany", "storyline": "client/interact/kaisuo_interface"}
+{"poi": 46004000, "status": "nierozwiazany", "storyline": "client/guanqia/taiji/tpzl-huangzhongshuxin"}
+{"poi": 46005400, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/ViewPlay_cup1"}
+{"poi": 46005500, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/ViewPlay_cup2"}
+{"poi": 46005600, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/ViewPlay_cup3"}
+{"poi": 46005700, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/ViewPlay_cave"}
+{"poi": 46005800, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/ViewPlay_top"}
+{"poi": 46005900, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/Level_flowerThrow"}
+{"poi": 46006100, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/TimePlay_Teleport"}
+{"poi": 46006200, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/TimePlay_bridge"}
+{"poi": 46006400, "status": "nierozwiazany", "storyline": "client/guanqia/putaojiubei/Level_tomb"}
+{"poi": 46006900, "status": "nierozwiazany", "storyline": "client/guanqia/jingyesi/jys_1001008fin"}
+{"file_id": "6ada001b31676f3d", "poi": 47006700, "sceny": [1026000], "status": "sceny", "storyline": "client/guanqia/chunqiubieguan/bieguan_huiyi_dialog1.etsb"}
+{"file_id": "a2a4a72a32676f3d", "poi": 47006800, "sceny": [1026001], "status": "sceny", "storyline": "client/guanqia/chunqiubieguan/bieguan_huiyi_dialog2.etsb"}
+{"file_id": "304101ce33676f3d", "poi": 47006900, "sceny": [1026002], "status": "sceny", "storyline": "client/guanqia/chunqiubieguan/bieguan_huiyi_dialog3.etsb"}
+{"file_id": "3526d6c334676f3d", "poi": 47007000, "sceny": [1026003], "status": "sceny", "storyline": "client/guanqia/chunqiubieguan/bieguan_huiyi_dialog4.etsb"}
+{"cutsceny": [300013], "file_id": "5091eef6726f6f31", "poi": 55001900, "sceny": [2700214], "status": "sceny", "storyline": "client/wanfa/wanguyirendian/yrd_hbmdoor.ets"}
+{"file_id": "3588082a69687a28", "poi": 55002000, "sceny": [6600042], "status": "sceny", "storyline": "client/dialogs/zhudi/wrd_guzhi.ets"}
+{"poi": 55003400, "status": "nierozwiazany", "storyline": "client/wanfa/wanguyirendian/wrd_1900040_submit.ets"}
+{"poi": 55003500, "status": "nierozwiazany", "storyline": "client/wanfa/wanguyirendian/wrd_1900032_submit.ets"}
+{"poi": 55006100, "status": "nierozwiazany", "storyline": "client/guanqia/dyl_xch/xch_cd2_360801_xin_read.ets"}
+{"file_id": "a23850b86e656d29", "poi": 56006200, "sceny": [6400429], "status": "sceny", "storyline": "client/guanqia/xiaozhang/tuimen.ets"}
+{"poi": 60001003, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"poi": 60001101, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"poi": 61013001, "status": "nierozwiazany", "storyline": "client/wanfa/wanguyirendian/wrd_tiaoxia_huapo"}
+{"poi": 61013901, "status": "nierozwiazany", "storyline": "client/guanqia/guishi/jlmzd/jlmzd_baoxiangguai.ets"}
+{"poi": 61014001, "status": "nierozwiazany", "storyline": "client/guanqia/guishi/jlmzd/jlmzd_chuansong.ets"}
+{"poi": 61017201, "status": "nierozwiazany", "storyline": "client/guanqia/gongnv/gongnv_engine_check_jiaohu.ets"}
+{"file_id": "4ee4176e6971692c", "poi": 61019401, "sceny": [6890488], "status": "sceny", "storyline": "client/guanqia/gongnv/gongnv_beiqi.ets"}
+{"cutsceny": [40046], "file_id": "2d9b6f7264656231", "poi": 62003400, "status": "bez_scen", "storyline": "client/wanfa/zujian/oujiahao/zufang_bed.ets"}
+{"poi": 62005900, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/oujiahao/zufang_muyutong"}
+{"poi": 62008500, "status": "nierozwiazany", "storyline": "client/guanqia/liujiguan/liujiguan_tingfengtip"}
+{"file_id": "454e3021315f6e43", "poi": 62012000, "sceny": [1010320], "status": "sceny", "storyline": "client/wanfa/zujian/oujiahao/wanjinzhishu/fenwei_sharen_1.ets"}
+{"file_id": "a273a67a315f674a", "poi": 62012700, "sceny": [7001167], "status": "sceny", "storyline": "client/wanfa/zujian/oujiahao/wanjinzhishu/wanjinzhishu_shabing_1.ets"}
+{"file_id": "5c73511d325f674a", "poi": 62012800, "sceny": [7001168], "status": "sceny", "storyline": "client/wanfa/zujian/oujiahao/wanjinzhishu/wanjinzhishu_shabing_2.ets"}
+{"file_id": "c740ebe0335f674a", "poi": 62012900, "sceny": [7001169], "status": "sceny", "storyline": "client/wanfa/zujian/oujiahao/wanjinzhishu/wanjinzhishu_shabing_3.ets"}
+{"file_id": "98a3bcc9345f674a", "poi": 62013000, "sceny": [7001170], "status": "sceny", "storyline": "client/wanfa/zujian/oujiahao/wanjinzhishu/wanjinzhishu_shabing_4.ets"}
+{"file_id": "77c7506c31676e35", "poi": 63003700, "status": "bez_scen", "storyline": "client/wanfa/miaomiaomiao/yinyou_fangxiang1.etsb"}
+{"file_id": "477fcee632676e35", "poi": 63003800, "status": "bez_scen", "storyline": "client/wanfa/miaomiaomiao/yinyou_fangxiang2.etsb"}
+{"file_id": "861e5b8533676e35", "poi": 63003900, "status": "bez_scen", "storyline": "client/wanfa/miaomiaomiao/yinyou_fangxiang3.etsb"}
+{"file_id": "b1b11d3f34676e35", "poi": 63004000, "status": "bez_scen", "storyline": "client/wanfa/miaomiaomiao/yinyou_fangxiang4.etsb"}
+{"file_id": "202133be35676e35", "poi": 63004100, "status": "bez_scen", "storyline": "client/wanfa/miaomiaomiao/yinyou_fangxiang5.etsb"}
+{"file_id": "6a4b0f9073706935", "poi": 65005300, "status": "bez_scen", "storyline": "client/wanfa/zujian/zz/baozhazhili_doorTips.ets"}
+{"file_id": "fc03b36669656d30", "poi": 65005500, "sceny": [7100202, 7100203, 7100204, 7100205, 7100271], "status": "sceny", "storyline": "client/dialogs/zz/wanshizhi_rucizuomei.ets"}
+{"file_id": "6a4b0f9073706935", "poi": 65006100, "status": "bez_scen", "storyline": "client/wanfa/zujian/zz/baozhazhili_doorTips.ets"}
+{"file_id": "216252237463613f", "poi": 70000800, "status": "bez_scen", "storyline": "client/wanfa/kaifengzhuxian/fanlou_cloth_box_interact.ets"}
+{"cutsceny": [90003], "file_id": "5ffb1628316e692f", "poi": 70001000, "sceny": [7530046, 7530349], "status": "sceny", "storyline": "client/dialogs/kaifengzhuxian/XN_xin1.ets"}
+{"file_id": "360ebe3275687a3a", "poi": 74010800, "status": "bez_scen", "storyline": "client/wanfa/zujian/daiyundi/qyyl_quannong_pizhu.ets"}
+{"file_id": "360ebe3275687a3a", "poi": 74011201, "status": "bez_scen", "storyline": "client/wanfa/zujian/daiyundi/qyyl_quannong_pizhu.ets"}
+{"poi": 89002100, "status": "nierozwiazany", "storyline": "client/guanqia/ymg_cc/ymg_qiaogu1.ets"}
+{"poi": 110011001, "status": "nierozwiazany", "storyline": "client/interact/compound_platform"}
+{"poi": 110014001, "status": "nierozwiazany", "storyline": "client/interact/compound_platform"}
+{"poi": 110015001, "status": "nierozwiazany", "storyline": "client/interact/compound_platform"}
+{"poi": 110016001, "status": "nierozwiazany", "storyline": "client/dialogs/yzy/tianjikeP1.etsb"}
+{"poi": 110016002, "status": "nierozwiazany", "storyline": "client/dialogs/yzy/tianjikeP2.etsb"}
+{"poi": 110019001, "status": "nierozwiazany", "storyline": "client/dialogs/yzy/tianjikeP2.etsb"}
+{"file_id": "4370ab3437506527", "poi": 110020001, "sceny": [140080, 140081, 140082, 140083, 140084, 140086], "status": "sceny", "storyline": "client/dialogs/yzy/tianjikeP7.etsb"}
+{"poi": 110021001, "status": "nierozwiazany", "storyline": "client/special_wanfa/1086_wanfa_rest/1086wanfa_rest"}
+{"poi": 110022001, "status": "nierozwiazany", "storyline": "client/special_wanfa/1086_wanfa_rest/1086wanfa_rest_mirror"}
+{"poi": 110023001, "status": "nierozwiazany", "storyline": "client/interact/compound_platform"}
+{"poi": 110027001, "status": "nierozwiazany", "storyline": "client/task/mindlake_6.etsb"}
+{"poi": 110031001, "status": "nierozwiazany", "storyline": "client/interact/compound_platform"}
+{"poi": 110034001, "status": "nierozwiazany", "storyline": "client/dialogs/yzy/interact_camera_1.etsb"}
+{"file_id": "9c06333f61696a2e", "poi": 110055001, "status": "bez_scen", "storyline": "client/dialogs/hjt/zhuiyi_jinsihujia.etsb"}
+{"file_id": "6dc3d764315f792d", "poi": 110056001, "sceny": [140200], "status": "sceny", "storyline": "client/dialogs/yzy/mindlake_money_1.etsb"}
+{"file_id": "5c27f274325f792d", "poi": 110057001, "sceny": [140201], "status": "sceny", "storyline": "client/dialogs/yzy/mindlake_money_2.etsb"}
+{"poi": 110059001, "status": "nierozwiazany", "storyline": "client/dialogs/yzy/underground_guide_search.etsb"}
+{"file_id": "6bc75dff335f792d", "poi": 110077001, "sceny": [140237], "status": "sceny", "storyline": "client/dialogs/yzy/mindlake_money_3.etsb"}
+{"file_id": "2db66e00345f792d", "poi": 110078001, "sceny": [140238], "status": "sceny", "storyline": "client/dialogs/yzy/mindlake_money_4.etsb"}
+{"file_id": "9b0e9a7b31305f33", "poi": 110080001, "sceny": [3401004], "status": "sceny", "storyline": "client/dialogs/yzy/hcwy_water_interact_01.etsb"}
+{"poi": 110083001, "status": "nierozwiazany", "storyline": "client/dialogs/zwy/hcwy_likai.etsb"}
+{"file_id": "824361723136323c", "poi": 110103001, "sceny": [140303], "status": "sceny", "storyline": "client/dialogs/yzy/enemy_attack/task_attack_200261.etsb"}
+{"file_id": "a5267efb64657447", "poi": 110118001, "status": "bez_scen", "storyline": "client/guanqia/Kaifeng_boss_fight/blz_task_st/task_blz_wanted.etsb"}
+{"file_id": "2e6530b5315f6b48", "poi": 110119001, "sceny": [140349], "status": "sceny", "storyline": "client/guanqia/Kaifeng_boss_fight/blz_task_st/task_blz_drink_1.etsb"}
+{"file_id": "5c66b714325f6b48", "poi": 110120001, "sceny": [140350], "status": "sceny", "storyline": "client/guanqia/Kaifeng_boss_fight/blz_task_st/task_blz_drink_2.etsb"}
+{"file_id": "35c84976335f6b48", "poi": 110121001, "sceny": [140351], "status": "sceny", "storyline": "client/guanqia/Kaifeng_boss_fight/blz_task_st/task_blz_drink_3.etsb"}
+{"file_id": "75a81e043136373a", "poi": 110125001, "sceny": [4800079], "status": "sceny", "storyline": "client/guanqia/putaojiubei/ptjb_cup3_task_200761.etsb"}
+{"cutsceny": [30770], "file_id": "7f4e4d836b6e692f", "poi": 110128001, "status": "bez_scen", "storyline": "client/guanqia/putaojiubei/ptjb_drink.ets"}
+{"file_id": "b92910c33537373a", "poi": 110129001, "status": "bez_scen", "storyline": "client/guanqia/putaojiubei/ptjb_cup3_task_200775.etsb"}
+{"file_id": "39ad2f3d316f6122", "poi": 112007700, "status": "bez_scen", "storyline": "client/task/maoguanggao1.ets"}
+{"file_id": "2095924d326f6122", "poi": 112007800, "status": "bez_scen", "storyline": "client/task/maoguanggao2.ets"}
+{"file_id": "b18d1fb8756c6729", "poi": 112009800, "sceny": [12000913], "status": "sceny", "storyline": "client/wanfa/zhaoguangyixianglu.ets"}
+{"poi": 121004301, "status": "nierozwiazany", "storyline": "client/interact/kaisuo_interface"}
+{"poi": 121007101, "status": "nierozwiazany", "storyline": "client/interact/kaisuo_interface"}
+{"file_id": "a66a275a6e69584e", "poi": 167001200, "status": "bez_scen", "storyline": "client/task/Task_liuyanchen/JiaYuanQiYu/YingYingBaFang/YingYingDeXin.ets"}
+{"file_id": "1dd326a375466951", "poi": 167011100, "status": "bez_scen", "storyline": "client/wanfa/zujian/liuyanchen/YeWaiBOSS/HG_GuiYuanShi/Book/Book_LiSiFu.ets"}
+{"file_id": "55bfa7166e697837", "poi": 174002700, "status": "bez_scen", "storyline": "client/task/huanggongzhixian/P4feibiaosongxin.ets"}
+{"file_id": "15693ccc6c616535", "poi": 179003301, "status": "bez_scen", "storyline": "client/wanfa/jianyu/huanggong_longyi_ordeal.ets"}
+{"poi": 180002401, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"file_id": "5936471469796746", "poi": 186000900, "status": "bez_scen", "storyline": "client/task/zhangxingyi/jiuliumen1107/fake_gacha_zhangxingyi.ets"}
+{"file_id": "2e6530b5315f6b48", "poi": 196000101, "sceny": [140349], "status": "sceny", "storyline": "client/guanqia/Kaifeng_boss_fight/blz_task_st/task_blz_drink_1.etsb"}
+{"poi": 197004700, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/lixia/task_1760578_zhuti1.ets"}
+{"poi": 197004800, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/lixia/task_1760584_zhuti2.ets"}
+{"poi": 197004900, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/lixia/task_1760590_zhuti3.ets"}
+{"poi": 197005000, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/lixia/task_1760596_zhuti4.ets"}
+{"poi": 197005100, "status": "nierozwiazany", "storyline": "client/wanfa/zujian/lixia/task_1760602_zhuti5.ets"}
+{"file_id": "4764f54d75797537", "poi": 197005400, "sceny": [1710000538], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_670200_qieluyu.ets"}
+{"file_id": "bb41f86d6961753b", "poi": 197005500, "sceny": [1710000540], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_6700202_jiaoyukuai.ets"}
+{"file_id": "4dacdc3e6961753b", "poi": 197005600, "sceny": [1710000541], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_6700203_jiaoyukuai.ets"}
+{"file_id": "3dd10c1069756838", "poi": 197005700, "sceny": [1710000543], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_6700207_jiashui.ets"}
+{"file_id": "89d86f3c69756f39", "poi": 197005800, "sceny": [1710000545], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_6700210_miehuoui.ets"}
+{"file_id": "7feca6a26e617041", "poi": 197006000, "sceny": [1710000544], "status": "sceny", "storyline": "client/wanfa/zujian/lixia/task_6700208_zhuangdianchupan.ets"}
+{"file_id": "45d8da03326e6931", "poi": 200035001, "sceny": [2000243], "status": "sceny", "storyline": "client/dialogs/hjt/jiufengzhiji_shuxin2.etsb"}
+{"file_id": "86b435336e697830", "poi": 200036001, "sceny": [2000244], "status": "sceny", "storyline": "client/dialogs/hjt/jiufengzhiji_shuxin.etsb"}
+{"file_id": "9a75f7e76e61742a", "poi": 200039001, "sceny": [2000262], "status": "sceny", "storyline": "client/dialogs/hjt/zhuiyi_jiutan.etsb"}
+{"file_id": "5ef24b67696a7531", "poi": 200040001, "sceny": [2000264], "status": "sceny", "storyline": "client/dialogs/hjt/zhuiyi_luoshenshouji.etsb"}
+{"file_id": "322e2635696a6f2e", "poi": 200046001, "sceny": [4700001], "status": "sceny", "storyline": "client/dialogs/hjt/sxd_longwenbiaoji.etsb"}
+{"file_id": "7becd3a069657728", "poi": 200048001, "sceny": [4700005], "status": "sceny", "storyline": "client/dialogs/hjt/sxd_lingwei.etsb"}
+{"file_id": "ce867c6269756837", "poi": 200072001, "sceny": [12900307], "status": "sceny", "storyline": "client/wanfa/hexizhuxianP1/task_300810_dashui.ets"}
+{"file_id": "c20ff36375686f35", "poi": 207004301, "sceny": [21300072], "status": "sceny", "storyline": "client/guanqia/gongnv/gongnv_1540017_jiaohu.ets"}
+{"file_id": "3b6975c36e697823", "poi": 231000400, "status": "bez_scen", "storyline": "client/task/task_e_shuxin.ets"}
+{"file_id": "3ff6691e6369703f", "poi": 235004601, "status": "bez_scen", "storyline": "client/task/zhangyongsheng/task_baibianyushan_openpic.ets"}
+{"file_id": "fe25eb76676e692e", "poi": 236001200, "status": "bez_scen", "storyline": "client/wanfa/sys/ybzy_yincnaghuaping.ets"}
+{"poi": 253001001, "status": "nierozwiazany", "storyline": "client/dialogs/dongyan/xinxia0.ets"}
+{"file_id": "9ac103ab75686f3a", "poi": 255000901, "sceny": [33300122], "status": "sceny", "storyline": "client/task/heqinyi/yejingkonghua/2700116_jiaohu.ets"}
+{"file_id": "4d9466336968733e", "poi": 255001401, "status": "bez_scen", "storyline": "client/task/heqinyi/naoshixingxiaji/yanzichaojianshi.ets"}
+{"file_id": "fb96e7dc61726538", "poi": 255001601, "status": "bez_scen", "storyline": "client/task/heqinyi/duoqingyibi/duihua-lettera.ets"}
+{"file_id": "860cf04062726538", "poi": 255001701, "status": "bez_scen", "storyline": "client/task/heqinyi/duoqingyibi/duihua-letterb.ets"}
+{"file_id": "691ae812315f753c", "poi": 256001301, "status": "bez_scen", "storyline": "client/wanfa/zujian/luqiancheng/djmhl_open_wenwu_1.ets"}
+{"file_id": "1cfc44c8325f753c", "poi": 256001401, "status": "bez_scen", "storyline": "client/wanfa/zujian/luqiancheng/djmhl_open_wenwu_2.ets"}
+{"file_id": "1cfc44c8325f753c", "poi": 256001701, "status": "bez_scen", "storyline": "client/wanfa/zujian/luqiancheng/djmhl_open_wenwu_2.ets"}
+{"file_id": "b50b18b965756e45", "poi": 256002601, "sceny": [2160001135, 2160001136], "status": "sceny", "storyline": "client/wanfa/zujian/luqiancheng/niuma_cat_wsz_talk_continue.ets"}
+{"file_id": "68c1ce2661686336", "poi": 256003401, "status": "bez_scen", "storyline": "client/wanfa/zujian/luqiancheng/yelu_guancha.ets"}
+{"file_id": "f6fd735470697444", "poi": 491000001, "sceny": [6201002], "status": "sceny", "storyline": "client/task/jiayuan_treasurebox/jiayuan_tresurebox_readtip.ets"}
+{"file_id": "315544386e656b46", "poi": 491001001, "status": "bez_scen", "storyline": "client/task/jiayuan_treasurebox/jiayuan_tresurebox_readtoken.ets"}
+{"file_id": "b8d658bf79656e47", "poi": 491002001, "sceny": [6201015], "status": "sceny", "storyline": "client/task/jiayuan_treasurebox/jiayuan_tresurebox_stealmoney.ets"}
+{"file_id": "c696e05031676e2a", "poi": 520001001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/fangxiang1.etsb"}
+{"file_id": "404a096232676e2a", "poi": 520002001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/fangxiang2.etsb"}
+{"file_id": "fc54c38833676e2a", "poi": 520003001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/fangxiang3.etsb"}
+{"file_id": "1589322134676e2a", "poi": 520004001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/fangxiang4.etsb"}
+{"file_id": "393d81f0676e6935", "poi": 520005001, "sceny": [6400007], "status": "sceny", "storyline": "client/guanqia/fanlou/xuanlvjiemi_chongting.etsb"}
+{"file_id": "1278261e35676e2a", "poi": 520037001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/fangxiang5.etsb"}
+{"file_id": "2fd96eec74756f3b", "poi": 520056002, "sceny": [6400381], "status": "sceny", "storyline": "client/guanqia/goulanwasi/dashijie/glws_pyx_1_out.etsb"}
+{"cutsceny": [30338], "file_id": "9a8b58c968795f31", "poi": 520057001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_yh.etsb"}
+{"cutsceny": [30340], "file_id": "0fe471e06c687932", "poi": 520058001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_yhl.etsb"}
+{"cutsceny": [30333], "file_id": "1923a53a66687032", "poi": 520059001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_phf.etsb"}
+{"cutsceny": [30334], "file_id": "de3dce7567736332", "poi": 520060001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_csg.etsb"}
+{"cutsceny": [30339], "file_id": "694f7b0a70687932", "poi": 520061001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_yhp.etsb"}
+{"cutsceny": [30336], "file_id": "cbad37dd79786833", "poi": 520062001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_fhxy.etsb"}
+{"cutsceny": [30335], "file_id": "dc97d31b6a686632", "poi": 520063001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_fhj.etsb"}
+{"cutsceny": [30332], "file_id": "f46e5e1071787132", "poi": 520064001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_qxq.etsb"}
+{"cutsceny": [30337], "file_id": "af18d38474627732", "poi": 520065001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_wbt.etsb"}
+{"cutsceny": [30341], "file_id": "ee17268d67687a32", "poi": 520066001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_zhg.etsb"}
+{"cutsceny": [30331], "file_id": "8a6d3dc370786832", "poi": 520067001, "status": "bez_scen", "storyline": "client/guanqia/fanlou/huajianji/daka_hxp.etsb"}
+{"file_id": "7aeeb18774756f3b", "poi": 520069002, "sceny": [6400391], "status": "sceny", "storyline": "client/guanqia/goulanwasi/dashijie/glws_pyx_2_out.etsb"}
+{"file_id": "33956f50697a6936", "poi": 570060001, "status": "bez_scen", "storyline": "client/wanfa/wulinlu/kf_fuzhaiqu_jiguanshizi.ets"}
+{"file_id": "2fbb09c9697a6934", "poi": 570072001, "status": "bez_scen", "storyline": "client/wanfa/guanqia/kf_ronglu_jiguanshizi.ets"}
+{"poi": 570088001, "status": "nierozwiazany", "storyline": "client/guanqia/srgq_rk/srgq_srm.ets"}
+{"poi": 870000003, "status": "nierozwiazany", "storyline": "client/interact/pickup_torch"}
+{"file_id": "39bf0aef74756f3c", "poi": 1120015002, "sceny": [12000057], "status": "sceny", "storyline": "client/guanqia/goulanwasi/dashijie/chunjie_pyx_out.etsb"}
