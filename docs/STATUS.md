@@ -483,11 +483,18 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
   masterów `.cine` z uporządkowanymi 5 022 pod-ujęciami (benchmark 30161:
   17 ujęć w kolejności gry). Uczciwie: osie `.cine` NIE zawierają nazw
   nagrań ani napisów — kolejność kwestii nadal nie wynika wprost.
-- **Następny krok:** krzyżówka `storyline_sceny` z czytanką (następstwa
-  + przeplot); pobrać ponownie bazę z Dysku i wyciągnąć POI→ścieżka
-  skryptu; zbadać, skąd gra bierze kolejność kwestii w przerywniku
-  (nie z `.cine`, nie z bazy — może montage/bnk). Szczegóły:
-  [dziennik](EXPERIMENT_LOG.md), wpis 2026-11-18 (3).
+- **Dokończone w tej samej sesji (wpis 2026-11-18 (4)):**
+  `poi_storyline_sceny.jsonl` — POI→scena przez skrypty (61 POI ze sceną,
+  benchmark 200046001→4700001 w całości z danych; 75 nierozwiązanych →
+  kandydaci do kitu v8) oraz `nastepstwa_scen.jsonl` — scalone krawędzie
+  v6+v7 (1 744; 1 045 potwierdzonych oboma skanami).
+- **Następny krok:** (a) czytanka v12 na `nastepstwa_scen.jsonl` +
+  przeplocie scena↔cutscena — najpierw krótka propozycja zmian układu dla
+  właściciela; (b) kit v8: jawni kandydaci `Storyline/<ścieżka>` (75 POI +
+  519 `.etsb`/`.ets` + 32 `storyline_path`), sonda pełnych bloków dla
+  wskazanych file_id; (c) kolejność kwestii w przerywnikach — nadal otwarta
+  (nie ma jej w `.cine` ani w bazie; następny trop: montage/bnk audio).
+  Szczegóły: [dziennik](EXPERIMENT_LOG.md), wpisy 2026-11-18 (3) i (4).
 
 ## Handoff (nieaktualny) — skaner v7 na Dysku, czekał na przebieg właściciela (2026-11-18)
 

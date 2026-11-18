@@ -1807,3 +1807,27 @@ cudzego kodu ani nie wymagają tej procedury.
   następstwa scena→scena + przeplot scena↔cutscena); mapowanie POI →
   `.etsb` → scena wymaga kolumny POI ze ścieżką skryptu z bazy gry
   (baza w `local/` do ponownego pobrania z Dysku w przyszłej sesji).
+
+### 2026-11-18 (4) — POI → scena domknięte indeksem; scalone następstwa v6+v7
+
+- **POI → scena:** `index/poi.jsonl` (tabela `active_interact_way`) już
+  zawierał ścieżki `interact_storyline` — krzyżówka z `etsb_storyline.jsonl`
+  daje `index/mpk/poi_storyline_sceny.jsonl`: 191 POI ze skryptem, w tym
+  **61 ze sceną** (benchmark POI **200046001** → `client/dialogs/hjt/
+  sxd_longwenbiaoji.etsb` → **scena 4700001** — cały łańcuch POI→skrypt→scena
+  wynika z danych), 55 ze skryptem bez scen, 75 nierozwiązanych (głowa sondy
+  nie trafiła bloku; jawni kandydaci `Storyline/<ścieżka>` do kitu v8).
+  Domknięcie przechodnie przez `ClientRunStorylineNode` zaimplementowane —
+  w obecnym korpusie 0 scen pośrednich.
+- **Następstwa scalone:** `index/mpk/nastepstwa_scen.jsonl` — 1 744 unikalne
+  krawędzie (1 066 z WYNIKv6, 1 723 z v7, **1 045 wspólnych** — skany
+  wzajemnie się potwierdzają; 21 tylko-v6 to grafy, których głowa sondy v7
+  nie złapała). Znane łańcuchy z WYNIKv5/6 obecne (13200326→327→328,
+  13200283→278, 24000036→24000021).
+- **Baza gry ponownie w `local/dane`** (części 1,3–8 z Dysku; `git checkout --`
+  na nadpisanych `index/paczki.json` i `docs/PLIKI_W_PACZKACH.md`).
+- **Następny krok:** użyć `nastepstwa_scen.jsonl` + przeplotu scena↔cutscena
+  w generatorze czytanki (v12) — to zmiana układu, więc najpierw krótka
+  propozycja dla właściciela: które sceny zmienią miejsce i dlaczego;
+  do kitu v8: kandydaci `Storyline/<ścieżka>` (75 POI + 519 `.etsb`/`.ets`
+  + 32 `storyline_path`), pełna (nie-głowowa) sonda wskazanych file_id.
