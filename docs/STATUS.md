@@ -491,12 +491,21 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 - **Priorytet właściciela (2026-11-18): połączenia scen — DOWIEZIONE
   z grafu zadań** (wpis (5) w dzienniku): `tools/zadania_sceny.py` →
   `index/mpk/nastepstwa_zadania.jsonl` (8 997 krawędzi z tabeli `tasks`);
-  kanoniczny `nastepstwa_scen.jsonl` ma **10 648 krawędzi** (1 087
-  potwierdzonych ≥2 źródłami). Główny łańcuch od 4700001 bez dziur:
-  `4700001 → 4700346 → 4700002 → 4700003 → 4700005 → … → [30162] →
-  [30165] → 4700068`. Uczciwie: krawędzi 4700001→4700041 w danych NIE ma
-  (4700041 to inny wątek — zadanie 3400017/grupa 5052; 4700352 bez
-  wyzwalacza w bazie; zakres 4700xxx = arkusz ins_kit jednej projektantki).
+  kanoniczny `nastepstwa_scen.jsonl` ma po wpisie (6) **18 625 krawędzi
+  z pięciu źródeł** (v6, v7, graf zadań, `branch_dialog_subsequent` —
+  8 011 krawędzi, przebieg z gry — 3). Główny łańcuch od 4700001 bez
+  dziur: `4700001 → 4700346 → 4700002 → 4700003 → 4700005 → … → [30162] →
+  [30165] → 4700068`.
+- **Mechanizm scen ambientowych rozpracowany (wpis (6)):** potwierdzony
+  w grze ciąg `4700037 → (klik POI) → 4700001 → 4700041 → 4700352` ma
+  wyjaśnienie w danych: sceny 4700037/4700041 to kity w świecie
+  (`spaces.*.spawn_kit_sid_no`, kit_serial_id == numer sceny, drzewo
+  `u_common_qifen`) przy POI 200046001; zadanie 3400017 spawnuje grupę
+  1632220065 i (`new_npc_task_data`) wysyła NPC 15000023 (Ruby) do kitu
+  4700041. Wyzwalacz riposty gracza 4700352 siedzi po stronie serwera
+  (brak w danych klienta) — krawędź utrwalona jako źródło „gra".
+  Nowy indeks `index/mpk/sceny_ambient_kity.jsonl`: 43 877 scen
+  ambientowych z pozycją XYZ — do grupowania czytanki wg miejsc.
 - **Następny krok:** (a) czytanka v12 na `nastepstwa_scen.jsonl` +
   przeplocie scena↔cutscena — najpierw krótka propozycja zmian układu dla
   właściciela; (b) kolejność KWESTII wewnątrz sceny: osie

@@ -9,10 +9,12 @@
   index/mpk/nastepstwa_zadania.jsonl — krawędzie z grafu zadań bazy gry
     (tabela `tasks`; generator tools/zadania_sceny.py), jeśli plik istnieje,
   index/mpk/nastepstwa_subsequent.jsonl — tabela `branch_dialog_subsequent`
-    (generator tools/dialog_subsequent.py), jeśli plik istnieje.
+    (generator tools/dialog_subsequent.py), jeśli plik istnieje,
+  index/mpk/nastepstwa_z_gry.jsonl — krawędzie potwierdzone przebiegiem
+    w grze (utrzymywane ręcznie), jeśli plik istnieje.
 
 Wynik: index/mpk/nastepstwa_scen.jsonl — po jednym wierszu na unikalną
-krawędź: {"z": [typ, nr], "do": [typ, nr], "zrodla": ["v6","v7","zadania","subsequent"]}.
+krawędź: {"z": [typ, nr], "do": [typ, nr], "zrodla": ["v6","v7","zadania","subsequent","gra"]}.
 Typy ujednolicone do "scena"/"cutscena". Pętle własne (a→a) pomijane.
 """
 
@@ -52,7 +54,8 @@ def main() -> int:
                 dodaj(ta, a, tb, b, "v7")
 
     for plik, zrodlo in (("nastepstwa_zadania.jsonl", "zadania"),
-                         ("nastepstwa_subsequent.jsonl", "subsequent")):
+                         ("nastepstwa_subsequent.jsonl", "subsequent"),
+                         ("nastepstwa_z_gry.jsonl", "gra")):
         p = MPK / plik
         if not p.exists():
             continue
@@ -70,7 +73,7 @@ def main() -> int:
             }, ensure_ascii=False) + "\n")
 
     liczby = {"krawedzi": len(krawedzie)}
-    for z in ("v6", "v7", "zadania", "subsequent"):
+    for z in ("v6", "v7", "zadania", "subsequent", "gra"):
         liczby[z] = sum(1 for s in krawedzie.values() if z in s)
     liczby["wiele_zrodel"] = sum(1 for s in krawedzie.values() if len(s) >= 2)
     print(json.dumps({**liczby, "plik": str(out.relative_to(ROOT))}, ensure_ascii=False))

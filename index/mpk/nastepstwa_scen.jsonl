@@ -2918,6 +2918,7 @@
 {"z": ["scena", 4600093], "do": ["scena", 4600092], "zrodla": ["subsequent"]}
 {"z": ["scena", 4600094], "do": ["scena", 4600092], "zrodla": ["subsequent"]}
 {"z": ["scena", 4600101], "do": ["scena", 9400226], "zrodla": ["zadania"]}
+{"z": ["scena", 4700001], "do": ["scena", 4700041], "zrodla": ["gra"]}
 {"z": ["scena", 4700001], "do": ["scena", 4700346], "zrodla": ["zadania"]}
 {"z": ["scena", 4700002], "do": ["scena", 4700003], "zrodla": ["v7"]}
 {"z": ["scena", 4700003], "do": ["scena", 4700005], "zrodla": ["zadania"]}
@@ -2939,6 +2940,8 @@
 {"z": ["scena", 4700029], "do": ["scena", 4700361], "zrodla": ["zadania"]}
 {"z": ["scena", 4700029], "do": ["scena", 6890252], "zrodla": ["zadania"]}
 {"z": ["scena", 4700030], "do": ["scena", 4700031], "zrodla": ["subsequent"]}
+{"z": ["scena", 4700037], "do": ["scena", 4700001], "zrodla": ["gra"]}
+{"z": ["scena", 4700041], "do": ["scena", 4700352], "zrodla": ["gra"]}
 {"z": ["scena", 4700068], "do": ["scena", 4700012], "zrodla": ["zadania"]}
 {"z": ["scena", 4700119], "do": ["scena", 4700379], "zrodla": ["zadania"]}
 {"z": ["scena", 4700123], "do": ["cutscena", 30167], "zrodla": ["zadania"]}

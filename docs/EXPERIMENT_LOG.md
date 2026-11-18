@@ -1872,3 +1872,47 @@ cudzego kodu ani nie wymagają tej procedury.
 - **Osie `dialog_timelines.4700001/41/352` istnieją w bazie** (bogate
   TimelinePObject z trackami per postać) — to kandydat na źródło kolejności
   KWESTII wewnątrz sceny (priorytet 3) na przyszłą sesję.
+
+## 2026-11-18 (6) — mechanizm scen ambientowych: kity w spaces + graf NPC-zadań
+
+Cel: wyjaśnić potwierdzony w grze ciąg 4700037 → (klik POI Dragon Pattern
+Mark) → 4700001 → 4700041 (komentarz Ruby) → 4700352 (reakcja Youxii).
+
+Fakty (z bazy gry):
+- `spaces.<s>.spawn_kit_sid_no` mapuje **numer sceny** na kity w świecie
+  (`kit_serial_id` == numer sceny). 4700037 → kit 470003720 (pozycja
+  [-2190.17, 8.03, -993.91]), 4700041 → kit 470004120 ([-2148.29, 7.23,
+  -1002.01]) — oba w s501/s701, ~40 m od siebie, przy POI 200046001.
+  Drzewo zachowań `u_common_qifen` (气氛 = ambient): NPC w kicie gra scenę
+  o numerze seryjnym kitu, gdy gracz jest w pobliżu.
+- Zadanie **3400017** (pre_task 3400016, task_space 501, grupa 5052)
+  spawnuje przy pobraniu grupę bytów **1632220065**
+  (`fetch_create_entity_serial_no`) — to grupa kitu 470004120.
+  `new_npc_task_data.3400017` instruuje NPC **15000023** (Ruby/Hongxian):
+  act 1 `task_sub_goto` → pozycja kitu, act 2 `task_sub_ins_kit`
+  z `taskbb_ins_kit_id` 4700041. Stąd komentarz Ruby po scenie POI.
+- Schemat ID kwestii potwierdzony: 470004101 w `voice_data_ai`
+  → dialog_no 4700041 (kwestia AI-gen Ruby). Kwestia gracza 470035201 ma
+  nagrany `voice_no` 7151581 (brak w voice_data_ai).
+- `dialog_timelines.4700352`: mówi gracz („我"), watch target 红线
+  (Hongxian, entity 900910), dialog_type 28, `sub_dialog_distance` 8 —
+  typowy sub-dialog ambientowy (riposta po kwestii NPC).
+
+Ograniczenie: wyzwalacz 4700352 **nie występuje** w danych klienta —
+przeszukano pełną bazę (klucze+wartości), wszystkie 197 spaces, 39 888
+dekodowanych grafów (u32le/u32be/u64le/f64le/ASCII). Siedzi w serwerowych
+drzewach zachowań (`monster_btree.se`, `u_common_qifen`, blackboard
+2300210), których nie ma w paczkach klienta. Krawędź 4700041→4700352
+utrwalona jako źródło „gra" (potwierdzenie przebiegiem).
+
+Nowe artefakty: `index/mpk/nastepstwa_subsequent.jsonl` (8 011 krawędzi
+z `branch_dialog_subsequent`), `index/mpk/sceny_ambient_kity.jsonl`
+(129 247 wierszy; 43 877 scen z pozycją XYZ w świecie),
+`index/mpk/nastepstwa_z_gry.jsonl` (3 krawędzie benchmarku). Kanoniczny
+`nastepstwa_scen.jsonl`: **18 625 krawędzi z pięciu źródeł**.
+
+Ślepe uliczki (nie wracać): `branch_dialog_subsequent` nie zawiera
+benchmarku; tabele `npc_dialog_select`/`scene_dialog_data`/`npc_tag_dialog`
+itd. bez śladu 4700352; trafienie `npc_dialog_select.14900115` to substring
+34700001; graf `duanqiao.ets` i cały korpus grafów nie niosą numerów scen
+ambientowych.
