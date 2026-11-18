@@ -7,10 +7,12 @@
   index/mpk/storyline_sceny.jsonl — grafy z przebiegu v7 (pole `nastepstwa`:
     [typ_a, nr_a, typ_b, nr_b]; typ: "scena"/"cutscena"),
   index/mpk/nastepstwa_zadania.jsonl — krawędzie z grafu zadań bazy gry
-    (tabela `tasks`; generator tools/zadania_sceny.py), jeśli plik istnieje.
+    (tabela `tasks`; generator tools/zadania_sceny.py), jeśli plik istnieje,
+  index/mpk/nastepstwa_subsequent.jsonl — tabela `branch_dialog_subsequent`
+    (generator tools/dialog_subsequent.py), jeśli plik istnieje.
 
 Wynik: index/mpk/nastepstwa_scen.jsonl — po jednym wierszu na unikalną
-krawędź: {"z": [typ, nr], "do": [typ, nr], "zrodla": ["v6","v7","zadania"]}.
+krawędź: {"z": [typ, nr], "do": [typ, nr], "zrodla": ["v6","v7","zadania","subsequent"]}.
 Typy ujednolicone do "scena"/"cutscena". Pętle własne (a→a) pomijane.
 """
 
@@ -49,12 +51,15 @@ def main() -> int:
             for ta, a, tb, b in d.get("nastepstwa", []):
                 dodaj(ta, a, tb, b, "v7")
 
-    plik_zadan = MPK / "nastepstwa_zadania.jsonl"
-    if plik_zadan.exists():
-        with open(plik_zadan, encoding="utf-8") as fh:
+    for plik, zrodlo in (("nastepstwa_zadania.jsonl", "zadania"),
+                         ("nastepstwa_subsequent.jsonl", "subsequent")):
+        p = MPK / plik
+        if not p.exists():
+            continue
+        with open(p, encoding="utf-8") as fh:
             for line in fh:
                 d = json.loads(line)
-                dodaj(d["z"][0], d["z"][1], d["do"][0], d["do"][1], "zadania")
+                dodaj(d["z"][0], d["z"][1], d["do"][0], d["do"][1], zrodlo)
 
     out = MPK / "nastepstwa_scen.jsonl"
     with open(out, "w", encoding="utf-8") as fh:
@@ -65,7 +70,7 @@ def main() -> int:
             }, ensure_ascii=False) + "\n")
 
     liczby = {"krawedzi": len(krawedzie)}
-    for z in ("v6", "v7", "zadania"):
+    for z in ("v6", "v7", "zadania", "subsequent"):
         liczby[z] = sum(1 for s in krawedzie.values() if z in s)
     liczby["wiele_zrodel"] = sum(1 for s in krawedzie.values() if len(s) >= 2)
     print(json.dumps({**liczby, "plik": str(out.relative_to(ROOT))}, ensure_ascii=False))
