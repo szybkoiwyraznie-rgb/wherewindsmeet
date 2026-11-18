@@ -488,13 +488,23 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
   benchmark 200046001→4700001 w całości z danych; 75 nierozwiązanych →
   kandydaci do kitu v8) oraz `nastepstwa_scen.jsonl` — scalone krawędzie
   v6+v7 (1 744; 1 045 potwierdzonych oboma skanami).
+- **Priorytet właściciela (2026-11-18): połączenia scen — DOWIEZIONE
+  z grafu zadań** (wpis (5) w dzienniku): `tools/zadania_sceny.py` →
+  `index/mpk/nastepstwa_zadania.jsonl` (8 997 krawędzi z tabeli `tasks`);
+  kanoniczny `nastepstwa_scen.jsonl` ma **10 648 krawędzi** (1 087
+  potwierdzonych ≥2 źródłami). Główny łańcuch od 4700001 bez dziur:
+  `4700001 → 4700346 → 4700002 → 4700003 → 4700005 → … → [30162] →
+  [30165] → 4700068`. Uczciwie: krawędzi 4700001→4700041 w danych NIE ma
+  (4700041 to inny wątek — zadanie 3400017/grupa 5052; 4700352 bez
+  wyzwalacza w bazie; zakres 4700xxx = arkusz ins_kit jednej projektantki).
 - **Następny krok:** (a) czytanka v12 na `nastepstwa_scen.jsonl` +
   przeplocie scena↔cutscena — najpierw krótka propozycja zmian układu dla
-  właściciela; (b) kit v8: jawni kandydaci `Storyline/<ścieżka>` (75 POI +
-  519 `.etsb`/`.ets` + 32 `storyline_path`), sonda pełnych bloków dla
-  wskazanych file_id; (c) kolejność kwestii w przerywnikach — nadal otwarta
-  (nie ma jej w `.cine` ani w bazie; następny trop: montage/bnk audio).
-  Szczegóły: [dziennik](EXPERIMENT_LOG.md), wpisy 2026-11-18 (3) i (4).
+  właściciela; (b) kolejność KWESTII wewnątrz sceny: osie
+  `dialog_timelines.<scena>` istnieją w bazie (TimelinePObject z trackami
+  per postać) — do przebadania; (c) kit v8: jawni kandydaci
+  `Storyline/<ścieżka>` (75 POI + 519 `.etsb`/`.ets` + 32 `storyline_path`)
+  + wyzwalacze 4700041/4700352 w `spaces.*`.
+  Szczegóły: [dziennik](EXPERIMENT_LOG.md), wpisy 2026-11-18 (3)–(5).
 
 ## Handoff (nieaktualny) — skaner v7 na Dysku, czekał na przebieg właściciela (2026-11-18)
 
