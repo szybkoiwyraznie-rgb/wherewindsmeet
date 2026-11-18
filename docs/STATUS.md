@@ -509,7 +509,9 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 - **Czytanka v12 DOWIEZIONA (wpis (7)):** chronologia liczona topologicznie
   z grafu następstw (łańcuchy scen w całości, cutsceny między swoimi scenami,
   pierwszeństwo krawędzi „gra"); benchmark właściciela stoi ciągiem;
-  `dist/WWM_Czytanka_PL_v12.zip` na Dysku.
+  `dist/WWM_Czytanka_PL_v12.zip` na Dysku; v13 dodaje wiersz
+  `Interakcja: <nazwa POI>` nad scenami wywoływanymi przez punkty na mapie
+  (59 scen, wpis (8)).
 - **Następny krok:** (a) uwagi właściciela do układu v12; (b) kolejność KWESTII wewnątrz sceny: osie
   `dialog_timelines.<scena>` istnieją w bazie (TimelinePObject z trackami
   per postać) — do przebadania; (c) kit v8: jawni kandydaci

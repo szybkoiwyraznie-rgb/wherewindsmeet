@@ -377,6 +377,7 @@ class Jednostka:
     podtytuly: dict[int, str] = field(default_factory=dict)      # numer linii → nagłówek nad nią
     zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
     streszczenie: int = 0                                     # ile linii na początku to streszczenie
+    wstep: str = ""                                           # wiersz nad nagłówkiem, np. „Interakcja: …”
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -581,9 +582,11 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
 
 
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
-                             krainy: list[dict] | None = None) -> list[Jednostka]:
+                             krainy: list[dict] | None = None,
+                             index: str | Path | None = None) -> list[Jednostka]:
     """Chronologia jest zapisana w `index/chronologia.jsonl`; tu tylko czytamy kolejność."""
     nazwy_pl = _nazwy_krain(ix, pl, krainy or [])
+    poi_scen = _poi_scen(ix, pl, index) if index else {}
 
     def sekcja(nazwa: str) -> str:
         polska = nazwy_pl.get(nazwa)
@@ -652,7 +655,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     osoby.append((pid, imie))
             jednostki.append(Jednostka(
                 "scena", f"Scena {numer}", sekcja(wiersz["s"]), linie,
-                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
+                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby,
+                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else "")))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
@@ -886,6 +890,49 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
 _POI_PLIK = "poi.jsonl"
 
 
+def _poi_scen(ix, pl: dict[str, str], katalog: str | Path) -> dict[int, str]:
+    """Scena → nazwa POI, który ją wywołuje (interakcja w świecie gry).
+
+    Powiązanie POI→scena pochodzi z `index/mpk/poi_storyline_sceny.jsonl`
+    (skrypt `interact_storyline` POI gra tę scenę — patrz
+    `tools/poi_storyline_sceny.py`; benchmark: POI 200046001 „Dragon Pattern
+    Mark” → scena 4700001). Nazwa POI jak w sekcji POI pliku 03: najpierw
+    polski przekład, bez niego tekst z gry z gwiazdką. POI bez nazwy nie
+    podpisujemy — lepszy brak wstępu niż goły numer.
+    """
+    plik_poi = Path(katalog) / _POI_PLIK
+    plik_sceny = Path(katalog) / "mpk" / "poi_storyline_sceny.jsonl"
+    if not plik_poi.is_file() or not plik_sceny.is_file():
+        return {}
+    nazwy = _wczytaj_nazwy(katalog)
+    numer = _przestrzen(ix, "active_interact_way", "button_name")
+    mapa: dict[str, str] = {}
+    if numer is not None:
+        for klucz, tekst in ix.teksty.items():
+            if tekst.w and tekst.w[0] == numer:
+                mapa.setdefault(str(tekst.w[1]), klucz)
+    ident_poi: dict[int, object] = {}
+    for wiersz in plik_poi.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        ident_poi[int(wpis["id"])] = wpis.get("nazwa") or wpis.get("id")
+    wynik: dict[int, str] = {}
+    for wiersz in plik_sceny.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        if wpis.get("status") != "sceny":
+            continue
+        nazwa, _klucz = _tekst_nazwy(ix, pl, mapa,
+                                     ident_poi.get(int(wpis["poi"])), nazwy)
+        if not nazwa.strip(GWIAZDKA + " "):
+            continue
+        for scena in wpis.get("sceny") or []:
+            wynik.setdefault(int(scena), nazwa)
+    return wynik
+
+
 def _poi(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
          katalog: str | Path) -> list[str]:
     """Punkty na mapie (POI): nazwa, a przy dowodzie także numer sceny.
@@ -1000,6 +1047,8 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         if jednostka.sekcja != ostatnia_sekcja:
             out += [jednostka.sekcja, ""]
             ostatnia_sekcja = jednostka.sekcja
+        if jednostka.wstep:
+            out += [jednostka.wstep, ""]
         out.append(f"## {jednostka.etykieta}")
         out.extend(linie)
         out.append("")
@@ -1295,7 +1344,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
                   "kontekst": 0, "bez_przekladu": 0}
 
-    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
+    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
     tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
     (wyj / "01_sceny_i_cutsceny.md").write_text(
         _naglowek("Sceny i cutsceny",

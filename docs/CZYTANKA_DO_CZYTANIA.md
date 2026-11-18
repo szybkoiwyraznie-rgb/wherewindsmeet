@@ -35,7 +35,10 @@ Zasady kolejności:
    `4700037 → 4700001 → 4700041 → 4700352 → 4700002 → …`); sceny bez krawędzi
    stoją między łańcuchami po numerze dialogu; cutsceny znane grafowi stoją
    **dokładnie między swoimi scenami** (`4700385 → cutscena 30162 → 30165 →
-   4700068`), a kotwica grupy zadań działa dopiero dla pozostałych,
+   4700068`), a kotwica grupy zadań działa dopiero dla pozostałych; scena
+   wywoływana przez punkt na mapie dostaje nad nagłówkiem wiersz
+   `Interakcja: <nazwa POI>` (powiązanie z `index/mpk/poi_storyline_sceny.jsonl`,
+   np. `Interakcja: Dragon Pattern Mark` nad sceną 4700001),
 4. **cutsceny przypisane do grupy zadań** stoją przy scenie, od której ich grupa
    się zaczyna (tabela powtórek daje `no` przerywnika → `grupa`, a grupa ma
    zakres numerów dialogów). Kotwicą jest **pierwsza scena grupy z przypisaną

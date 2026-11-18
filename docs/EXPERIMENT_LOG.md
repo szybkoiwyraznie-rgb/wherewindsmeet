@@ -1938,3 +1938,13 @@ spoza grafu; cutsceny w krainie mogą stać z grafu (bez pola `g`).
 
 Czytanka v12: `dist/WWM_Czytanka_PL_v12.zip` (6,8 MB) z tej chronologii —
 dostarczona na Dysk. 588 testów OK.
+
+## 2026-11-18 (8) — „Interakcja: <POI>" nad sceną; czytanka v13
+
+Na prośbę właściciela scena wywoływana przez punkt na mapie dostaje
+w `01_sceny_i_cutsceny.md` wiersz `Interakcja: <nazwa POI>` nad nagłówkiem
+(np. `Interakcja: Dragon Pattern Mark` nad `## Scena 4700001`). Powiązanie
+POI→scena z `index/mpk/poi_storyline_sceny.jsonl` (status `sceny`), nazwa
+POI jak w sekcji POI pliku 03 (polski przekład, bez niego tekst z gry
+z gwiazdką); POI bez nazwy nie podpisujemy. 59 scen dostało wstęp.
+Czytanka v13 (`dist/WWM_Czytanka_PL_v13.zip`) na Dysku.
