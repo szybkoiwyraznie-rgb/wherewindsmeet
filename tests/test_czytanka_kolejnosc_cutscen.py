@@ -119,6 +119,45 @@ class TestNaglowkiWPliku(unittest.TestCase):
         ])
         self.assertEqual(uzyte, {"a", "b", "c", "sum"})
 
+    def test_przerwa_po_streszczeniu_przed_kwestiami(self):
+        # streszczenie na początku (podtytuł pod linią 0) — po nim pusty wiersz
+        jednostka = cz.Jednostka(
+            "cutscena", "Cutscena 30150", "# Prolog",
+            [("", "sum"), ("", "a"), ("", "b")],
+            podtytuly={0: "Streszczenie sceny"}, streszczenie=1)
+        pl = {"sum": "Król Bez Oblicza znów atakuje.", "a": "Robi się ciekawie.",
+              "b": "Jak zawsze?"}
+        out, _, _ = cz._plik_scen([jednostka], pl, "przetlumaczone", self._statystyka())
+        self.assertEqual(out[2:], [
+            "## Cutscena 30150",
+            "### Streszczenie sceny",
+            "Król Bez Oblicza znów atakuje.",
+            "",
+            "Robi się ciekawie.",
+            "Jak zawsze?",
+            "",
+        ])
+
+    def test_przerwa_po_streszczeniu_z_wariantem_napisow(self):
+        # streszczenie, a po nim zwykłe kwestie i dopiero nagłówek wariantu
+        jednostka = cz.Jednostka(
+            "cutscena", "Cutscena 1", "# Prolog",
+            [("", "sum"), ("", "a"), ("", "b")],
+            podtytuly={0: "Streszczenie sceny", 2: "Inny wariant napisów tej cutsceny (wiersze 590153–590154)"},
+            streszczenie=1)
+        pl = {"sum": "Streszczenie.", "a": "Pierwsza kwestia.", "b": "Druga kwestia."}
+        out, _, _ = cz._plik_scen([jednostka], pl, "przetlumaczone", self._statystyka())
+        self.assertEqual(out[2:], [
+            "## Cutscena 1",
+            "### Streszczenie sceny",
+            "Streszczenie.",
+            "",
+            "Pierwsza kwestia.",
+            "### Inny wariant napisów tej cutsceny (wiersze 590153–590154)",
+            "Druga kwestia.",
+            "",
+        ])
+
     def test_ukryte_powtorzenia_nie_trafiaja_do_reszty(self):
         jednostka = cz.Jednostka("cutscena", "Cutscena 1", "# Kraina",
                                  [("", "a")], zasloniete=("duplikat",))

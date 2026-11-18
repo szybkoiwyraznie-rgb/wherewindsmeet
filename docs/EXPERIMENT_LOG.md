@@ -1294,3 +1294,393 @@ cudzego kodu ani nie wymagają tej procedury.
   `WWM_Czytanka_PL_2026-11-14.zip`, `1 523 414 B`, id `1TrnTI3H_4r_jthW8xo1fADwqT1l1gmKz`.
   Poprzednie trzy paczki czytanek przeniesione do kosza Dysku.
 - **Testy:** `439` (doszło `9` w `TestCzytankaDoCzytania`).
+
+## 2026-11-17 — `v0.4.0` przetestowane w grze: działa (zgłoszenie właściciela)
+
+- **Zgłoszenie właściciela:** pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
+  (`dist/`, SHA-256 `2bfdfc6285f1a7c26517c7d40617ca1233b166a4582a9181f96c2bd16ee92ad8`,
+  na Dysku Google id `1wyKn5HPyaZTBjUznVyc6ZMOjp7LCrFxf`) opiera się o najnowszą
+  zwrotkę tłumacza `WWM_PL2.zip` i została przetestowana w grze **na wersji gry
+  2.4**. **Działa — to, co jest przetłumaczone, pojawia się w grze.**
+- **Elementy z wersji 2.4:** dodatkowe elementy do tłumaczenia z Patcha 2.4
+  zostały wyciągnięte collectorem, dodane do najnowszego pakietu dla tłumacza
+  i przekazane do tłumaczenia.
+- **`v0.4.0` to stan pełny po imporcie `WWM_PL2.zip`:** `86 282` przekłady
+  (`85 956` po kluczu + `326` wariantów płci; pomiar
+  `tools/pokrycie_tlumaczenia.py` 2026-11-17: cały wyciąg `86 098`/`487 684`
+  = `17,7%`). Import `WWM_PL2.zip` dodał `+9 443` klucze i `+244` warianty płci;
+  `15` konfliktów nadpisano na korzyść tłumacza (raport:
+  `zwrotki/raport_scalenia_WWM_PL2.json`). Wcześniejsze „`v0.4.0` nie testowano
+  w grze” z wpisu z 2026-11-14 jest **nieaktualne**.
+- **Tłumacz pracuje nad dalszymi przekładami** — kolejne zwrotki trafią do
+  magazynu zwykłym obiegiem (`tools/import_zwrotki.py` → commit `tlumaczenie/`
+  → kolejne wydania). Poprzednie wydanie `v0.1.0` (`WWM_PL1.zip`, `75 685`
+  przekładów) jest nieaktualne; nie ma sensu go potwierdzać w grze.
+- **Zaktualizowane dokumenty:** `README.md`, `docs/STATUS.md` (stan, tabela,
+  pokrycie, otwarte ustalenia, następny krok), `docs/PATCHER_WWM.md`,
+  `docs/TEST_W_GRZE.md`, `docs/PAKIET_TLUMACZA.md`.
+- **Granice:** zgłoszenie nie precyzuje zakresu widzianych ekranów ani sposobu
+  instalacji — do dziennika trafia jako raport właściciela „działa na 2.4”, nie
+  jako audyt każdego ekranu. Otwarte pozostaje m.in., skąd klient pobiera napisy
+  filmów (`entry_collect_movie_subtitle_data` czy te same sceny), limity
+  szerokości pól i zachowanie gry po cotygodniowej aktualizacji. Nadal
+  obowiązuje zasada: tylko zmiany tekstu przy wyłączonej grze, bez wstrzykiwania
+  i obchodzenia zabezpieczeń; projekt nie gwarantuje bezpieczeństwa konta.
+
+### 2026-11-17 (2) — Czytanka: przerwa po streszczeniu cutsceny + sprawdzenie prologu
+
+- **Przerwa po streszczeniu:** `01_sceny_i_cutsceny.md` — po `### Streszczenie sceny`
+  stoi pusta linia przed kwestiami dialogu (dziś kwestie szły od razu po
+  streszczeniu). Zmiana w `_plik_scen` (`tools/czytanka_czysta.py`): `Jednostka`
+  dostała pole `streszczenie` (liczba linii streszczenia na początku jednostki),
+  przerwa wstawia się tylko wtedy, gdy nagłówek i treść streszczenia faktycznie
+  wyemitowano. 2 nowe testy (`tests/test_czytanka_kolejnosc_cutscen.py`),
+  całość 546 zielonych. Sprawdzone na realnych danych: `## Cutscena 30161`
+  pokazuje streszczenie, pustą linię i dopiero kwestie. **Nieopublikowane** —
+  kolejna wersja paczki czytanki dopiero przy decyzji właściciela.
+- **Sprawdzenie prologu — czy numerowane cutsceny otwarcia są w danych:**
+  są, ale tylko częściowo i bez wiązania z transkryptem.
+  * Pakiet xinshou (otwarcie): `30032 sq006_cj_xia` (61,3 s), `30033
+    sq005_cjs_video` (84,7 s), `30147 sq002_wxhcc` (51,0 s), `30150
+    sq010_yshj_video` (124,7 s), `30151 sq001_zlhm_pc` (78,8 s) + bliźniaki
+    mobile (`30487`, `30495`, `30662`).
+  * Streszczenie w danych ma **tylko `30147`** („You rode in on horseback, and
+    fell from the startled horse… The Void King… troops emerge from the
+    courtyard…”; `synopsis_text_mobile`, znormalizowane na PL: „Wjeżdżasz
+    konno, koń się płoszy…”) i **`30150`** („A bug drifts past, seeping into
+    the corpse… The Void King strikes, then falls…” → PL „Robak przelatuje
+    i wnika w zwłoki…”). Obie jednostki renderują się **już dziś** standardowo
+    jako `## Cutscena 30147` / `## Cutscena 30150` + `### Streszczenie sceny`
+    (30147 w 燕南 — kotwica grupy zadań; 30150 w Prologu — dopasowanie
+    streszczenia z transkryptem).
+  * `30032`/`30033`/`30151` streszczenia nie mają (`cutscenes.synopsis_text_pc`
+    i `_mobile` puste); kandydaci bez potwierdzenia.
+  * Linie transkryptu żyją w puli `text_msg` (wiersze ~`590335–590355` itd.)
+    i w scenach `ui_type` 10 (`10167–10187`, `3900065/3900066`, `7530284`…);
+    klucze dopasowane z transkryptu to trafienia tekstowe, nie wiązanie.
+    Klasycznego wiązania napis ↔ numer cutsceny w danych nie ma (osie `.cine`
+    nie są w paczce — patrz `docs/CINE_KOLEJNOSC.md`).
+- **Decyzja właściciela (2026-11-17):** **niczego nie zmieniać.** `30147` to
+  osobna scena (wjazd konny, koń się płoszy) — nie podmienia prologu; `30150`
+  („robak leci…”) właściciel już ma. Prolog zostaje transkryptem
+  (`## Prolog 1–4`), numerowane cutsceny stoją tam, gdzie wskazuje chronologia.
+  Bez zgadywania numerów dla Prolog 1 i Prolog 4.
+- **CZYTANKA_DO_CZYTANIA.md:** poprawione nieaktualne opisy (streszczenie na
+  początku, przerwa; opis „kolejności z ekranu” oznaczony jako usunięty w v9).
+
+### 2026-11-17 (3) — Czytanka `v10`: budowa, weryfikacja, wysłana na Dysk
+
+- **Żądanie właściciela (2026-11-17):** „Wygeneruj nową czytankę i wgraj na
+  drive". Wydanie **v10** — kolejny numer, paczka z datą w nazwie nie jest
+  tworzona; `--wersja 10` odmówiłby nadpisania istniejącej paczki.
+- **Budowa:** `python3 tools/czytanka_czysta.py --wyj out/czytanka --wersja 10`.
+  Wynik liczbowy: `75 331` jednostek, `29 536` linii, `pominiete` 0,
+  `reszta` 62 838, `kontekst` 503, `bez_przekladu` 160 751, `zbiory` 1 020,
+  `pamiatki` 120 (bez nazw 0), `poi` 2 948 (z dialogiem 368, bez nazwy 11).
+- **Paczka:** `dist/WWM_Czytanka_PL_v10.zip`, **6 771 033 B**, SHA-256
+  `6796e1d7a09875ad34715f1114b8d907d48a3819fd3532cea52975f393dbb85d`.
+  Zawartość: `01_sceny_i_cutsceny.md`, `02_kontekst_scen_i_cutscen.md`,
+  `03_reszta.md`, `README.md`. Jedyną zmianą względem v9 jest pusta linia
+  przerwy po `### Streszczenie sceny` (wpis `(2)` wyżej); prolog i cała
+  kolejność bez zmian. Sprawdzone w paczce: w `## Cutscena 30161` streszczenie
+  → pusta linia → kwestie.
+- **Dysk Google (folder „Where Winds Meet"):** `WWM_Czytanka_PL_v10.zip`,
+  id `10hgkAARQzpK2r8_2VyI9zCo-ZJtu2KG2`, 2026-11-17, 6 771 033 B — zgodny
+  rozmiar z lokalną paczką.
+- **Testy i kontrola:** `python3 tools/run_tests.py` — 546 OK;
+  `python3 tools/check_repository.py` OK; `git diff --check` czysty.
+- **Docs zsynchronizowane:** `docs/WERSJE_CZYTANKI.md` (wpis v10),
+  `docs/STATUS.md` (najnowsza paczka, 14 testów / 546),
+  `docs/CZYTANKA_DO_CZYTANIA.md` (opis przerwy; v9-oznaczenie „kolejności
+  z ekranu" zostaje jako historia), ten dziennik.
+
+### 2026-11-17 (4) — Powrót do porzuconego zadania: trzy indeksy z `.mpk` — badania + kit skanera
+
+- **Zadanie (właściciel, 2026-11-17):** ponownie podejść do porzuconego
+  zadania znalezienia w danych gry trzech brakujących powiązań: (1) scena →
+  następna scena (`## Scena 4700001` → `4700041` → `4700352`),
+  (2) aktywacja POI → start sceny, (3) osie czasu `.cine` cutscen.
+  Prawdopodobne miejsce: ~200 plików `Resources*.mpk` (1 GB/szt.), nie
+  pliki HD, które mamy.
+- **Badania publicznych źródeł (wnioski w `docs/MPK_FORMAT_RESEARCH.md`):**
+  * `Zhincore/wwm-messiah-tools` (MIT, aktywna, ostatni commit dziś):
+    `Resources.mpkinfo` (root) wskazuje `Resources.mpk` i `Resources<N>.mpk`
+    przez pole `packed >> 1` — ~200 `Resources*.mpk` to **części jednej
+    logicznej paczki**, a indeks podaje, który wpis siedzi w której.
+    Format `.mpkinfo` v3: `u32 3, u32 count`, wpisy 20 B
+    `(id_lo, id_hi, offset, size, packed)`, trailer 16 B; `file_id =
+    (MurmurHash3_x86_32(path) << 32) | lo32` (ogon ścieżki bez rozszerzenia;
+    ścieżki GUID-owe — fast path); bloki EZST (AES-256-ECB prefiks + zstd),
+    `ZSTD` (plain), LuaText (LZ4). `Patch.mpkdb` = SQLite, tabele
+    `info0`/`info1`, `v0` signed i64, `v6` offset.
+  * `mohebbiamin/WWM-MPK-Tool` — zamknięty unsigned exe; tylko potwierdza, że
+    paczki da się czytać; **nie wprowadzamy go do łańcucha**.
+  * `dest1yo/wwm_utils` — VirusTotal flag (Trojan) według wątku ResHax;
+    **zakazany**.
+- **Roadmapa:** `docs/ROADMAP_MPK_INDEKSY.md` — bramki 0–5 (badania + kit →
+  raport z 1. uruchomienia → wycinarka `.cine`/`.etsb` → analiza `.cine` →
+  analiza `.etsb` (następstwo scen, POI) → domknięcie). Dalsze sesje wykonują
+  kolejne bramki.
+- **Kit `WWM_MPK_Skaner_v1.zip` (`dist/`, 36 914 B, SHA-256
+  `1d27db14b2f7f2345cef5656e6bc629e86b732809502637b353b2f3144c87f16`):**
+  `tools/mpk_skaner.py` (stdlib, zero sieci, tylko odczyt — paczki, indeksy
+  i okienka po 4 KB), `SKANUJ.bat` (dwuklik, Python 3.10+ wbudowany,
+  bez pip), `narzedzia/kandydaci.jsonl` (`7 130` kandydatów: `174` realnych
+  ścieżek `client/dialogs/...` z `index/poi.jsonl` + `138` wariantów
+  `.ets↔.etsb`, `6 818` wzorców `.cine` z `cine_name` — wzorzec potwierdzony
+  przez `cine_path` z tabeli `cutscenes`, np. `Char/e_01_cutscene/qhrw/
+  sq001_zlxl/sq001_zlxl.cine`). Skaner haszuje kandydatów i szuka ich
+  **w indeksach** — od razu wiadomo, czy `.cine`/`.etsb` leżą w
+  `Resources*.mpk`, w `Patch*.mpk`, czy w ogóle nie leżą lokalnie.
+  Raport: `RAPORT.json` + `PODSUMOWANIE.txt`; całość jako
+  `WWM_MPK_Skaner_WYNIK.zip` (właściciel odsyła na Dysk; paczek `.mpk` NIE).
+- **Weryfikacja:** testy jednostkowe + integracyjne na danych syntetycznych
+  (`tests/test_mpk_skaner.py`, 14 testów) i pełny zestaw 560 zielony;
+  `tools/check_repository.py` OK. **Nie uruchamiano na maszynie właściciela**
+  — to sonda; nie zawiera i nie otwiera jeszcze prawdziwych paczek.
+- **Ograniczenia:** trafień wzorców `.cine` nie widzieliśmy na żywych danych
+  (wzorce to hipoteza z jednego znanego przykładu); `Patch.mpkdb` czytany
+  `mode=ro`; offsety mogą być niefizyczne dla „lite" instalacji (skaner to
+  wykrywa). Następna sesja: bramka 1 — odczyt wyniku od właściciela.
+
+### 2026-11-17 (5) — Kit MPK Skaner: błąd inwokacji Pythona i naprawa
+
+- **Zgłoszenie właściciela:** po dwukliku w `SKANUJ.bat` —
+  `'"py -3"' is not recognized as an internal or external command`.
+- **Przyczyna (moja):** wywołanie `"%PYEXE%" "narzedzia\mpk_skaner.py"` miało
+  `%PYEXE%` w cudzysłowach, więc Windows szukał programu dosłownie
+  `"py -3"` zamiast `py.exe -3`. Autodeteckja Pythona działała poprawnie —
+  padała sama linia startowa.
+- **Naprawa:** inwokacja bez cudzysłowów (`%PYEXE% "narzedzia\mpk_skaner.py" …`),
+  komentarze `rem` zamiast polegający na założeniu, że `py -3` istnieje
+  (najpierw `py -3`, potem `python`). Skaner pozostaje bez zależności — nie ma
+  żadnej biblioteki do instalowania, więc kit **nie tworzy venv**;
+  odkrywanie interpretera jest takie samo jak w patcherze (pylauncher →
+  PATH), bez etapu pip. Upewniono się, że ścieżka wywołania nie wprowadza
+  problemów ze spacjami (spacje może mieć tylko ścieżka skryptu, ta jest
+  cudzysłowowana).
+- **Regresja:** nowe testy statyczne w `tests/test_mpk_skaner.py`
+  (`TestSkanujBat`): brak wywołania `"%PYEXE%"`, kolejność wykrywania
+  py launcher → python, ASCII + CRLF. Całość 563 zielone.
+- **Paczka `WWM_MPK_Skaner_v1.zip` przebudowana:** `36 967 B`, SHA-256
+  `3a165d9841daa7b8c40c37ad441ec00dbab11b0cf961c41df0da152256ddce49`.
+  Stara (błędna) paczka na Dysku przeniesiona do kosza; naprawiona wgrana
+  tego samego dnia do folderu „Where Winds Meet"
+  (id `1dcU3_eqk6rME9l5HxE3R5qZlz3h0mcWC`). Weryfikacja integracyjna na
+  syntetycznej instalacji z podziałem `Resources*.mpk` (pack_id 0/1/2) —
+  wszystkie 3 kandydatów trafionych we właściwe kontenery.
+
+### 2026-11-17 (6) — Sonda u właściciela wróciła: 14 trafień `.cine`, kit v2 (wycinarka)
+
+- **Wejście:** `WWM_MPK_Skaner_WYNIK.zip` (`17 180 B`, SHA-256
+  `0f80a219aef87ae0ff7e82ad4378f7e42fe786bc7a1112cc0915b31d0012f225`) —
+  raport z maszyny właściciela (Steam, folder gry).
+- **Wynik liczbowy (bramka 1):**
+  * **489 `*.mpk`, `211 334 119 524 B`**; `Resources.mpkinfo`: **2 604 099
+    wpisów** (+46 063 placeholdery), 158 kontenerów, wszystkie istnieją,
+    offsety fizyczne wszędzie (0 niefizycznych, 0 brakujących); suma wpisów
+    `200 513 882 817 B`; 24 kontenery z pokryciem > 100 % (max `Resources80`
+    144,3 % / `Resources90` 132,9 %) — do audytu, nie blokuje; 4 kontenery
+    podejrzanie puste (`Resources145/146/149/115`) — może część pobierania
+    Steam, zasugerowano „Zweryfikuj spójność plików gry".
+  * `LT1.mpkinfo`: **240 wpisów** → `LT1.mpk` (`2 568 577 B`), pokrycie
+    100,0 % — paczka skryptowa.
+  * `Patch3109.mpkinfo` (22) i `Patch3110.mpkinfo` (24) — pokrycie 100,0 %,
+    bloki ~1,2 MB, duże zasoby łatki — **pomijamy**.
+  * `Patch.mpkdb` (SQLite): `info0` 854 wierszy (`v0` file_id i64,
+    `v6` offset), `info1` 0, `meta` 1, `pak` 2.
+  * **Trafienia kandydatów: 14** — wszystkie `.cine` z wzorca
+    `Char/e_01_cutscene/qhrw/<film>/<film>.cine`, **wszystkie w
+    `Resources34.mpk`** (4 177–23 174 B). Wzorzec potwierdzony na realnej
+    instalacji; rodzina `e_01_cutscene/qhrw` trafia w 100 % generowanych
+    ścieżek.
+  * **0 trafień `.etsb`/`.ets`** — 174 ścieżki POI `storyline` + warianty
+    NIE są plikami VFS pod tymi ścieżkami; najpewniej to cel skoku logicznego,
+    nie plik. Do ustalenia po harvest z Lua.
+- **Kit v2 (`dist/WWM_MPK_Skaner_v2.zip`, `39 045 B`, SHA-256
+  `2df898d5100e3ee04b64319991ec1011cffed06ee4a69d9ef44737b525366727`):**
+  sonda (jak v1) + wycinanie SUROWYCH bloków: trafione kandydatów i wszystkie
+  wpisy `LT1.mpkinfo` (limity 64 MB/blok, 512 MB łącznie) + `mpkdb_dump.json`
+  (`Patch.mpkdb` w trybie `mode=ro`, schema + wszystkie wiersze). Bez
+  dekodowania EZST — dekodujemy po swojej stronie. Jednoklik `SKANUJ.bat`;
+  zero bibliotek, żadnych nowych zależności. 17 testów jednostkowych +
+  integracyjny + pełny przepływ zbudowanego ZIPa na syntetycznej instalacji —
+  zielone. Wgrany na Dysk (folder „Where Winds Meet",
+  id `1WqyhL9M4GmEpder8puCF6EK994PcRqRc`, 2026-11-17);
+  poprzedni v1 (po naprawie bat) przeniesiony do kosza.
+- **Dokumenty:** `docs/MPK_SKANER_RAPORT.md` (pełny raport z wnioskami),
+  `docs/ROADMAP_MPK_INDEKSY.md` (bramki 0/1 ✅, bramka 2 w trakcie),
+  `docs/STATUS.md`.
+- **Następny krok:** właściciel uruchamia v2 i wysyła wynik (~3 MB);
+  potem dekoder EZST po stronie repo, analiza `.cine`, harvest ścieżek z Lua.
+
+### 2026-11-17 (7) — MPK Skaner v2: awaria `json.dumps` na BLOB-ach w Patch.mpkdb → v3
+
+- **Zgłoszenie właściciela (7:35, Python 3.14):** skaner dotarł do kroku 5 —
+  wyciął **14/14 `.cine` (106 800 B)** i **240/240 bloków LT1 (2 568 577 B)**,
+  potem padło:
+  `TypeError: Object of type bytes is not JSON serializable` —
+  kolumna BLOB w tabeli `meta` (i potencjalnie inne). Awaria przed
+  `_zapisz_zip` → `WWM_MPK_Skaner_WYNIK.zip` **nie powstał**.
+- **Przyczyna (moja):** `zrzut_mpkdb` ładował wiersze wprost do `json.dumps`;
+  SQLite zwraca `bytes` dla BLOB-ów. Test integracyjny miał BLOB-free tabelę
+  `meta`, więc regresję przegapiłem.
+- **Naprawa (v3):**
+  * `_json_safe`: bytes/bytearray/memoryview → `{"__bytes__": true,
+    "rozmiar": N, "hex": "..."}` (hex pełny do 256 B, powyżej podgląd
+    + `uciniete: true`); inne typy → `str(val)`.
+  * `zrzut_mpkdb`: błąd pojedynczej tabeli łapany do pola `blad`,
+    ok=false tylko gdy którakolwiek tabela padła; zapisuje zawsze
+    `mpkdb_dump.json` (ostatnia linia obrony: `_zapisz_mpkdb_dump`).
+  * krok 4/5 opakowany w `try/except` — błąd wycinania/zrzutu nie blokuje
+    powstania `RAPORT.json`/ZIP-a.
+  * test regresji: `test_patch_mpkdb_z_blobami_nie_wywraca_json` (meta z BLOB
+    160 B, pak z BLOB 300 B) — 18 testów skanera, całość zielona.
+- **Kit v3:** `dist/WWM_MPK_Skaner_v3.zip` (`39 793 B`, SHA-256
+  `92a2f7d7fa8d46bcc94a241c6ebac6c38ec0fe8703ff76d5f32a51f2c4d9b2c8`),
+  zweryfikowany na syntetycznej instalacji z BLOB-ami
+  (`mpkdb_dump.json` poprawny, ZIP powstaje, wycięcie trafień i LT1 OK).
+  Na Dysku (folder „Where Winds Meet", id `1lhq0Ic8S7mIpwf2Jx7Du7rraHtLhwacE`);
+  v2 przeniesiona do kosza (id `1WqyhL9M4GmEpder8puCF6EK994PcRqRc`).
+- **Uwaga:** wycięte bloki z nieudanego przebiegu v2
+  (`MPK_SKANER_WYNIK\wyciete\*.bin`, 254 pliki) są po stronie właściciela —
+  przebieg v3 wytnie je ponownie tak samo; nie trzeba ich robić ręcznie.
+
+### 2026-11-17 (8) — Sonda v3 wróciła z danymi: dekodowanie EZST i walidacja file_id
+
+- **Wejście:** `WWM_MPK_Skaner_WYNIK (1).zip` (`2 207 306 B`, SHA-256
+  `ca1837849990344e97e0014b75c087ce864c7fceeaa1fcc25c2008515dec9936`) —
+  pełny przebieg v3 u właściciela: 14/14 `.cine` wycięte, 240/240 Lua LT1,
+  `mpkdb_dump.json` OK (BLE → hex działa).
+- **Dekodowanie (nasz venv `/tmp`, zależności z publicznego repo MIT
+  `Zhincore/wwm-messiah-tools`):**
+  * **14/14 `.cine` zdekodowanych** — rozmiary zdekodowane == rozmiary z
+    indeksu (`match=True`). Format: magic `c1 59 41 0d` + u64le długość +
+    u8 liczba identyfikatorów + tabela pól null-terminated (np.
+    `StartTime`, `Entity`, `Camera`, `Montage`, `OverseaTag`…) + binarna
+    oś czasu. Rozmiary: 17 988–200 718 B.
+  * **240/240 LuaText zdekodowanych** — Lua 5.4 chunki; źródło
+    debuggingowe (`@<ścieżka>`) odnalezione w każdym wpisie.
+  * **REGUŁA VFS POTWIERDZONA: ścieżka VFS = `LuaText/` + debug_source** —
+    `file_id` zgadza się dla **240/240** (`match: True` we
+    `index/mpk/lt1_dekodowane.jsonl`). Dodatkowo 6 wierszy-ścieżek w
+    `Patch.mpkdb.info0` (`LuaText/patch/patch_context.lua` itd.) spina
+    pak z mpkdb: `pak = LT1.mpk` (2 097 152 + 471 425 = 2 568 577 B).
+  * **Walidacja naszego `file_id`:** `LuaText/patch/patch_context.lua` →
+    `092819317478651b` == blok `lt1_092819317478651b.bin`; analogicznie
+    consts/main/pre_check/download — 5/5. Hashing poprawny na danych gry.
+  * `Patch.mpkdb`: `info0` 854 wierszy (848 z file_id + 6 ścieżek
+    bootstrapu patchera), `info1` pusta (wierszy 0), `meta` zaciemnione
+    (rozmiar 6 B klucza / 130 B wartości; sha256 zanotowane, bajtów nie
+    zapisujemy), `v4/v5` = (0,0) ×848 + (0,1) ×6.
+- **Artefakty w repo (per instrukcja właściciela: „zapisuj wszystko jako
+  indeks i commituj od razu”):** `index/mpk/` — `README.md` (zasady dla
+  przyszłych agentów), `cine_dekodowane.jsonl`, `lt1_dekodowane.jsonl`,
+  `lt1_stringi.jsonl` (41 727 identyfikatorów z licznikami),
+  `patch_mpkdb_info0.jsonl`, `patch_mpkdb_pak.jsonl`,
+  `patch_mpkdb_meta.json`. Surowe/dekodowane bajty w `local/mpk_dekodowane/`
+  (gitignore). Generator: `tools/mpk_artefakty.py`.
+- **POI `storyline` nadal 0 trafień pod ścieżkami bez prefiksu** → kit v4
+  rozszerza kandydaci o prefiksy `LuaText/`, `LuaText/hexm/`,
+  `LuaText/hexm/client/storyline_data/` (i warianty rozszerzeń).
+  Kit **v4** (`wwm-mpk-skaner-v4`): okno wyboru folderu gry (tkinter,
+  jak w patcherze) zamiast wpisywania ścieżki z palca — uwaga właściciela
+  (1). Wyślij na Dysk per instrukcja.
+- **Dalej:** właściciel uruchamia v4, odsyła wynik; Bramka 3 = analiza
+  osi `.cine` (powiązanie z `cutsceny_meta`, weryfikacja 30161).
+
+### 2026-11-17 (9) — Storyline-grafy jako most do zadań i cutscen; POI nadal bez wiązania
+
+- **Wejście:** 14 dekodowanych bloków JSON z `Storyline.NodeBuffer` w
+  lokalnym `local/patch_karwedane/` (surowe/dekodowane bloki pozostają poza Git),
+  `index/poi.jsonl`, `index/zadania.jsonl`, `index/sceny_*.jsonl`,
+  `index/cutsceny_meta.jsonl`, `index/chronologia.jsonl`; formaty sprawdzone
+  względem publicznego `Zhincore/wwm-messiah-tools` (`codecs.py`,
+  `repository.py`). W `codecs.py` nie ma parsera `.cine`.
+- **Metoda:** przejście po `NodeBuffer` i `ConnectData`, weryfikacja wybranych
+  ID w indeksach tekstowych; wyliczenie podsumowań pozbawionych tekstu, pozycji,
+  payloadów i krawędzi grafu. Dodano generator
+  `tools/index_storyline_graphs.py`.
+- **Wyniki dodatnie:**
+  * `5_2a40efe1316c7433` (68 węzłów) zawiera `TrackTaskNode` 380493/380494;
+    zadania 380492–380499 tworzą łańcuch przez pola `pre`/`post` w
+    `index/zadania.jsonl`. Graf ma też transfery 30019/30020 w przestrzeni
+    31003 i dwukrotnie ścieżkę `client/guanqia/fxds/paoku/lighting2.ets`.
+  * `5_a31638d0356c7433` zawiera `DialogCutsceneSequenceNode`:
+    ID 2560507 (typ 1) → 32474 (typ 2), oba z `auto_preload_next=true`.
+    2560507 istnieje jako `d` w `index/sceny_3.jsonl`; 32474 istnieje w
+    `index/cutsceny_meta.jsonl` jako `sq001_qzpk_male` (10,5 s, przestrzeń
+    31003). To jest potwierdzony most **graf Storyline → dialog/cutscene**,
+    nie POI → graf.
+  * `5_dfacb22a326c7433` zawiera `TrackTaskNode` 380497 oraz QTE 219/220.
+    Grafy nie dają na tym etapie kompletnej ani ogólnej chronologii scen.
+  * Podsumowanie 14 grafów zapisane w `index/mpk/storyline_graphs.jsonl`
+    (8 699 B); odtwarzanie: `python3 tools/index_storyline_graphs.py
+    local/patch_karwedane --output index/mpk/storyline_graphs.jsonl`.
+- **Wyniki ujemne / ostrożność:**
+  * `chronologia.jsonl.p` jest numerem pozycji na liście chronologii, nie
+    kluczem transferu. Pozorna zbieżność `p=30019` z `transfer_no=30019` jest
+    przypadkowa; nie używać tego jako wiązania.
+  * 13 151 unikalnych 16-bajtowych GUID-ów `Resource` w blokach `hex_world`
+    nie trafia w tekstowe GUID-y indeksów (poza zerowym false positive).
+    Dwa GUID-y z bajtami `POI` są fragmentami losowo wyglądających binarnych
+    identyfikatorów, nie markerem tabeli.
+  * `1_patch_repository.bin` po zdjęciu 4-bajtowego prefiksu `CCCC` dekoduje
+    się z EZST do listy 51 typów zasobów, ale jej nagłówek nie zgadza się z
+    formatem names-file opisanym w `repository.py`; sam ten blok nie mapuje
+    GUID-ów `hex_world` na ścieżki/nazwy.
+  * 174 unikalne ścieżki `poi.storyline` z wariantami prefiksu i `.ets/.etsb`
+    dały **0/848** trafień w Patch `info0` i **0/240** w LT1. Właścicielski
+    wynik v4: **14/8 066** kandydatów — wyłącznie `.cine` pack-34, żadnych
+    POI-storyline trafień.
+- **Wniosek / następny krok:** POI→scena nie jest w Patch `info0`, LT1 ani
+  dotychczas zidentyfikowanych blokach `hex_world` w czytelnym, bezpośrednim
+  formacie. Poszukiwać pełnej pary names/data repository albo źródła bazowego
+  pakietu; nie przypisywać jeszcze żadnego POI do grafu. Dla Bramki 3
+  kontynuować parsowanie osi `.cine`; publiczny codec jej nie opisuje.
+
+### 2026-11-17 (10) — Następstwa scen z danych `index/`: 16 946 krawędzi z oceną pewności (priorytet 1)
+
+- **Wejście:** wyłącznie `index/` (bez skanera, bez MPK): `sceny_*.jsonl`
+  (pole `x`), `zadania.jsonl` (`pre`/`post`, momenty dialogów i cutscen),
+  `wybory.jsonl`, `opcje_npc.jsonl`. Priorytety właściciela: (1) kolejność
+  scen jedna po drugiej, (2) POI → scena, (3) kolejność kwestii w cutscenach.
+- **Metoda:** `tools/nastepstwa_scen.py` zbiera krawędzie „koniec → początek”
+  z pięciu źródeł, każde z oceną pewności; węzeł to `{"t": "d"|"c", "n": …}`
+  (dialog z `sceny_*` albo cutscena wskazywana przez zadanie). Pętle własne
+  i cele spoza `sceny_*` wypadają (liczone w podsumowaniu). Wynik:
+  `index/nastepstwa_scen.jsonl` (16 946 wierszy, ~2,2 MB), testy
+  `tests/test_nastepstwa_scen.py` (syntetyczne + zgodność z zapisanym plikiem,
+  jak `test_chronologia.py`).
+- **Wyniki:** `nastepstwo` 7 680 (`branch_dialog_subsequent`, 5 765 dialogów
+  źródłowych — jawne następniki), `wybor` 6 912 (prawie wszystkie już w tabeli
+  następstw — tylko 1 krawędź nowa), `opcja_npc` 292, `zadanie` 1 071
+  (koniec zadania → początek następnego w łańcuchu; tylko 2 z tych par scen
+  pokrywa się z tabelą następstw — to realnie nowe wiązania), `zadanie_wewnatrz`
+  991 (role `przyjecie → rozmowa → zakonczenie`; wewnątrz roli kolejności nie
+  wymyślamy — iloczyn kartezjański między kolejnymi rolami). Pominięte:
+  159 celów spoza `sceny_*`, 5 371 pętli własnych (ten sam dialog w kilku
+  rolach zadania).
+- **Wyniki ujemne / odrzucone hipotezy:**
+  * `grupy_zadan.zadania` to listy **posortowane numerycznie** (884/884 grup
+    z ≥2 zadaniami) — to przynależność, nie kolejność; krawędzie „kolejne
+    w grupie” odrzucone (58% zgodności z `pre/post` to artefakt rosnących
+    numerów w łańcuchu).
+  * Przykładowy łańcuch `4700001 → 4700041 → 4700352` w danych `index/`
+    **nie występuje**: 4700001 nie ma `x`; 4700041 i 4700352 nie są
+    wskazywane przez żadne zadanie (4700001 to tylko `finish_dialogs` zadań
+    220003 i 10000220003). Teza STATUS „pełne następstwo siedzi w `.etsb`”
+    dla tego łańcucha nadal prawdziwa.
+  * `zamiany_dialogow` (zastępowanie dialogu wariantami) i pozycja
+    `chronologia.p` (porządek pozycyjny krain, nie przyczynowy) — nie są
+    dowodem następstwa; nie użyte.
+- **Wniosek / następny krok:** priorytet 1 jest częściowo domknięty z danych
+  `index/` (jawne następniki + łańcuch zadań). Priorytet 2 (POI → scena)
+  nadal wymaga `.etsb`/MPK albo pełnego repository nazw — bez zgadywania
+  mapowania GUID→POI. Priorytet 3 (oś `.cine`) bez zmian: Bramka 3.
+
+### 2026-11-18 — Skaner v5 (`WYNIKv5`) i v6: grafy JSON Storyline w `Resources*.mpk`
+
+- Z `WWM_MPK_Skaner_WYNIKv5.zip` (162 wycinki `res_*.bin` z `Resources*.mpk`) wyodrębniono **1 106 kompletnych grafów JSON Storyline** (`{"Variables":...,"Storyline":{...,"NodeBuffer":[...]}}`).
+- Węzły `GameLevelStorylineDialogsPlayNode` (274 wystąpienia) zawierają bezpośrednio `dialogs_no` (numer sceny) oraz `ConnectData` (`srcNodeID` → `dstNodeID`). Już z tego wycinka wyciągnięto **13 bezpośrednich krawędzi `dialog → dialog`** (m.in. `13200326 -> 13200327 -> 13200328`, `13200283 -> 13200278`, `24000036 -> 24000021`).
+- `WYNIKv5` zapełnił limit 30 MB oknami binarnymi wokół `StartDialog`/`TrackTaskNode`. Zbudowano **skaner v6** (`WWM_MPK_Skaner_v6.zip`), który wycina z `Resources*.mpk` wyłącznie oczyszczone kompletne obiekty JSON Storyline zawierające węzły scen/cutscen (`GameLevelStorylineDialogsPlayNode`, `DialogCutsceneSequenceNode`, `DialogNode`, `BranchDialog`, `TrackTaskNode`) do `wyciete/storyline_wyciete.jsonl`.

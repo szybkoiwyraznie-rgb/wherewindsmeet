@@ -113,4 +113,4 @@ kompaktowanie skraca tabelę), ale zawartość tak.
 | 1 136 704 wpisów mapy EN (baza + `LocalData/Patch/_diff` w Patchu 2.4) | wyciągnięte, 0 błędów (poprzednio 1 124 787 w buildzie 25906190) |
 | zapis zwrotny całej mapy i `_diff` przez łatkę | `tools/zbuduj_latke.py`, `tools/patcher_wwm.py` i `tools/apply_translation.py`; mała łatka testowa (`latka_testowa.py` na mapie EN) zweryfikowana w realnej grze Steam (UI + prolog + polskie znaki działają); symulacja obu patcherów sprawdzona na kopiach binarek Patcha 2.4 (`26592996`) |
 | mówcy, powiązania tabel, kolejność scen | odczytane z bazy gry ([BAZA_GRY.md](BAZA_GRY.md), [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md)) |
-| limity pól interfejsu i pełna fabuła w grze | **limity szerokości i pełne tłumaczenie nie sprawdzone jeszcze w grze** (widoki podają długość EN; pełna łatka czeka na zwrotkę) |
+| limity pól interfejsu i pełna fabuła w grze | **pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip` przetestowana w grze — działa** (przetłumaczone treści pojawiają się w grze; zgłoszenie właściciela, 2026-11-17); limity szerokości dłuższych pól nadal nie sprawdzone (widoki podają długość EN) |

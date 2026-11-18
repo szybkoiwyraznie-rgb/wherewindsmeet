@@ -5,20 +5,22 @@ pliki gry → wyciąg `index/` → pakiet dla tłumacza → import zwrotki do ma
 `tlumaczenie/` → łatka map tekstów (oraz powtarzalny obieg przyrostowy po
 aktualizacjach gry). Cel i kryteria akceptacji opisuje [docs/CEL.md](docs/CEL.md).
 
-**Stan (2026-11-13): wyciąg `index/` i narzędzia są zaktualizowane do Patcha 2.4 (Steam build `26592996`),**
-a do magazynu **`tlumaczenie/` zaimportowano pierwszą zwrotkę (`WWM_PL1.zip`: `75 685` przekładów, `15,46%` tekstów gry)**.
+**Stan (2026-11-17): wyciąg `index/` i narzędzia są zaktualizowane do Patcha 2.4 (Steam build `26592996`),**
+a w magazynie **`tlumaczenie/` zaimportowano dwie zwrotki tłumacza — `WWM_PL1.zip` (`75 685` przekładów)
+i najnowszą `WWM_PL2.zip` (magazyn: `86 282` przekłady = `17,7%` tekstów gry)**.
 Zbudowano i wysłano zregenerowany pełny pakiet **`v4`** (`paczka_dla_tlumacza_wwm_v4.zip`, `422 248` miejsc `PL:`, w tym `75 683` przeniesionych
 jako `PL: tekst` i `346 565` pustych / `253 693` bez tabel UI/meta) wraz z raportami zmian **`rewizje_en.jsonl`** (`899` rewizji EN dla
 przetłumaczonych wpisów) oraz **`usuniete_klucze.jsonl`** (`566` usuniętych kluczy). Cały obieg po stronie narzędzi (ekstrakcja bazy,
 budowa pakietu, trzyplikowe Czytanki z limitem `<5 MB/część`, import zwrotki, samowystarczalna łatka `patcher_wwm.py`,
 audyt aktualizacji i pakiet uzupełniający) działa i został przetestowany na prawdziwych plikach Patcha 2.4.
-**Zweryfikowano dotąd w uruchomionej grze (Steam Windows, poprzedni build `25906190`):** mała łatka testowa
+**Zweryfikowano dotąd w uruchomionej grze (Steam Windows):** mała łatka testowa
 (`tools/latka_testowa.py` w trybie binarnym — menu, ustawienia i napisy otwierającego prologu) załadowała się
 w kliencie bez problemu, a czcionki gry wyświetliły komplet polskich znaków diakrytycznych
-(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`).
-**Wciąż czeka na sprawdzenie w oknie gry:** pierwsza łatka `v1` na pełnej bazie `tlumaczenie/` (`75 685` przekładów, m.in. cutsceny i ponad 9,7 tys. kwestii dialogowych),
-zachowanie gry na Patchu 2.4 (`26592996`) oraz bezpośrednie uruchomienie samowystarczalnego instalatora `patcher_wwm.py`
-w oknie gry (na kopii plików `26592996` przeszedł w piaskownicy pełny cykl instalacji i przywrócenia SHA-256).
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Pełna łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
+(oparta na najnowszej zwrotce tłumacza `WWM_PL2.zip`, `86 282` przekłady) została przetestowana
+w grze na wersji gry 2.4 i działa — co jest przetłumaczone, pojawia się w grze** (zgłoszenie właściciela, 2026-11-17).
+**Dodatkowe elementy do tłumaczenia z wersji 2.4 wyciągnięte collectorem dodano do najnowszego pakietu dla tłumacza i przekazano do tłumaczenia.**
+Tłumacz pracuje nad dalszymi przekładami; kolejne zwrotki trafią do magazynu obiegiem jak dotąd.
 Gotowy jest także tryb cotygodniowych aktualizacji zbieracza (`collector/URUCHOM_AKTUALIZACJE.bat`, przetestowany
 na 8-częściowej paczce z Patcha 2.4), bezpieczne kopie zapasowe i przywracanie oryginałów oraz opis testu
 ([docs/TEST_W_GRZE.md](docs/TEST_W_GRZE.md)). Właściciel dopuszcza wyłącznie zmiany tekstów przy wyłączonej
@@ -32,6 +34,7 @@ potwierdziliśmy niezależnie i nie obiecujemy bezpieczeństwa konta.
 - [Baza danych gry (`MANIFEST` → `indexN` → `dataN`)](docs/BAZA_GRY.md)
 - [Kontener map tekstów i warstwy `_diff`](docs/LOCALE_CONTAINER.md), [patcher i one-click ze zwrotki](docs/PATCHER_WWM.md), [czytanki `.md` z fabuły i encyklopedii](docs/CZYTANKI_WWM.md), [czytanka w kolejności z gry](docs/CZYTANKA_KOLEJNOSC_GRY.md) oraz [plan pierwszego testu w grze](docs/TEST_W_GRZE.md)
 - [Dziennik eksperymentów](docs/EXPERIMENT_LOG.md) i [zestawienie dostaw z gry](docs/OVERSEA_INWENTARZ.md)
+- [Cine chronologia i indeksy `.mpk`](docs/MPK_FORMAT_RESEARCH.md), [raport ze skanera](docs/MPK_SKANER_RAPORT.md), [artefakty `index/mpk/`](index/mpk/README.md) oraz [roadmapa odzyskania brakujących indeksów](docs/ROADMAP_MPK_INDEKSY.md)
 - [Plan etapów](docs/ROADMAP.md), [wykonalność i ryzyka](docs/FEASIBILITY.md),
   [wybór wersji Windows](docs/WINDOWS_OPTIONS.md), [zbieracz ZIP dla Windows](docs/COLLECTOR.md),
   [zgłoszona instalacja Steam](docs/STEAM_REFERENCE.md),

@@ -19,11 +19,12 @@ pamięci procesu.
 (Steam Windows, tryb binarny `latka_testowa.py`): klient przyjął przepisane
 mapy `translate_words_map_en*` w menu i otwierającym prologu, a wbudowane
 czcionki gry wyświetliły komplet polskich znaków diakrytycznych
-(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). Nadal warto powtórzyć próbę dla
-nowego samowystarczalnego instalatora (`patcher_wwm.py`) po dużych
-aktualizacjach gry, a pełna łatka fabularna czeka na pierwszą zwrotkę
-tłumaczenia. Projekt nie gwarantuje bezpieczeństwa konta ani zgodności z
-warunkami wydawcy.
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Pełna łatka fabularna
+`WWM_Spolszczenie_PL_v0.4.0.zip` (oparta na najnowszej zwrotce tłumacza
+`WWM_PL2.zip`, `86 282` przekłady) została następnie przetestowana w grze i
+działa — przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela,
+2026-11-17). Warto powtórzyć próbę po dużych aktualizacjach gry. Projekt nie
+gwarantuje bezpieczeństwa konta ani zgodności z warunkami wydawcy.
 
 ---
 

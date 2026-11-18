@@ -27,7 +27,7 @@ README.md + sceny.zip + cutsceny.zip + widoki.zip → tłumacz (Dysk właścicie
 tlumaczenie/  (Git)                     klucz tekstu → przekład
         │  tools/one_click_patch.py (standalone z index/) albo zbuduj_latke.py
         ▼
-plan_latki.json + patcher / mapy        → próba UI+prolog potwierdzona w grze; pełna łatka czeka na zwrotkę
+plan_latki.json + patcher / mapy        → próba UI+prolog potwierdzona w grze; pełna łatka v0.4.0 przetestowana w grze — działa
 
 po patchu gry:  nowy wyciąg → tools/audyt_aktualizacji.py → nowe_sloty.txt
                 → tools/buduj_paczke.py --tylko-sloty → pakiet uzupełniający
@@ -157,7 +157,10 @@ Kontekst cutscen i mówców między `tools/buduj_paczke.py` i
 `tools/buduj_czytanki.py` jest współdzielony w module
 `tools/kontekst_cutscen.py`. W wysłanej wersji `v3` (`25906190`, `--tylko-z-en`)
 pakiet zawierał **418 773** miejsc `PL:`; po aktualizacji `index/` do Patcha 2.4
-(`26592996`) oraz imporcie pierwszej zwrotki `WWM_PL1.zip` (`75 685` przekładów)
+(`26592996`) oraz imporcie pierwszej zwrotki `WWM_PL1.zip` (`75 685` przekładów;
+potem doszła druga, najnowsza `WWM_PL2.zip` — magazyn `86 282` przekłady,
+a zbudowana z niej łatka `WWM_Spolszczenie_PL_v0.4.0.zip` została przetestowana
+w grze i działa)
 zregenerowany pełny pakiet **`v4`** (`--wypelnij-pl`) ma **422 248** miejsc `PL:`
 (`168 191` w `sceny.zip`, `4 116` w `cutsceny.zip`, `249 941` w `widoki.zip`),
 w tym **`75 683` wypełnionych `PL: tekst`** i **`346 565` pustych `PL:`**
@@ -306,10 +309,10 @@ tłumaczysz raz: …” i trzeba je wypełnić w pliku sceny, który pakiet wska
 `--sceny-od`/`--sceny-do`) zapisuje plik w formacie pakietu (`klucz:`/`PL:`)
 gotowy do wypełnienia i podania do `import_zwrotki.py`.
 
-Pomiar z 2026-11-14 po imporcie zwrotki prologu (szczegóły w
+Pomiar z 2026-11-17 po imporcie `WWM_PL2.zip` (szczegóły w
 [dzienniku](EXPERIMENT_LOG.md)): napisy cutscen `100%`, intro `100%`, napisy
 filmowe `100%` (także wiersze `钗头凤` i `中渡桥之战`), prolog `100%`, sceny
-przerywników `11,8%`, pozostałe sceny `7,4%`, cały wyciąg `15,5%`.
+przerywników `19,1%`, pozostałe sceny `13,7%`, cały wyciąg `17,7%`.
 
 ## Zwrotka → magazyn przekładów
 
@@ -327,8 +330,11 @@ do magazynu i trafia do raportu z plikiem i numerem linii (bez treści).
 Magazyn (`tools/tlumaczenie.py`): `tlumaczenie/pl_0…f.jsonl`
 (`{"k": klucz, "pl": przekład}`) i `tlumaczenie/pl_warianty.jsonl`
 (`{"id": identyfikator, "pl": przekład}`). Jest wersjonowany w Git —
-stanowi główny dorobek projektu (od `WWM_PL1.zip`: **75 685** przekładów, w tym
-**75 603** po kluczu i **82** warianty płciowe).
+stanowi główny dorobek projektu (po `WWM_PL1.zip` i `WWM_PL2.zip`: **86 282**
+przekłady = **85 956** po kluczu i **326** warianty płciowe; pomiar
+`tools/pokrycie_tlumaczenia.py`, 2026-11-17). Łatka `WWM_Spolszczenie_PL_v0.4.0.zip`
+zbudowana z tego stanu została przetestowana w grze i działa (zgłoszenie
+właściciela, 2026-11-17).
 W `tools/format_paczki.py` i `tools/import_zwrotki.py` dopuszcza się również
 kody techniczne `</...>` wieloliterowe, dwuczłonowy heks po przekształceniu
 koloru (np. `#ffc89c`) oraz komentarzowe `#` wprost przed słowem (`#Gracz`),
@@ -366,10 +372,12 @@ w [TEST_W_GRZE.md](TEST_W_GRZE.md) (`python3 tools/latka_testowa.py --wyj-zip di
 **Stan w grze:** mała łatka testowa (`latka_testowa.py` na mapie angielskiej —
 UI i otwierający prolog) została już uruchomiona w kliencie Steam i potwierdziła,
 że gra przyjmuje przepisane mapy oraz wyświetla komplet polskich znaków
-(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Nie sprawdzono jeszcze w grze**
-pełnej łatki fabularnej (czeka na zwrotkę tłumacza), limitów szerokości pól
-oraz nowego samowystarczalnego instalatora `patcher_wwm.py` bezpośrednio w
-oknie gry. Nie obiecujemy bezpieczeństwa konta.
+(`ą ć ę ł ń ó ś ź ż Ą Ć Ę Ł Ń Ó Ś Ź Ż`). **Pełna łatka fabularna
+`WWM_Spolszczenie_PL_v0.4.0.zip` (zwrotka tłumacza `WWM_PL2.zip`, `86 282`
+przekłady) została przetestowana w grze i działa — przetłumaczone treści
+pojawiają się w grze** (zgłoszenie właściciela, 2026-11-17). Nie sprawdzono
+jeszcze limitów szerokości pól ani zachowania po cotygodniowej aktualizacji
+gry. Nie obiecujemy bezpieczeństwa konta.
 
 ## Aktualizacja gry — co robić krok po kroku
 
@@ -430,4 +438,4 @@ Sprawdzone na prawdziwych danych aktualizacji:
 | pominięte identyfikatory tylko chińskie nie są wyświetlane w kliencie zachodnim | **hipoteza** |
 | tabele `__grey` to druga wersja tej samej tabeli | **hipoteza** z nazwy; ich teksty są w pakiecie |
 | mała łatka (`latka_testowa.py` UI + prolog) przyjmowana przez grę, polskie znaki się wyświetlają | **fakt — potwierdzone w uruchomionej grze Steam (Windows)** |
-| pełne tłumaczenie fabularne i wrapper `patcher_wwm.py` w oknie gry | **jeszcze nie sprawdzone w grze** (czeka na zwrotkę tłumacza; format map identyczny) |
+| pełna łatka fabularna (`WWM_Spolszczenie_PL_v0.4.0.zip`, zwrotka `WWM_PL2.zip`, `86 282` przekłady) w oknie gry | **fakt — przetestowana w grze 2026-11-17: działa, przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela) |

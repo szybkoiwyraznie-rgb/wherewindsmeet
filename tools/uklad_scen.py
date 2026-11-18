@@ -22,6 +22,8 @@ pozostałe dialogi według projektu i numeru.
 """
 
 from __future__ import annotations
+import json
+from pathlib import Path
 
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -192,6 +194,16 @@ def uloz(ix) -> Uklad:
         for source in row["dialogi"]:
             for target in targets:
                 nastepuje(source, target)
+
+    storyline_path = Path(__file__).resolve().parent.parent / "index" / "mpk" / "storyline_nastepstwa.jsonl"
+    if storyline_path.is_file():
+        with storyline_path.open(encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                if row["z"]["t"] == "d" and row["do"]["t"] == "d":
+                    nastepuje(row["z"]["n"], row["do"]["n"])
 
     # zadania w kolejności: typ -> grupa -> łańcuch
     by_section: dict[tuple, list[int]] = defaultdict(list)
