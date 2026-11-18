@@ -360,3 +360,74 @@ class TestKwestieZapasowe(unittest.TestCase):
         kwestie = [{"t": 1.0, "zh": "还活着吗某某某某", "audio": "vo_x_1"}]
         self.assertEqual(self.ck.kwestie_zapasowe(kwestie, self.glob, self.pula,
                                                   self.poczatki), [])
+
+
+class TestMowcyCutsceny(unittest.TestCase):
+    """Propagacja mówców po plikach nagrań — tylko w obrębie jednej cutsceny."""
+
+    def _mowcy(self, klucze, audio_kluczy, audio_napisow=None, wiersze=None):
+        return cz._mowcy_cutsceny(klucze, None, {}, {}, wiersze or {},
+                                  audio_napisow or {}, audio_kluczy)
+
+    def test_jeden_plik_audio_jeden_glos(self):
+        # cztery wiersze nagrania npc_07; kontekst zna Ruby dla dwóch (hx)
+        wiersze = {"k1": 1, "k2": 2, "k3": 3, "k4": 4}
+        audio_napisow = {2: "vo_sm_sxdm4_cs_zlxl_hx_05", 3: "vo_sm_sxdm4_cs_zlxl_hx_06"}
+        audio_kluczy = {k: "vo_sm_sxdm7_npc_07" for k in wiersze}
+        mowcy = self._mowcy(list(wiersze), audio_kluczy, audio_napisow, wiersze)
+        self.assertEqual(set(mowcy.values()), {"Ruby"})
+
+    def test_rodzina_npc_wymaga_dwoch_zgodnych_nagran(self):
+        # jedno zidentyfikowane nagranie rodziny to za mało na propagację
+        wiersze = {"k1": 1, "k2": 2}
+        audio_napisow = {1: "vo_sm_sxdm4_cs_zlxl_hx_02"}
+        audio_kluczy = {"k1": "vo_x_npc_01", "k2": "vo_x_npc_02"}
+        mowcy = self._mowcy(["k1", "k2"], audio_kluczy, audio_napisow, wiersze)
+        self.assertEqual(mowcy, {"k1": "Ruby", "k2": ""})
+        # dwa zgodne nagrania rodziny — trzecie dostaje etykietę
+        wiersze = {"k1": 1, "k2": 2, "k3": 3}
+        audio_napisow = {1: "vo_sm_sxdm4_cs_zlxl_hx_02", 2: "vo_sm_sxdm4_cs_zlxl_hx_03"}
+        audio_kluczy = {"k1": "vo_x_npc_01", "k2": "vo_x_npc_02", "k3": "vo_x_npc_03"}
+        mowcy = self._mowcy(["k1", "k2", "k3"], audio_kluczy, audio_napisow, wiersze)
+        self.assertEqual(mowcy["k3"], "Ruby")
+
+    def test_niezgodnosc_blokuje_propagacje(self):
+        # rodzina npc z dwoma różnymi postaciami — nic nie zgadujemy
+        wiersze = {"k1": 1, "k2": 2, "k3": 3}
+        audio_napisow = {1: "vo_sm_sxdm4_cs_zlxl_hx_02", 2: "vo_sm_sxdm7_pma_01"}
+        audio_kluczy = {"k1": "vo_x_npc_01", "k2": "vo_x_npc_02", "k3": "vo_x_npc_03"}
+        mowcy = self._mowcy(["k1", "k2", "k3"], audio_kluczy, audio_napisow, wiersze)
+        self.assertEqual(mowcy["k3"], "")
+
+    def test_gracz_wprost_z_cine(self):
+        mowcy = self._mowcy(["k1"], {"k1": "vo_sm_sxdm7_pma_04"})
+        self.assertEqual(mowcy["k1"], "Youxia")
+
+
+class TestNaglowekSasiadow(unittest.TestCase):
+    """Bloki puli bez pokrycia treścią bloku głównego to nie „warianty"."""
+
+    def setUp(self):
+        self.zh_map = {"a1": "不是说好一起去将军祠吗", "a2": "怎么睡着了呀",
+                       "w1": "不是说好一起去将军祠吗怎么睡着了",     # prawdziwy wariant
+                       "o1": "歌罢人散尽", "o2": "物是人非事事休"}   # recytacja obok
+        self.wiersz = {"n": 1, "kn": ["a1", "a2", "w1", "o1", "o2"], "k": []}
+        self.wiersze = {"a1": 591148, "a2": 591149, "w1": 590157,
+                        "o1": 591125, "o2": 591126}
+        self.pl = {k: f"PL {k}" for k in self.zh_map}
+        self.kolejnosc = [[{"w": 591148, "k": "a1", "t": 1.0},
+                           {"w": 591149, "k": "a2", "t": 2.0}]]
+
+    def test_wariant_zostaje_sasiad_dostaje_uczciwy_naglowek(self):
+        _, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
+                                              kolejnosc=self.kolejnosc,
+                                              zh=self.zh_map.get)
+        naglowki = list(podtytuly.values())
+        self.assertTrue(any(n.startswith("Inny wariant") for n in naglowki), naglowki)
+        self.assertTrue(any(n.startswith("Napisy sąsiadujące") for n in naglowki), naglowki)
+
+    def test_bez_zh_naglowki_jak_dawniej(self):
+        _, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
+                                              kolejnosc=self.kolejnosc)
+        self.assertFalse([n for n in podtytuly.values()
+                          if n.startswith("Napisy sąsiadujące")])

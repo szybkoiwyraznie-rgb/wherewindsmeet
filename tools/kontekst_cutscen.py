@@ -112,6 +112,11 @@ _TOKENY_GRACZA = frozenset({"pma", "pmb", "pmc", "pm"})
 _RE_OGON_AUDIO = re.compile(r"(?:_\d+|_ui)+$")
 
 
+def rdzen_audio(audio: str) -> str:
+    """Nazwa nagrania bez ogona numerów (`vo_x_npc_07` → `vo_x_npc`)."""
+    return _RE_OGON_AUDIO.sub("", audio or "")
+
+
 def mowca_z_audio(audio: str) -> str:
     """Mówca wynikający wprost z nazwy nagrania („Youxia", imię) albo ''.
 

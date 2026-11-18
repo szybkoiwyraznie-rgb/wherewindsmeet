@@ -41,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
 from tools import kontekst_cutscen as kontekst_cutscen_mod  # noqa: E402
+from tools import cutsceny_kolejnosc_kwestii as kolejnosc_mod  # noqa: E402
 from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
@@ -516,8 +517,8 @@ def _dialog_sceny(blok: list[str], bloki: list[list[str]], wiersze: dict[str, in
 
 def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
                      audio: dict[int, str] | None = None,
-                     kolejnosc: list[list[dict]] | None = None
-                     ) -> tuple[list[str], dict[int, str], list[str]]:
+                     kolejnosc: list[list[dict]] | None = None,
+                     zh=None) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
     Kolejność kwestii, gdy jest, bierzemy ze ścieżki audio pliku `.cine`
@@ -531,6 +532,13 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     wersja napisów (np. 590153–590179 i 591148–591169 w 30161). Grany jest
     **najnowszy** blok, a starsze wersje schodzą pod nagłówek wariantu, żeby
     nic nie ginęło, ale czytelnik nie dostał dwóch scen splątanych w jedną.
+
+    Gdy podano `zh` (klucz → tekst chiński), bloki spoza chronologii, które
+    prawie wcale nie pokrywają się treścią z blokiem głównym (poniżej 30 %
+    kwestii), dostają uczciwszy nagłówek „Napisy sąsiadujące w puli" —
+    pula trzyma obok siebie wiersze różnych scen (np. recytacja sztuki
+    o Ośmiu Wspaniałych w wierszach 591125–591147 tuż przed blokiem 30161)
+    i to nie są warianty tej cutsceny.
 
     Streszczenie sceny (`k`) stoi **na początku**, zaraz pod nagłówkiem cutsceny.
     """
@@ -567,6 +575,15 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     powtorzone: list[str] = []
     widziane: set[str] = set()
 
+    liczba_chrono = len(bloki_chrono) or 1
+    baza_norm: set[str] = set()
+    if zh and bloki:
+        for blok in bloki[:min(liczba_chrono, len(bloki))]:
+            for k in blok:
+                nz = kolejnosc_mod._norm(zh(k) or "")
+                if nz:
+                    baza_norm.add(nz)
+
     streszczenie = [k for k in wiersz.get("k") or [] if k]
     if streszczenie:
         podtytuly[0] = "Streszczenie sceny"
@@ -580,6 +597,13 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
             opis = (f"wiersze {min(numery)}–{max(numery)}" if numery and min(numery) != max(numery)
                     else f"wiersz {numery[0]}" if numery else "wiersze bez numeru")
             naglowek = f"Inny wariant napisów tej cutsceny ({opis})"
+            if zh and baza_norm and numer_bloku >= liczba_chrono:
+                normy = [nz for nz in (kolejnosc_mod._norm(zh(k) or "") for k in blok) if nz]
+                trafione = sum(1 for nz in normy
+                               if any(nz in b or b in nz for b in baza_norm))
+                if normy and trafione * 10 < len(normy) * 3:
+                    naglowek = (f"Napisy sąsiadujące w puli przerywników ({opis}) — "
+                                "zapewne inna scena w pobliżu")
         czeka_na_naglowek = bool(naglowek)
         for klucz in blok:
             tekst = pl.get(klucz)
@@ -594,6 +618,64 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
                 czeka_na_naglowek = False
             klucze.append(klucz)
     return klucze, podtytuly, powtorzone
+
+
+def _mowcy_cutsceny(klucze: list[str], ix, pl, porzadek,
+                    wiersze_napisow: dict[str, int],
+                    audio_napisow: dict[int, str],
+                    audio_kluczy: dict[str, str]) -> dict[str, str]:
+    """Mówcy kwestii cutsceny + bezpieczna propagacja po plikach nagrań.
+
+    Identyfikacja wprost: krok dialogu sceny (`_mowca_klucza`) albo nazwa
+    nagrania (`mowca_z_audio`) — z audio wiersza w kontekście **i** z audio
+    kwestii `.cine` osobno (kontekst potrafi mieć generyczne `npc_NN`, gdy
+    `.cine` ma `pma_NN`). Potem propagacja, wyłącznie w obrębie tej jednej
+    cutsceny:
+
+    1. **Jeden plik audio to jeden głos** — gdy część wierszy tego samego
+       nagrania ma mówcę, a identyfikacje są zgodne, etykieta przechodzi na
+       pozostałe wiersze tego nagrania (w 30161 `sxdm7_npc_07` kryje cztery
+       wiersze, z czego kontekst zna Ruby tylko dla dwóch).
+    2. **Rodzina placeholderów `..._npc_NN`** ścieżki `.cine`: gdy co
+       najmniej dwa nagrania rodziny są zidentyfikowane i wszystkie wskazują
+       tę samą postać, pozostałe nagrania rodziny dostają tę etykietę
+       (ścieżka 30161 nazywa głos Ruby `sxdm7_npc_*`, a jej prawdziwe
+       nagrania `cs_zlxl_hx_*` kontekst zna dla części wierszy). Przy
+       jakiejkolwiek niezgodności identyfikacji nic nie propagujemy.
+    """
+    mowcy: dict[str, str] = {}
+    pliki: dict[str, set[str]] = {}
+    for klucz in klucze:
+        numer = wiersze_napisow.get(klucz)
+        ctx = (audio_napisow.get(numer) if numer is not None else None) or ""
+        cine = audio_kluczy.get(klucz) or ""
+        mowcy[klucz] = (_mowca_klucza(klucz, ix, pl, porzadek)[0]
+                        or kontekst_cutscen_mod.mowca_z_audio(ctx)
+                        or kontekst_cutscen_mod.mowca_z_audio(cine))
+        for plik in (ctx, cine):
+            if plik:
+                pliki.setdefault(plik, set()).add(klucz)
+    for grupa in pliki.values():        # 1. jeden plik audio = jeden głos
+        znani = {mowcy[k] for k in grupa if mowcy[k]}
+        if len(znani) == 1:
+            mowca = next(iter(znani))
+            for k in grupa:
+                mowcy[k] = mowcy[k] or mowca
+    rodziny: dict[str, dict[str, str]] = {}
+    for klucz in klucze:                # 2. rodzina placeholderów `_npc`
+        cine = audio_kluczy.get(klucz) or ""
+        rdzen = kontekst_cutscen_mod.rdzen_audio(cine)
+        if rdzen.endswith("_npc"):
+            wpis = rodziny.setdefault(rdzen, {})
+            wpis[cine] = wpis.get(cine) or mowcy[klucz]
+    for rdzen, nagrania in rodziny.items():
+        znani = {m for m in nagrania.values() if m}
+        if len(znani) == 1 and sum(1 for m in nagrania.values() if m) >= 2:
+            mowca = next(iter(znani))
+            for klucz in klucze:
+                if audio_kluczy.get(klucz) in nagrania:
+                    mowcy[klucz] = mowcy[klucz] or mowca
+    return mowcy
 
 
 def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
@@ -660,6 +742,12 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 przestrzenie |= gdzie
+                if not mowca:
+                    # mówca z nazwy nagrania (jak w cutscenach) — prologi to
+                    # też napisy puli, krok dialogu sceny zwykle ich nie zna
+                    numer_wiersza = wiersze_napisow.get(klucz)
+                    audio = audio_napisow.get(numer_wiersza) if numer_wiersza else None
+                    mowca = kontekst_cutscen_mod.mowca_z_audio(audio or "")
                 if _okrzyk(ix.zh(klucz)):
                     mowca = ""
                 linie.append((mowca, klucz))
@@ -700,20 +788,13 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
             numer = int(wiersz["n"])
             kolejnosc = kolejnosc_cutscen.get(numer)
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
-                                                            audio_napisow, kolejnosc)
+                                                            audio_napisow, kolejnosc,
+                                                            zh=ix.zh)
             audio_kluczy = {r["k"]: r["a"] for blok in kolejnosc or []
                             for r in blok if r.get("k") and r.get("a")}
-            linie = []
-            for klucz in klucze:
-                mowca = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0]
-                if not mowca:
-                    # mówca z nazwy nagrania: najpierw audio wiersza (kontekst),
-                    # potem audio kwestii ze ścieżki `.cine`
-                    numer_wiersza = wiersze_napisow.get(klucz)
-                    audio = (audio_napisow.get(numer_wiersza) if numer_wiersza else None) \
-                        or audio_kluczy.get(klucz) or ""
-                    mowca = kontekst_cutscen_mod.mowca_z_audio(audio)
-                linie.append((mowca, klucz))
+            mowcy = _mowcy_cutsceny(klucze, ix, pl, porzadek,
+                                    wiersze_napisow, audio_napisow, audio_kluczy)
+            linie = [(mowcy.get(klucz, ""), klucz) for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             liczba_streszczenia = sum(1 for k in wiersz.get("k") or [] if k)
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),

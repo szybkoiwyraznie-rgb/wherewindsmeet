@@ -2039,3 +2039,40 @@ audio wiersza i z generycznym `npc` zostają bez podpisu — uczciwie).
 Testy: +6 (`TestMowcaZAudio`, `TestKwestieZapasowe`), całość **597 OK**.
 Pułapka z danych: `vo_sm_sxd_npc_pma_44` to „Guest A", nie gracz —
 `pma` bywa licznikiem po `npc_`; stąd twarda blokada `_npc_`.
+
+## 2026-11-18 (12) — dziurawe podpisy mówców: propagacja po plikach nagrań; uczciwe nagłówki bloków sąsiednich
+
+Zgłoszenie właściciela po v16: (a) podpisy w 30161 dziurawe, (b) Prolog 4 bez
+podpisów, (c) Prolog 2 stracił "Xiujin Pavilion Enforcer" względem v14,
+(d) "Inny wariant napisów" pokazuje treść innych scen.
+
+**(a) Propagacja** (`_mowcy_cutsceny` w czytance): ścieżka `.cine` 30161
+nazywa głos Ruby placeholderem `sxdm7_npc_NN`, a identyfikujące nagranie
+(`cs_zlxl_hx_NN`) kontekst zna tylko dla części wierszy. Dwie reguły,
+obie w obrębie jednej cutsceny: (1) jeden plik audio = jeden głos —
+etykieta przechodzi na pozostałe wiersze tego samego nagrania; (2) rodzina
+placeholderów `..._npc_NN`: gdy ≥2 nagrania rodziny zidentyfikowane i
+wszystkie wskazują tę samą postać, reszta rodziny dostaje etykietę;
+każda niezgodność blokuje propagację. Poprawka przy okazji: audio
+kontekstu i audio `.cine` próbujemy OSOBNO (`or` na ścieżkach gubił
+`pma_06` gracza, gdy kontekst miał generyczne `npc_124`). Efekt: 30161
+podpisana w 100 % (36/36), +196 podpisanych linii, 18 cutscen z
+dopropagowanymi etykietami (próbki zweryfikowane treścią).
+
+**(b)** Prolog dostał ten sam fallback `mowca_z_audio`, ale wiersze
+Prologu 4 nie mają w danych ani audio, ani kroku dialogu — zostają bez
+podpisów (uczciwie, nie zgadujemy: rozmowa dziecka z wujem Jiangiem).
+
+**(c)** To nie regres v16: etykiety typu "Xiujin Pavilion Enforcer"
+pochodziły z podpowiedzi `mowca_en` przypiętych do INNEGO tekstu o tej
+samej treści (mechanizm podszywania usunięty w v15, wpis 10). Wiersze
+"They're here!" nie mają w danych żadnego mówcy ani audio.
+
+**(d)** `_napisy_cutsceny` z parametrem `zh`: blok spoza chronologii,
+którego kwestie pokrywają się z blokiem głównym w <30 % (po `_norm`),
+dostaje nagłówek "Napisy sąsiadujące w puli przerywników (…) — zapewne
+inna scena w pobliżu" zamiast "Inny wariant". 5 bloków przemianowanych
+(m.in. recytacja o Ośmiu Wspaniałych 591125–591147 przy 30161, dzieci
+w jaskini 590381–590431 przy 30413 — zweryfikowane treścią).
+
+Testy: +6 (`TestMowcyCutsceny`, `TestNaglowekSasiadow`), całość 603 OK.
