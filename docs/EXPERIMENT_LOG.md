@@ -1831,3 +1831,44 @@ cudzego kodu ani nie wymagają tej procedury.
   propozycja dla właściciela: które sceny zmienią miejsce i dlaczego;
   do kitu v8: kandydaci `Storyline/<ścieżka>` (75 POI + 519 `.etsb`/`.ets`
   + 32 `storyline_path`), pełna (nie-głowowa) sonda wskazanych file_id.
+
+### 2026-11-18 (5) — Połączenia scen z grafu zadań; prawda o benchmarku 4700001→4700041
+
+- **Prośba właściciela:** najważniejsze są połączenia scena→scena
+  (przykład: po 4700001 zaraz 4700041).
+- **Znalezione źródło kolejności — tabela `tasks`** (24 753 zadania;
+  kolumny `pre_task`/`post_task` + momenty grania: `fetch_play_cutscene`,
+  `fetch_play_dialogs`, `run_task_storyline` (sceny ze skryptów przez
+  `etsb_storyline.jsonl`), `finish_dialogs`, `finish_play_dialogs`,
+  `finish_play_cutscene`). Nowe narzędzie `tools/zadania_sceny.py` →
+  `index/zadania_sceny.jsonl` (13 623 zadania ze zdarzeniami) i
+  `index/mpk/nastepstwa_zadania.jsonl` (**8 997 krawędzi**; sceny z jednego
+  skryptu uczciwie nieporządkowane; zadania bez zdarzeń przeskakiwane).
+- **Kanoniczny plik następstw** `index/mpk/nastepstwa_scen.jsonl` po scaleniu
+  trzech źródeł (v6, v7, zadania): **10 648 krawędzi, 1 087 potwierdzonych
+  co najmniej dwoma źródłami**. Główny łańcuch od 4700001 ciągnie się bez
+  dziur z przeplotem cutscen: `4700001 → 4700346 → 4700002 → 4700003 →
+  4700005 → 4700377 → 4700384 → 4700385 → [30162] → [30165] → 4700068 → …`.
+- **Benchmark właściciela 4700001→4700041 — wynik uczciwy:** tej krawędzi
+  NIE ma w danych. Fakty:
+  * po 4700001 (zadanie 220003, `finish_dialogs`) łańcuch `post_task`
+    idzie do 220005, a jego skrypt `hjt/220005.etsb` gra **4700346**;
+  * 4700041 jest grane w zadaniu **3400017** (grupa 5052,
+    `qiyu_xunxiazhilu` — inny wątek) przez `new_npc_task_data`
+    (`taskbb_ins_kit_id: 4700041`), nie przez kolumny `tasks`;
+  * 4700352 nie ma w całej bazie ŻADNEGO wyzwalacza poza własną osią
+    `dialog_timelines.4700352` (pełny skan `szukaj_w_bazie --id`);
+  * `longwenbiaoji` występuje w bazie dokładnie raz (`active_interact_way`)
+    — kolejne „znaki smoka" nie są POI z tej tabeli;
+  * zakres **4700000–4799999 to jeden arkusz `ins_kit`** projektantki 李妍
+    (`ins_kit_designer_no`: start_id/finish_id per projektant) — numery
+    4700xxx to wpisy jej arkusza, a wyzwalacze części z nich siedzą w
+    rozmieszczeniu świata (`spaces.*` — trafienia u32 dla 4700041).
+- **Hipoteza (do sprawdzenia, nie fakt):** 4700041/4700352 odpalają się
+  z bytów rozmieszczonych w `spaces` (kolejne znaki wątku sxd) — kolejność
+  wynika z PROWADZENIA gracza (zadania/nawigacja), nie z jawnej krawędzi.
+  Ewentualne potwierdzenie: dekodowanie wpisów `spaces.*` wokół trafień
+  u32 4700041 albo pełne wycięcie nierozwiązanych skryptów kitem v8.
+- **Osie `dialog_timelines.4700001/41/352` istnieją w bazie** (bogate
+  TimelinePObject z trackami per postać) — to kandydat na źródło kolejności
+  KWESTII wewnątrz sceny (priorytet 3) na przyszłą sesję.
