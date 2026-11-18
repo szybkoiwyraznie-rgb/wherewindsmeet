@@ -32,6 +32,9 @@ Zdekodowane bloki trzyma `local/mpk_dekodowane/` (gitignore).
 | `patch_mpkdb_meta.json` | 1 wiersz `meta` — tylko rozmiary i sha256 (bajty to zaciemniona konfiguracja; NIE zapisujemy) |
 | `storyline_graphs.jsonl` | 14 grafów `Storyline` z dekodowanych bloków: liczby typów węzłów oraz wybrane identyfikatory zadań, transferów, przestrzeni, cutscen/QTE i ścieżki zagnieżdżonych storyline; bez tekstu, pozycji, payloadów ani krawędzi grafu |
 | `sciezki_vfs.jsonl` | 11 278 unikalnych ścieżek/nazw plików VFS z bazy gry (974 `.cine`, 3 011 `.graph`, 926 `.etsb`, 6 367 `.ets`; 10 559 z katalogiem): kolumny `cutscenes.cine_path`, `fenbao_cutscene_info.resources`/`.cutscene_graph` (z numerami cutscen w polu `cutsceny`) + surowy skan chunków `dataN`; generator `tools/sciezki_vfs.py` — to są kandydaci file_id dla skanera v7 |
+| `cine_ujecia.jsonl` | **978 masterów `.cine`** z przebiegu v7: ścieżka, numery cutscen, **uporządkowana lista pod-ujęć** (5 022 dzieci, 5 021 potwierdzone w paczkach po `file_id`) — kolejność ujęć przerywnika wprost z osi czasu gry; generator `tools/wynik7_indeksy.py` |
+| `etsb_storyline.jsonl` | **6 961 rozwiązanych skryptów `Storyline/<ścieżka>.etsb`** (reguła VFS: prefiks `Storyline/`): file_id, kontener + fakty z grafu (sceny `dialogs_no`, cutsceny, zadania, zagnieżdżone skrypty); zawiera benchmark POI `Storyline/client/dialogs/hjt/sxd_longwenbiaoji.etsb → scena 4700001` |
+| `storyline_sceny.jsonl` | **8 948 grafów Storyline** z przebiegu v7 (bloki EZST + kandydaci + skan goły, dedup): sceny/cutsceny/zadania/skrypty w grafie + `nastepstwa` — krawędzie przez węzły pośrednie: 3 909 scena→scena (1 508 unikalnych), 235 cutscena→scena, 182 scena→cutscena, 192 cutscena→cutscena |
 
 ## Reguły VFS — potwierdzone na danych gry (2026-11-17)
 
