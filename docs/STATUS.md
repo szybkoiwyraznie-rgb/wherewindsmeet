@@ -335,6 +335,16 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 
 ## Następny krok
 
+**ROADMAPA (zlecenie właściciela 2026-11-18): chronologia tekstów W cutscenach.**
+Dziś tylko niewielka część cutscen ma kolejność kwestii (bloki puli `text_msg`
+po numerze wiersza + nieliczne napisy przypisane z bazy); większość cutscen
+w czytance ma wyłącznie streszczenie, bez dialogów. Zadanie: znaleźć w danych
+gry nośnik kolejności kwestii cutscen (osie czasu cutscen nie są w pakiecie
+aktualizacji; `dialog_timelines.*` nie zawierają napisów puli — patrz dziennik;
+kandydaci do zbadania: pliki .cine/bnk audio, `voice_data_ai`-podobne tabele
+dla cutscen, grafy MESSIAH cutscen w pełnym kliencie) i wpiąć ją w chronologię.
+
+
 0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** Trzy pliki
    według ustaleń właściciela: `01_sceny_i_cutsceny.md` (filmy, prolog, krainy po
    kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze),

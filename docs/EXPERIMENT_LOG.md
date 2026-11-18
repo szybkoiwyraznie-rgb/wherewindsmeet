@@ -1948,3 +1948,30 @@ POI→scena z `index/mpk/poi_storyline_sceny.jsonl` (status `sceny`), nazwa
 POI jak w sekcji POI pliku 03 (polski przekład, bez niego tekst z gry
 z gwiazdką); POI bez nazwy nie podpisujemy. 59 scen dostało wstęp.
 Czytanka v13 (`dist/WWM_Czytanka_PL_v13.zip`) na Dysku.
+
+## 2026-11-18 (9) — zwrotka WWN_PL_v4: +26 243 przekłady; łatka v0.5.0; czytanka v14
+
+Zwrotka tłumacza `WWN_PL_v4.zip` (Dysk, 31 MB, 80 plików .md: PL/cutsceny,
+PL/sceny, PL/widoki). Import `tools/import_zwrotki.py`: 312 493 miejsc PL,
+26 123 nowych, 120 zmienionych (pierwszeństwo tłumacza — nadpisują wersje
+z repo), 85 274 bez zmian, 0 odrzuconych. Dwa wpisy z nadmiarowymi tokenami
+`#Y…#E` (klucze b1196aba0f5f6d1c, 9f844bb3748bcbb8 w
+`oversea_home_entry_bag_search.describe_str`) przyjęte świadomie przez
+`--mimo-tokenow`: tłumacz celowo dodał kody koloru wyróżnienia, których
+źródło nie ma — do obejrzenia w grze przy następnym teście.
+Magazyn po imporcie: **111 735 przekładów (22,82%)**.
+
+Łatka **v0.5.0**: `dist/WWM_Spolszczenie_PL_v0.5.0.zip`, 9 447 453 B,
+SHA-256 3e8e9cdf06fe5a9a7fd6c6782842b49d193655c66eaa17dd87069b8e02e34081,
+112 405 przekładów w planie (112 079 kluczy + 326 wariantów płci; 670
+bliźniaków __grey, 754 kolizje odłożone). Zbudowana z magazynu
+(`one_click_patch.py --tylko-magazyn`), jak przetestowana w grze v0.4.0.
+
+Czytanka **v14** (`dist/WWM_Czytanka_PL_v14.zip`): układ v13 + nowe
+przekłady; nazwy POI we wstępach „Interakcja:" już po polsku
+(np. „Interakcja: Znak smoczego wzoru" nad sceną 4700001). Obie paczki
+na Dysku.
+
+ROADMAPA (następne duże zadanie od właściciela): **chronologia tekstów
+W cutscenach** — większość cutscen ma dziś tylko streszczenie, bez kwestii;
+szczegóły w docs/STATUS.md (sekcja „Następny krok").
