@@ -1,7 +1,16 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-17**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-18**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+**Najnowsze (v19, wpis 15 w dzienniku):** czytanka dzieli pliki na części
+po ~2,5 MB (`01_sceny_i_cutsceny_01..08.md`, `03_reszta_01..03.md`,
+README z listą części); karty pamiątek mają legendę `<motyw> · <kolejność>`
+(motywy z `curio_theme.history_name`, po polsku); nowy magazyn
+`tlumaczenie/pl_nazwy_hasel.jsonl` z **2 032 polskimi nazwami haseł**
+(wszystkie brakujące nazwy przy opisach + 56 nazw motywów pamiątek);
+filtr opisów powtarzających nazwę wydzielony do `_opis_powtarza_nazwe`.
+Reszta w 03: **91 095 pozycji**. Testy: **611 OK**.
 
 **Dane z gry na Dysku Google:** 8 części `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`
 (60 plików, `536 MB` po rozpakowaniu). Spis „co leży w której części” jest

@@ -2113,3 +2113,43 @@ Nowe: `_wlasciciele_nagran` w czytance (rdzeń nagrania → cutscena, tylko
 rdzenie jednoznaczne po zwinięciu klonów `no % 10**8`); nagłówek bloku
 sąsiedniego wskazuje właściciela, gdy nagranie go zdradza:
 „… (są tu nagrania cutsceny 30435)". Testy: +3, całość 604 OK.
+
+## 2026-11-18 (15) — legendy pamiątek, podział na części, 2032 nazwy PL
+
+Trzy tematy w jednym kroku (branch `arena/84521f3f-wherewindsmeet`):
+
+1. **Legendy pamiątek.** Przestrzeń 1168 w kontekstach pamiątek to
+   `curio_theme.history_name` (klucz wiersza = numer motywu). Karta
+   pamiątki dostaje legendę `<nazwa motywu> · <kolejność>` (człon obszaru
+   pominięty — motyw↔lokacja to nie 1:1). Nowa `_legenda_pamiatki` szuka
+   wprost w mapie motywów, bo rid-y kolidują między tabelami (np. wiersz
+   '102025' dzielą arrows/common_scores/text_msg/manual_items).
+   Włócznia Jiang Wulanga = motyw 1 „Yanyun spogląda na północ".
+
+2. **Podział plików na części ~2,5 MB** (`_CZESC_BUDZET`, `_czesci`,
+   `_zapisz_czesci`, `_wiersze_readme`). Cięcie na nagłówkach; w listach
+   na `**…`/pustej linii po zapasie `budzet//10`, po 2× zapasie dowolnie;
+   przecięta sekcja kontynuowana jako `# … (ciąg dalszy)`; nazwy
+   `NN_baza_01.md…`, tytuł „— część N z M"; README listuje części. Mała
+   budowa (testowa) mieści się w budżecie → stare nazwy, testy małych
+   danych bez zmian. `tests/test_chronologia.py` skleja globy
+   `01_sceny_i_cutsceny*.md` / `03_reszta*.md`.
+
+3. **Filtr `_reszta`** zrefaktorowany do testowalnej
+   `_opis_powtarza_nazwe` — przepuszcza opisy z własną treścią
+   (naprawione jue); „Wooden Arrow" to klucz bez PL, nie regresja.
+
+3a. **Nowy magazyn `tlumaczenie/pl_nazwy_hasel.jsonl` — 2032 wpisy PL**:
+   wszystkie brakujące nazwy haseł z opisem (1984) + 56 nazw motywów
+   pamiątek (`curio_theme.history_name`), minus 1 placeholder
+   `待定-占坑` bez treści. Konwencje: odznaki „nazwa: tier · seria",
+   „Próba:/Szkoła:/Geografia:/Z podróży:", tytuły ksiąg w „…",
+   serie rzymskie, 墨城 = „Miasto Moistów". Wczytuje się globem
+   `pl_*.jsonl` bez zmian w kodzie.
+
+Budowa `out/czytanka_v19`: 01→8 części, 03→3 części + README;
+75 328 jednostek, 30 986 kwestii PL, 160 897 z gwiazdką, reszta
+**91 095** (+2 024 nowo nazwane pozycje), zbiory 1020, pamiątki 120
+(0 bez nazwy), POI 2944. Testy: **611 OK** (nowe `TestCzesciPlikow`,
+`TestOpisyNazw`, `TestLegendaPamiatki`). Docs: tabela części w
+`CZYTANKA_DO_CZYTANIA.md`.

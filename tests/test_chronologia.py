@@ -237,7 +237,11 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         cls.statystyka = czytanka_czysta.zbuduj(
             index=str(KATALOG / "index"), magazyn=str(KATALOG / "tlumaczenie"),
             wyj=Path(cls._katalog.name), zakres="wszystko")
-        cls.tekst = (Path(cls._katalog.name) / "01_sceny_i_cutsceny.md").read_text(encoding="utf-8")
+        # Treść może być pocięta na części (`01_sceny_i_cutsceny_01.md`…) —
+        # testy patrzą na sklejoną całość.
+        cls.tekst = "".join(
+            plik.read_text(encoding="utf-8")
+            for plik in sorted(Path(cls._katalog.name).glob("01_sceny_i_cutsceny*.md")))
 
     @classmethod
     def tearDownClass(cls):
@@ -254,7 +258,9 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
 
     def test_napisy_przerywnikow_sa_w_01(self):
         self.assertIn("Wodzu, obudź się!", self.tekst)
-        reszta = (Path(self._katalog.name) / "03_reszta.md").read_text(encoding="utf-8")
+        reszta = "".join(
+            plik.read_text(encoding="utf-8")
+            for plik in sorted(Path(self._katalog.name).glob("03_reszta*.md")))
         self.assertNotIn("Wodzu, obudź się!", reszta)
 
     def test_mowca_jest_pogrubiony(self):

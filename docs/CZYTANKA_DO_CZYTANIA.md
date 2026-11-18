@@ -1,14 +1,22 @@
 # Czytanka do czytania (`tools/czytanka_czysta.py`)
 
-Trzy pliki, po jednym na rodzaj treści — bez czasów mówienia, kluczy, tabel
-i pustych linii między kwestiami. Kolejność bierze się z **jednego stałego pliku
-w repo** (`index/chronologia.jsonl`), a nie z układania od nowa przy każdym
+Dwa rodzaje treści — bez czasów mówienia, kluczy, tabel i pustych linii
+między kwestiami. Kolejność bierze się z **jednego stałego pliku w repo**
+(`index/chronologia.jsonl`), a nie z układania od nowa przy każdym
 uruchomieniu.
 
-| plik | zawartość | wiersze |
+Każdy rodzaj jest **cięty na części po ~2,5 MB** (żeby dało się je czytać
+w przeglądarkach i czytnikach): nazwy mają przyrostek `_NN`
+(np. `01_sceny_i_cutsceny_01.md … _08.md`), tytuł w środku dostaje dopisek
+„— część N z M", a sekcja przecięta na granicy części jest kontynuowana
+pod nagłówkiem `# … (ciąg dalszy)`. Gdy całość mieści się w budżecie,
+plik zostaje jeden i nazwa nie ma przyrostka. `README.md` obok plików
+wylicza wszystkie części.
+
+| pliki (v19) | zawartość | wiersze |
 |---|---|---|
-| `01_sceny_i_cutsceny.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 189 566 kwestii |
-| `03_reszta.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych | 89 071 pozycji |
+| `01_sceny_i_cutsceny_01.md … _08.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 191 224 kwestii |
+| `03_reszta_01.md … _03.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych; karty pamiątek mają legendę `<motyw> · <kolejność>` | 91 095 pozycji |
 
 Plik `02_kontekst_scen_i_cutscen.md` (kontekst do jednostek z 01) został
 **zlikwidowany na życzenie właściciela** (2026-11-18) — wszystko, co pokazywał,
