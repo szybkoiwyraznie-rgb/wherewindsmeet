@@ -46,6 +46,10 @@ WARIANTY = str.maketrans({
     "呀": "啊",
 })
 
+# Słownictwo opisów scenicznych w `sound_data.text` (nie są napisami):
+# oddechy, gwar tłumu, odgłosy walki opisane poza nawiasami didaskaliów
+OPISY_SCENICZNE = ("气息", "群杂", "音效", "视频", "呼吸", "干音", "垫乐", "哭腔")
+
 LUKA_KLASTRA = 25      # maks. przerwa numeracji w klastrze jednoznacznych trafień
 MARGINES_OKNA = 10     # zapas okna wokół klastra
 MIN_KLASTER = 2        # tyle jednoznacznych trafień uwiarygadnia klaster
@@ -156,14 +160,16 @@ def kolejnosc_kwestii(kwestie: list[dict],
             if len(wiersze) == 1 and len(t) >= 2:
                 jednoznaczne.append(wiersze[0][0])
     okna = _okno(jednoznaczne)
+    audio_kwestii = {float(k["t"]): k.get("audio") or "" for k in kwestie}
     bloki = [blok for o in sorted(okna, key=lambda o: o.start)
-             if (blok := _blok_okna(znorm, pula_norm, o))]
+             if (blok := _blok_okna(znorm, pula_norm, o, audio_kwestii))]
     return bloki
 
 
 def _blok_okna(znorm: list[tuple[str, float]],
                pula_norm: dict[str, list[tuple[int, str]]],
-               okno: range) -> list[dict]:
+               okno: range,
+               audio_kwestii: dict[float, str] | None = None) -> list[dict]:
     """Uporządkowane wiersze jednego okna (wariantu) puli."""
     dozwolone = {w for wiersze in pula_norm.values() for w, _ in wiersze
                  if w in okno}
@@ -171,6 +177,7 @@ def _blok_okna(znorm: list[tuple[str, float]],
         return []
 
     # 2. emisja kwestii w porządku czasu; wiersz użyty najwyżej raz
+    audio_kwestii = audio_kwestii or {}
     uzyte: set[int] = set()
     kwestie_wiersze: list[tuple[float, list[tuple[int, str]]]] = []
     for nz, t in znorm:
@@ -222,7 +229,96 @@ def _blok_okna(znorm: list[tuple[str, float]],
     wynik: list[dict] = []
     for t, przydzial in sorted(kwestie_wiersze, key=lambda p: p[0]):
         for w, k in przydzial:
-            wynik.append({"w": w, "k": k, "t": round(t, 3)})
+            wpis = {"w": w, "k": k, "t": round(t, 3)}
+            audio = audio_kwestii.get(t)
+            if audio:
+                wpis["a"] = audio
+            wynik.append(wpis)
+    return wynik
+
+
+def indeks_poczatkow(glob_norm: dict[str, list[str]],
+                     pula_norm: dict[str, list[tuple[int, str]]]) -> dict[str, list[str]]:
+    """Pierwsze 2 znaki → teksty (len ≥ 2) malejąco po długości — szybka segmentacja."""
+    mapa: dict[str, list[str]] = {}
+    for tekst in set(glob_norm) | set(pula_norm):
+        if len(tekst) >= 2:
+            mapa.setdefault(tekst[:2], []).append(tekst)
+    for teksty in mapa.values():
+        teksty.sort(key=len, reverse=True)
+    return mapa
+
+
+def kwestie_zapasowe(kwestie: list[dict],
+                     glob_norm: dict[str, list[str]],
+                     pula_norm: dict[str, list[tuple[int, str]]],
+                     poczatki: dict[str, list[str]]) -> list[dict]:
+    """Tryb zapasowy: kwestie cutscen bez okna puli (krótkie przerywniki).
+
+    Cutsceny z 1–4 kwestiami nie tworzą klastrów jednoznacznych dopasowań
+    (`_okno` wymaga ich co najmniej dwóch), a ich napisy często leżą poza
+    pulą przerywników — w tabelach dialogów scen. Tu dopasowujemy tekst
+    scenariusza do **całego** wyciągu: najpierw w całości, a gdy się nie
+    uda — segmentacją z pełnym pokryciem (żadnych luk ≥ 2 znaki, segmenty
+    ≥ 4 znaki), żeby nie zgadywać. Kwestie bez tekstu po zdjęciu
+    didaskaliów oraz opisy sceniczne spoza nawiasów (oddechy „气息",
+    gwar „群杂", opisy wideo) to nie napisy — pomijamy.
+    """
+    wynik: list[dict] = []
+    for kw in sorted(kwestie, key=lambda k: float(k["t"])):
+        zh = _bez_didaskaliow(kw["zh"])
+        nz = _norm(zh)
+        if not nz:
+            continue                    # same didaskalia (oddech, okrzyk)
+        if any(slowo in zh for slowo in OPISY_SCENICZNE):
+            continue                    # opis nagrania, nie kwestia napisów
+        t, audio = round(float(kw["t"]), 3), kw.get("audio") or ""
+
+        def wpis(klucz: str, tekst_nz: str) -> dict:
+            w = {"k": klucz, "t": t}
+            para = min((p for p in pula_norm.get(tekst_nz, ())), default=None)
+            if para is not None and para[1] == klucz:
+                w["w"] = para[0]
+            if audio:
+                w["a"] = audio
+            return w
+
+        def klucz_dla(tekst_nz: str) -> str | None:
+            """Deterministycznie: wiersz puli, a bez niego najmniejszy klucz."""
+            para = min((p for p in pula_norm.get(tekst_nz, ())), default=None)
+            if para is not None:
+                return para[1]
+            klucze = glob_norm.get(tekst_nz)
+            return min(klucze) if klucze else None
+
+        klucz = klucz_dla(nz)
+        if klucz is not None:
+            wynik.append(wpis(klucz, nz))
+            continue
+        # segmentacja z pełnym pokryciem (dziury najwyżej 1-znakowe)
+        poz, dziura, segmenty = 0, 0, []
+        while poz < len(nz):
+            najlepszy = None
+            for tekst in poczatki.get(nz[poz:poz + 2], ()):
+                if len(tekst) < 4:
+                    break               # krótkie zbitki łapią słownictwo UI
+                if nz.startswith(tekst, poz):
+                    najlepszy = tekst   # listy są posortowane malejąco po długości
+                    break
+            if najlepszy is None:
+                poz += 1
+                dziura += 1
+                if dziura >= 2:
+                    segmenty = []
+                    break
+                continue
+            dziura = 0
+            segmenty.append(najlepszy)
+            poz += len(najlepszy)
+        for tekst in segmenty:
+            klucz = klucz_dla(tekst)
+            if klucz is not None:
+                wynik.append(wpis(klucz, tekst))
     return wynik
 
 
@@ -236,11 +332,28 @@ def zbuduj(index: str | Path = "index",
         if nz:
             pula_norm.setdefault(nz, []).extend(wiersze)
 
+    # pełny wyciąg: tryb zapasowy dla cutscen, których napisy żyją poza pulą
+    from tools import indeks as indeks_mod
+    wyciag = indeks_mod.wczytaj(index, teksty=True, sceny=False)
+    glob_norm: dict[str, list[str]] = {}
+    for klucz, tekst in wyciag.teksty.items():
+        nz = _norm(tekst.zrodlo or "")
+        if nz:
+            glob_norm.setdefault(nz, []).append(klucz)
+    poczatki = indeks_poczatkow(glob_norm, pula_norm)
+
     wynik: list[dict] = []
+    zapasowych = 0
     with Path(sciezka_audio).open(encoding="utf-8") as f:
         for linia in f:
             wpis = json.loads(linia)
-            bloki = kolejnosc_kwestii(wpis.get("kwestie") or [], pula_norm)
+            kwestie = wpis.get("kwestie") or []
+            bloki = kolejnosc_kwestii(kwestie, pula_norm)
+            if not bloki:
+                zapas = kwestie_zapasowe(kwestie, glob_norm, pula_norm, poczatki)
+                if zapas:
+                    bloki = [zapas]
+                    zapasowych += 1
             if bloki:
                 wynik.append({"no": wpis["no"], "bloki": bloki})
 
@@ -252,6 +365,7 @@ def zbuduj(index: str | Path = "index",
 
     return {
         "cutscen": len(wynik),
+        "w_tym_zapasowych": zapasowych,
         "blokow": sum(len(r["bloki"]) for r in wynik),
         "wierszy": sum(len(b) for r in wynik for b in r["bloki"]),
     }

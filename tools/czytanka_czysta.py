@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
+from tools import kontekst_cutscen as kontekst_cutscen_mod  # noqa: E402
 from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
@@ -697,11 +698,22 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                 wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else "")))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
+            kolejnosc = kolejnosc_cutscen.get(numer)
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
-                                                            audio_napisow,
-                                                            kolejnosc_cutscen.get(numer))
-            linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
-                     for klucz in klucze]
+                                                            audio_napisow, kolejnosc)
+            audio_kluczy = {r["k"]: r["a"] for blok in kolejnosc or []
+                            for r in blok if r.get("k") and r.get("a")}
+            linie = []
+            for klucz in klucze:
+                mowca = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0]
+                if not mowca:
+                    # mówca z nazwy nagrania: najpierw audio wiersza (kontekst),
+                    # potem audio kwestii ze ścieżki `.cine`
+                    numer_wiersza = wiersze_napisow.get(klucz)
+                    audio = (audio_napisow.get(numer_wiersza) if numer_wiersza else None) \
+                        or audio_kluczy.get(klucz) or ""
+                    mowca = kontekst_cutscen_mod.mowca_z_audio(audio)
+                linie.append((mowca, klucz))
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             liczba_streszczenia = sum(1 for k in wiersz.get("k") or [] if k)
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),

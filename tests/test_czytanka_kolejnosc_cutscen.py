@@ -301,3 +301,62 @@ class TestChronologiaCine(unittest.TestCase):
         self.assertEqual(klucze, ["r1", "g1", "r2", "stare"])
         self.assertEqual(podtytuly, {3: "Inny wariant napisów tej cutsceny (wiersz 50)"})
         self.assertEqual(powtorzone, [])
+
+
+class TestMowcaZAudio(unittest.TestCase):
+    """Mówca z nazwy nagrania: tylko pewniki (gracz, kody postaci w `_cs_`)."""
+
+    def test_nagrania_gracza(self):
+        from tools import kontekst_cutscen as kc
+        for audio in ("vo_sm_sxdm7_pma_04", "vo_gp_wswll_pma_24",
+                      "vo_gp_znqsr_pma_219_01", "vo_shenxiandu_player_m_65",
+                      "vo_xyz_player_f_3", "vo_sm_sxdm4_cs_zlxl_pma_05"):
+            self.assertEqual(kc.mowca_z_audio(audio), "Youxia", audio)
+
+    def test_generyczne_npc_bez_mowcy(self):
+        from tools import kontekst_cutscen as kc
+        for audio in ("vo_sm_sxd_npc_124", "vo_sm_sxdm7_npc_01",
+                      "vo_sm_sxd_npc_pma_44",   # licznik `pma` po `npc` to nie gracz
+                      "vo_sm_kfm8_npc_231_ui", ""):
+            self.assertEqual(kc.mowca_z_audio(audio), "", audio)
+
+    def test_kod_postaci_w_sciezce_cs(self):
+        from tools import kontekst_cutscen as kc
+        self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_17"), "Ruby")
+        self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_02"), "Ruby")
+
+
+class TestKwestieZapasowe(unittest.TestCase):
+    """Tryb zapasowy: cutsceny bez okna puli dopasowane do całego wyciągu."""
+
+    def setUp(self):
+        from tools import cutsceny_kolejnosc_kwestii as ck
+        self.ck = ck
+        self.glob = {ck._norm("还活着吗"): ["k-zywy"],
+                     ck._norm("我还以为"): ["k-myslalem"],
+                     ck._norm("终于可以给你用冻死骨了"): ["k-toksyna"]}
+        self.pula = {}
+        self.poczatki = ck.indeks_poczatkow(self.glob, self.pula)
+
+    def test_dopasowanie_calej_kwestii_w_kolejnosci_czasu(self):
+        kwestie = [
+            {"t": 5.0, "zh": "我还以为", "audio": "vo_x_qunza_2"},
+            {"t": 1.0, "zh": "还活着吗（冷笑）", "audio": "vo_x_qunza_1"},
+        ]
+        wynik = self.ck.kwestie_zapasowe(kwestie, self.glob, self.pula, self.poczatki)
+        self.assertEqual([r["k"] for r in wynik], ["k-zywy", "k-myslalem"])
+        self.assertEqual(wynik[0]["a"], "vo_x_qunza_1")
+        self.assertNotIn("w", wynik[0])    # klucz spoza puli nie dostaje wiersza
+
+    def test_opisy_sceniczne_pomijane(self):
+        kwestie = [{"t": 0.5, "zh": "会武胜利被击败气息（视频）", "audio": "vo_x_1"},
+                   {"t": 1.0, "zh": "黑市追逃群杂气息", "audio": "vo_x_2"},
+                   {"t": 2.0, "zh": "（轻轻叹气）", "audio": "vo_x_3"}]
+        self.assertEqual(self.ck.kwestie_zapasowe(kwestie, self.glob, self.pula,
+                                                  self.poczatki), [])
+
+    def test_segmentacja_wymaga_pelnego_pokrycia(self):
+        # „还活着吗" + nieznany ogon dłuższy niż 1 znak → bez zgadywania
+        kwestie = [{"t": 1.0, "zh": "还活着吗某某某某", "audio": "vo_x_1"}]
+        self.assertEqual(self.ck.kwestie_zapasowe(kwestie, self.glob, self.pula,
+                                                  self.poczatki), [])

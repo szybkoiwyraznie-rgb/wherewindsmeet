@@ -2013,3 +2013,29 @@ Regresja: `tests/test_czytanka_kolejnosc_cutscen.py` 17 testów
 (591148/591170) po tabelach — tylko `text_msg`/`text_msg__grey`;
 `ccs_text_msg` to UI; nazwy audio nie występują plaintext poza
 `sound_data`; trafienia u32 w skompresowanych Lua to przypadkowe zbitki.
+
+## 2026-11-18 (11) — tryb zapasowy dla krótkich cutscen + mówcy z nazw nagrań
+
+Dokończenie chronologii cutscen (zlecenie właściciela):
+
+**Tryb zapasowy** (`kwestie_zapasowe` w `tools/cutsceny_kolejnosc_kwestii.py`):
+cutsceny z 1–4 kwestiami nie tworzą klastrów okna puli, a ich napisy żyją
+w tabelach dialogów scen. Dopasowanie do **całego** wyciągu: najpierw cała
+kwestia, potem segmentacja z pełnym pokryciem (segmenty ≥ 4 znaki, dziury
+≤ 1 znak). Filtr opisów scenicznych (气息/群杂/视频/音效… — oddechy, gwar,
+opisy wideo to nie napisy). Indeks: **347 cutscen (215 okno + 132
+zapasowe), 2 826 wierszy**; wpisy mają teraz pole `a` (audio kwestii).
+Reszta brakujących z 334 to nagrania bez tekstu napisów (same oddechy).
+
+**Mówcy z nazw nagrań** (`mowca_z_audio` w `tools/kontekst_cutscen.py`):
+identyfikacja z danych, nie z podpowiedzi `mowca_en`: nagrania gracza
+(`pma`/`pmb`/`player_m`/`player_f`, z wyłączeniem liczników po `_npc_`)
+→ **Youxia**; kody postaci w ścieżkach `_cs_` ze słownika pewników
+(`PREFIKSY_MOWCOW_CS`, na razie `zlxl_hx` → Ruby). Czytanka podpisuje
+kwestie cutscen: najpierw audio wiersza z kontekstu, potem audio kwestii
+z `.cine`. W 30161 przeplot ma teraz podpisy **Ruby/Youxia** (kwestie bez
+audio wiersza i z generycznym `npc` zostają bez podpisu — uczciwie).
+
+Testy: +6 (`TestMowcaZAudio`, `TestKwestieZapasowe`), całość **597 OK**.
+Pułapka z danych: `vo_sm_sxd_npc_pma_44` to „Guest A", nie gracz —
+`pma` bywa licznikiem po `npc_`; stąd twarda blokada `_npc_`.
