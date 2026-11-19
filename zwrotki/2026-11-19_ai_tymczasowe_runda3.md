@@ -23,6 +23,11 @@
    EN: Qiu Pingsheng\nHis Final Words.
    PL: Qiu Pingsheng\nOstatnie Słowa.\n
 
+[tasks_envelop_data · text] 保大五年，契丹攻汴京，致百坊焚毁殆尽，生灵涂炭。后汴民重修坊市，然东南一隅困于物力，渐成颓垣。
+   klucz: 018c963e9afbaf67
+   EN: In the fifth year of the Baoda era, the Khitan attacked Kaifeng, burning nearly all the workshops and markets, leaving the populace devastated. Though the citizens rebuilt the markets, a corner in the southeast remains in ruin due to a lack of resources.
+   PL:  W piątym roku ery Baoda — Khitanowie zaatakowali Kaifeng — i spalili prawie wszystkie warsztaty i rynki — i wielu ludzi zginęło. Potem mieszkańcy Kaifeng — odbudowali rynki — ale południowo-wschodni róg — z powodu braku zasobów — stopniowo zamienił się w ruinę.\n
+
 [tasks_envelop_data · text] ……当年假衣一事，多有得罪，近来常思，亦觉蹊跷……\n……若愿联手求真，望请寻信#Y北竹林#E……
    klucz: 01e05e303183ae62
    EN: ...Sorry for the counterfeit garment years ago. Recently, I have found something amiss...\n...Send word to #YNorthern Bamboo Grove#E if you also want to seek the truth...
@@ -73,6 +78,11 @@
    EN: —The Tribute of Yu
    PL: —— „The Tribute of Yu”
 
+[tasks_envelop_data · text] 青蛟帮张错投于赵光义帐下，分家为假，分仕诸方为真。然河伯此人，有江湖计，无庙堂谋。此计难出他手，或是张错自为。看他年岁，是个可怜的聪明人。手中棋少，纵百般挣扎，也只能想出这不好不坏的解法。近日于樊楼之上亲睹开封盛景，心中百味，一时难名。\n……若能得两全法，也算好事。
+   klucz: 06fd1825f49e7aec
+   EN: The defection of Zhang Cuo from the Jade Serpent Hall to Zhao Guangyi's camp is a ruse. The true purpose is not a schism, but a calculated distribution of power. Yet, the River Master understands the machinations of the street, not the court. Such a strategy is unlikely to be his. It must be Zhang Cuo's own gambit. For one so young, he is tragically intelligent. With a weak hand to play, this imperfect compromise is the only outcome his desperate struggles could yield.\n\nGazing upon the prosperity of Kaifeng from atop the Revelry Hall recently, my heart was filled with an indescribable mix of feelings.\n\n... If a path that satisfies both sides could be found, it would be a blessing indeed.
+   PL:  Zhang Cuo z Jade Serpent Hall — dołączył do Zhao Guangyi — pozornie ustępstwo — naprawdę — rozkład wpływów. Ale River Master — zna Jianghu — nie zna dworu. Ten plan — nie wyszedłby z jego ręki — to raczej własna zagrywka Zhang Cuo. W tym wieku — to człowiek mądry do tragedii. W rękach ma mało kamieni — i mimo różnorodnych starań — mógł wymyślić tylko takie niezłe, ale nie doskonałe — rozwiązanie. Ostatnio — z poziomu Revelry Hall — podziwiałem wspaniałość Kaifengu — w sercu — wszystkie smaki — i trudno je nazwać.\n…… Jeśli uda się znaleźć rozwiązanie na dwa razy — to też będzie dobre.\n
+
 [tasks_envelop_data · to] 残缺的阴文本
    klucz: 075671da4c10f616
    EN: Fragmented Cipher Scroll
@@ -92,6 +102,11 @@
    klucz: 087ae78a0d33be8c
    EN: Faithless Qiu,
    PL: Wierucho Qiu,
+
+[tasks_envelop_data · text] 柳青衣的长生之体暂无药可解，我此次前来，只能先替她恢复神智记忆。\n你说她不喜欢别人替她作决定，又恐她恢复记忆后寻短见，不知李公子可已想到应对之策？\n她所受之苦皆因弃徒孙不弃所致，身为师父，我实在惭愧，遥叩谢罪。
+   klucz: 0935e3cf9fd4f75a
+   EN: There's still no cure for Liu Qingyi's immortal condition. This time, I've come only to help restore her mind and memories.\nYou said she hates others making decisions for her and may try to take her own life once she remembers everything. Have you thought about how to deal with that? \nAll her suffering was caused by my former disciple, Sun Buqi. As his master, I'm deeply ashamed and offer my heartfelt apologies from afar.
+   PL:  Dla nieśmiertelnego Liu Qingyi — jeszcze nie ma lekarstwa. Ja — przyszedłem tym razem — tylko przywrócić jej umysł i pamięć.\n Mówiłeś — że nie lubi, gdy inni podejmują za nią decyzje — a ona się boi — że gdy odzyska pamięć — popełni samobójstwo — czy Master Li — już ma rozwiązanie?\n Wszystkie jej cierpienia — z powodu mojego dawnego ucznia Sun Buqi — ja — jako jego mistrz — jestem naprawdę zawstydzony — z daleka — padam na kolana i błagam o przebaczenie.\n
 
 [tasks_envelop_data · text] 柳靥：藤王村现任掌事人，三年前自外乡迁居此处。\n李醉唐：祖上世代居住于此，归义军退伍老兵，独居。\n何琥珀：祖上世代居住于此，贩酒为生，妻儿已殁，独居。\n康蒲酿：窣利商人，现携妻定居藤王村。 \n徐酡娘：康蒲酿之妻，中原人士。\n醇婆婆：祖上世代居住于此，其夫石墨葡其子石醴泉早年战死沙场。
    klucz: 0a12eece4b1282a1
@@ -117,6 +132,11 @@
    klucz: 0ab153b0b2b78491
    EN: Secret Letter of Khitan
    PL: Tajny list z Khitanu
+
+[tasks_envelop_data · text] 浮戏山一事，承蒙相助。近来听人说起你回清河，主持重修，想必诸事繁杂，未免劳神。特托人奉上香炉一盏。\n焚香可静气凝神，除障祛秽，亦觉睡眠。改日拜访，我再携些我自用的香丸来。
+   klucz: 0b2042b0564339be
+   EN: I am most grateful for your assistance regarding the matter at Ethereal Summit. I heard recently that you have returned to Qinghe to preside over the restoration. Such affairs are surely numerous and complex; I trust you are not overly taxed by them. I have taken the liberty of sending an incense burner to you by messenger.\n\nThe burning of incense can quiet the spirit, cleanse away impurities, and aid in restful sleep. When I next visit, I shall bring with me some of the incense pellets I personally use for you to try.
+   PL:  Sprawa Ethereal Summit — dziękuję za pomoc. Ostatnio słyszałem, że wróciłaś do Qinghe — na ponowne prace — i na pewno masz pełne ręce roboty. Specjalnie — za pośrednictwem ludzi — wysyłam Ci kadzielnicę.\n Kadzenie uspokaja oddech i umysł — oczyszcza z przeszkód i brudu — i pomaga w śnie. Innym razem — gdy przyjdę — przyniosę trochę własną używanych kuleczek kadzideł.\n
 
 [tasks_envelop_data · text] 一套有些老旧的妆奁，盒中的脂粉已经干结成块。
    klucz: 0b44d6ff7e5c1353
@@ -243,6 +263,11 @@
    EN: Unsigned Reply
    PL: Odpowiedź nieznanego
 
+[tasks_envelop_data · text] 初，吾欲得百年前长生仙人之术，使举世皆无病痛，亦能解医者世代牺牲之苦。\n柳青衣获长生时，吾以为此道已成，不料此女每醒辄入水寻短见，欲返寻常人身，常吟此间古墓碑文“生如岁华，一世一荣”。\n吾所造长生者，躯体长生而七情仍存，吾之力终不达人心，可叹！
+   klucz: 18a8ee6530f62a1c
+   EN: At first, I intended to master the ancient art of immortality passed down from a century ago, hoping to free all people from the grasp of sickness and to end the relentless toil and sacrifice borne by generations of healers.\nWhen Liu Qingyi finally attained eternal life, I believed my quest was complete. Yet, to my dismay, each time she awoke, she plunged into the water, seeking death and yearning to reclaim a simple, mortal existence. She often whispered the words carved upon the ancient tomb's stone: \n"Life, like flowers, fades and grows, \nOne bloom alone a lifetime knows." \nThough I fashioned immortals whose bodies would never decay, their hearts remain tethered to mundane desires. In the end, my power cannot touch or alter the human spirit. It's truly a sorrow beyond words!
+   PL:  Początkowo — chciałem zdobyć technikę nieśmiertelności sprzed stu lat — żeby wszyscy na świecie byli wolni od chorób — i żeby lekarze byli wolni od poświęceń pokoleń.\n Gdy Liu Qingyi zyskała życie wieczne — pomyślałem, że cel osiągnięty — ale niespodziewanie — ta dziewczyna — za każdym razem — gdy się obudzi — rzuca się do wody — szukając śmierci — pragnąc wrócić do zwykłego życia — i wciąż recytuje napis z grobu w tym miejscu — „Życie jak roczna pora — jedna epoka — jeden rozkwit”.\n Ci, których stworzyłem w życiu wiecznym — mają nieśmiertelne ciała — ale uczucia wciąż pozostają — moja moc — nie sięga do serc ludzkich — jak smutne!\n
+
 [tasks_envelop_data · to] 《梨园集·入阵 下册》
    klucz: 193e3a59734f3699
    EN: The Masked Troupe Collection: Formation Entry II
@@ -338,6 +363,11 @@
    EN: A special feather
    PL: Specjalne pióro
 
+[tasks_envelop_data · text] 太白剑乃西川名侠#M君无逸#E所带的佩剑。\n传闻君无逸正是依凭此剑，纵横江湖十余年。\n剑身冰寒，或用某种天生寒性的神铁所铸。\n太白剑斩江断岳，拥有莫大威能，天下武林世家，自君无逸辞世后寻之。
+   klucz: 22c586adcd3a6e2e
+   EN: The Taibai Sword was the prized blade of #MJun Wuyi#E, the legendary hero of Western Sichuan.\nIt is said that, wielding this very sword, Jun Wuyi carved his path through the jianghu for over ten years. \nForged from a rare, naturally cold divine steel, its blade is said to hold an eternal chill. \nThe Taibai Sword possesses a power so immense it could cut through rivers and mountains. Since Jun Wuyi's passing, all martial forces have sought this legendary weapon.
+   PL:  Taibai Sword — miecz słynnego bohatera Zachodnich Syczuanów — #MJ Jun Wuyi#E.\n Podobnie jak mówili — Jun Wuyi — tym mieczem — przemierzał Jianghu — ponad dziesięć lat.\n Ostrze — lodowo zimne — prawdopodobnie — odlane z jakiejś niebiańskiej stali — z naturalną zimna-energią.\n Taibai Sword — przecina rzeki i woła — ma potężną moc — wszystkie rodziny wojowników — od śmierci Jun Wuyi — szukają go.\n
+
 [tasks_envelop_data · to] 梳篦药方
    klucz: 22ec01d6a22d5d8f
    EN: Shubi Prescription
@@ -347,6 +377,11 @@
    klucz: 234ec340c75b6eb8
    EN: Chen Bai
    PL: Chen Bai — ostateczne słowa\n
+
+[tasks_envelop_data · text] 开州刺史慕容章之子慕容延钊，出身显赫，家境优渥，且性格宽厚仁慈。自其好友李筠归中原，投身刘知远麾下后。一直为其照顾其女。
+   klucz: 237c17d56c70d92d
+   EN: Murong Yanzhao hails from a prestigious and wealthy family and is known for his kind and generous nature. Since his close friend Li Jun returned to the Central Plains and joined Liu Zhiyuan's forces, Murong has taken responsibility for caring for Li's daughter.
+   PL:  Syn gubernatora Kaizhou — Murong Zhanga — Murong Yanzhao — pochodzi z znakomitej i dostatniej rodziny — i jest z natury łagodny i miłosierny. Od kiedy jego przyjaciel Li Jun — wrócił do Środkowych Ziem — dołączył do Liu Zhiyuan — i odtąd — opiekował się jego córką.\n
 
 [tasks_envelop_data · text] 布条上歪歪扭扭地写着：\n“宝藏空空，金蝉脱壳。壁画玄机，尽在宗庙。”
    klucz: 24648b139d48e761
@@ -392,6 +427,11 @@
    klucz: 2719a8ea304b8cbf
    EN: Cong
    PL: Cong\n
+
+[tasks_envelop_data · text] 朱色，取个“工”字——像晚霞，像秋枫……中秋，合该食蟹！叹凉州无蟹……听长安来的商队说，中原秋蟹肥了，掰开壳能流出黄灿灿的膏，蘸醋吃——啧，等开春商队再来，定要托他们捎坛醋，就着这满墙“蟹蝥”下饭！嗯……阿弥陀佛，菩萨莫怪。\n——蟹蝥红。\n\n黄色，取“廿”字——杏子，葵花，栀子香……听说长安的栀子洁白无暇，香气又甜又怯，怕是耐不住凉州风雪。栀子花香，藏经洞里嗅不到，卧佛寺下见不着，可经书里却写了另一种栀子香——“薝蔔花”，西方净土孕育出的金黄圣花，清芳可爱，菩萨最是喜欢。只要做好事，行功德，菩萨笑眯了眼，天上便会降下花雨，众生闻香得度——既如此，不慎点上的这几抹黄，便算作了佛光花雨，想来菩萨大度，不会同我计较吧？\n——栀子黄。\n\n绿色，取“夕”字——玉门关外不见绿，凉州雪盛，苍郁难觅。这抹绿……像家前的绿柳，像塘里的荷叶，也像家后的那座碧山。小时候觉着山大，郁郁葱葱，进去了便要迷路，再回不了家。长大后才知晓，山虽大，却永远在家的后方。人就算不往山里去，也会迷路的。届时只要闭上眼，若能见山，家便不远了。\n——碧山绿。\n\n青色，取青字头——这颜色，我曾听见过。宿在佛寺的那一夜，风声呜咽，令人难以安眠。恍惚间，似有微弱笛音，自厢房外的竹林深处传来……若是循声而去，那花鸟精怪，不知能否听懂人言，让我画上一笔？若是不去，未免辜负良辰，佳人，知音……忽地笛声断了，话本子被吹落下案，窗外月正明。\n——竹月青。\n\n白色……这白不像凉州的雪，不像月下的沙，白垩摸起来细细滑滑……是不是有些像，寺里祈福的女眷说起过的，荔枝？她们说那果子生在岭南，剥开壳，里头是雪白透亮的肉，柔润晶莹……这抹白，用来画观音的指尖正好。咳，我可没有不敬之心，只是有些羡慕罢了……不过，要我指尖也这样好看了，那可就提不了笔了。\n——荔肉白。
+   klucz: 27564c096e3b3600
+   EN: This vermilion hue—it reminds me of the sunset glow, of autumn maples... Mid-Autumn is for feasting on crabs! Alas, in Liangzhou, there are no crabs to be found. Merchants from Chang'an speak of the autumn crabs of the Central Plains, plump and rich, their shells cracking open to reveal oozing, golden roe, best savored with a dip of vinegar... Tsk. When the caravans return in spring, I must ask them to bring a jar of vinegar. Then I can pair it with this wall of "crab roe" for my meal! Ahem... Amitabha, may the Bodhisattvas forgive my worldly thoughts.\n\n—Crab Roe Red.\n\nThis shade of yellow—like apricots, sunflowers, the scent of gardenias... I hear the gardenias of Chang'an are flawless white, their fragrance sweet and shy—too delicate, I fear, to endure the wind and snow of Liangzhou. One cannot smell gardenias in the Sutra Caves, nor find them near the Reclining Buddha Temple. Yet the scriptures speak of another kind of gardenia fragrance—the Zhanbo flower, a sacred golden bloom from the Western Pure Land. It is pure and lovely, a favorite of the Bodhisattvas. They say if you perform good deeds and accumulate merit, the Bodhisattvas will smile, and a rain of fragrant flowers will fall from the heavens, guiding all beings to enlightenment with its scent. In that case, these few accidental smudges of yellow can be counted as the light of Buddha and a rain of sacred flowers. I imagine the Bodhisattvas are generous and will not hold it against me.\n—Gardenia Yellow.\n\nThis shade of green... One sees no green beyond the Jade Gate Pass. In Liangzhou, the snows are heavy, and verdant life is hard to find. This splash of green... it's like the willow trees in front of my home, the lotus leaves in the pond, and the emerald mountain behind my house. As a child, the mountain seemed immense and lush, a place to get lost in and never return. Only after growing up did I understand that though the mountain is vast, it always stands behind home. One can get lost in life even without venturing into the mountains. In those moments, you need only close your eyes. If you can see the mountain, home is not far.\n—Emerald Mountain Green.\n\nThis color, this cyan... I believe I have heard it before. That night I lodged at the monastery, the wind wailed, making sleep impossible. In a daze, I seemed to hear the faint sound of a flute, drifting from deep within the bamboo grove outside my room... If I had followed the sound, I wonder if the spirits of flowers and birds would have understood my words and let me capture their likeness with a single stroke? But to not go would be to waste a perfect moment, a beautiful presence, a kindred sound... Then, suddenly, the flute fell silent. A gust of wind blew my storybook from the desk. Outside, the moon was intensely bright.\n—Moonlit Bamboo Cyan.\n\nThis white... it's not like the snow of Liangzhou, nor the sand under the moon. This chalk powder feels fine and smooth to the touch... Is it not a bit like what the devout ladies at the temple speak of—the lychee? They say the fruit grows in the southern lands. You peel back the shell to find flesh as white as snow and translucent, soft and glistening... This shade of white would be perfect for painting the fingertips of Guanyin. Ahem, I mean no disrespect, of course. It is only a bit of envy... Then again, if my own fingertips were so lovely, I would no longer be able to hold a brush.\n—Lychee Flesh White.
+   PL:  Czerwony — biorę znak „robotnik” 工 — jak zachód słońca — jak klony jesienne…… Pół jesieni — i czas jeść kraby! Szkoda — że w Liangzhou nie ma krabów…… Słyszałem od karawany z Chang'an — że kraby w Środkowym Cesarstwie są tłuste — i jak je rozciąć — ciek z nich żółta mleczko — i je się maczane w occie — aha — kiedy karawany znów przyjdą wiosną — trzeba zlecić im butelkę octu — i je się do tego tego „krabów” — z ryżem! Hmm…… Amitofo — niech Bodhisattwa nie gniewa.\n—— Krabowiec czerwony.\n\n Żółty — biorę „dwadzieścia” 廿 — morele — słoneczniki — gardenie…… Słyszałem — że gardenie w Chang'an są czystej bieli — i pachną słodko — i boja się — że liangowskie śniegi i wiatry nie pozwolą im przeżyć. Zapach gardenii — w jaskiniach tekstów nie znajdziesz — pod Świątynią Leżącego Buddy nie zobaczysz — ale w sutrach — jest inny zapach gardenii — „zhanbo” 薝蔔 — złoty kwiat z zachodniego raju — czysty i zachwycający — Bodhisattwa bardzo go lubi. Wystarczy robić dobre rzeczy — czynić zasługi — a Bodhisattwa się uśmiecha — i z Nieba spada deszcz z kwiatów — i wszyscy ludzie słyszą zapach i się wyzwalają…… skoro tak — to jeśli kiedyś nieuwagą coś zapalę……\n
 
 [tasks_envelop_data · from] 秦川老农
    klucz: 27cb64fd70569ffe
@@ -553,6 +593,11 @@
    EN: On the twentieth day of the third month, in the 16th year of the Dali reign, Yang Sanniang, for want of funds, has borrowed the sum of 1,000 wen from the Apothecarium. Repayment shall be made in installments of 200 wen per month for six months, principal and interest included. Should the debtor abscond, the guarantor shall be responsible for repayment in her stead. Payments are due before each full moon. In case of default, the owed amount shall be doubled. For fear of bad faith, this contract was agreed upon by both parties, face-to-face, and sealed with fingerprints.\n\nGuarantor: Monk Youtong, age 56
    PL: Dwudziestego marca, szesnastego roku ery Dali — Yang Sanniang, z powodu potrzeby pieniędzy — pożycza od Apteki Tysiąc Wenów — miesięcznie płaci Dwieście Wenów — przez sześć miesięcy — kapitał i odsetki razem. Gdyby po otrzymaniu pieniędzy — uciekła i uniknęła — poręczyciel zobowiązuje się zwrócić w jej imieniu. Pieniądze płatne przed każdym pełnym miesiącem. W przypadku naruszenia — suma się podwaja. W obawie przed brakiem słowa — obie strony umawiają się — i przykładają odciski.\n\nPoręczyciel — mnich Youtong, lat 56.\n
 
+[tasks_envelop_data · text] 赵匡胤自恃勇武，常微服出行。人劝谏其行，以防不虞之变。赵闻言大笑，道：“若应为天下主，谁能图之？不应为天下主，虽闭户深居，何益也？”
+   klucz: 36c6086c4b115dba
+   EN: Confident in his martial prowess, Zhao Kuangyin often traveled amongst his people in disguise. When his retainers advised against this, warning of unforeseen dangers, Zhao met their concerns with a great laugh, declaring: "If I am destined to be the lord of all under Heaven, who could dare to scheme against me? And if I am not, what use is there in hiding behind closed doors?"
+   PL:  Zhao Kuangyin — pewien swojej odwagi — często chodził w przebraniu. Radzi mu przeciw — by uniknąć niespodziewanych zmian. Zhao słysząc — śmiał się głośno — i rzekł: „Jeśli mam być panem całego świata — kto może mnie osnuć? A jeśli nie — to nawet zamykając się w domu — jaką ma to wartość?”\n
+
 [tasks_envelop_data · to] 拼起的日记
    klucz: 378124ef886e6f5a
    EN: Reconstructed Diary
@@ -598,6 +643,11 @@
    EN: Hidden Letter
    PL: Ukryty list
 
+[tasks_envelop_data · text] 走夜路的人，有时会遇到一排穿着红衣服默默行走的小女孩。打头那个看着最可怜，总爱跟路人伸手央求：“牵我走一段吧，我怕黑。”\n有个晚归的货郎，看领头那红衣丫头实在可怜，就牵了她的手。这一牵却发现，那双手如同铁箍，冰凉刺骨，甩都甩不开！货郎吓得魂飞魄散，想跑，脚却不听使唤，只能跟着那队红衣女孩走。\n她们越走越快，专挑没人的荒林子里钻。货郎想喊，喉咙像被堵住一样。他惊恐地发现，自己的手也开始发青发冷，再看那些女孩，个个眼神空洞，哪有一点小孩样？最后，他竟迷迷糊糊排进了队伍末尾，骨头像是被打断，也成了个穿红衣服的女孩，跟着走，眼神也渐渐空了。\n老人说，那是被“牵”进去的替死鬼。领头那丫头的手，就是勾魂索，牵上了就得顶她的缺，永世跟着走。
+   klucz: 3bce6196b7723d30
+   EN: Nightward travelers sometimes cross paths with a silent procession of little girls garbed in blood-red. The vanguard of this macabre troupe appears the most wretched, forever reaching out to wayfarers with a trembling beg: "Walk with me a while. The dark frightens me."\nA late-returning peddler, blinded by misplaced mercy, took the leading girl's hand. Instantly, he found her grip to be a shackle of freezing iron, impossible to cast off. His soul fractured with terror. He willed himself to flee, yet his legs betrayed him, forcing him to march in step with the crimson procession.\nTheir pace quickened, diving into the most barren, sunless thickets. He tried to cry for help, but his throat was sealed as if packed with grave-dirt. In mounting horror, he watched his own flesh turn a bruised, lifeless blue. He gazed at the girls, their eyes were vacuous pits, bereft of all humanity. At last, his mind clouded. His bones snapped and contorted until he took his place at the rear of the line: another girl in a red dress, marching silently into the gloom, his own eyes now hollow voids.\nThe old ones call them the replacement spirits, drawn in by the clasp. The first girl's hand is a soul-snaring noose. Clasp it, and you fill her vacancy, doomed to wander the dark forever.
+   PL:  Ludzie idący nocą — czasem spotykają szereg małych dziewczynek — w czerwonych sukienkach — idących w milczeniu. Ta na przedzie — wygląda najżałośniej — zawsze wyciąga rękę do przechodniów — i prosi: „Poprowadź mnie kawałek — boję się ciemności.”\n Był pewien handlarz — wracał późno — zobaczył tę dziewczynkę na przedzie w czerwieni — naprawdę żal — wziął ją za rękę. Lecz gdy wziął — okazało się — te dwie ręce — jak żelazne obręcze — zimne aż do kości — nie da się wyrwać! Handlarz — dusza uleciała — chciał uciekać — nogi nie słuchają — musi iść za tym szeregiem dziewczynek w czerwieni.\n Szły coraz szybciej — wchodziły tylko w puste, dzikie lasy. Handlarz chciał krzyczeć — gardło zapchane. Z przerażeniem odkrył — jego ręka też zaczyna sinieć i zimnieć — a dziewczynki — wszystkie z pustym wzrokiem — czy to wygląda jak dziecko? W końcu — nieprzytomny — dołączył do końca szeregu — kości jak połamane — też stał się jedną z tych w\n
+
 [tasks_envelop_data · to] 任非相尚未完成的手记
    klucz: 3c441444a4680424
    EN: Ren Feixiang's Unfinished Notes
@@ -628,6 +678,11 @@
    EN: Young hero, come to my residence at once!
    PL: Młody bohaterze, pilne, pilne — przyjdź do rezydencji generała natychmiast!\n
 
+[tasks_envelop_data · text] 宝箱一族避世千年，凡入我箱族之地者，当心怀敬畏。不得妄启箱盖，不得私探锁孔，更不可空手祈福。\n——朱砂印·贪者自失
+   klucz: 3f81f5e2c3545b67
+   EN: The Treasure Chest clan has hidden away for a thousand years. Those who step into our sanctuary must do so with reverence. Never rashly lift a lid, never pry at a lock, and never beg empty-handed.\n—Sealed with Vermilion Sand: "Greed Will Be Your Undoing."
+   PL:  Klub Skarbów — na tysiąc lat — wycofał się ze świata; ktokolwiek wejdzie do naszych ziem — musi mieć serce pełne czci. Nie wolno pochopnie otwierać wieka skrzyni — nie wolno szperać po zamkach — i nie wolno prosić z pustymi rękami.\n—— Pieczęć cynobrowa: „Kto chciwy — sam się zgubi.”\n
+
 [tasks_envelop_data · text] 此棺已封，切勿开棺。棺内尸骨朝生暮落余毒难消，触之性命难保……我欠青溪的一条命，就此还清。 若执意开棺，死生自负，言尽于此！
    klucz: 3f9da9d771931988
    EN: This coffin is sealed—do not open it. Inside, the Ephemeral Blight lingers. Disturb it at your own risk—you may not live to regret it. Consider this your final warning.
@@ -647,6 +702,11 @@
    klucz: 40f539b0d5980c2b
    EN: Secrets Await
    PL: Tajemnice czekają — kto chce, niech przyjdzie szybko
+
+[tasks_envelop_data · text] 今日赵匡胤赴太清观祈福，随后转至赵光义府邸后园设宴，比试射箭，兴致颇高，连中数箭。赵光义亦陪射数轮。
+   klucz: 415fb8e113e434b7
+   EN: Today, Zhao Kuangyin first visited the Primordial Azure Temple to offer prayers. Afterward, he proceeded to the rear garden of Zhao Guangyi's residence for a banquet. An archery contest was held, and he, in high spirits, hit the mark several times in a row. Zhao Guangyi accompanied him for a few rounds of shooting.
+   PL:  Dziś Zhao Kuangyin — poszedł do Primordial Azure Temple — złożyć ofiary — a potem — do posiadłości Zhao Guangyi — do ogrodu — i wydał obiad. Konkurs strzelecki — znakomity — trafił kilka razy. Zhao Guangyi też grał kilka rund.\n
 
 [tasks_envelop_data · to] 贺老启
    klucz: 41927c59ca17c0cd
@@ -737,6 +797,11 @@
    klucz: 492d987e0b28d362
    EN: Fragmented Verse
    PL: Wiersz połamany
+
+[tasks_envelop_data · text] 当轩对樽酒，四面芙蓉开。今朝独对碧波 ，来年赏荷时节，可有新友同舟否？
+   klucz: 49cc5fb705e9c576
+   EN: With a cup of wine by the bright window, lotus blossoms bloom all around. This morning, by the serene waters, I sit alone and wonder: when will the lotus bloom again next year? Will there be new friends to share the boat with?
+   PL:  Przy oknie — z kielichem wina — lotosy ze wszystkich stron się otwierają. Dziś rano — samotnie przy turkusowej wodzie — w następny sezon lotosów — czy będzie nowy przyjaciel — do tej samej łodzi?\n
 
 [tasks_envelop_data · text] 上好的蒸青绿茶，茶汤已经凉掉，散发出一股冷淡的海藻香。
    klucz: 49fc7e519d561125
@@ -868,6 +933,11 @@
    EN: Final Words of He Juzu
    PL: „Ostatnie Słowa He Juzu”
 
+[tasks_envelop_data · text] 世上有一种林子，平时看不到。只有雾气最深的夜晚它才长出来。老话说，只有心诚的人才能活着出来。\n从前有个痴公子，误打误撞走到这样的林子里。他在雾里走了很久，发现自己一直在打转。他看到了了十几个破庙。那庙很小，看不清供的什么。他身无长物，只好用林中的东西做祭品，给每一座庙都磕头。结果他就糊里糊涂走出了林子。 \n当他走出林子，松了一口气的时候，低头一看，却发现自己的影子没了。——他的影子才是真正的祭品，被永远留在了林子里。从此这人就变得疯傻痴呆，最后不知道去哪儿了。
+   klucz: 546b2f1a11674b06
+   EN: There exists a kind of forest in this world that remains unseen by day. It only grows on nights when the mist is at its thickest. The old tales say that only those with absolute sincerity can walk out of it alive.\nOnce, a besotted young master stumbled into such a forest. He wandered through the fog for a long time, only to realize he was walking in circles. He came upon a dozen ruined shrines. They were so small he couldn't even tell what was enshrined within. Having nothing of value on him, he used whatever he could find in the dirt as offerings, kowtowing before every single shrine. Somehow, in a daze, he managed to stumble his way out.\nWhen he finally emerged and breathed a sigh of relief, he looked down, only to find his shadow was gone. His shadow was the true offering, left behind in those woods forever. From then on, the man was reduced to a witless husk, and eventually wandered off to who knows where.
+   PL:  Na świecie — jest pewien las — zwykle niewidoczny. Rośnie tylko w najgłębsze mgliste noce. Mówi stare przysłowie — tylko ludzie o szczerym sercu mogą z niego wyjść żywi.\n Niegdyś — pewien nawiedzony młody pan — przypadkiem — trafił do takiego lasu. Szedł we mgle długo — i zorientował się — że ciągle krąży. Zobaczył kilkanaście rozpadłych świątyń. Świątynie małe — nie widać, komu oddają cześć. Nie miał nic przy sobie — więc wziął rzeczy z lasu jako ofiarę — i przed każdą świątynią się pokłonił. W rezultacie — wyszedł z lasu nie wiedząc jak.\n Gdy wyszedł — westchnął z ulgą — i spojrzał w dół — i zobaczył — że nie ma cienia. — Jego cień był prawdziwą ofiarą — i na zawsze pozostał w lesie. Od tego dnia — stał się obłąkany — i nikt nie wie, gdzie się podział.\n
+
 [tasks_envelop_data · text] 一朝别后，二地空悬。以为三四月，谁知五六年。慰叹终重逢，未料相决绝…… \n白微，师尊常言，“一命一价”。洪水将袭、绣金逼迫，至此绝境，吾方悟此言。\n出逃，则敌夺手札、毒患复起；固守，则全城无虞，然我等十死无生。\n我据实相告，拜而请。默然良久后，友人苏茂慨叹曰：“愿随之。为小妹、为亲友，以死换生。”余者或悲或泣，然终纷纷留守。\n见状，我心慰藉，又生遗憾。然一命一价，为护珍爱之人，为保天下安宁，愿以我等性命为价。\n\n白微，愿有一日，你得见此信，知我憾恨与无奈。愿有一日，你得见手札，传之当传之人，以此为助，根除毒患。\n白微，愿你无病无恙，一世长安。
    klucz: 546e519457eca00f
    EN: Ever since we parted years ago, there's been an emptiness in my heart. I thought we might find solace in each other when we finally met someday—never expecting that day would never come.\nOur master often said, "One life, one price." Unfortunately, now with the flood looming and Aureate Pavilion closing in, I finally understand the weight behind his words.\nIf we fled, the enemy would seize our journals and the poison would rise anew. If we stayed, the city would be safe—yet at the cost of our lives.\nSo, I asked them for their opinions. Despite great grief, they all chose to stay, for their beloved ones. As you can see, one life, one price. For the sake of those we hold dear, for the peace of the world, we offer our own lives as the price.\n\nI hope that one day you find this letter and understand my regret and desperation behind it. I hope you find the journal as well—pass it to the right hands to end this plague forever.\nMay you live in health and peace all your days.
@@ -882,6 +952,11 @@
    klucz: 550dda0d1f0589c3
    EN: Jue Fangzhi's Journal IV
    PL: Dziennik Jue Fangzhi IV
+
+[tasks_envelop_data · text] 凡遇无礼者，开箱有喜——诅咒其必失所携至宝，永为我族珍藏。
+   klucz: 55d6688693d573ba
+   EN: To the disrespectful, our chests offer a gift: a curse. Your most precious possession will be lost to you, becoming another treasure in our hoard. Forever.
+   PL:  Kto okaże brak szacunku — skrzynia się otworzy z radością — i spada na niego klątwa: straciłaś wszystkich swoje najcenniejsze skarby — i na zawsze staną się naszą własnością.\n
 
 [tasks_envelop_data · to] 阿娘敬启
    klucz: 567ed0456081c8d7
@@ -1018,6 +1093,11 @@
    EN: Jin
    PL: Jin\n
 
+[tasks_envelop_data · text] 今日截获一函，北汉皇帝刘钧密遣蜡丸书，意图勾连李筠，共谋反宋。
+   klucz: 618988e1f8efadcd
+   EN: Today, an intercepted letter revealed that Liu Jun, the Northern Han emperor, secretly dispatched a wax-sealed message aiming to collude with Li Jun in a conspiracy against the Song.
+   PL:  Dziś przechwycono list — cesarz Northern Han Liu Jun — potajemnie wysłał woskową pieczęć — w której — do Li Juna — o wspólny spisek przeciw Song.\n
+
 [tasks_envelop_data · to] 李煜-信件路人4-4
    klucz: 61c8a0eac8a0cc9b
    EN: Li Yu - Letter Passerby 4-4
@@ -1118,6 +1198,11 @@
    EN: Record of the Shengle Sect
    PL: „Zapis Sekty Shengle”
 
+[tasks_envelop_data · text] ……其家中有父母和一弟。其父为当地游侠，卷入一赌约后身殒 ，其母自尽。赌局有古怪。\n\n公子批：赌局……原来是他。
+   klucz: 683415a9bab61519
+   EN: The subject's family consisted of parents and a younger brother. The father, a local wandering swordsman, perished in a gambling match under suspicious circumstances; the mother took her own life thereafter. The nature of the gambling match is questionable.\n\nA note by Shimmer: "The gambling match... So it was him."
+   PL: …… Jego rodzina — mieli rodziców i młodszego brata. Jego ojciec — lokalny wędrujący szermierz — zginął — wciągniętym w zakład — a matka — popełniła samobójstwo. To zakład — był dziwny.\n\n Dopisek Shimmera: „Ten zakład…… więc to był on.”\n
+
 [tasks_envelop_data · from] 孤影 绝笔
    klucz: 6885de6897aa0286
    EN: Lone Quill\nHis Final Words.
@@ -1183,6 +1268,11 @@
    EN: Wen Wuque
    PL: Wen Wuque\n
 
+[tasks_envelop_data · text] 孤魏武真身！赤壁船焚乃周瑜施魇，铜雀台暗窖藏汉室赤金十万斤。诸葛村夫用八阵图镇孤魂魄，需大钱五十贯破阵。助孤重掌山河，封尔征西将军，授寒食散长生方！
+   klucz: 6df2a9345ffdbdf7
+   EN: I am the TRUE Emperor Wu of Wei, Cao Cao! I didn't lose at Red Cliffs; that was just Zhou Yu's illusion magic! I have 100,000 pounds of pure gold locked in a secret vault beneath the Bronze Sparrow Terrace! But that peasant Zhuge Liang trapped my soul with his Eight Trigrams Array! I need EXACTLY 50 strings of coins to smash it! Help me rule the world again, and I'll make you General of the West and give you the magic powder of long life!
+   PL:  Ja — prawdziwy Cesarz Wu z Wei! Spalenie statków pod Red Cliffs — to była iluzja Zhou Yu — w podziemnych piwnicach Bronze Sparrow Terrace — ukryte sto tysięcy jin czerwonego złota z dynastii Han. Wiejski głupiec Zhuge — uwięził mój duch — Ośmioma Formacjami — potrzeba dokładnie pięćdziesięciu sznurów monet — by je złamać. Pomóż mi odzyskać góry i rzeki — a mianuję Cię Generałem Zachodu — i dam Ci receptę nieśmiertelności Cold-Food Powder!\n
+
 [tasks_envelop_data · to] 爷爷留下的信
    klucz: 6ec994e43902b173
    EN: Letter from Grandpa
@@ -1222,6 +1312,11 @@
    klucz: 717f6d2b4858a007
    EN: Unknown Letter
    PL: Nieznany list
+
+[tasks_envelop_data · text] 保大十二年，周太祖殂，晋王荣即皇帝位。北汉主闻太祖晏驾，甚喜，谋大举入寇，遣使请兵于契丹。战起，荣亲临，矢石不顾，士气大振，扭转败局。赵匡胤亦在其中。
+   klucz: 732a8258e029ed9f
+   EN: In the twelfth year of the Baoda era, following the death of Emperor Taizu of Zhou, Prince Jin ascended the throne as emperor. Upon hearing of Taizu's passing, the Northern Han ruler rejoiced and plotted a major invasion, sending envoys to the Khitan for military aid. When battle erupted, the emperor personally led the forces, rallying his troops and turning the tide of defeat. Zhao Kuangyin was also present among the ranks.
+   PL:  W dwunastym roku ery Baoda — Umarł Taizu of Zhou — książę Jin Rong objął tron. Władca Northern Han — dowiedziawszy się o śmierci Taizu — bardzo się ucieszył — planował wielki najazd — i wysłał poselstwo do Khitanu — prosząc o wojsko. Bitwa wybuchła — Rong osobiście się pojawił — nie zwracał uwagi na strzały i kamienie — morale wojska wzrosło — i sytuacja odwróciła się. Zhao Kuangyin też był wśród nich.\n
 
 [tasks_envelop_data · to] 棺内的信
    klucz: 73aec140ce9051c4
@@ -1373,6 +1468,11 @@
    EN: Ren Shanzhong
    PL: —— Ren Shanzhong\n
 
+[tasks_envelop_data · text] 狂澜弟子，嗜酒如命，酒血互偿。\n若能在三日内，遍尝世间九种美酒，便可入我狂澜门下！\n不历九酝淬骨洗肠，怎敢妄称饮过江湖！
+   klucz: 7f0f671efc1ef029
+   EN: We of the Raging Tides live and die by the cask. Blood debts are paid in spirits; spirit debts are paid in blood. Survive a trial of the nine legendary brews of this realm within three days, and you may pass through our gates. If you've never been cleansed by these brews that reforge the very bone and marrow, then don't claim you've tasted the true spirit of the jianghu.
+   PL:  Uczeń Raging Tides — żyje winem jak wodą — krwie i wino wymieniają się nawzajem.\n Jeśli w ciągu trzech dni — spróbujesz wszystkich dziewięciu legendarnych win tego świata — możesz wejść do Mokjego sekty Raging Tides!\n Bez dziewięciu prób — krwi czystej jak kości i czyszczącej jelita — jak można śmieć powiedzieć — że piłeś Jianghu!\n
+
 [tasks_envelop_data · text] 诸苦所困，贪欲为本。既无所得，何苦再来？
    klucz: 7fb85db64c49ae2e
    EN: All suffering springs from desire. All effort in vain, why bother to try again?
@@ -1423,6 +1523,11 @@
    EN: Everyone's desperate to join Well of Heaven, and you're the first one I've seen to quit! $T(2026) must be crazy. Go missing. If my people catch you next time, they will rough you up! And when that happens, I'm not going to step in!
    PL: Wszyscy zasuwają do Well of Heaven — a Ty, łepetynko, uciekasz?! $T(2026) — naprawdę wpadłeś w świnię! Idź, idź już — żebyśmy cię więcej nie widzieli — jak cię znowu zobaczymy — moi bracia ci narożniki ureżniesz! Wtedy ja się nie wtrącę!\n
 
+[tasks_envelop_data · text] 今日截获一函，乃冯夷寄往天上来之家书，内述其北上之由。恐生后变，此信已拦。
+   klucz: 8211e0748a85e2ac
+   EN: We intercepted a family letter from Feng Yi to Heavenfall today, which detailed the reasons behind his northern journey. The letter was seized to avoid any unforeseen consequences.
+   PL:  Dziś przechwycono list — od Feng Yi — do rodziny w Heavenfall — wyjaśniający powody jego wyjazdu na północ. Obawiono się ewentualnych zmian — list został zatrzymany.\n
+
 [tasks_envelop_data · to] 《墨子·大取》
    klucz: 823e6c70cad48f07
    EN: Mozi: Greater Choice
@@ -1453,6 +1558,11 @@
    EN: Your Candle's Flame, My Guiding Light
    PL: „Twoja świeca, mój kierunek”
 
+[tasks_envelop_data · text] 昔日梁府声势煊赫，却一夕间被人血洗。然金银俱在，未知动手之人身份。古谱或于此夜为人取走。\n\n公子批：竟还与梁府旧事有所瓜葛？有意思，你且深入探查。
+   klucz: 849b71abaa8a115e
+   EN: The once-illustrious Liang family was massacred overnight in a bloodbath. Curiously, their treasures were left untouched, and the identity of the assailants remains unknown. The ancient score was likely taken on that same night.\n\nA note by Shimmer: "So, this is even entangled with the old affair of the Liang family? How intriguing. I want a thorough investigation."
+   PL:  Dom Liang — kiedyś potężny — w jedną noc — wymordowany. Ale złoto i srebro — zostały — nieznana jest tożsamość napastników. Stara partytura — prawdopodobnie — zabrana tej samej nocy.\n\n Dopisek Shimmera: „Więc — ma to związek ze sprawą dawną rodziny Liang? Ciekawe. Zbadajcie to dokładnie.”\n
+
 [tasks_envelop_data · to] 温通补血方与解毒利咽方
    klucz: 84ab211a418c7c4c
    EN: Prescriptions for Blood Tonic and Throat Relief
@@ -1478,6 +1588,11 @@
    EN: A respectful farewell,\nLiu Si'an
    PL: Z szacunkiem żegna,\nLiu Si'an\n
 
+[tasks_envelop_data · text] 我们已探得#M君无逸#E和#M太白剑#E的下落，果然不出您所料，真在这雪谷之中！只是这“#M雪怪#E”，一直在阻挠我们行动。明日我们将继续挺进雪谷。
+   klucz: 86b95c41b3132e94
+   EN: We've confirmed the whereabouts of #MJun Wuyi#E and the #MTaibai Sword#E—just as you expected, they're hidden deep within Snow Valley. However, the #MSnow Monster#E has been standing in our way. We'll press on and push further into the valley tomorrow.
+   PL:  Ustaliliśmy — gdzie jest #MJ Jun Wuyi#E i #MTaibai Sword#E — jak przeczuwałeś — naprawdę w tej Śnieżnej Dolinie! Tylko ten „#MŚnieżny Potwór#E” — wciąż blokuje nam działania. Jutro — będziemy dalej wchodzić do Śnieżnej Doliny.\n
+
 [tasks_envelop_data · to] 《渡厄卷》
    klucz: 877c8b4e7e3b6678
    EN: Scroll of Deliverance
@@ -1487,6 +1602,11 @@
    klucz: 87e90738647db0f9
    EN: Echoes from the Depths of Memory 4
    PL: Echo z głębin pamięci · Cztery
+
+[tasks_envelop_data · text] 今密探潜入无忧洞，探得洪肆踪迹。肆挟九流门恩人之子为人质，以迫九流。
+   klucz: 87f513900c02fed2
+   EN: Our undercover agent infiltrated Unbound Cavern today and uncovered traces of Hong Si. Hong holds hostage the son of a benefactor from the Nine Mortal Ways, using him as leverage to coerce the sect.
+   PL:  Dziś — tajny agent — infiltrował Unbound Cavern — i ustalił — Hong Si — używa syna dobroczyńcy z Nine Mortal Ways jako zakładnika — aby wymusić na sekcie.\n
 
 [tasks_envelop_data · text] 我等时间，等了一辈子。 \n等到手中的唐旗已暌违这片土地，近一个甲子。 \n人言常道，五十而知天命。可我等的，并不是那个天命的安排。 \n所以我与时间相争，哪怕背弃我的善良，滥用我的权术，牺牲……我的长兄。 \n不，哪怕牺牲的是我。凉州可以无我，归义军可以无我， \n但那个誓心归国的愿望，还需要一个继任者。 \n而今日，我便要等那个继任者到来。 \n只是，我等的那个人，还存着赤子的热忱，和对我的敬重。 \n长安的质子，不应是归义军领袖的软肋。 \n故而，我告诉他真相，也告诉他龌龊。 \n我希望他舍弃我，一如我舍弃兄长。 \n如果权力的更迭都需要鲜血，那么就用我的血肉来为他造势。 \n直到他凌驾我的旧部，取代我的威望。 \n看着外面被他控制的亲兵，看着他压制那些不愿我归唐的声音。 \n果然，他做得很好。 \n我本以为，他来的时候，会把刀架在我的脖颈， \n可他却把刀递给了我—— \n我太熟悉这把刀，起初的那场送别，就是兄长将刀送予我， \n后来我又把它送还给兄长的儿子。 \n而现在，这把刀又还至跟前。 \n他说，他会带着归义军，等我回家。 \n那一刻，我们洞谙彼此，我知道，此时、未来， \n不管千里、万里，我们还会站在彼此身旁。 
    klucz: 881d2f6fa62d1ee2
@@ -1502,6 +1622,11 @@
    klucz: 888ea36aa1da428a
    EN: Map of Liangzhou, Hand-drawn by Cao Jing Guanyin
    PL: Mapa Liangzhou — ręcznie narysowana przez Cao Jing Guanyin
+
+[tasks_envelop_data · text] 见此书时，吾命已绝。  \n昔充御廐养马吏，本分举发官吏克扣战马草料银，竟遭污为通贼逆党。念双亲早亡，兄弟相携苟活至今，实不忍累弟同死，故屈身求庇于龙武军。  \n然其胁吾驱驾夜行，弃尸荒野。及验车中亡者，竟是……\n吾虽卑贱，岂能为此大逆不道之事？故吞盐卤自绝。可叹半生驭马驯烈、弓刀铩羽之能，终作弑逆帮凶！  \n此书能否达于汝手，实未可知。若有幸得阅，当谨记吾诫：速弃功名之念，速置二亩瘠田。躬耕糊口虽艰，然安平胜万金。\n\n
+   klucz: 8a451a44e734389a
+   EN: By the time you read this scroll, my breath shall have ceased. \nI once served as a humble groom in the Imperial Stables, content merely to tend the steeds. Yet, simply for reporting an official's embezzlement of fodder funds, I was framed as a rebel. Thinking of our departed parents and how we have clung to life together, I could not bear to drag you to the grave with me. Thus, I sought refuge with the Longwu Army.\nBut they coerced me into driving a carriage through the dead of night to dump a corpse in the wilds. When I checked the deceased inside... it was none other than...\nLowly as I may be, my heart could never brook such treason. Therefore, I have swallowed bitter brine to end my own life. Alas! To think that a lifetime spent taming wild stallions and mastering the blade should end like this, as an unwitting accomplice to regicide! \nI do not know if this letter will ever reach your hands. If luck grants you this sight, engrave my warning upon your heart: Forswear all dreams of rank and fame. Buy a few acres of barren land instead. A peasant's toil may be bitter, but a life of peace outweighs a mountain of gold.
+   PL:  Gdy czytasz ten list — moje życie już się skończyło.\n Niegdyś — byłem koniuch w cesarskich stajniach — doniosłem o defraudacji pieniędzy na paszę dla koni — i zostałem oczerniony jako buntownik. Wspomniałem zmarłych rodziców — bracia trzymali się razem — i przetrwali do dziś — nie mogłem znieść — żeby mój brat umarł razem ze mną — więc uniżyłem się i poprosił o ochronę u Longwu Army.\n Lecz ona zmusiła mnie — do nocnej jazdy powozem — i porzucenia zwłok na pustkowiu. A gdy sprawdziłem ciało w powozie — okazało się……\n Ja — choć nisko urodzony — jak mogłem dopuścić się takiej zbrodni? Dlatego — połknąłem sól i skończyłem ze sobą. Żal — przez pół życia — wabiłem konie i tresowałem dzikie — a teraz — zostałem wspólnikiem zbrodni!\n Czy ten list dotrze do Twoich rąk — naprawdę nie wiem. Jeśli będzie szczęście i przeczytasz — pamiętaj moje ostrzeżenie: porzuć myśl o sławie i zasługach — kup dwie morgi jałowej ziemi. Uprawa roli — choć trudna — ale spokój i bezpieczeństwo cenniejsze niż złoto.\n\n
 
 [tasks_envelop_data · text] 少侠，来将军府一叙。
    klucz: 8a491c1cb8e227f6
@@ -1573,6 +1698,11 @@
    EN: Unsent Letter from Liu Kaiyan
    PL: Niewyslany list Liu Kaiyan
 
+[tasks_envelop_data · text] 今日截获一函，乃薛丑致万俟安山之书。其在书中，言鬼市子自朱佑生殁后，人心涣散如沙，亟需重聚之策。又云近日于外偶得三稚子，与诸童计议，欲令其伪托朱氏遗孤之名，以统九流。
+   klucz: 8f96004a504010ca
+   EN: An intercepted letter today from Xue Chou to Moqi Anshan lamented that, after Zhu Yousheng died, loyalty dissolved like sand in the wind at Ghostlight Market, and a plan to reunite is urgently needed. He also mentioned recently encountering three young children outside who, together with local youths, plotted to impersonate Zhu's heirs and rule the Nine Mortal Ways.
+   PL:  Dziś przechwycono list — od Xue Chou do Moqi Anshan — w którym — mówi, że od śmierci Zhu Yousheng — serca ludzi w Ghostlight Market rozprysły się jak piasek — i pilnie potrzebny nowy plan — aby je znów zjednoczyć. I dodaje — że ostatnio — spotkał przypadkowo troje małych dzieci — i z innymi dziećmi — planowali pod szyld Zhu — udawać sieroty po Zhu — i rządzić Nine Mortal Ways.\n
+
 [tasks_envelop_data · text] 什么样子、到底应该是什么样子……
    klucz: 8f9b6a4aacfcb9e7
    EN: What should it be like... what is it supposed to be like...?
@@ -1617,6 +1747,11 @@
    klucz: 92a696307a3d43e9
    EN: To my disciple:\n\nLet my bones be interred in Liangzhou, to share the eternal frost with the myriad righteous spirits gathered there. The mortal veil is torn, and my worldly obsessions have vanished. As I lie dying, I leave for our clan two vows, sworn in iron and blood.\n\nThe First Vow: The sect of Raging Tides will cut all ties with the throne. From this day on, our eagles answer no summons, and our dragons seek no grace!\n\nThe Second Vow: Our disciples shall not pass from this world leaving fortunes, false glory, or even their bones to trouble the living. Their gourds shall be full of rice, oil, and wine, to ensure no soul goes hungry or cold on the journey beyond.\n\nShould you encounter one who wears the "Gourd of Remembrance," show him honor. That man possesses a hero's heart and our Raging Tides spirit. If he is willing to drink with you, welcome him into our fold.\n\nFarewell, and be well.
    PL:  Do mojego ucznia Hengjiang:\n\nHuaishen pochowany w Liangzhou — razem z tysiącami szlachetnych dusz Guiyi Army — pije szron z nimi. Zasłona pyłu jest przebita — przywiązania zgasły. Ja — na łożu śmierci — zostawiam dwa przysięgi z żelaza i krwi:\nPierwsza: Raging Tides — całe klan — zrywa wszystkie stosunki z tronem. Od dziś — orły nie odpowiadają na rozkazy — wojny nie przyjmują łaski!\nDruga: uczniowie Raging Tides — po śmierci — nie zostawią złota i nefrytu — nie zostawią sławy w kronikach — nie zostawią resztek ciała dla potomków — tylko butelkę z ryżowym winem — na drogę do podziemia — żeby nie zamarzły i nie zgłodniały.\nJeśli spotkasz przybysza z butelką na pasie — „jedna butelka — i już nie wraca” — pamiętaj — przyjmuj go uprzejmie. Ten człowiek — o rycerskiej odwadze i krwi — ma w sobie ducha Raging Tides — jeśli zechce napić się z nami — weź go do sekty.\n Otóż to — dbaj o siebie.\n
+
+[tasks_envelop_data · text] 今日截获一函，乃鬼市子明器坊掌柜任山重，致赵普夫人魏芷昔之书。其在书中，称魏为师妹，劝魏放下狼山一战，又问魏是否寻到救民之法。
+   klucz: 93c3167b358f27c0
+   EN: An intercepted letter today came from Ren Shanzhong, the owner of Funerary Artifact Workshop in the Ghostlight Market, addressed to Zhao Pu's wife Wei Zhixi. In the letter, Ren refers to Wei as his junior sister, urging her to let go of the Battle of Langshan and inquiring whether she has found any way to save the people.
+   PL:  Dziś przechwycono list — właściciel Funerary Artifact Workshop w Ghostlight Market — Ren Shanzhong — do żony Zhao Pu — Wei Zhixi. W liście — zwraca się do Wei jak do młodszej siostry — radzi porzucić bitwę pod Langshan — i pyta Wei — czy znalazła sposób na ratowanie ludzi.\n
 
 [tasks_envelop_data · from] 项籍绝笔
    klucz: 940bcc72472a5264
@@ -1668,10 +1803,20 @@
    EN: A Partially Charred Letter
    PL: List spalony w połowie
 
+[tasks_envelop_data · text] 今日截获一函，乃李筠之子李守节致其姊李鸢之书。其在书中极力赞颂慕容延钊及石守信平叛之伟绩，对其父李筠只字不提。至于石守信与慕容延钊屡施劝降之举，亦略而不述。
+   klucz: 988bbde349bf40ca
+   EN: Today, we intercepted a letter from Li Jun's son, Li Shoujie, addressed to his sister, Li Yuan. In it, he lavishes praise on Murong Yanzhao and Shi Shouxin for their heroic efforts in quelling the rebellion, yet conspicuously omits any mention of their father, Li Jun. The persistent peace overtures of Shi and Murong are briefly acknowledged, but lightly.
+   PL:  Dziś przechwycono list — od Li Shoujie, syna Li Juna — do jego siostry Li Yuan. W liście — chwali Murong Yanzhao i Shi Shouxina — za wielkie zasługi w tłumieniu rebeliantu — o swoim ojcu Li Junie — ani słowa. Co do Shi Shouxina i Murong Yanzhao — ciągle proponują poddanie się — też pominięte.\n
+
 [tasks_envelop_data · from] 郭怀烈绝笔
    klucz: 98a60a24b9b81ba8
    EN: —Guo Huailie, his final brushstroke
    PL: —— Ostatnie pióro Guo Huailie\n
+
+[tasks_envelop_data · text] 今得一剂，出自青溪掌门孙愿之手，可暂缓朝生暮落之毒。此药自沈义伦处所截，似欲交予太医署翟煦。
+   klucz: 98aff62cf52d8129
+   EN: A recently acquired remedy, developed by Sun Yuan, master of Silver Needle, can temporarily counteract the Ephemeral Blight. This medicine was intercepted from Shen and seemed destined for the Imperial Medical Academy under Zhai Xu.
+   PL:  Dziś zdobyto jedno lekarstwo — wyszło z rąk Sun Yuana, przywódcy Silver Needle — potrafi tymczasowo zawrócić truciznę Dawn-to-Dusk Blossom. To lekarstwo — skradziony od Shen Yiluna — prawdopodobnie — miało trafić do Zhai Xu w Imperial Medical Academy.\n
 
 [tasks_envelop_data · from] 冯如之亲笔
    klucz: 990a10634e03b8e8
@@ -1722,6 +1867,11 @@
    klucz: 9c3e78b92a08146e
    EN: They say a single day as husband and wife fosters a hundred days of grace. I was truly fortunate to have met you, my lord, to be wed in the warmth of spring, our fates bound as I came of age.\n\nYet our noble house fell in a single night. I intended to follow you, to shatter like jade, but word came from Hexi that you had cast me aside.\nI know too well that your cold words of release were a shield to grant me life.\n\nIn this life, we may never meet again. Therefore, I must blaze a trail through this wasteland, carving out a chance at survival from this utter despair. Only then can I honor the sacrifice you made for me.\n\nReflecting on this life, I have crossed seas of sand and shouldered great responsibilities. If we should meet again in the Yellow Springs, I swear you will see me with new eyes.\n\nOur fate in this world was brief, yet I pray for the next. I hold no regrets. May you always know this.
    PL:  Mówi się, że jeden dzień małżeństwa — to sto dni łaski.\n Druga Pani ma szczęście — spotkała Panią — uroczystość ślubną zawarto w dniach wiosny — dobry związek — w wieku dojrzewania.\n Lecz dom o wysokiej pozycji — upadł w jedną noc. Chciała rozkawałkować jadem i pójść za Panem — lecz nie pomyślała — Pan wysłał list z Hexi — odrzucił ją.\n Ja wiem — Panie — jego zimne słowa o odprawie — w rzeczywistości — chciały ją ochronić.\n Tego życia — nie spotkamy się więcej — jedyne, co można zrobić — to iść na oślep, przez trudności — i znaleźć choćby cień szansy — i wtedy — jego trud nie będzie daremny.\n Patrząc na to życie — ja przeszłam przez morze piasku — zasługuję na wielkie zadania. Jeśli spotkamy się w świecie podziemnym — na pewno będziesz na mnie z innymi oczami patrzeć.\n Te związki w tym życiu — zbyt płytkie. — Tylko proszę o następne życie. Bez żalu — Oby Panie — pamiętał.\n
+
+[tasks_envelop_data · text] 好大侠，许久不见，近日可安好啊？我猜，大侠肯定过得风生水起，潇洒快活吧！\n嗯？我？当然是在筹备我的“逆袭大业”啦！咳咳，给我五十文，我提前给你透露点？\n哈哈，不打趣你了。等到我们再见的那一日。再跟你说个三天三夜吧。
+   klucz: 9c7305a42c18d3fb
+   EN: Hey, great hero. It has been a long time. Have you been well these days? I imagine you must be living it up, roaming free and enjoying life to the fullest.\nMe? Of course I am busy preparing my grand comeback. Care to give me fifty coins and I might let you in on a secret ahead of time? Haha, just teasing you.\nWhen we meet again someday, I will tell you everything. I could talk for three days and three nights without stopping.
+   PL:  Hej, bohaterze — dawno Cię nie widziałem — co u Ciebie? Zgaduję — życie masz wspaniałe — i wolne — i radosne!\n Co? Ja? Oczywiście — szykuję się na „wielkie odrodzenie”! Hm, hm — daj mi pięćdziesiąt monet — a wcześniej Ci coś zdradzę?\n Haha — żartuję. Kiedy się znowu spotkamy — pogadamy przez trzy dni i trzy noce.\n
 
 [tasks_envelop_data · to] 《写给游侠的信》
    klucz: 9cf08c5c2b089899
@@ -1853,6 +2003,11 @@
    EN: I hope you can understand that ruling a nation and securing peace demands swift, resolute action. The Cup of Wine Policy remains the most effective method to maintain order. I bear no guilt, yet Zheng Yi betrayed the Zhao family for Shadow Arsenal, threatening my life. How could I possibly forgive such treachery?
    PL: Mająca nadzieję, że zrozumiesz: rządzić państwem i zapewnić światu spokój trzeba zdecydowanie. „Puchar wina odbierający władzę wojskową” to najskuteczniejszy sposób rządzenia. Nie zrobiłem nic złego, a jednak Zheng Yi zdradził rodzinę Zhao dla Shadow Arsenal i godził w moje życie — jak mogłem go tak bezkarnie puścić?
 
+[tasks_envelop_data · text] 玄元教近日频现于浮戏山中。暗中探得其弟子只言片语，暂未得其密谋之意，然种种线索，疑指赵宋。
+   klucz: a721626b10aa389a
+   EN: The mysterious Xuanyuan Cult has been frequently appearing around Ethereal Mountain recently. Secret inquiries have gleaned only fragments of their disciples' talk, with no clear indication of their plans, though clues seem to point toward the Zhao-Song court.
+   PL:  Xuanyuan Cult — ostatnio — często pojawia się w Ethereal Mountain. Potajemnie zdobyłem fragmenty rozmów jego uczniów — jeszcze nie mają — jego ukrytych planów — ale wszystkie ślady — kierują na Zhao-Song.\n
+
 [tasks_envelop_data · from] ——朱鱼
    klucz: a79da96340d9df70
    EN: Zhu Yu
@@ -1912,6 +2067,11 @@
    klucz: abff1355d3351eeb
    EN: Discarded Papers
    PL: Wyrzucone papiery
+
+[tasks_envelop_data · text] 颜妹：  \n上次你跟我说的事，我思量妥了。\n不比你是家中独女，我兄弟十人，少一个不少。家中薄田可托长兄，我自入赘就是。\n若你爹娘仍不松口……可记得邻村的小韩？\n去年带媳妇私奔躲到玉门关外烧陶窑，上月回来抱了个胖小子，如今两家老人都抢着送鸡蛋。  \n但私奔终归坏名声……算了算了，再议吧！  
+   klucz: ac2db958394551d4
+   EN: Kaiyan my dear,\n\nI've been thinking hard about what you said.\n\nYou're your family's only daughter, but I'm one of ten brothers—they won't miss one of us. My eldest brother can take over our small plot of land, and I'll simply marry into your family. That should solve it.\n\nAnd if your parents still refuse… you remember Xiao Han from the neighboring village, right?\n\nHe ran off with his wife last year, hid out past Jade Gate Pass firing pottery. Just last month he returned carrying a plump son, and now their families are practically fighting over who gets to bring them eggs.\n\nStill, running away earns you a bad reputation... Best not to think about it. We'll figure something out later.\n
+   PL:  Yanmei:\n W sprawie, o której mi powiedziałaś ostatnio — przemyślałem to.\n Ty jesteś jedynaczką w rodzinie — ja — jeden z dziesięciu braci — bez jednego nic się nie zmieni. Ciągnące się pola można powierzyć najstarszemu — i po prostu ożenić się w Twoim domu.\n Jeśli rodzice nadal się nie zgadzają…… Ty pamiętasz Xiao Han z sąsiedniej wioski?\n W zeszłym roku — z żoną — uciekli po kryjomu — do wypału ceramiki za Jade Gate Pass — wrócili w zeszłym miesiącu — z tłustym noworodkiem — teraz obie rodziny — rzucili się sobie na głowę — nosząc jajka.\n Ale ucieczka — zawsze brudzi opinię…… mniejsza z tym…… później omówimy!\n
 
 [tasks_envelop_data · text] 敕睦州官驿参事洪钰\n勤恳兢守，通晓诸文，博闻强记……\n……不辞辛劳，保音书通达……\n可兹任悬泉驿长。
    klucz: acf0c4fa9b24ff2d
@@ -2053,6 +2213,11 @@
    EN: ...To atone for the fault a decade past, I shall this time offer the Heavenly Silkworm Garment as a token.
    PL: ……Jak zadośćuczynienie za ten błąd sprzed dziesięciu lat — tym razem koniecznie podaruję Heavenly Silkworm Garment.\n
 
+[tasks_envelop_data · text] 公子想解钱荒之困，于开封落子数处。然而一子于粮，一子守渡，还有一子在我。东阙公子之志，怕是不在熔炉之中吧。\n我猜，公子身后，尚有一人。何不请其现身？\n容鸢\n\n一清丽字迹：看看看看，人家要见你呢。\n\n公子批：不愧是李筠之女。
+   klucz: b9722cc2e616e076
+   EN: Your efforts to solve the coin shortage have seen you place several pieces on the board in Kaifeng. One move targets the grain supply, another secures the ferry crossing, and a third rests with me. Yet, I surmise your true objective does not lie with the Furnace.\nI suspect there is another person behind you. Why not invite the one pulling the strings to step out from the shadows?\nMurong Yuan\n\nWritten in the margin with a delicate hand: "Well, well, look at that. You have an admirer."\n\nA note by Shimmer: "As expected of Li Jun's daughter."
+   PL:  Pan — żeby rozwiązać niedobór coinów — umieścił kilka kamieni w Kaifeng. Ale jeden kamień — to ziarno; jeden — to przejście; a jeszcze jeden — to ja. Pan wie — że ambicje Ember of East — prawdopodobnie — nie mieszczą się w Furnance.\n Zgaduję — że za Panem — jest jeszcze ktoś. Dlaczego nie poprosi go — żeby się pokazał?\n Murong Yuan\n\n Piękny charakter: patrz patrz patrz — chcę się z Tobą spotkać.\n\n Dopisek Pana: nie dziwię się — że to córka Li Yuna.\n
+
 [tasks_envelop_data · text] 此次门派路线图失窃，想是师弟为人利用所致。小弟愿前往风雪林场，救出师弟，夺回地图。
    klucz: b9a9ef86fbca4639
    EN: The map was stolen because someone took advantage of my junior. I volunteer to go to the Snowy Tree Farm to rescue him and recover the map.
@@ -2077,6 +2242,11 @@
    klucz: bc32953042b60463
    EN: By imperial decree, after centuries of selection, one was chosen from millions to become the Colossus.\nYet due to the medicine, #Ywhen the Colossus's lifespan ends, its mind descends into madness and chaos.#E Left unchecked, it will surely cause a disaster...\n#YShould the worst come to pass, the Colossus must be slain without hesitation, all bonds and attachments severed. This must be strictly observed...#E\n\nThis medicine is fierce and potent. While it can tame insects and fish alike, awakening their intellect... it shortens their lives and stirs maddening frenzy... Controlling the waters with it is just like drinking poison to quench thirst. Send Yan Qing to investigate the "Flowing Water" in Mohist Hill that may hold a permanent cure.
    PL: ……Z rozkazu cesarskiego wybrano go z wieków i tysięcy — jednym z milionów, aby został Władcą Smoczym.\nZ powodu tego leku #YWładca Smoczy, gdy jego czas się kończy, utraci rozum i wpadnie w szaleństwo#E. Jeśli pozwolić temu płynąć, grozi nam katastrofa……\n#YJeżeli dojdzie do najgorszego, musisz Władcę Smoczego zgładzić własnoręcznie i odciąć wszelkie przywiązania — błagam, przestrzegaj tego……#E — dwunasty rok ery Yongping\n                                                                               \n\nTen lek działa gwałtownie. Choć potrafi oswoić robactwo i ryby, przebudzając ich rozum…… skraca też ich życie i budzi w nich szaleńcze napady…… Leczenie powodzi takim lekiem przypomina gaszenie pragnienia trucizną. Słyszałem, że na Mohist Hill krąży mechanizm „Płynąca Woda” — wyślij Yan Qinga, aby go namierzył. Może uda się znaleźć rozwiązanie na zawsze.\n\n
+
+[tasks_envelop_data · text] 葬者，藏也，乘生气也。\n夫阴阳之气，噫而为风，升而为云，降而为雨，行乎地中则为生气。盖生者，气之聚。凝结者成骨，死而独留。故葬者反气纳骨，以荫所生之道也。经云：气感而应，鬼福及人。\n……\n凡墓门置石狮，必令#Y首向生门，尾扫幽途#E。狮目注阳，则阴祟不侵；狮爪踞地，则亡者安寝。若首尾倒逆，#Y阳关塞而阴气滞，生气不循也#E。
+   klucz: bca7beea93d0bc39
+   EN: Burial is the act of concealment, a means to ride the Vital Qi.\nThe breath of Yin and Yang exhales to become wind, ascends to form clouds, and descends as rain; yet when it courses through the veins of the earth, it becomes Vital Qi. Life itself is but the coalescence of this Qi. That which solidifies becomes bone, the sole remnant after death. Thus, burial is the act of returning Qi to the bone, thereby sheltering the paths of the living. As the scripture states: "When Qi resonates in the earth, the blessings of the spirits reach the living."\n...\nFor any tomb guarded by stone lions, one must ensure their #Yheads face the Gate of Life, while their tails sweep the Paths of Gloom#E. When their eyes gaze upon the Yang, no shadowy malevolence may intrude; when their claws firmly clasp the earth, the departed shall rest in peace. Should their orientation be reversed, the Gateway of Yang shall be barred, the Yin shall stagnate, and the Vital Qi shall fail to circulate.
+   PL:  Pochówek — to ukrycie — to podróż na energii życia.\n Energia yin i yang — wydychana — staje się wiatrem; wznosi się — chmurami; opada — deszczem; krąży w ziemi — i staje się energią życia. Żyjący — to skupienie energii. Skrzepłe — tworzy kości — po śmierci zostają tylko one. Dlatego pochówek — to zawrócenie energii i przyjęcie kości — droga osłony żyjących. Księga mówi: energia odczuwa i odpowiada — szczęście duchów spływa na ludzi.\n……\n Każdy grobowiec z kamiennymi lwami — musi mieć #Ygłowy zwrócone ku Wrotom Życia, a ogony zamiatające Ścieżki Mroku#E. Gdy oczy lwów patrzą na Yang — złe duchy nie wejdą; gdy łapy mocno trzymają ziemię — zmarli spoczywają w pokoju. Gdyby głowa i ogon były odwrócone — #YWrota Yang się zamkną, a energia Yin zastygnie — energia życia nie będzie krążyć#E.\n
 
 [tasks_envelop_data · from] 司账：孙墨卿 
    klucz: bcb4d8aa93db1e2a
@@ -2203,10 +2373,20 @@
    EN: To Bai Wei,
    PL: Do Bai Wei,
 
+[tasks_envelop_data · text] 秦川有一种老狐狸，想要变成人，就得偷吃人的精气。它不咬别处，专吃人的脚趾头。\n有个靠跑商发家的张老爷，晚上总要唤两个暖脚婢伺候。半夜，床底下有动静，他装睡偷看却发现，从床底下钻出来一只狗那么大的狐狸，眼睛通红，像人一样站起来，枯树枝似的爪子掀开他被子，捧起他左脚就咬小趾头，而两个暖脚婢却睡死过去。\n张老爷疼得要命，却浑身僵硬，喊不出也动不了。只见狐狸咬得带劲，喉咙里发出怪声，牙上还带着血光。咬完，狐狸眼里的红光淡了点，居然像人一样咧嘴一笑，然后钻回床底不见了。\n张老爷能动后一看，小指头差点咬断，血肉模糊。怪的是，伤好后那小指头变得像石头一样又冷又硬，没知觉了。而事后那两个暖脚婢却毫不知情。
+   klucz: c79b418c72a64332
+   EN: There is a breed of ancient fox in Qinchuan that must steal the vital essence of humans to take on a human form. It bites nowhere else. Just the toes.\nMaster Zhang, a merchant who made his fortune on the road, always kept two bed-warming maids to serve him at night. At midnight, hearing a rustle beneath his bed, he feigned sleep and peeked. From under the bed crawled a fox as large as a hound. Its eyes glowing a blood-red hue, it stood on its hind legs like a man. With claws like withered branches, it pulled back his quilt, lifted his left foot, and began gnawing on his little toe. Strangely, the two maids slept on like the dead.\nThe pain was excruciating, yet Zhang's body went completely rigid; he could neither scream nor move. He could only watch the fox chew vigorously, emitting eerie rasps from its throat, its teeth glinting with blood. After the feast, the red glow in its eyes dimmed. It flashed a hideous, human-like grin before diving back under the bed and vanishing.\nWhen Zhang finally regained his movement, he found his little toe nearly severed into a bloody pulp. The strange thing was, after the wound healed, that toe became as cold and hard as stone, completely devoid of feeling. As for the two maids, they remained entirely oblivious to the night's horrors.
+   PL:  W Qinchuan — jest pewien stary lis — żeby stać się człowiekiem — musi ukraść ludzką esencję życia. Nie gryzie nigdzie indziej — tylko ludziom palce u nóg.\n Był pewien Pan Zhang — zbogacił się na handlu — nocami zawsze wołał dwie pokojówki do grzania nóg. Północą — pod łóżkiem — szelest — udawał, że śpi, i podglądał — i zobaczył — spod łóżka wyszedł lis wielkości psa — oczy czerwone — wstał jak człowiek — suche jak gałąź pazury podniosły kołdrę — chwycił lewą stopę — i ugryzł mały palec — a dwie pokojówki spały jak zabite.\n Pan Zhang — ból nie do zniesienia — ale całe ciało zesztywniałe — nie mógł krzyknąć ani się ruszyć. Widział — jak lis gryzie zawzięcie — w gardle dziwne dźwięki — na zębach blask krwi. Po ugryzieniu — czerwony blask w oczach lisa nieco zbladł — i — jak człowiek — wykrzywił się w uśmiechu — i wrócił pod łóżko — i zniknął.\n Gdy Pan Zhang mógł się ruszyć — spojrzał — mały palec prawie odgryziony —\n
+
 [tasks_envelop_data · to] 来自天泉的信
    klucz: c7a4d02bb1167131
    EN: A Letter from Well of Heaven
    PL: List z Well of Heaven
+
+[tasks_envelop_data · text] 甚雨连旬，博浪沙一带水势渐涨，人心惶惶，百姓聚于万古一人殿前祷告河伯。瓠子金堤尚在修葺，若长此以往，黄河恐有再决之虞。公子小心。
+   klucz: c7cad9fa7910d7b2
+   EN: Prolonged heavy rains have caused the waters around Roaring Sands to rise steadily, causing widespread panic. The people have gathered before the Eternal Solitude Hall to pray to the River Master. The repair of the Huzi Dike is still underway, but if the rains continue, there is grave concern that the Yellow River may break its banks again. Please proceed with caution.
+   PL:  Ulewne deszcze trwające dniami — wokół Roaring Sands — woda się podnosi — mieszkańcy się lękają — ludzie zgromadzili się przed Eternal Solitude Hall — modlitwę do River Mastera. Zabezpieczenia Huzi Dike wciąż naprawiany — jeśli to potrwa — Yellow River — może znów pęknąć — Panie — bądź ostrożny.\n
 
 [tasks_envelop_data · from] 儿 守谅
    klucz: c7cc739b0d3c35b5
@@ -2223,6 +2403,11 @@
    EN: Mechanism Trouble? Call the Gateway!
    PL: Problem z mechanizmem — szukaj drzwi!
 
+[tasks_envelop_data · text] 近日探得常平使沈义伦欲各郡先贷军粮于民，虽被赵宋驳回，但其意志坚决，难为公子所用。
+   klucz: c7f3605ff1e1a6c5
+   EN: Recent intelligence reveals that Master of Grain Shen Yilun intended to have the prefectures lend military grain to civilians first. Though this was rejected by the Zhao-Song court, Shen remains determined and difficult to manipulate.
+   PL:  Ostatnio ustalono — że Shen Yilun — Lord Master of Grain — zamierza — dla każdego powiatu — najpierw wypożyczyć wojskowe ziarno ludziom — choć Zhao-Song odrzuciło to — jego wola jest twarda — trudno będzie Panu go wykorzystać.\n
+
 [tasks_envelop_data · text] 清河魔侠·血月无妄·绝影剑主：\n\n阁下重金悬赏所求的太素回春仙丹，本尊已炮制完成。此丹可助你功力大增，问鼎天下第一指日可待！\n若对此丹还算满意，请入夜后于门前放下十文钱作为报酬。明日，本尊自有更多好物奉上。
    klucz: c8287f86d988fc8d
    EN: GREETINGS, O RENEGADE BLADE OF QINGHE, THE-ONE-WHO-WALKS-BENEATH-THE-BLOOD-MOON, LORD OF THE SHADOWLESS SWORD!\n\nBEHOLD! The Primordial Essence Restorative Pill that you put out a world-shaking bounty for—I have forged it into existence! This mystical treasure will amplify your inner force beyond measure, and your destiny to dominate all under heaven is but a heartbeat away!\n\nShould this creation prove worthy, you are to place a sum of ten copper coins before your gate as darkness falls. Consider it a token. On the morrow, expect even more wondrous artifacts from my legendary collection!\n
@@ -2233,10 +2418,20 @@
    EN: Ren Pingzhao, Lone Cloud
    PL: Ren Pingzhao, Lone Cloud\n
 
+[tasks_envelop_data · text] 邀请函已经送到啦，你们这弄得还挺花哨。道主会去群英会相助。但有几个事儿我得提前说明白。\n别给道主这席上酒，拿牛乳换一下，备三盏杯。切记，形制需毫无二致。再者，点心茶点这类的多来点儿，要甜的。樱桃煎、浮元子、酥琼叶就挺好的。\n先这样吧。若还有其他，再行告知。\n东阙\n\n公子批：你真领着人来此处用膳不成？
+   klucz: c88c304eaf0b3fc9
+   EN: Your invitation was delivered. Quite a show you're putting on. The Dao Lord will be at the Heroes Assembly to support you, but there are conditions I need to state plainly.\n\nFirst, no wine for the Dao Lord. Have it replaced with milk in three vessels that look exactly the same. No exceptions. Second, there had better be plenty of sweets. Candied cherries, floating glutinous balls, and crispy jade pastries are good options.\n\nThat will be all for now. If there are further instructions, you will be notified.\n\nThe Ember of East\n\nA note by Shimmer: "Are you serious? You're treating this assembly like a private dinner party?"
+   PL:  Zaproszenie już dotarło — robią z tego przedstawienie. Dao Lord przyjdzie — i pomoże w Heroes Assembly. Ale kilka spraw muszę najpierw jasno powiedzieć.\n Nie dawaj Panu wódkę — zamiast tego mleko — trzech kieliszków — ale pamiętaj — kształt musi być identyczny. I jeszcze — ciastka i przekąski słodkie — dużo — kandyzowanych wiśni 樱桃煎, pływających klusek ryżowych 浮元子 i kruchych liści z jadeitu 酥琼叶 — to będzie dobre.\n Na razie — tyle. Jeśli będzie coś jeszcze — dam znać.\n Ember of East\n\n Dopisek Pana: naprawdę przyprowadzasz tu ludzi — żeby tu jeść?\n
+
 [tasks_envelop_data · text] 金瓯回归日，官家广散财。\n乞怜歌声起，草盆成宝盆。
    klucz: c89d58c45ff23ed5
    EN: On the day the treasured land returns,\nThe Emperor's bounty freely burns. \nWith heartfelt pleas in melodies spun, \nHumble bowls turn treasures won.
    PL: Dzień powrotu Golden Jar — Cesarz obsypuje bogactwo.\nPiesna Pieśń Ulitowania się rozlega — miska dla żebrzącego staje się miską skarbu.\n
+
+[tasks_envelop_data · text] 常平使沈义伦自吴越归。今夜宿长兴集霁雨楼，随行之人寥寥。\n言尽于此。\n
+   klucz: c8d3466646882862
+   EN: Master of Grain Shen Yilun has returned from Wuyue. Tonight, he lodges at the Clearsky Tower in Crosswind Bazaar. His retinue is small.\n\nI have said all that needs to be said.
+   PL:  Lord Master of Grain Shen Yilun — wrócił z Wuyue. Dziś noc — zatrzymuje się w Clearsky Tower — w Crosswind Bazaar — z niewielką świtą.\n Wszystko, co trzeba — zostało powiedziane.\n\n
 
 [tasks_envelop_data · text] 初三\n赵林、小方、小存上工\n王岩新来\n\n初四\n王岩、赵林、小方、小存上工\n\n初五\n王岩、赵林、小方、小存上工，\n货物被盗，疑有贼人！
    klucz: c8d6b55bfa95749c
@@ -2372,6 +2567,11 @@
    klucz: d21a1e77c64d4d9f
    EN: Respectfully,\nMaster of Grain
    PL:  Z uszanowaniem,\nLord Master of Grain\n
+
+[tasks_envelop_data · text] 生平事件待补充
+   klucz: d2416b2cc7d9622e
+   EN: Further details of ongoing matters will be added in due course.
+   PL:  Szczegóły życia — do uzupełnienia\n
 
 [tasks_envelop_data · text] 元和四年秋，闻狱中夜有嚎哭者，听其音，不似长安之声。问其人，身出陇右，本为官身，驻于悬泉驿中。蕃戎侵扰，交通断绝。辞别朋友，孤身赶赴长安。中途没于戎人之手，改服易音，#Y信物皆失#E，茹毛饮血数十余年。一朝得机，藏青冢寒草，历黄河薄冰，昼伏宵行，进入唐境，边军视为戎人擒缚。拜迎再三不可免，判流配江南卑湿地。言罢悯然，遂遣酒，使其暖身。余幼居边镇，知边将之拥兵不战，虚奏邀功。此番亲闻亲见，颇极愤慨，故与友人各作《缚戎人》之诗。
    klucz: d29448ec1226a11c
@@ -2528,10 +2728,20 @@
    EN: Bloodstained scripture
    PL:  Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona Księga krwią zabarwiona\n
 
+[tasks_envelop_data · text] 今日截获密函二封：\n其一乃陈达邵致军械库诸将之书，其文盛言“杯酒释兵权”之谋，致使武臣权柄尽削。\n其二系方无涯致无忧帮帮主之密札，命其手下假扮商贾，混入市集，阻断军械库与外邦商人的交易。\n\n公子批：陈、方二人，不过明棋耳。其父母暗持枢机，欲乱军械库之势，夺其权柄。
+   klucz: df7d953cb2fa8594
+   EN: Two secret letters were intercepted today:\nThe first, a letter from Chen Dashao to the generals of the Shadow Arsenal, strongly advocates for a "Banquet to Relieve Military Power," a plot to strip the commanders of their authority.\nThe second, a clandestine message from Fang Wuya to the master of the Unbound Cavern, orders his subordinates to disguise themselves as merchants, infiltrate the markets, and disrupt trade between the Shadow Arsenal and foreign parties.\n\nA note by Shimmer: "Chen and Fang are merely pawns on the board. Their parents are the ones pulling the strings from the shadows, seeking to sow chaos within the Arsenal and usurp its power."
+   PL:  Dziś przechwycono dwie tajne listy:\nPierwsza — od Chen Dashao — do generałów Shadow Arsenal — w której — otwarcie wypowiada się — „Puchar wina odbierający władzę wojskową” — w wyniku czego — zwierzchnicy wojskowi całkowicie utracili władzę.\nDruga — tajna wiadomość od Fang Wuyi — do szefa Unbound Cavern — rozkazując swoim ludziom — udawać kupców — i infiltrować rynki — by przerwać transakcje między Shadow Arsenal a zagranicznymi handlarzami.\n\n Dopisek Pana: Chen i Fang — to tylko jawny szach. Ich rodzice wciąż — trzymają kluczowe elementy — i chcą zakłócić stabilność Shadow Arsenal — i przejąć jej władzę.\n
+
 [tasks_envelop_data · to] 被烧毁的信
    klucz: dfb8f709ecd6415b
    EN: Charred Letter
    PL: Spalony list
+
+[tasks_envelop_data · text] 昨夜隐月山突传钟声，声震四野，如雷贯耳。村人皆惊，尤以孩童为甚，整夜啼哭。
+   klucz: e0781a8706e09544
+   EN: Last night, a sudden bell toll echoed across Moonveil Mountain, its sound rolling like thunder through the fields. The villagers were shaken, especially the children, who cried through the night.
+   PL:  Zeszłej nocy — na Moonveil Mountain — nagle rozbrzmiał dzwon — jego dźwięk wstrząsnął całą okolicą — jak grzmot przez ziemię i niebo. Mieszkańcy wszyscy zaniepokoili się — najwyżej dzieci — płakały całą noc.\n
 
 [tasks_envelop_data · to] 《梨园集·入阵 上册》
    klucz: e1823f485a2a0a13
@@ -2593,6 +2803,11 @@
    EN: Blue Brocade Bag
    PL: Niebieski Woreczek Brokatowy
 
+[tasks_envelop_data · text] 凡墓门置石狮，必令#Y首向生门，尾扫幽途#E。狮目注阳，则阴祟不侵；狮爪踞地，则亡者安寝。若首尾倒逆，阳关塞而阴气滞，生气不循也。
+   klucz: e4b7a0bbe4220170
+   EN: For any tomb guarded by stone lions, one must ensure their #Yheads face the Gate of Life, while their tails sweep the Paths of Gloom#E. When their eyes gaze upon the Yang, no shadowy malevolence may intrude; when their claws firmly clasp the earth, the departed shall rest in peace. Should their orientation be reversed, the Gateway of Yang shall be barred, the Yin shall stagnate, and the Vital Qi shall fail to circulate.
+   PL:  Każdy grobowiec z kamiennymi lwami — musi mieć #Ygłowy zwrócone ku Wrotom Życia, a ogony zamiatające Ścieżki Mroku#E. Gdy oczy lwów patrzą na Yang — złe duchy nie wejdą; gdy łapy mocno trzymają ziemię — zmarli spoczywają w pokoju. Gdyby głowa i ogon były odwrócone — Wrota Yang się zamkną, a energia Yin zastygnie — energia życia nie będzie krążyć.\n
+
 [tasks_envelop_data · text] 我千辛万苦可算找着了你哥哥的消息，最近他可就在凉州。\n若是想见他，便用你们家的“名酒”来换吧。\n这酒可是要献给回鹘族里那些大人物的，别想着糊弄，酒酿好了，我会先来验一验货。
    klucz: e4ec588592a77b80
    EN: It took everything I had, but I've finally found news of your brother. He's in Liangzhou right now.\nIf you want to see him, it'll cost you your family's "celebrated vintage."\nThis wine is promised to the Uhu bigwigs, so don't even think about passing off some cheap imitation. Once it's ready, I'll be coming by to inspect the goods myself.
@@ -2632,6 +2847,11 @@
    klucz: e8fb404bcc558443
    EN: Nameless Remains
    PL: Nieznane kości
+
+[tasks_envelop_data · text] 占城国使臣今日入贡，所献方物清单如下：犀角、象牙、龙脑、香药、孔雀四、大食瓶二十。
+   klucz: ea448f816489983f
+   EN: The envoy from Champa arrived today bearing tribute: rhinoceros horn, ivory, dragon's brain resin, fragrant herbs, four peacocks, and twenty exquisite bottles from Arabia.
+   PL:  Dziś — wysłannik Champa — przybył z trybutem — lista darów: róg nosorożca — ivory — smocza żywica — pachnące zioła — cztery pawie — dwadzieścia butelek z Arabii.\n
 
 [tasks_envelop_data · text] 清泉帮如今如此嚣张，天泉为何要一忍再忍！把头心怀仁爱，我却咽不下这口气，请把头给我十数个兄弟，我定会一举剿灭清泉帮！
    klucz: ea55bdaf5bff9dce
@@ -2703,6 +2923,11 @@
    EN: Hidden Letter
    PL: Ukryty list
 
+[tasks_envelop_data · text] 有双生子，为梁府所收养。据探报，梁府少主身罹羸疾，需一特殊“药引”。此收养之举似有蹊跷。\n\n公子批：双生子？继续查吧。
+   klucz: f384dce7a926ddd9
+   EN: A set of twins was adopted by the Liang family. According to our intelligence, the young master of the Liang household suffers from a wasting disease and requires a special "medicinal catalyst." This adoption appears suspicious.\n\nA note by Shimmer: "Twins? Keep digging."
+   PL:  Są bliźnięta — przyjęte przez rodzinę Liang. Jak donosi wywiadowca — młody pan rodziny Liang — cierpi na chorobę wyniszczającą — i potrzebuje specjalnego „leku ratującego życie”. To przyjęcie — wygląda podejrzanie.\n\n Dopisek Shimmera: „Bliźnięta? Kontynuujcie śledztwo.”\n
+
 [tasks_envelop_data · to] 破旧的本子
    klucz: f48f88c0b4c399ad
    EN: From a Worn Notebook
@@ -2752,6 +2977,11 @@
    klucz: f77a5bd0157faeb9
    EN: Once, I was discussing the joy of fish with Zhuangzi by the river, a sudden insight struck me—this gave rise to The Unspoken.\nThis book centers on one word. It draws on no classics or teachings and mistakes fragments for wholes—plausible yet absurd, possibly all wrong. But this word is dangerous: it defies etiquette, easily wielded by anyone, and if carelessly used, it invites unexpected trouble—beware.\nThat word is "argue."\nFirstly, deny whatever is said. Just target the statement, not its logic—attacking words without regard for truth.\nSecondly, stand apart. By adopting a weaker stance, you can defeat the strong—offer a contrary view, stir emotions, and let the crowd's passion silence reason. The foolish will follow.\nThirdly, let words feed on words. Every utterance has flaws—find and exploit them. Use emptiness to mask reality and turn mistakes into principles.
    PL: Ja i Zhuangzi — siedzimy nad brzegiem Hao i rozmawiamy o szczęściu ryb; kiedyś powstała nowa Droga — i spisałem księgę niewymowną.\nTa księga mówi tylko jedno słowo — nie oparta na pieśniach i księgach; bierze część jako całość; wygląda sensownie, ale w istocie nie ma sensu; wszystko, co mówi — może być błędem. Lecz to słowo jest jadowite — przekracza granice obyczaju — sprzedający i robotnicy mogą je wypowiadać; jeśli użyć go nierozważnie — może przynieść dziwną katastrofę. Zachowaj rozwagę. Zachowaj rozwagę.\nTo słowo brzmi: „gang”.\nPierwsza zasada gang — mówić odwrotnie. Wszystkie rzeczy podniebia — dzielą się na yin i yang; jest „tak” — więc jest „nie”. Droga gang — w tym, by zaprzeczać cudzym słowom i zaprzeczać zaprzeczeniu — nie trzeba nawet rozumieć ich treści.\nDruga zasada gang — mówić inaczej. Wszyscy pijani — ten, kto trzeźwy — jest panem — fałszywą słabością pokonywać silnych. Droga gang — w tym, by mówić inaczej i budzić uczucia tłumu — uczuciami tłumu przyciskać Drogi — głupcy na pewno pójdą za tym.\nTrzecia zasada gang — mówić o mówieniu. Wszystkie słowa — zawsze coś gubią; błędem cudzych słów atakować ich prawdę. Droga gang — w tym, by fałszem pokrywać prawdę — fałszem stawać się prawdą; błędem cudzych słów zamieniać ich sens — a nawet błąd czynić sensem.\n
+
+[tasks_envelop_data · text] 今探得，公子寻得之霓裳古谱曾匿于梁府。\n\n公子批：\n此信莫不是自行走了三秋，才至我手中？\n\n又一清秀字迹：\n那古谱我拿去了。我一见它，心中甚是欢喜。不过那曲谱上已有他人注解和补全之策。虽与我之解法殊途……歪则歪矣，倒也别出心裁，真真是个妙人儿。我已叫他们寻寻那注解之人是谁，或能与我们做个伴儿也未可知呢？
+   klucz: f7aecf11f993effc
+   EN: It has now been ascertained that the ancient Rainbow Robe Score, which Shimmer of South was seeking, was once hidden in the Liang estate.\n\nA note by Shimmer:\n\n"Did this letter take a three-year journey just to reach my hands?"\n\nAnother note in an elegant script:\n\n"I've taken the score. My heart leaped with joy the moment I saw it. However, someone has already annotated it and proposed ways to complete it. Though their method is a world apart from mine... unorthodox, yes, but exceptionally ingenious. What a fascinating mind. I have already tasked my people to find who this annotator is. Who knows, perhaps they could become a worthy companion to us?"
+   PL:  Dziś ustalono — że stara Partytura Tęczowej Szaty — której szukał Shimmer of South — była ukryta w posiadłości Liang.\n\n Dopisek Shimmera:\n Czy ten list nie podróżował trzy jesieni — zanim trafił w moje ręce?\n\n Kolejny elegancki charakter:\n Tej partytury — zabrałem. Kiedy ją zobaczyłem — w sercu — wielka radość. Ale ta partytura — już ma adnotacje i uzupełnienia od kogoś innego. Choć — różne od mojego rozwiązania — choć krzywe — ale oryginalne — naprawdę utalentowana osoba. Powiedziałem im — niech poszukają — kim jest ten adnotujący — może się z nami zaprzyjaźnić.\n
 
 [tasks_envelop_data · to] 南烛公子亲启
    klucz: f7e567aab7f0addb
@@ -2807,6 +3037,11 @@
    klucz: fadc3061b7ee545e
    EN: Mark the core of the formation at the spot on the map, and cover it with a common object. Soon enough, the camouflaging items will gather around, creating a hidden, untouched corner.\nThe time it takes for the formation to take effect depends on the terrain and area size. It requires careful calculation and patience.\nOnce the formation is active, someone needs to check and reinforce the core regularly. That's the only way to keep it stable for the long run.
    PL: Na miejscu wskazanym na mapie — narysuj znak serca formacji — i przykryj zwyczajnym przedmiotem. Wkrótce — wszystkie rzeczy zasłaniające się zgromadzą się — i otrzymasz ukryty, nietknięty kąt.\nCzas działania formacji — zależy od wysokości terenu i wielkości obszaru — wymaga uważnych obliczeń — i cierpliwości.\nPo uruchomieniu formacji — trzeba regularnie wysyłać ludzi — sprawdzać i wzmacniać ognisko formacji — aby trwała trwale.\n
+
+[tasks_envelop_data · text] 孤受命天帝！妲己冤魄诉于北溟，殷都鹿台藏玄鸟遗宝万箱。恶来囚孤于摘星楼骸井，需大钱五十贯破咒。助孤重临王座，赐尔北里仙姝、酒池肉林永寿秘术！
+   klucz: faf2bf01cd13c609
+   EN: I am the GREAT King Zhou, chosen by Heaven! Daji's ghost cried to me from the North, saying there are ten thousand boxes of treasure hidden under the Deer Terrace! But the evil Elai locked my soul in a bone well! I need EXACTLY 50 strings of coins to break the curse! Help me reclaim my throne, and I will reward you with pretty fairy girls, pools of wine, forests of meat, and eternal life!
+   PL:  Ja — z woli Niebiańskiego Cesarza! Duch Daji skarżył się nad Morzem Północnym — w jelenim tarasie stolicy Yin — ukryte tysiące skrzyń skarbów Ognistego Ptaka. Zły Elai uwięził mnie w studni szkieletów w Wieży Zrywania Gwiazd — potrzeba dokładnie pięćdziesięciu sznurów monet — by złamać klątwę. Pomóż mi wrócić na tron — a dam Ci północne nimfy, baseny wina i lasy mięsa — i sekret wiecznego życia!\n
 
 [tasks_envelop_data · to] 晋王即位
    klucz: fb625e4859a96f13
