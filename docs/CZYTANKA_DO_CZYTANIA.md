@@ -6,28 +6,34 @@ między kwestiami. Kolejność bierze się z **jednego stałego pliku w repo**
 uruchomieniu.
 
 Każdy rodzaj jest **cięty na części po ~2,5 MB** (żeby dało się je czytać
-w przeglądarkach i czytnikach): nazwy mają przyrostek `_NN`
-(np. `01_sceny_i_cutsceny_01.md … _08.md`), a **tytuł części opisuje jej
-zawartość** — `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra —
-część 5 z 8`, `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3` (lista
-etkiet sekcji, po przecinkach, kolejność z pliku; maks. 5, potem `…`).
+w przeglądarkach i czytnikach): **nazwa pliku części jest opisowa** — np.
+`01 - prolog, Yannan — część 1 z 8.md` albo
+`02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md`
+(tytuł w środku bez przedrostka „Where Winds Meet — ”; lista etykiet sekcji,
+po przecinkach, kolejność z pliku; maks. 5, potem `…`).
 Gdy całość mieści się w budżecie, plik zostaje jeden i nazwa nie ma
 przyrostka ani dopisku. Sekcja przecięta na granicy części jest
 kontynuowana pod nagłówkiem `# … (ciąg dalszy)`; wiersz `Interakcja: …`
 zawsze przechodzi na początek nowej części razem ze sceną, nigdy nie
 zostaje sam na jej końcu. `README.md` obok plików wylicza wszystkie części
-i krótką listę sekcji każdej z nich.
+i krótką listę sekcji każdej z nich. Części noszą numery w nazwie
+(„część N z M”), więc widać ich kolejność; w Eksplorerze/finderze
+alfabetyczny porządek nie pokrywa się z kolejnością czytania — kolejność
+wylicza `README.md`.
 
-| pliki (v21) | zawartość | wiersze |
+| pliki (v22) | zawartość | wiersze |
 |---|---|---|
-| `01_sceny_i_cutsceny_01.md … _08.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 191 224 kwestii |
-| `02_reszta_01.md … _03.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych; karty pamiątek mają legendę `<motyw> · <kolejność>` | 91 441 pozycji |
+| `01 - prolog, Yannan — część 1 z 8.md` … `01 - cutsceny bez grupy, napisy przerywników, pieśni — część 8 z 8.md` (8 plików) | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 191 224 kwestii |
+| `02 - kompendium, interfejs, postacie, pozostałe, przedmioty — część 1 z 3.md` … `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md` (3 pliki) | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych; karty pamiątek mają legendę `<motyw> · <kolejność>` | 91 441 pozycji |
 
 Plik `02_kontekst_scen_i_cutscen.md` (kontekst do jednostek z 01) został
 **zlikwidowany na życzenie właściciela** (2026-11-18) — wszystko, co pokazywał,
 jest w pliku reszty. Od v21 plik reszty nosi nazwę `02_reszta` (numer 02
 przekazany po zlikwidowanym kontekście); wcześniej nazywał się
-`03_reszta`. Żadne hasło nie jest już „zużywane" przez kontekst.
+`03_reszta`. Żadne hasło nie jest już „zużywane" przez kontekst. Od **v22**
+części mają wyłącznie opisowe nazwy plików (np. `01 - prolog, Yannan —
+część 1 z 8.md`); stary przyrostek `_NN` (`01_sceny_i_cutsceny_01.md`)
+zniknął. Treści plików — co do bajta — się nie zmieniły.
 
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 

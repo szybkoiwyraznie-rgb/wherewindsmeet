@@ -2239,3 +2239,39 @@ id `1wMFzfRAqr964kL-p8o8k_OSV3s_2brDz`). Weryfikacja po budowie: wszystkie
 59 wierszy `Interakcja:` stoją bezpośrednio nad `## Scena …` (skan całego
 01), wszystkie 120 kart pamiątek bez pustych wierszy między tytułem,
 legendą i treścią (skan sekcji `# Pamiątki` we wszystkich trzech częściach 02).
+
+## 2026-11-19 (18) — nazwy plików części; czytanka v22
+
+Właściciel po pobieraniu v21: „pliki dalej mają stare tytuły" — okazało
+się, że chodziło o **nazwy plików** części, nie o nagłówki w środku
+(nagłówki naprawiła v21, ale pliki nazywały się wciąż `01_sceny_i_cutsceny_01.md …
+_08.md` / `02_reszta_01.md … _03.md`). Żądanie: nazwy mają mówić, co jest
+w środku (przykłady właściciela: „02 - zadania, kompendium, pozostałe",
+„01 - prowincja X").
+
+Zmiana (`tools/czytanka_czysta.py`): **nazwa pliku części = tytuł części
+(bez przedrostka `Where Winds Meet — `) + `.md`** — np. `01 - prolog,
+Yannan — część 1 z 8.md`, `02 - sztuki walki, walka, zadania, świat i
+miejsca, historie zasłyszane, … — część 3 z 3.md`. `_nazwa_pliku_czesci`
+podmienia znaki niedozwolone w nazwach (`\/:*?"<>|` i znaki kontrolne) na
+`-` i ucina kropki/spacje na końcu (Windows). Gdy część nie ma sekcji
+(brak listy etykiet) — nazwa zostaje stara (`baza_NN.md`). Pojedynczy,
+niecięty plik bez zmian (`02_reszta.md`). Treść plików — co do bajta —
+taka sama jak v21 (zweryfikowane `cmp` na wszystkich 11 plikach treści
+out/czytanka_v22 vs out/czytanka_v21). `README.md` w paczce nadal wylicza
+wszystkie części z krótką listą sekcji; w repo testy sklejające części
+sortują po `część N` (nazwy są opisowe, więc alfabetyczny porządek
+nie działa).
+
+Uwaga: w Eksplorerze alfabetyczny porządek części nie pokrywa się z
+kolejnością czytania — kolejność liczbowa jest w nazwie („część N z M")
+i w README. Paczka **czytanka_v22.zip** na Dysku (id
+`1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`, 8 436 785 B, SHA-256
+`0eaf4790be1fc3594b7b5e5b554c9549d79c4fe5b4854a6cf69886a679625840`).
+v21 na Dysku zostaje jako archiwum; v20 również (nie usuwano nic bez zgody
+właściciela).
+
+Testy: **623 OK** (rozszerzony `TestTytulyCzesci.test_zapisz_czesci_nadaje_tytul_z_zawartoscia`:
+nazwy zaczynają się od `01 - `, zawierają `część` i kończą `.md`, bez
+znaków zakazanych w ścieżce; `test_chronologia.py` skleja części po numerze
+z „część N”, nie alfabetycznie).

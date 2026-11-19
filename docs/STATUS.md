@@ -3,7 +3,16 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (czytanka v21, wpis 17 w dzienniku):** plik reszty nazywa się
+**Najnowsze (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
+mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
+`02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md`
+(nazwa = tytuł części bez przedrostka „Where Winds Meet — ”); stary
+przyrostek `_NN` zniknął. Treść plików — co do bajta — taka sama jak v21.
+Paczka `czytanka_v22.zip` na Dysku (id `1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`,
+SHA-256 `0eaf4790be1fc3594b7b5e5b554c9549d79c4fe5b4854a6cf69886a679625840`,
+8 436 785 B). `v21` zostaje na Dysku jako archiwum. Testy: **623 OK**.
+
+**Poprzednie (czytanka v21, wpis 17 w dzienniku):** plik reszty nazywa się
 teraz `02_reszta` (numer 02 przejęty po zlikwidowanym pliku kontekstu),
 tytuł każdej części nazywa jej zawartość (np. `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra — część 5 z 8`,
 `# Where Winds Meet — 02 - przedmioty — część 2 z 3`), a `README.md` w paczce
@@ -11,8 +20,7 @@ wylicza krótką listę sekcji każdej
 części. Dwie uwagi formatowania od właściciela: karta pamiątki ma teraz
 tytuł, legendę i treść w kolejnych liniach bez pustych wierszy, a wiersz
 `Interakcja: …` stoi tuż nad `## Scena …` (też bez pustej linii; przy
-cięciu na części przechodzi z nią na początek nowej części). Testy:
-**623 OK**. Paczka `dist/WWM_Czytanka_PL_v21.zip` na Dysku (id
+cięciu na części przechodzi z nią na początek nowej części). Paczka `dist/WWM_Czytanka_PL_v21.zip` na Dysku (id
 `1wMFzfRAqr964kL-p8o8k_OSV3s_2brDz`, SHA-256 `b528e98b600a6c8d9fe60e9304644685369301cde240c697999f83af76db0fe8`).
 
 **Poprzednie (v20, wpis 16 w dzienniku):** sekcja „Zadania i wątki” ma
