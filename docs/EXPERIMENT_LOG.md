@@ -2407,3 +2407,24 @@ zgłosił `tokeny`, poprawione przed importem. Magazyn: **116 150 → 116 207**.
 wszystkie 350 to/from + 4 melodie). Pozostało ~450 list (najdłuższe listy
 z wątków fabularnych — m.in. księgi z 黄河 i Wielki Mur). Zasada bez
 zmian: żadnych schematów, każdy tekst indywidualnie.
+
+## 2026-11-19 (21c) — runda 3 (c–d): 635 z 1 023; jeden incydent z sandboxem
+
+Kontynuacja rundy 3. Po wpisie 21b (573/1 023) doszły kolejne porcje:
+**(c) +47** listów (`958cf17`) i **(d) +15** (`6a680ba`) — razem **635 z 1 023**
+(281/669 list + wszystkie 350 to/from + 4 melodie). Magazyn:
+**116 254 → 116 269** (23,75%). Wszystkie wpisy indywidualnie, bez schematów.
+
+Incydent (do odnotowania): sandbox w trakcie tej tury wrócił do stanu
+sprzed sesji — lokalny `HEAD` wskazywał `45b4be3`, a pliki `/tmp/*` z rundy 3
+zniknęły. Mój commit `b369614` (próba (d)) powstał na złej podstawie i push
+został odrzucony (`fetch first`). Naprawa bez utraty pracy: nową zwrotkę
+`zwrotki/2026-11-19_ai_tymczasowe_runda3_c.md` zachowałem, zresetowałem
+gałąź do `origin/arena/0bd156b2-wherewindsmeet` (`958cf17`), przywróciłem
+zwrotkę i zaimportowałem ponownie — import idempotentny: **15 nowych,
+0 zmienionych, 0 odrzuconych**. Stan plików `tlumaczenie/` zgadza się
+z sumą importów (116 269). Wniosek na przyszłość: po każdym `timeout`/restarcie
+sandboxa sprawdzać `git log` i `/tmp` przed dalszą pracą; zwrotki trzymać
+w repo (są wersjonowane), nie tylko w `/tmp`.
+
+Pozostało w rundzie 3: **388 listów**. Potem rundy 4–8.
