@@ -2330,3 +2330,43 @@ Każda runda: ekstrakcja pustych `PL:` z paczki v5 (nowy
 `tools/wyciag_z_paczki.py`), przekład AI, import, commit, push.
 Łatka v0.6.0 dopiero po zamknięciu rund (albo w punkcie przejściowym — do
 decyzji właściciela).
+
+## 2026-11-19 (20) — przekład AI-tymczasowy, runda 2 (text_msg 180xxx; 1 211 wpisów); łatka na koniec
+
+Właściciel przesądził: **łatka v0.6.0 dopiero po domknięciu wszystkich
+rund** — zadanie obejmuje wszystkie kategorie z jego listy, realizowane
+w kilku turach. Runda 2: **wszystkie 1 211** bez-PL kluczy z preferowanego
+źródła `text_msg · content`, wierszy 180xxx (komunikaty UI, minigry
+i wydarzenia — m.in. Jianghu Tactics, Anniversary Flying Chess, Howlion's
+Trial, Taotao Fashion, ustawienia grafiki) + nieliczne opisy fabularne
+(m.in. **灰扑扑的剑穗 / Dusty Sword Tassel**, index 681 w mapie rundy).
+Kategorie z listy właściciela pokrywające się z tym zakresem (2/3):
+- **(3) przedmioty fabularne z terenu** — w danych gry NIE mają osobnej
+  tabeli; warstwa opisu przedmiotów leży w `text_msg` (preferowane źródło
+  z `w[]`), więc objęte tą rundą;
+- opisy ustawień i minigier są skutkiem ubocznym tego worka (udało się
+  wszystko, nie tylko świecko).
+
+Mechaniczne rodziny (`江湖弈chenxinN`, `江湖弈yanfeiN`, `周年庆飞行棋N`,
+64+38+66 etykiet) wygenerowane schematem (`Taktyki Jianghu <id>`,
+„Jubileuszowa Gra Planszowa N”); reszta (~1 040) tłumaczona ręcznie.
+Tokeny zachowane; w `--na-sucho` wyszły 2 wpisy z nadmiarowym `#E`
+(`%s因千里奔袭#baf5ba…` i bliźniak with Linked Hearts — źródło celowo
+NIE zamyka tagu) — poprawione; import: **1 211 nowych, 0 odrzuconych**;
+magazyn **114 423 → 115 634** (23,62%). Ciekawe: w `runda2` znalazły się
+też ~250 komunikatów już-obecnych w paczce (np. zdania typu „宝箱已被开启”).
+
+Uwagi rzeczowe do rundy:
+- dwie partie długich wpisów (Dawny Jialing / 孙愿, Wang Zongze) i wiele
+  wierszy `@T[...]` z datami — skopiowane **1:1**;
+- przy tłumaczeniu nazwy `灰扑扑的剑穗` został zgłoszony (i poprawiony
+  w źródle mapy) jeden błąd słowny („kutas miecza” → „chwost miecza”);
+- testy 623 OK; łatka **nie** budowana (decyzja właściciela — wszystkie
+  rundy najpierw).
+
+Następne rundy (kolejność zachowana): runda 3 — listy fabularne
+`tasks_envelop_data` (1 020; z pominięciem poczty systemowej); runda 4 —
+`tasks.task_desc_str` + `task_name`; runda 5 — `tasks.task_target_str`
+(hinty; 7 947); runda 6 — `ccs_text_msg` (4 952); runda 7 — reszta
+`text_msg` (~50 500, partie); runda 8 — luźne gadki z początku gry.
+Po każdej: `import_zwrotki.py`, commit, push. Łatka v0.6.0 na końcu.
