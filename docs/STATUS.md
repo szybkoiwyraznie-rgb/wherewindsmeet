@@ -3,7 +3,20 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
+**Najnowsze (przekład AI-tymczasowy, wpis 19 w dzienniku):** właściciel
+zlecił tymczasowy przekład nieprzetłumaczonych fragmentów widocznych w grze
+(bez poczty systemowej) i **runda 1** jest zaimportowana do magazynu:
+**310 wpisów** (elementy budowlane 家园, hasła i typy Kompendium 博物,
+„Traces of the Past” ×2). Autorem rundy 1 jest **agent AI, nie człowiek** —
+zwrotka Tłumacza nadpisze te wpisy przy imporcie (wyższy priorytet).
+Magazyn: **114 423** (z 114 113). Nowa paczka tłumacza **v5** (Czysta —
+AI-wypełnień NIE ma w paczce wysyłanej Tłumaczowi; buduje się ją ponownie
+z `--wypelnij-pl`, jeśli Tłumacz ma rysować po robocie AI). Pozostałe
+rundy: text_msg 1800xxx → listy fabularne → opisy zadań → hinty (7 948)
+→ ccs → reszta text_msg → luźne gadki z początku gry; łatka v0.6.0 po
+zamknięciu rund. Patrz też wpis 18 (czytanka v22).
+
+**Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
 `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md`
 (nazwa = tytuł części bez przedrostka „Where Winds Meet — ”); stary

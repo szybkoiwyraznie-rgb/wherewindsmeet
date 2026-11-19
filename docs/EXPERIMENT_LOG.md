@@ -2275,3 +2275,54 @@ Testy: **623 OK** (rozszerzony `TestTytulyCzesci.test_zapisz_czesci_nadaje_tytul
 nazwy zaczynają się od `01 - `, zawierają `część` i kończą `.md`, bez
 znaków zakazanych w ścieżce; `test_chronologia.py` skleja części po numerze
 z „część N”, nie alfabetycznie).
+
+## 2026-11-19 (19) — przekład AI-tymczasowy, runda 1 (310 wpisów); pakiet tłumacza v5
+
+Właściciel zgłosił nieprzetłumaczone fragmenty widoczne podczas gry i
+zlecił ich **tymczasowy przekład przez agenta AI** — do czasu dostarczenia
+zwrotki przez Tłumacza, która te wpisy nadpisze (wyższy priorytet zwrotki;
+zwykły import, raport `zmienione`). Decyzja właściciela dotyczy wyłącznie
+tymczasowego użycia w ramach tej sesji; zwrotka AI jest jawnie oznaczona
+(`zwrotki/2026-11-19_ai_tymczasowe_runda1.md`), a w Git trafia zapis, że
+autorem rundy 1 jest agent AI, nie człowiek.
+
+Ustalenia graniczne (2026-11-19):
+- **nie tłumaczymy poczty systemowej** (`emails_data`, „Dear Wanderer…”) — tylko listy fabularne z zadań;
+- kategoria (6) „pojedyncze sceny w pierwszej prowincji” to wg właściciela
+  **luźne gadki gracza/NPC** (sceny rozmów tła), nie zwykłe kwestie scen;
+- „Lattice Door” (格子门, `building_exchange_group_config.content`) — nazwa
+  drzwi w opisie w chacie (opis historyczny był już po polsku);
+- ścieżka: **pakiet tłumacza v5** (`--wypelnij-pl`, 422 248 miejsc PL,
+  114 053 wypełnione) → agent wypełnia wybrane kategorie → import zwykłym
+  `tools/import_zwrotki.py` → po zakończeniu rund **łatka v0.6.0**.
+
+Runda 1 (2026-11-19): **310 wpisów** — `building_exchange_group_config`
+(90 nazw elementów budowlanych 家园, m.in. wiersz 1026 格子门),
+`manual_broad_type` (35 kategorii Kompendium 博物), `manual_consts` (4),
+`manual_entry_groups_data` (6), `manual_items` (16 gatunków drewna),
+`manual_main_type` (27 tytułów i opisów tonów), `manual_monster_data` (13),
+`manual_photo_level` (5 ocen zgadywania, kody kolorów zachowane),
+`manual_poetry_reward` (10 tytułów), `manual_reply_data` (57 nazw narzędzi
+i umiejętności z tierami), `manual_subtype_index` (45 podtypów),
++ 2× „Traces of the Past” (往事追溯 w `ccs_text_msg`, 往事·待追溯 w
+`programmer_text_msg`). Import: 310 nowych, 0 odrzuconych, tokeny zgodnie.
+Magazyn po rundzie 1: **114 423** (było 114 113).
+
+Uwaga odkryta przy budowie paczki v5: klucz `格子门`/`Lattice Door`
+(`eae347b6f13d5626`, „Drzwi kratowe”) **jest już w magazynie** — gra pokazuje
+go po angielsku najpewniej dlatego, że sterta właściciela jest starsza niż
+łatka v0.5.0 / wpis `pl_nazwy_hasel` z 2026-11-18; po imporcie rundy 1
+iść w łatkę v0.6.0.
+
+Pozostałe rundy (zaplanowane): runda 2 — `text_msg` wiersze 180000–180450
+(przedmioty fabularne z terenu, „Dusty Sword Tassel”; ~811 wpisów);
+runda 3 — `tasks_envelop_data` (listy fabularne, 1 020 wpisów, długie
+teksty); runda 4 — `tasks.task_desc_str` + `task_name` (opisy zadań);
+runda 5 — `tasks.task_target_str` (hinty w questach; 7 948, podzielone na
+partie tematyczne); runda 6 — `ccs_text_msg` (4 952; komunikaty interfejsu);
+runda 7 — reszta `text_msg` (50 504 bez PL — partie po częstotliwości);
+runda 8 — luźne gadki z początku gry (lokalizacja do ustalenia po skanie).
+Każda runda: ekstrakcja pustych `PL:` z paczki v5 (nowy
+`tools/wyciag_z_paczki.py`), przekład AI, import, commit, push.
+Łatka v0.6.0 dopiero po zamknięciu rund (albo w punkcie przejściowym — do
+decyzji właściciela).
