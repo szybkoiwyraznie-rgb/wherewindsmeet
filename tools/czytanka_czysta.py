@@ -1512,13 +1512,25 @@ def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
     return czesci
 
 
+# Znaki niedozwolone w nazwach plików (Windows) — zastępujemy myślnikiem;
+# kropki i spacje na końcu nazwy są też niedozwolone w Windows.
+_ZABRONIONE_W_NAZWIE = re.compile(r'[\\/:*?"<>|\x00-\x1f]')
+
+
+def _nazwa_pliku_czesci(tytul_czesci: str) -> str:
+    """Nazwa pliku części = tytuł części (bez „Where Winds Meet — ”), z `.md`."""
+    nazwa = _ZABRONIONE_W_NAZWIE.sub("-", tytul_czesci).strip().rstrip(". ")
+    return nazwa + ".md"
+
+
 def _zapisz_czesci(wyj: Path, baza: str, tytul: str, opis: str,
                    linie: list[str], statystyka: dict) -> tuple[list[str], list[str]]:
     """Zapisuje treść w jednej lub kilku częściach.
 
     Zwraca (nazwy plików, opisy części). Przy podziale tytuł części opisuje
-    jej zawartość (np. `02 - przedmioty — część 2 z 3`),
-    przy jednym pliku zostaje zwykły tytuł bazowy.
+    jej zawartość (np. `02 - przedmioty — część 2 z 3`), a **nazwa pliku to
+    ten tytuł** (np. `02 - przedmioty — część 2 z 3.md`).
+    Przy jednym pliku zostaje zwykły tytuł bazowy i stara nazwa `baza.md`.
     """
     czesci = _czesci(linie)
     numer_baza = baza.split("_", 1)[0]
@@ -1528,10 +1540,10 @@ def _zapisz_czesci(wyj: Path, baza: str, tytul: str, opis: str,
         if len(czesci) == 1:
             nazwa, tytul_czesci, opis_czesci = f"{baza}.md", tytul, ""
         else:
-            nazwa = f"{baza}_{numer:02d}.md"
             opis_czesci = _opis_czesci(czesc)
             tytul_czesci = f"{numer_baza} - {opis_czesci}" if opis_czesci else tytul
             tytul_czesci += f" — część {numer} z {len(czesci)}"
+            nazwa = _nazwa_pliku_czesci(tytul_czesci) if opis_czesci else f"{baza}_{numer:02d}.md"
         (wyj / nazwa).write_text(
             _naglowek(tytul_czesci, opis) + "\n".join(czesc) + "\n",
             encoding="utf-8")
@@ -1568,9 +1580,10 @@ def _readme(statystyka: dict, zakres: str,
 Pliki treści cięte są na części po ~2,5 MB (granice tylko na nagłówkach sekcji
 i jednostek; sekcja przecięta w środku zaczyna kolejną część nagłówkiem
 z dopiskiem „(ciąg dalszy)”), bo wielkich plików nie da się wygodnie przeglądać.
-Tytuł każdej części nazywa jej zawartość (np. „01 - prolog, Yannan — część 1 z 8”
-albo „02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … —
-część 3 z 3”), a w tabeli wyżej przy każdej części stoi krótka lista jej sekcji.
+Tytuł i nazwa pliku każdej części nazywają jej zawartość (np. „01 - prolog, Yannan —
+część 1 z 8.md” albo „02 - sztuki walki, walka, zadania, świat i miejsca, historie
+zasłyszane, … — część 3 z 3.md”), a w tabeli wyżej przy każdej części stoi krótka
+lista jej sekcji.
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
 i tabel; kwestia bez mówcy to goły tekst.

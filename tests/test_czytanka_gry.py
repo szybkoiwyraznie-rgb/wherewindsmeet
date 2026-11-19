@@ -475,6 +475,9 @@ class TestTytulyCzesci(unittest.TestCase):
             finally:
                 self.czytanka._czesci = oryginal
             self.assertGreater(len(nazwy), 1)
+            self.assertTrue(all(nazwa.startswith("01 - ") for nazwa in nazwy))
+            self.assertTrue(all("część" in nazwa and nazwa.endswith(".md") for nazwa in nazwy))
+            self.assertTrue(all("/" not in nazwa and "\\" not in nazwa for nazwa in nazwy))
             tresc = (Path(katalog) / nazwy[0]).read_text(encoding="utf-8")
             self.assertIn("01 - prolog", tresc)
             self.assertTrue(all(opisy))
