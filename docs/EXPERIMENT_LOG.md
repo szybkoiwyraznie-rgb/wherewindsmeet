@@ -2295,6 +2295,10 @@ Ustalenia graniczne (2026-11-19):
 - ścieżka: **pakiet tłumacza v5** (`--wypelnij-pl`, 422 248 miejsc PL,
   114 053 wypełnione) → agent wypełnia wybrane kategorie → import zwykłym
   `tools/import_zwrotki.py` → po zakończeniu rund **łatka v0.6.0**.
+  Paczka na Dysku jako **paczka_dla_tlumacza_wwm_v5.zip**
+  (id `1bQHWtz-Y9x2Bfl58Ppe2jDchIB5OsgUx`, 45 348 474 B, SHA-256
+  `b736123d1d3e1a25f868ee015babcf69c0c0d59449cf4ac1306e43ac62295aa4`);
+  czysta — bez AI-wypełnień;
 
 Runda 1 (2026-11-19): **310 wpisów** — `building_exchange_group_config`
 (90 nazw elementów budowlanych 家园, m.in. wiersz 1026 格子门),
