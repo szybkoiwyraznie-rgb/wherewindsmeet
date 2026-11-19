@@ -312,9 +312,9 @@ class TestCzytankaDoCzytania(unittest.TestCase):
         return (self.wyj / nazwa).read_text(encoding="utf-8")
 
     def test_dwa_pliki_tresci_bez_kontekstu(self):
-        """Plik 02 zlikwidowany — zostają 01, 03 i README."""
+        """Dawny plik 02 z kontekstem zlikwidowany — zostają 01, 02 reszta i README."""
         self.assertEqual(sorted(p.name for p in self.wyj.glob("*.md")),
-                         ["01_sceny_i_cutsceny.md", "03_reszta.md", "README.md"])
+                         ["01_sceny_i_cutsceny.md", "02_reszta.md", "README.md"])
 
     def test_kwestia_ma_mowce_i_tekst_w_jednej_linii(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
@@ -338,8 +338,8 @@ class TestCzytankaDoCzytania(unittest.TestCase):
         self.assertGreater(piesn, tresc.index("## Scena"))
 
     def test_napisy_spoza_cutscen_trafiaja_do_reszty(self):
-        # `napis_a` nie należy do żadnej cutsceny ani grupy zadań → plik 03
-        self.assertIn("Napisy przerywnika.", self.czytaj("03_reszta.md"))
+        # `napis_a` nie należy do żadnej cutsceny ani grupy zadań → plik 02
+        self.assertIn("Napisy przerywnika.", self.czytaj("02_reszta.md"))
         self.assertNotIn("Napisy przerywnika.", self.czytaj("01_sceny_i_cutsceny.md"))
 
     def test_scena_bez_mapy_ma_wlasna_sekcje(self):
@@ -429,3 +429,95 @@ class TestLegendaPamiatki(unittest.TestCase):
     def test_brak_motywu_to_pusta_linia(self):
         self.assertEqual(
             self.czytanka._legenda_pamiatki(None, {}, {}, {"motyw": 99}), "")
+
+
+class TestTytulyCzesci(unittest.TestCase):
+    """Tytuł części pliku treści nazywa jej zawartość (np. „01 - prolog, Yan Nan”)."""
+
+    def setUp(self):
+        from tools import czytanka_czysta
+
+        self.czytanka = czytanka_czysta
+
+    def test_opis_czesci_bierze_etykiety_sekcji(self):
+        czesc = ["# Prolog", "", "## Scena 1", "x",
+                 "# 燕南 — Yan Nan", "", "## Scena 2", "y"]
+        self.assertEqual(self.czytanka._opis_czesci(czesc), "prolog, Yan Nan")
+
+    def test_opis_czesci_obcina_dluga_liste(self):
+        sekcje = ["Zadania i wątki", "Encyklopedia, księgi i poszlaki",
+                  "Przedmioty, stroje i tytuły", "Sztuki walki i umiejętności",
+                  "Walka i przeciwnicy", "Świat, sekty i miejsca"]
+        czesc = []
+        for sekcja in sekcje:
+            czesc += [f"# {sekcja}", "treść", ""]
+        self.assertTrue(self.czytanka._opis_czesci(czesc).endswith(", …"))
+
+    def test_opis_czesci_pusty_bez_sekcji(self):
+        self.assertEqual(self.czytanka._opis_czesci(["## Scena 1", "x"]), "")
+
+    def test_ciag_dalszy_sekcji_liczy_sie_do_etykiety(self):
+        czesc = ["# Zadania i wątki (ciąg dalszy)", "", "## Wątek", "x"]
+        self.assertEqual(self.czytanka._opis_czesci(czesc), "zadania")
+
+    def test_zapisz_czesci_nadaje_tytul_z_zawartoscia(self):
+        with tempfile.TemporaryDirectory() as katalog:
+            oryginal = self.czytanka._czesci
+            self.czytanka._czesci = lambda linie: oryginal(linie, budzet=1000)
+            try:
+                statystyka = {"plikow": 0}
+                linie = ["# Prolog", ""]
+                for numer in range(10):
+                    linie += [f"## Scena {numer}", "x" * 120]
+                nazwy, opisy = self.czytanka._zapisz_czesci(
+                    Path(katalog), "01_sceny_i_cutsceny", "Sceny i cutsceny",
+                    "opis", linie, statystyka)
+            finally:
+                self.czytanka._czesci = oryginal
+            self.assertGreater(len(nazwy), 1)
+            tresc = (Path(katalog) / nazwy[0]).read_text(encoding="utf-8")
+            self.assertIn("01 - prolog", tresc)
+            self.assertTrue(all(opisy))
+
+    def test_zapisz_czesci_przy_jednym_pliku_bez_dopisku(self):
+        with tempfile.TemporaryDirectory() as katalog:
+            statystyka = {"plikow": 0}
+            nazwy, opisy = self.czytanka._zapisz_czesci(
+                Path(katalog), "02_reszta", "Reszta", "opis",
+                ["# Zadania i wątki", "", "**Hasło:** opis"], statystyka)
+            self.assertEqual(nazwy, ["02_reszta.md"])
+            self.assertEqual(opisy, [""])
+            self.assertIn("# Where Winds Meet — Reszta\n",
+                          (Path(katalog) / "02_reszta.md").read_text(encoding="utf-8"))
+
+
+class TestInterakcjaWstep(unittest.TestCase):
+    """Wiersz „Interakcja: …” stoi tuż nad nagłówkiem sceny, bez pustej linii."""
+
+    def test_wstep_bezposrednio_nad_scena(self):
+        from tools import czytanka_czysta
+
+        jednostka = czytanka_czysta.Jednostka(
+            "scena", "Scena 4700001", "# 清河 — Qinghe",
+            [("Mówca", "klucz1")], {0}, [],
+            wstep="Interakcja: Znak smoczego wzoru")
+        out, _, _ = czytanka_czysta._plik_scen(
+            [jednostka], {"klucz1": "Tekst."}, "wszystko",
+            {"jednostek": 0, "linii": 0, "pominiete": 0, "bez_przekladu": 0}, None)
+        self.assertIn("Interakcja: Znak smoczego wzoru\n## Scena 4700001", "\n".join(out))
+
+    def test_wiersz_interakcji_przechodzi_z_jednostka_do_nastepnej_czesci(self):
+        from tools import czytanka_czysta
+
+        linie = ["# Sekcja", ""]
+        for numer in range(20):
+            if numer == 10:
+                linie += ["Interakcja: Znak smoczego wzoru",
+                          f"## Scena {numer}", "x" * 100]
+            else:
+                linie += [f"## Scena {numer}", "x" * 100]
+        czesci = czytanka_czysta._czesci(linie, budzet=1000)
+        for czesc in czesci:
+            for i, linia in enumerate(czesc):
+                if linia.startswith("Interakcja: "):
+                    self.assertEqual(czesc[i + 1], "## Scena 10")

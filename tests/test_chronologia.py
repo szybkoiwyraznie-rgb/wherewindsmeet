@@ -160,7 +160,7 @@ class TestZapisanaChronologia(unittest.TestCase):
 
 
 class TestNapisyPrzerywnikow(unittest.TestCase):
-    """Pula napisów przerywników (`text_msg`) ma trafić do 01, nie do 03.
+    """Pula napisów przerywników (`text_msg`) ma trafić do 01, nie do 02.
 
     W danych gry napis nie ma numeru cutsceny — jest tylko wiersz i nazwa nagrania.
     Dlatego chronologia trzyma je w blokach scen: część podpięta pod cutscenę
@@ -260,7 +260,7 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         self.assertIn("Wodzu, obudź się!", self.tekst)
         reszta = "".join(
             plik.read_text(encoding="utf-8")
-            for plik in sorted(Path(self._katalog.name).glob("03_reszta*.md")))
+            for plik in sorted(Path(self._katalog.name).glob("02_reszta*.md")))
         self.assertNotIn("Wodzu, obudź się!", reszta)
 
     def test_mowca_jest_pogrubiony(self):
@@ -299,7 +299,7 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         self.assertNotIn("[brak przekładu]", poza_prologiem)
 
     def test_pliku_kontekstu_nie_ma(self):
-        """Plik 02 zlikwidowany na życzenie właściciela — hasła idą do 03 reszta."""
+        """Dawny plik 02 z kontekstem zlikwidowany na życzenie właściciela — hasła idą do 02 reszta."""
         self.assertFalse((Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").exists())
 
     def test_mowca_po_lacince(self):

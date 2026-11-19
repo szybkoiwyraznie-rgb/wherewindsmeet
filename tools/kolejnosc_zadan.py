@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kolejność zadań w czytance — łańcuch gry zamiast alfabetu.
 
-Sekcja „Zadania i wątki” w pliku 03 była sortowana po nazwie, więc rozdziały
+Sekcja „Zadania i wątki” w pliku 02 była sortowana po nazwie, więc rozdziały
 i etapy mieszały się alfabetycznie. Tu liczy się to, co gra sama wie:
 
 1. **Grupa zadań** (`index/grupy_zadan.jsonl`) ma `kolejnosc` — to rozdział
