@@ -2370,3 +2370,29 @@ Następne rundy (kolejność zachowana): runda 3 — listy fabularne
 (hinty; 7 947); runda 6 — `ccs_text_msg` (4 952); runda 7 — reszta
 `text_msg` (~50 500, partie); runda 8 — luźne gadki z początku gry.
 Po każdej: `import_zwrotki.py`, commit, push. Łatka v0.6.0 na końcu.
+
+## 2026-11-19 (21) — przekład AI-tymczasowy, runda 3 (listy fabularne) — stan pośredni: 516 z 1 023 wpisów
+
+Właściciel doprecyzował metodę (2026-11-19): **pełna jakość, kontekst, zero skrótów
+i schematów** („Tłumaczysz jako AI z kontekstem i z głową”). Wszystkie listy długo-
+opisowe tłumaczone indywidualnie (ZH z EN gry jako odniesieniem — EN czytany dla
+zrozumienia, wybór po polsku), nie mechanicznie. Mechaniczne wypełnienia
+z rund 1–2 dla `江湖弈chenxinN/yanfeiN/周年庆飞行棋N` pozostają w magazynie
+(są AI-tymczasowe, zostaną nadpisane zwrotką Tłumacza) i zostały opisane jako
+takie; nowej tej praktyki nie rozszerzam.
+
+Runda 3 (w toku): zakres = `tasks_envelop_data` (text/to/from/melody_puzzle_text/
+melody_solved_text), **bez poczty systemowej** `emails_data` (decyzja właściciela).
+
+Stan na koniec tury: **162 z 669 list** + **350 z 350 tytułów/adresów/podpisów**
+(`to`/`from`) + **4 z 4 melodii** = **516 z 1 023** wpisów zaimportowanych
+(0 odrzuconych; tokeny zgodne). Magazyn: **115 634 → 116 150** (23,73%).
+Zwrotka: `zwrotki/2026-11-19_ai_tymczasowe_runda3.md` (rosnąca; reszta w kolejnych
+turach). Łatka v0.6.0 NIE budowana — zgodnie z decyzją właściciela dopiero
+po domknięciu wszystkich rund.
+
+Pozostałe w rundzie 3: 507 list (głównie długie — tematyka przewodzi:
+krąg Qiongqi/Colossus, powódź 黄河, Wansan, listy z 江南, dzieła mocne).
+Następnie: runda 4 (task_desc_str), runda 5 (task_target_str ~7 947),
+runda 6 (ccs_text_msg 4 952), runda 7 (reszta text_msg ~50 500 — decyzja
+właściciela niezbędna co do zakresu), runda 8 (luźne gadki z początku gry).
