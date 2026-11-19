@@ -14,12 +14,27 @@ import sys
 from pathlib import Path
 
 
+def _w_zakresie(wiersz: str, od: int | None, do: int | None) -> bool:
+    """`wiersz` to np. 'wiersz 1800045' — bierzemy cyfrową część."""
+    cyfry = re.sub(r"\D", "", wiersz)
+    if not cyfry:
+        return False
+    n = int(cyfry)
+    if od is not None and n < od:
+        return False
+    if do is not None and n > do:
+        return False
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--paczka", required=True, help="katalog rozpakowanej paczki (z podkatalogami sceny/cutsceny/widoki)")
     ap.add_argument("--tabela", action="append", default=[])
     ap.add_argument("--prefiks", action="append", default=[])
     ap.add_argument("--zrodlo", default="widoki")
+    ap.add_argument("--wiersz-od", type=int, default=None, help="dolna granica numeru wiersza (liczbowo)")
+    ap.add_argument("--wiersz-do", type=int, default=None, help="górna granica numeru wiersza (liczbowo)")
     args = ap.parse_args()
 
     wzorzec = re.compile(r"^\d+\. \[([^\]]+)\] (.*)$")
@@ -48,6 +63,8 @@ def main() -> int:
                 for p in args.prefiks:
                     if biezacy["tabela"].startswith(p):
                         trafia = True
+                if trafia and (args.wiersz_od is not None or args.wiersz_do is not None):
+                    trafia = _w_zakresie(biezacy.get("wiersz", ""), args.wiersz_od, args.wiersz_do)
                 if trafia:
                     biezacy.setdefault("en", "")
                     braki.append(biezacy)
