@@ -2396,3 +2396,14 @@ krąg Qiongqi/Colossus, powódź 黄河, Wansan, listy z 江南, dzieła mocne).
 Następnie: runda 4 (task_desc_str), runda 5 (task_target_str ~7 947),
 runda 6 (ccs_text_msg 4 952), runda 7 (reszta text_msg ~50 500 — decyzja
 właściciela niezbędna co do zakresu), runda 8 (luźne gadki z początku gry).
+
+## 2026-11-19 (21b) — runda 3 (b): +57 wpisów; 573 z 1 023; poprawka tokenu
+
+Kontynuacja rundy 3 (po wpisie 21 — 516/1 023). Doszły **57** nowe wpisy
+(27 list + poprawki); poprawione tłumaczenie `#N…#E` w `沉疴久矣…`
+(`bc06088ff39aa2f2`) — brakująca `#E` po `(于此停笔，未能写完)`, dry-run
+zgłosił `tokeny`, poprawione przed importem. Magazyn: **116 150 → 116 207**.
+Łącznie wpisy zaimportowane z rundy 3: **573 z 1 023** (219/669 list +
+wszystkie 350 to/from + 4 melodie). Pozostało ~450 list (najdłuższe listy
+z wątków fabularnych — m.in. księgi z 黄河 i Wielki Mur). Zasada bez
+zmian: żadnych schematów, każdy tekst indywidualnie.

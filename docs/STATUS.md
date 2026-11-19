@@ -3,7 +3,7 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (przekład AI-tymczasowy, wpisy 19–21 w dzienniku):** runda 3 w toku — **516 z 1 023** wpisów list fabularnych (`tasks_envelop_data`) zaimportowane (162/669 list + wszystkie 350 to/from + 4 melodie), po nowej metodzie właściciela (jakość + kontekst, zero schematów). Magazyn **116 150** (23,73%). Rundy 1–2: 1 521 wpisów, w tym mechaniczne etykiety minigier (opisane w dzienniku, do nadpisania zwrotką Tłumacza). Łatka v0.6.0 — dopiero po domknięciu rund. Rundy 4–8 pozostają.
+**Najnowsze (przekład AI-tymczasowy, wpisy 19–21b w dzienniku):** runda 3 w toku — **573 z 1 023** wpisów list fabularnych (219/669 list + wszystkie 350 to/from + 4 melodie). Magazyn **116 207** (23,74%). Pozostałe listy w kolejnych turach; dalej rundy 4–8. Łatka v0.6.0 — dopiero po domknięciu rund.
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
