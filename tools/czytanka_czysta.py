@@ -1243,23 +1243,37 @@ def _haslo(nazwa: str, opisy: list[str]) -> str:
 
 
 def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, pl,
-                  krainy: list[dict] | None) -> list[str]:
-    """Sekcja „Zadania i wątki” w kolejności łańcucha gry, nie alfabetycznie."""
+                  krainy: list[dict] | None, luzne: list[str] | None = None) -> list[str]:
+    """Sekcja „Zadania i wątki” w kolejności łańcucha gry, nie alfabetycznie.
+
+    `luzne` to linie bez hasła z tej samej kategorii: gdy któraś jest nazwą
+    zadania z planu (zadanie ma przetłumaczoną nazwę, ale żadnego opisu),
+    staje pod nagłówkiem swojego rozdziału/łańcucha i znika z listy — reszta
+    zostaje w `luzne` do wypisania po sekcji.
+    """
     z_klucza: dict[str, str] = {}
     for nazwa, klucz in klucze_nazw.items():
         z_klucza.setdefault(klucz, nazwa)
+    dostepne: set[str] = set(luzne or ())
     out: list[str] = []
     wypisane: set[str] = set()
     for blok in kolejnosc_zadan.plan(ix, pl, krainy):
         linie = []
         for klucz in blok.klucze:
             nazwa = z_klucza.get(klucz)
-            if not nazwa or nazwa in wypisane or nazwa not in opisy:
+            if nazwa and nazwa not in wypisane and nazwa in opisy:
+                wypisane.add(nazwa)
+                linie.append(_haslo(nazwa, opisy[nazwa]))
                 continue
-            wypisane.add(nazwa)
-            linie.append(_haslo(nazwa, opisy[nazwa]))
+            tekst = pl.get(klucz)
+            if tekst and tekst in dostepne and tekst not in wypisane:
+                wypisane.add(tekst)
+                dostepne.discard(tekst)
+                linie.append(tekst)
         if linie:
             out += [f"## {blok.tytul}", ""] + linie + [""]
+    if luzne is not None:
+        luzne[:] = [linia for linia in luzne if linia in dostepne]
     reszta = [nazwa for nazwa in sorted(opisy, key=str.lower) if nazwa not in wypisane]
     if reszta:
         out += ["## Pozostałe zadania i wątki", ""]
@@ -1321,8 +1335,9 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             wlasne = {klucz.split("\x00", 1)[1]: wartosc
                       for klucz, wartosc in klucze_nazw.items()
                       if klucz.startswith(etykieta + "\x00")}
-            out += _sekcja_zadan(sekcje[etykieta], wlasne, ix, pl, krainy)
-            out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
+            luzne = sorted(bez_nazwy.get(etykieta, []), key=str.lower)
+            out += _sekcja_zadan(sekcje[etykieta], wlasne, ix, pl, krainy, luzne)
+            out.extend(luzne)
             out.append("")
             continue
         for nazwa in sorted(sekcje.get(etykieta, {}), key=str.lower):

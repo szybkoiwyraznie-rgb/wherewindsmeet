@@ -2153,3 +2153,42 @@ Budowa `out/czytanka_v19`: 01→8 części, 03→3 części + README;
 (0 bez nazwy), POI 2944. Testy: **611 OK** (nowe `TestCzesciPlikow`,
 `TestOpisyNazw`, `TestLegendaPamiatki`). Docs: tabela części w
 `CZYTANKA_DO_CZYTANIA.md`.
+
+## 2026-11-18 (16) — rozdziały i łańcuchy jako nagłówki zadań (v20)
+
+Temat: chronologia wyższego rzędu w sekcji „Zadania i wątki" — nazwy
+rozdziałów wątku głównego i nazwy łańcuchów pobocznych jako nagłówki.
+
+1. **`kolejnosc_zadan.plan()` emituje bloki per grupa.** Wątek główny:
+   `Blok("Wątek główny — {numer · nazwa}")` z `_tytul_rozdzialu`
+   (numer_tytulu + tytul łączone „ · ", fallback cipai); sekcje główne
+   bez grupy/tytułu → wspólny blok „Wątek główny — zadania bez
+   rozdziału". Łańcuchy ≥`PROG_LANCUCHA`(=2) →
+   `Blok("Wątek poboczny — {nazwa}")` z `_tytul_lancucha`
+   (nazwa → tytul → fallback „grupa N"; fallback dotyczy tylko 23 grup
+   bez żadnego klucza nazwy w danych). Pojedyncze per kraina bez zmian.
+
+2. **346 nowych wpisów PL w `pl_nazwy_hasel.jsonl`** (2032 → 2378):
+   297 nazw grup/rozdziałów (m.in. Rozdział pierwszy–czwarty, „Ciąg
+   dalszy nastąpi", Wyzwania przełomu I–XXII, „Wstąpienie: …",
+   „Wieści ze świata — …", „Kto zapala lampę — część II–VI") + 49 nazw
+   zadań wątku głównego bez opisów (m.in. „Szepty nawałnicy",
+   „Zgromadzenie bohaterów", „Przez Łąkę: Postanowienie/Pożegnanie/
+   Wymarsz"). Korekta użytkownika: `317bb1d50b3e8900`
+   „Niebiosa nie przeprawiają" → **„Nieśmiertelni nie przypłyną"**.
+
+3. **`_sekcja_zadan` wciąga luźne nazwy.** Zadania z przetłumaczoną
+   nazwą, ale bez opisów, lądowały dotąd jako gołe linie za sekcją;
+   teraz parametr `luzne` dopasowuje je po tekście do kluczy planu
+   i stawia pod nagłówkiem rozdziału/łańcucha (reszta zostaje za
+   sekcją jak dotąd). Dzięki temu rozdziały 2–4 w ogóle się pokazują
+   (ich zadania nie mają opisów) i łańcuchów z nagłówkiem jest 236
+   zamiast 105.
+
+Budowa `out/czytanka_v20`: nagłówki `## Wątek główny — Rozdział
+pierwszy · Nieśmiertelni nie przypłyną` … „czwarty · Zwiastun żaru",
+236 nagłówków pobocznych; liczniki bez zmian względem v19. Uwaga
+z danych: „Whispers of the Tempest" należy w grze do grupy 1, nie 2.
+Testy: **614 OK** (przebudowane `tests/test_kolejnosc_zadan.py`:
+nagłówek rozdziału pierwszego, >500 nazwanych łańcuchów, fallback
+tylko dla grup bez nazwy, wciąganie luźnych nazw pod nagłówek).

@@ -101,16 +101,22 @@ Zasady kolejności:
    krainie (燕南 194 → 218, 河西 16 → 55, 不见 6 → 20 i mniejsze).
 
 8. **zadania w 03 idą kolejnością gry, nie alfabetem** — sekcja `# Zadania i wątki`
-   dzieli się na `## Wątek główny`, `## Wątki poboczne (łańcuchy)`, bloki
-   `## Zadania pojedyncze — <kraina>` i na końcu `## Pozostałe zadania i wątki`.
-   Kolejność liczy `tools/kolejnosc_zadan.py` z tego samego układu, który dostaje
-   pakiet dla tłumacza (`tools/uklad_scen.py`): typ zadania (wątek główny
-   pierwszy), grupa rozdziału po `kolejnosc` z `index/grupy_zadan.jsonl`,
-   a w grupie łańcuch `pre`/`post` z tabeli zadań. Pojedyncze zadania bez
-   łańcucha stoją osobno, pogrupowane krainą w kolejności odwiedzania
-   (`index/prowincje.json`). Hasła z tej sekcji, których nie da się przypisać do
-   żadnego zadania (np. kwestie z `debate_guider_dialog_data`), zostają na końcu
-   sekcji, alfabetycznie — nic nie wypada, ale nie udają questów.
+   dzieli się na bloki z nazwami rozdziałów i łańcuchów: `## Wątek główny —
+   Rozdział pierwszy · Nieśmiertelni nie przypłyną` … `czwarty · Zwiastun żaru`
+   (plus „zadania bez rozdziału”), `## Wątek poboczny — <nazwa łańcucha>` dla
+   każdego łańcucha z co najmniej dwoma zadaniami, bloki `## Zadania pojedyncze —
+   <kraina>` i na końcu `## Pozostałe zadania i wątki`. Kolejność liczy
+   `tools/kolejnosc_zadan.py` z tego samego układu, który dostaje pakiet dla
+   tłumacza (`tools/uklad_scen.py`): typ zadania (wątek główny pierwszy), grupa
+   rozdziału po `kolejnosc` z `index/grupy_zadan.jsonl`, a w grupie łańcuch
+   `pre`/`post` z tabeli zadań. Tytuł rozdziału i nazwa łańcucha pochodzą
+   z `grupy_zadan` (numer i nazwa po polsku z `pl_nazwy_hasel.jsonl`).
+   Zadanie z przetłumaczoną nazwą, ale bez opisów, też staje pod nagłówkiem
+   swojego rozdziału (jako sama nazwa). Pojedyncze zadania bez łańcucha stoją
+   osobno, pogrupowane krainą w kolejności odwiedzania (`index/prowincje.json`).
+   Hasła z tej sekcji, których nie da się przypisać do żadnego zadania
+   (np. kwestie z `debate_guider_dialog_data`), zostają na końcu sekcji,
+   alfabetycznie — nic nie wypada, ale nie udają questów.
 
 9. **zbiory i pamiątki** mają w 03 własne sekcje (`# Zbiory i pamiątki —
    zasłyszane historie`, `# Zbiory i pamiątki — karty przeciwników`): para

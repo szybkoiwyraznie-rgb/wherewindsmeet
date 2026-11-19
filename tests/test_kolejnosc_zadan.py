@@ -32,7 +32,25 @@ class KolejnoscZadanTests(unittest.TestCase):
 
     def test_watek_glowny_stoi_pierwszy(self):
         self.assertTrue(self.bloki, "brak bloków zadań")
-        self.assertEqual(self.bloki[0].tytul, "Wątek główny")
+        self.assertTrue(self.bloki[0].tytul.startswith("Wątek główny — "), self.bloki[0].tytul)
+
+    def test_pierwszy_blok_to_rozdzial_pierwszy(self):
+        """Nagłówek pierwszego bloku niesie chronologię wyższego rzędu: numer i nazwę rozdziału."""
+        self.assertIn("Rozdział pierwszy", self.bloki[0].tytul)
+        self.assertIn("Nieśmiertelni nie przypłyną", self.bloki[0].tytul)
+
+    def test_lancuchy_poboczne_maja_nazwy(self):
+        poboczne = [blok for blok in self.bloki if blok.tytul.startswith("Wątek poboczny — ")]
+        self.assertGreater(len(poboczne), 500, "łańcuchy poboczne nie dostały osobnych bloków")
+        # fallback „grupa N” wolno użyć tylko, gdy grupa naprawdę nie ma w danych
+        # żadnego klucza nazwy (nazwa/tytul) — inaczej zgubiliśmy nazwę łańcucha
+        for blok in poboczne:
+            if not blok.tytul.startswith("Wątek poboczny — grupa "):
+                continue
+            numer = int(blok.tytul.rsplit(" ", 1)[1])
+            grupa = self.indeks.grupy.get(numer) or {}
+            self.assertFalse(grupa.get("nazwa") or grupa.get("tytul"),
+                             f"grupa {numer} ma klucz nazwy, a dostała fallback")
 
     def test_zadne_zadanie_nie_powtarza_sie_w_dwoch_blokach(self):
         widziane: set[str] = set()
@@ -51,7 +69,9 @@ class KolejnoscZadanTests(unittest.TestCase):
                 klucz = self.indeks.zadania[numer].get("nazwa")
                 if klucz and klucz not in oczekiwane:
                     oczekiwane.append(klucz)
-        self.assertEqual(self.bloki[0].klucze, oczekiwane)
+        z_blokow = [klucz for blok in self.bloki if blok.tytul.startswith("Wątek główny")
+                    for klucz in blok.klucze]
+        self.assertEqual(z_blokow, oczekiwane)
 
     def test_lancuchy_przed_pojedynczymi(self):
         rodzaje = [("pojedyncze" if blok.tytul.startswith("Zadania pojedyncze") else blok.rodzaj)
@@ -90,6 +110,22 @@ class SekcjaZadanTests(unittest.TestCase):
         self.assertIn("**Zadanie z planu:** opis", tekst)
         self.assertIn("## Pozostałe zadania i wątki", tekst)
         self.assertIn("**Zadanie spoza planu**", tekst)
+
+    def test_luzna_nazwa_zadania_staje_pod_naglowkiem_rozdzialu(self):
+        """Zadanie z przetłumaczoną nazwą, ale bez opisów, nie wypada z rozdziału."""
+        from unittest import mock
+
+        from tools import czytanka_czysta
+
+        blok = kolejnosc_zadan.Blok("Wątek główny — Rozdział drugi · Tygiel", "watek", ["k1", "k2"])
+        luzne = ["Szepty nawałnicy", "Linia niczyja"]
+        with mock.patch.object(czytanka_czysta.kolejnosc_zadan, "plan", return_value=[blok]):
+            linie = czytanka_czysta._sekcja_zadan(
+                {}, {}, None, {"k1": "Szepty nawałnicy"}, [], luzne)
+        tekst = "\n".join(linie)
+        self.assertIn("## Wątek główny — Rozdział drugi · Tygiel", tekst)
+        self.assertIn("Szepty nawałnicy", tekst)
+        self.assertEqual(luzne, ["Linia niczyja"])
 
 
 if __name__ == "__main__":

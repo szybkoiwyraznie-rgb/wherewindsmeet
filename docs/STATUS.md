@@ -3,14 +3,13 @@
 Aktualizacja: **2026-11-18**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (v19, wpis 15 w dzienniku):** czytanka dzieli pliki na części
-po ~2,5 MB (`01_sceny_i_cutsceny_01..08.md`, `03_reszta_01..03.md`,
-README z listą części); karty pamiątek mają legendę `<motyw> · <kolejność>`
-(motywy z `curio_theme.history_name`, po polsku); nowy magazyn
-`tlumaczenie/pl_nazwy_hasel.jsonl` z **2 032 polskimi nazwami haseł**
-(wszystkie brakujące nazwy przy opisach + 56 nazw motywów pamiątek);
-filtr opisów powtarzających nazwę wydzielony do `_opis_powtarza_nazwe`.
-Reszta w 03: **91 095 pozycji**. Testy: **611 OK**.
+**Najnowsze (v20, wpis 16 w dzienniku):** sekcja „Zadania i wątki” ma
+nagłówki chronologii wyższego rzędu: `## Wątek główny — Rozdział pierwszy ·
+Nieśmiertelni nie przypłyną` … `czwarty · Zwiastun żaru` oraz `## Wątek
+poboczny — <nazwa łańcucha>` (236 nazwanych łańcuchów). `kolejnosc_zadan.plan()`
+emituje bloki per grupa; `_sekcja_zadan` wciąga pod nagłówki też zadania bez
+opisów (parametr `luzne`). Magazyn `pl_nazwy_hasel.jsonl`: **2 378 wpisów**
+(+297 nazw grup/rozdziałów, +49 nazw zadań głównych). Testy: **614 OK**.
 
 **Dane z gry na Dysku Google:** 8 części `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`
 (60 plików, `536 MB` po rozpakowaniu). Spis „co leży w której części” jest
