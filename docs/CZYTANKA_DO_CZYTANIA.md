@@ -7,20 +7,27 @@ uruchomieniu.
 
 Każdy rodzaj jest **cięty na części po ~2,5 MB** (żeby dało się je czytać
 w przeglądarkach i czytnikach): nazwy mają przyrostek `_NN`
-(np. `01_sceny_i_cutsceny_01.md … _08.md`), tytuł w środku dostaje dopisek
-„— część N z M", a sekcja przecięta na granicy części jest kontynuowana
-pod nagłówkiem `# … (ciąg dalszy)`. Gdy całość mieści się w budżecie,
-plik zostaje jeden i nazwa nie ma przyrostka. `README.md` obok plików
-wylicza wszystkie części.
+(np. `01_sceny_i_cutsceny_01.md … _08.md`), a **tytuł części opisuje jej
+zawartość** — `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra —
+część 5 z 8`, `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3` (lista
+etkiet sekcji, po przecinkach, kolejność z pliku; maks. 5, potem `…`).
+Gdy całość mieści się w budżecie, plik zostaje jeden i nazwa nie ma
+przyrostka ani dopisku. Sekcja przecięta na granicy części jest
+kontynuowana pod nagłówkiem `# … (ciąg dalszy)`; wiersz `Interakcja: …`
+zawsze przechodzi na początek nowej części razem ze sceną, nigdy nie
+zostaje sam na jej końcu. `README.md` obok plików wylicza wszystkie części
+i krótką listę sekcji każdej z nich.
 
-| pliki (v19) | zawartość | wiersze |
+| pliki (v21) | zawartość | wiersze |
 |---|---|---|
 | `01_sceny_i_cutsceny_01.md … _08.md` | prolog, potem krainy po kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze; napisy przerywników i pieśni na końcu | 191 224 kwestii |
-| `03_reszta_01.md … _03.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych; karty pamiątek mają legendę `<motyw> · <kolejność>` | 91 095 pozycji |
+| `02_reszta_01.md … _03.md` | komplet informacji dodatkowych: wszystko, co tłumaczone, a nie weszło do 01 (przedmioty, encyklopedia, kompendium, POI, pamiątki…), pogrupowane według rodzaju danych; karty pamiątek mają legendę `<motyw> · <kolejność>` | 91 441 pozycji |
 
 Plik `02_kontekst_scen_i_cutscen.md` (kontekst do jednostek z 01) został
 **zlikwidowany na życzenie właściciela** (2026-11-18) — wszystko, co pokazywał,
-jest w 03; żadne hasło nie jest już „zużywane" przez kontekst.
+jest w pliku reszty. Od v21 plik reszty nosi nazwę `02_reszta` (numer 02
+przekazany po zlikwidowanym kontekście); wcześniej nazywał się
+`03_reszta`. Żadne hasło nie jest już „zużywane" przez kontekst.
 
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 
@@ -49,7 +56,10 @@ Zasady kolejności:
    4700068`), a kotwica grupy zadań działa dopiero dla pozostałych; scena
    wywoływana przez punkt na mapie dostaje nad nagłówkiem wiersz
    `Interakcja: <nazwa POI>` (powiązanie z `index/mpk/poi_storyline_sceny.jsonl`,
-   np. `Interakcja: Dragon Pattern Mark` nad sceną 4700001),
+   np. `Interakcja: Znak smoczego wzoru` nad sceną 4700001) — wiersz stoi
+   **tuż nad `## Scena …`, bez pustej linii** (od v21; wcześniej między nimi
+   była pusta linia), a przy cięciu na części przechodzi na początek nowej
+   części razem ze sceną,
 4. **cutsceny przypisane do grupy zadań** stoją przy scenie, od której ich grupa
    się zaczyna (tabela powtórek daje `no` przerywnika → `grupa`, a grupa ma
    zakres numerów dialogów). Kotwicą jest **pierwsza scena grupy z przypisaną
@@ -60,7 +70,7 @@ Zasady kolejności:
    a nie w kolejności własnych numerów,
 5. **cutsceny bez grupy** stoją na końcu, w kolejności własnych numerów, w sekcji
    `# Cutsceny bez grupy zadań` — nie udajemy, że znamy ich miejsce,
-6. **napisy przerywników** (pula `text_msg`, 2 688 wierszy) nie leżą już w 03.
+6. **napisy przerywników** (pula `text_msg`, 2 688 wierszy) nie leżą już w 02.
    Napis w danych gry **nie ma numeru cutsceny** — ma tylko identyfikator wiersza
    i czasem nazwę nagrania (`vo_sm_sxdm4_cs_zlxl_hx_07`). Sprawdzone na pakiecie
    aktualizacji z 2026-11-13: osie czasu cutscen nie są w nim w ogóle, a osie
@@ -100,7 +110,7 @@ Zasady kolejności:
    cutscen wcześniej odłożonych do „Scen bez przypisanej mapy” stoi w swojej
    krainie (燕南 194 → 218, 河西 16 → 55, 不见 6 → 20 i mniejsze).
 
-8. **zadania w 03 idą kolejnością gry, nie alfabetem** — sekcja `# Zadania i wątki`
+8. **zadania w 02 idą kolejnością gry, nie alfabetem** — sekcja `# Zadania i wątki`
    dzieli się na bloki z nazwami rozdziałów i łańcuchów: `## Wątek główny —
    Rozdział pierwszy · Nieśmiertelni nie przypłyną` … `czwarty · Zwiastun żaru`
    (plus „zadania bez rozdziału”), `## Wątek poboczny — <nazwa łańcucha>` dla
@@ -118,19 +128,21 @@ Zasady kolejności:
    (np. kwestie z `debate_guider_dialog_data`), zostają na końcu sekcji,
    alfabetycznie — nic nie wypada, ale nie udają questów.
 
-9. **zbiory i pamiątki** mają w 03 własne sekcje (`# Zbiory i pamiątki —
+9. **zbiory i pamiątki** mają w 02 własne sekcje (`# Zbiory i pamiątki —
    zasłyszane historie`, `# Zbiory i pamiątki — karty przeciwników`): para
    „tytuł + pełny tekst” z jednego wiersza gry, także bez przekładu (wtedy
    z gwiazdką). Wcześniej wchodził sam tekst bez tytułu, a bez przekładu — wcale.
    Pamiątki (przedmioty z historią) stoją w sekcji `# Pamiątki — przedmioty
    z historią`: tytuł „właściciel — przedmiot” (`**Jiang Wulang — Stara
-   włócznia**`) i cała opowieść z gry pod spodem. Właściciel bez przekładu idzie
+   włócznia**`), legenda `<motyw> · <kolejność>` i cała opowieść z gry pod
+   spodem — wszystkie trzy w **kolejnych liniach, bez pustych wierszy**
+   (od v21; wcześniej między nimi stał pusty wiersz). Właściciel bez przekładu idzie
    z identyfikatora ikony z danych gry (`head_npc_…_jiangwulang`), nie
    z domysłu; pamiątka bez nazwy przedmiotu nie wchodzi i jest policzona
    w README (`pamiatki_bez_nazwy`). Nazwy biorą się z `index/nazwy.jsonl`
    (identyfikator tekstu → treść i klucz przekładu), a nie z domysłu po
    identyfikatorze wiersza.
-10. **punkty na mapie (POI)** mają w 03 sekcję `# Punkty na mapie (POI)`:
+10. **punkty na mapie (POI)** mają w 02 sekcję `# Punkty na mapie (POI)`:
    `**Nazwa** — scena N` **tylko wtedy**, gdy gra zapisała numer sceny
    w wierszu POI (`play_dialog_no` / `result_play_dialog`). Sama ścieżka
    scenariusza (`interact_storyline`, np. `…/sxd_longwenbiaoji.etsb`) nie jest
@@ -166,7 +178,7 @@ Zasady:
 - **jedna kwestia = jedna linia**, bez odstępu między kwestiami; pusty wiersz
   oddziela tylko jednostki (scenę, cutscenę),
 - **bez punktora w ogóle — w każdym pliku:** kwestia to `**Mówca:** tekst`,
-  a gdy mówcy nie ma — goły tekst. Ten sam układ w 03 (reszta):
+  a gdy mówcy nie ma — goły tekst. Ten sam układ w 02 (reszta):
   `**Nazwa:** opis`. Punktor nic nie wnosił, a przy łamanych zdaniach mylił,
 - **imię mówcy:** polskie, gdy jest w magazynie; inaczej angielskie (zlatynizowane)
   z danych gry, a dla etykiet zapisanych w grze tylko rolą — z ręcznego słownika
@@ -225,12 +237,12 @@ Zasady:
 - **0 kwestii z chińską etykietą mówcy** i 0 z samym numerem; 4 713 etykiet
   chińskich przeszło na łacinkę (tabela 3 156 znaków),
 - 3 pieśni (na końcu), 4 sekcje prologu, 38 sekcji krain,
-- plik 02 zlikwidowany (2026-11-18); wszystkie hasła, karty i rozdziały
-  fabularne encyklopedii są w pliku 03,
+- plik 02-kontekst zlikwidowany (2026-11-18); wszystkie hasła, karty i rozdziały
+  fabularne encyklopedii są w pliku reszty (od v21 `02_reszta`; wcześniej `03_reszta`),
 - 704 karty bez polskiego przekładu mają tekst z gry z gwiazdką (biogramy
   encyklopedii są na razie po angielsku), 805 kart nie ma nazwy w danych —
   to opisy bez nazwy, więc idą gołym tekstem,
-- 61 905 pozycji w pliku 03,
+- 61 905 pozycji w pliku reszty (stan z 2026-11-15),
 - archiwum: `dist/WWM_Czytanka_PL_v2.zip` (6 607 212 B,
   SHA-256 `06eb1d2ad973e6924e9fd524bc0b5d56ce9e9cc6cfce1d448cc1f08c95c350a6`).
   Wersje numerujemy (`v1`, `v2`, `v3`…), nie datujemy — spis:
@@ -252,4 +264,4 @@ prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
 `tools/zbuduj_czytanke_pelna.py` (trzy warstwy: chronologia, fabuła, kontekst)
 i `tools/buduj_czytanke_gry.py` (sceny w tabelach z chińskim i angielskim)
 zostają jako narzędzia robocze do weryfikacji i audytu — ale **nie są czytanką
-dla właściciela**. Czytanka to dwa pliki treści (01 i 03) plus README.
+dla właściciela**. Czytanka to dwa pliki treści (01 i 02) plus README.

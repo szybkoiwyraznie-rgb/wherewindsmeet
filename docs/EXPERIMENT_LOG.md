@@ -2192,3 +2192,50 @@ z danych: „Whispers of the Tempest" należy w grze do grupy 1, nie 2.
 Testy: **614 OK** (przebudowane `tests/test_kolejnosc_zadan.py`:
 nagłówek rozdziału pierwszego, >500 nazwanych łańcuchów, fallback
 tylko dla grup bez nazwy, wciąganie luźnych nazw pod nagłówek).
+
+## 2026-11-19 (17) — uwagi właściciela do Czytanki; czytanka v21
+
+Owner notes after reading v20. Three changes, all in `tools/czytanka_czysta.py`:
+
+1. **Nazwa pliku reszty: `03_reszta` → `02_reszta`** (`02` przejęty po
+   zlikwidowanym `02_kontekst_scen_i_cutscen.md`); wszystkie odwołania
+   (docstring, README generatora, `docs/CZYTANKA_DO_CZYTANIA.md`,
+   `docs/STATUS.md`, testy) przeniesione; `03_reszta*.md` już nie powstaje.
+2. **Tytuł części nazywa jej zawartość** (`_etykieta_sekcji`, `_opis_czesci`,
+   `_zapisz_czesci`): lista etykiet `# ` sekcji w kolejności występowania,
+   po przecinkach, maks. 5 (potem `…`); krótkie nazwy z `_KROTKIE_SEKCJE`
+   (np. `Zadania i wątki` → `zadania`, `Encyklopedia…` → `kompendium`,
+   `Pamiątki — przedmioty z historią` → `pamiątki`), a kraina `# 清河 —
+   Qinghe - ostatnia iluzja…` bierze człon po ` — ` i ucina dopisek po
+   pierwszym `, `, ` - ` lub ` (` → `Qinghe`. Tytuł części np.
+   `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra — część 5 z 8`,
+   `# Where Winds Meet — 02 - przedmioty — część 2 z 3`;
+   pojedynczy, niecięty plik zostaje pod zwykłym tytułem. `README.md` w paczce
+   wylicza krótką listę sekcji każdej części (wiersze tabeli).
+3. **Dwie uwagi formatowania:** karta pamiątki ma tytuł, legendę i treść
+   w kolejnych liniach bez pustych wierszy (`**Jiang Wulang — Stara włócznia**`
+   / `U Przystani Niebios · 1` / treść — prośba właściciela, przykład 1:1);
+   wiersz `Interakcja: <POI>` stoi tuż nad `## Scena …` bez pustej linii
+   (prośba właściciela, przykład 1:1), a `_czesci` przy cięciu na części
+   przenosi wiersz `Interakcja: …` na początek nowej części razem ze sceną
+   (inaczej mógł zostać sam na końcu części).
+
+Budowa `out/czytanka_v21`: 01 → 8 części, 02 → 3 części + README;
+75 328 jednostek, 30 986 kwestii PL, 160 897 z gwiazdką, reszta **91 441**
+(v19: 91 095; +346 to nowe klucze `pl_nazwy_hasel.jsonl` z wpisu 16 —
+wpis 16 podawał „liczniki bez zmian", ale licznik `reszta` liczy klucze
+magazynu, więc przesunął się o pełną dopisaną porcję), zbiory 1020,
+pamiątki 120, POI 2945 (w tym 369 z numerem sceny).
+
+Testy: **623 OK** (nowe: `TestTytulyCzesci` (5), `TestInterakcjaWstep` (2),
+`PamiatkiTests.test_tytul_legenda_i_tresc_w_kolejnych_liniach`;
+`test_dwa_pliki_tresci_bez_kontekstu` i glob `02_reszta*.md` w
+`test_chronologia.py` pilnują nowej nazwy).
+
+Paczka `dist/WWM_Czytanka_PL_v21.zip` (8 435 805 B, SHA-256
+`b528e98b600a6c8d9fe60e9304644685369301cde240c697999f83af76db0fe8`) na
+Dysku (folder „Where Winds Meet", `czytanka_v21.zip`,
+id `1wMFzfRAqr964kL-p8o8k_OSV3s_2brDz`). Weryfikacja po budowie: wszystkie
+59 wierszy `Interakcja:` stoją bezpośrednio nad `## Scena …` (skan całego
+01), wszystkie 120 kart pamiątek bez pustych wierszy między tytułem,
+legendą i treścią (skan sekcji `# Pamiątki` we wszystkich trzech częściach 02).

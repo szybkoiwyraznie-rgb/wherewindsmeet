@@ -1,9 +1,21 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-18**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (v20, wpis 16 w dzienniku):** sekcja „Zadania i wątki” ma
+**Najnowsze (czytanka v21, wpis 17 w dzienniku):** plik reszty nazywa się
+teraz `02_reszta` (numer 02 przejęty po zlikwidowanym pliku kontekstu),
+tytuł każdej części nazywa jej zawartość (np. `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra — część 5 z 8`,
+`# Where Winds Meet — 02 - przedmioty — część 2 z 3`), a `README.md` w paczce
+wylicza krótką listę sekcji każdej
+części. Dwie uwagi formatowania od właściciela: karta pamiątki ma teraz
+tytuł, legendę i treść w kolejnych liniach bez pustych wierszy, a wiersz
+`Interakcja: …` stoi tuż nad `## Scena …` (też bez pustej linii; przy
+cięciu na części przechodzi z nią na początek nowej części). Testy:
+**623 OK**. Paczka `dist/WWM_Czytanka_PL_v21.zip` na Dysku (id
+`1wMFzfRAqr964kL-p8o8k_OSV3s_2brDz`, SHA-256 `b528e98b600a6c8d9fe60e9304644685369301cde240c697999f83af76db0fe8`).
+
+**Poprzednie (v20, wpis 16 w dzienniku):** sekcja „Zadania i wątki” ma
 nagłówki chronologii wyższego rzędu: `## Wątek główny — Rozdział pierwszy ·
 Nieśmiertelni nie przypłyną` … `czwarty · Zwiastun żaru` oraz `## Wątek
 poboczny — <nazwa łańcucha>` (236 nazwanych łańcuchów). `kolejnosc_zadan.plan()`
@@ -24,7 +36,7 @@ treści do rozmowy) — innej drogi nie ma, bo sandbox nie ma sieci do Dysku
 `curio_config` / `curio_owner` / `curio_theme` (+ `equip_items` na nazwę
 i opis). `tools/pamiatki_z_bazy.py` zapisuje z nich **same liczby** do
 `index/pamiatki.jsonl` (120 wierszy), a `czytanka_czysta._pamiatki()` dokłada
-sekcję `# Pamiątki — przedmioty z historią` do `03`: **98 pamiątek** z tytułem
+sekcję `# Pamiątki — przedmioty z historią` do reszty (dziś `02`): **98 pamiątek** z tytułem
 „właściciel — przedmiot” i całą opowieścią (przekład, a bez przekładu tekst
 z gry z gwiazdką). 22 pamiątki nie mają w wyciągu nazwy przedmiotu — nie
 wchodzą, licznik `pamiatki_bez_nazwy` w README czytanki mówi ile. Opowieści
@@ -38,15 +50,15 @@ identyfikatory używane przez czytankę, z treścią i kluczem. To odblokowało 
 
 **Pamiątki (przedmioty z historią).** Tabele `curio_config` / `curio_owner` /
 `curio_theme` / `equip_items`; `tools/pamiatki_z_bazy.py` →
-`index/pamiatki.jsonl`, sekcja `# Pamiątki — przedmioty z historią` w `03`:
+`index/pamiatki.jsonl`, sekcja `# Pamiątki — przedmioty z historią` w `02`:
 **120 pamiątek, 0 bez nazwy**, tytuł „właściciel — przedmiot”
 („Jiang Wulang — Stara włócznia”) i cała opowieść. Opowieści nie są
 przetłumaczone (0 ze 120), więc wszystkie idą z gwiazdką.
 
 **Punkty na mapie (POI).** `tools/poi_z_bazy.py` → `index/poi.jsonl` (10 368
-wierszy, 1 368 z numerem sceny), sekcja `# Punkty na mapie (POI)` w `03`:
+wierszy, 1 368 z numerem sceny), sekcja `# Punkty na mapie (POI)` w `02`:
 **2 948 haseł**, z tego **368** z potwierdzonym numerem sceny, **11** bez nazwy
-w mapach języka. „Dragon Pattern Mark” jest w `03` z gwiazdką (brak przekładu
+w mapach języka. „Dragon Pattern Mark” jest w `02` z gwiazdką (brak przekładu
 klucza `b86a976ba200e189`) i bez numeru sceny — wiersz POI ma tylko ścieżkę
 `client/dialogs/hjt/sxd_longwenbiaoji.etsb`.
 
@@ -141,7 +153,7 @@ z kluczem tekstu (`index/warianty.jsonl`). Naprawione 2026-11-14 w
 
 Pięć braków zgłoszonych przez właściciela (angielskie kwestie w scenach,
 brakujące przedmioty, brak POI, brak powiązań scena → scena, alfabetyczny
-porządek questów w 03) ma plan i kolejność w
+porządek questów w reszcie) ma plan i kolejność w
 [ROADMAP_CZYTANKA_V6.md](ROADMAP_CZYTANKA_V6.md).
 
 ## Gdzie jesteśmy
@@ -351,7 +363,8 @@ wiersze puli `text_msg` przez `tools/cutsceny_kolejnosc_kwestii.py`
 (benchmark 30161 — ręczny zapis gracza — odtworzony w 100%, 36/36 kwestii).
 Czytanka od v15 renderuje cutsceny w tej kolejności (215 cutscen z pełnym
 przeplotem). Czytanka od 2026-11-18 (wpis 13) ma dwa pliki treści: 01 sceny i cutsceny
-+ 03 reszta (komplet informacji dodatkowych); plik 02 kontekst zlikwidowany
++ 02 reszta (komplet informacji dodatkowych; numer 02 przejęty po zlikwidowanym
+kontekście; dawniej `03_reszta.md`); plik 02-kontekst zlikwidowany
 na życzenie właściciela. Dokończone 2026-11-18 (wpisy 11–12): tryb zapasowy pokrył 132 krótkie
 cutsceny (indeks: 347 cutscen, 2 826 kwestii); czytanka podpisuje mówców
 z nazw nagrań (gracz → Youxia, kody `_cs_`) z propagacją po plikach
@@ -360,7 +373,10 @@ pokrycia treścią dostają nagłówek „Napisy sąsiadujące" zamiast „Inny
 wariant".
 
 
-0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** Trzy pliki
+0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** (stan
+   z 2026-11-17; od 2026-11-18 układ to **dwa pliki treści**: `01_sceny_i_cutsceny`
+   i `02_reszta` — plik 02-kontekst zlikwidowany 2026-11-18, plik reszty
+   od v21 nazywa się `02_reszta`, wcześniej `03_reszta`.) Trzy pliki
    według ustaleń właściciela: `01_sceny_i_cutsceny.md` (filmy, prolog, krainy po
    kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze),
    `02_kontekst_scen_i_cutscen.md` (kontekst w tej samej kolejności),
@@ -374,7 +390,7 @@ wariant".
    chińską etykietę mówcy — schodzą ze słownikiem `index/nazwy_mowcow.json`.
    Pieśni i filmy stoją na końcu (w grze nie ma ich na starcie), a **wszystkie
    trzy pliki są bez punktora**: `**Mówca:** tekst`, `**Nazwa:** opis`, bez mówcy
-   goły tekst. **Paczki numerujemy, nie datujemy:** najnowsza
+   goły tekst. **Paczki numerujemy, nie datujemy:** (stan z 2026-11-17)
    `dist/WWM_Czytanka_PL_v10.zip`
    (`6 771 033 B`, SHA-256
    `6796e1d7a09875ad34715f1114b8d907d48a3819fd3532cea52975f393dbb85d`),
@@ -398,7 +414,7 @@ wariant".
    (`## Prolog 1–4`), numerowane cutsceny stoją tam, gdzie wskazuje chronologia.
    **Stan po decyzjach właściciela z 2026-11-15:** (a) do pliku 02 wchodzą tylko
    hasła, które gra naprawdę opisuje — 8 891 jednostek ma kontekst, 65 351
-   pozycji bez opisu przeniesiono do 03 (m.in. `江晏`/Jiang Yan, `镇冠珏`/Nefryt
+   pozycji bez opisu przeniesiono do reszty (m.in. `江晏`/Jiang Yan, `镇冠珏`/Nefryt
    Zhenguan, `丰厚醇`/Hojna Wiosna, `燕北旧盟`/Dawne Przymierze Yanbei — gra nie
    daje im żadnego opisu); (b) karty bez opisu zniknęły też z list haseł, razem
    z 28 tys. śmieciowych wpisów (`玩家`, `0`, `Entity轨道组`) i 747 duplikatami;
