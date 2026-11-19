@@ -1,7 +1,15 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-17**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-18**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+**Najnowsze (v20, wpis 16 w dzienniku):** sekcja „Zadania i wątki” ma
+nagłówki chronologii wyższego rzędu: `## Wątek główny — Rozdział pierwszy ·
+Nieśmiertelni nie przypłyną` … `czwarty · Zwiastun żaru` oraz `## Wątek
+poboczny — <nazwa łańcucha>` (236 nazwanych łańcuchów). `kolejnosc_zadan.plan()`
+emituje bloki per grupa; `_sekcja_zadan` wciąga pod nagłówki też zadania bez
+opisów (parametr `luzne`). Magazyn `pl_nazwy_hasel.jsonl`: **2 378 wpisów**
+(+297 nazw grup/rozdziałów, +49 nazw zadań głównych). Testy: **614 OK**.
 
 **Dane z gry na Dysku Google:** 8 części `WWM_AKTUALIZACJA_20261113_193108_9bdd6b3f_czesc1..8.zip`
 (60 plików, `536 MB` po rozpakowaniu). Spis „co leży w której części” jest
@@ -335,6 +343,23 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
 
 ## Następny krok
 
+**ROADMAPA WYKONANA (2026-11-18, wpis 10 w EXPERIMENT_LOG): chronologia
+tekstów W cutscenach — ZNALEZIONA.** Nośnik kolejności to ścieżka audio
+głównego pliku `.cine` cutsceny (wpisy `czas:id_sound_data`), czytana przez
+`tools/cine_sciezka_audio.py` z korpusu MPK_SKANER_WYNIK i tłumaczona na
+wiersze puli `text_msg` przez `tools/cutsceny_kolejnosc_kwestii.py`
+(benchmark 30161 — ręczny zapis gracza — odtworzony w 100%, 36/36 kwestii).
+Czytanka od v15 renderuje cutsceny w tej kolejności (215 cutscen z pełnym
+przeplotem). Czytanka od 2026-11-18 (wpis 13) ma dwa pliki treści: 01 sceny i cutsceny
++ 03 reszta (komplet informacji dodatkowych); plik 02 kontekst zlikwidowany
+na życzenie właściciela. Dokończone 2026-11-18 (wpisy 11–12): tryb zapasowy pokrył 132 krótkie
+cutsceny (indeks: 347 cutscen, 2 826 kwestii); czytanka podpisuje mówców
+z nazw nagrań (gracz → Youxia, kody `_cs_`) z propagacją po plikach
+nagrań w obrębie cutsceny (30161 podpisana w 100 %), a bloki puli bez
+pokrycia treścią dostają nagłówek „Napisy sąsiadujące" zamiast „Inny
+wariant".
+
+
 0. **Czytanka do czytania w nowym układzie — zbudowana, do wysłania.** Trzy pliki
    według ustaleń właściciela: `01_sceny_i_cutsceny.md` (filmy, prolog, krainy po
    kolei — sceny **i** cutsceny przemieszane w kolejności występowania w grze),
@@ -462,10 +487,86 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md), wpis (9). Bramka 3 (oś `.cine`,
    weryfikacja 30161) nadal otwarta.
 
-## Handoff — stan po WYNIKv6 i czytankach v11 (2026-11-18)
+## Handoff — WYNIK v7 przerobiony: reguła `Storyline/`, benchmark POI potwierdzony (2026-11-18)
+
+- **Przebieg v7 właściciela odebrany i przetworzony** (8 części na Dysku,
+  189,6 MB; 36 545 trafień sondy EZST + 3 113 trafień kandydatów, 0 błędów;
+  wszystkie 39 888 bloków zdekodowane po stronie repo bez błędu).
+- **Priorytet 2 — benchmark POTWIERDZONY:** odkryta reguła VFS
+  `Storyline/<ścieżka>.etsb`; `Storyline/client/dialogs/hjt/
+  sxd_longwenbiaoji.etsb` → graf grający `dialogs_no 4700001`
+  (Dragon Pattern Mark → scena, wprost z danych). Rozwiązano 6 961
+  skryptów → `index/mpk/etsb_storyline.jsonl`. Do pełnego POI→scena
+  brakuje tylko kolumny POI→ścieżka skryptu z bazy gry (baza do
+  ponownego pobrania do `local/` — sandbox ją czyści).
+- **Priorytet 1 — duży skok:** `index/mpk/storyline_sceny.jsonl` — 8 948
+  grafów, 5 121 unikalnych scen, **1 508 unikalnych krawędzi scena→scena**
+  (było 13 z WYNIKv6) + przeplot 235 cutscena→scena / 182 scena→cutscena.
+  Uczciwie: `4700041`/`4700352` nie występują w korpusie — łańcuch
+  benchmarku nadal niepotwierdzony (korpus = tylko głowy bloków).
+- **Priorytet 3 — połowa drogi:** `index/mpk/cine_ujecia.jsonl` — 978
+  masterów `.cine` z uporządkowanymi 5 022 pod-ujęciami (benchmark 30161:
+  17 ujęć w kolejności gry). Uczciwie: osie `.cine` NIE zawierają nazw
+  nagrań ani napisów — kolejność kwestii nadal nie wynika wprost.
+- **Dokończone w tej samej sesji (wpis 2026-11-18 (4)):**
+  `poi_storyline_sceny.jsonl` — POI→scena przez skrypty (61 POI ze sceną,
+  benchmark 200046001→4700001 w całości z danych; 75 nierozwiązanych →
+  kandydaci do kitu v8) oraz `nastepstwa_scen.jsonl` — scalone krawędzie
+  v6+v7 (1 744; 1 045 potwierdzonych oboma skanami).
+- **Priorytet właściciela (2026-11-18): połączenia scen — DOWIEZIONE
+  z grafu zadań** (wpis (5) w dzienniku): `tools/zadania_sceny.py` →
+  `index/mpk/nastepstwa_zadania.jsonl` (8 997 krawędzi z tabeli `tasks`);
+  kanoniczny `nastepstwa_scen.jsonl` ma po wpisie (6) **18 625 krawędzi
+  z pięciu źródeł** (v6, v7, graf zadań, `branch_dialog_subsequent` —
+  8 011 krawędzi, przebieg z gry — 3). Główny łańcuch od 4700001 bez
+  dziur: `4700001 → 4700346 → 4700002 → 4700003 → 4700005 → … → [30162] →
+  [30165] → 4700068`.
+- **Mechanizm scen ambientowych rozpracowany (wpis (6)):** potwierdzony
+  w grze ciąg `4700037 → (klik POI) → 4700001 → 4700041 → 4700352` ma
+  wyjaśnienie w danych: sceny 4700037/4700041 to kity w świecie
+  (`spaces.*.spawn_kit_sid_no`, kit_serial_id == numer sceny, drzewo
+  `u_common_qifen`) przy POI 200046001; zadanie 3400017 spawnuje grupę
+  1632220065 i (`new_npc_task_data`) wysyła NPC 15000023 (Ruby) do kitu
+  4700041. Wyzwalacz riposty gracza 4700352 siedzi po stronie serwera
+  (brak w danych klienta) — krawędź utrwalona jako źródło „gra".
+  Nowy indeks `index/mpk/sceny_ambient_kity.jsonl` (53 601 wierszy): 43 877 scen
+  ambientowych z pozycją XYZ — do grupowania czytanki wg miejsc.
+- **Czytanka v12 DOWIEZIONA (wpis (7)):** chronologia liczona topologicznie
+  z grafu następstw (łańcuchy scen w całości, cutsceny między swoimi scenami,
+  pierwszeństwo krawędzi „gra"); benchmark właściciela stoi ciągiem;
+  `dist/WWM_Czytanka_PL_v12.zip` na Dysku; v13 dodaje wiersz
+  `Interakcja: <nazwa POI>` nad scenami wywoływanymi przez punkty na mapie
+  (59 scen, wpis (8)).
+- **Następny krok:** (a) uwagi właściciela do układu v12; (b) kolejność KWESTII wewnątrz sceny: osie
+  `dialog_timelines.<scena>` istnieją w bazie (TimelinePObject z trackami
+  per postać) — do przebadania; (c) kit v8: jawni kandydaci
+  `Storyline/<ścieżka>` (75 POI + 519 `.etsb`/`.ets` + 32 `storyline_path`)
+  + wyzwalacze 4700041/4700352 w `spaces.*`.
+  Szczegóły: [dziennik](EXPERIMENT_LOG.md), wpisy 2026-11-18 (3)–(5).
+
+## Handoff (nieaktualny) — skaner v7 na Dysku, czekał na przebieg właściciela (2026-11-18)
 
 - **Priorytet 1 (scena → scena)**: `WYNIKv6` wyciągnął 1 066 krawędzi z nieskompresowanych grafów JSON w `Resources*.mpk` (`index/mpk/storyline_nastepstwa.jsonl`), ale **benchmark `4700001 → 4700041 → 4700352` ma w nich 0 trafień** — w czytankach `WWM_Czytanka_PL_v11.zip` układ dla tych scen nadal idzie po numerach.
 - **Priorytet 2 (POI → scena)**: `index/mpk/poi_sceny.jsonl` ma 1 307 bezpośrednich powiązań z `poi.dialog`, ale **benchmark `Dragon Pattern Mark → 4700001` (`client/dialogs/hjt/sxd_longwenbiaoji.etsb`) ma 0 trafień** w `lt1_stringi.jsonl` i w `WYNIKv6`.
 - **Priorytet 3 (kolejność kwestii w cutscenach)**: `index/mpk/cine_dekodowane.jsonl` ma tylko 14 sztuk z sondy `Resources34` (w grze jest ich kilkaset).
 - **Przyczyna**: brakujące grafy, skrypty `.etsb` i osie `.cine` leżą w `Resources*.mpk` w blokach skompresowanych/zaszyfrowanych (`EZST`) oraz pod sygnaturą `.cine` (`c159410d`), których nieskompresowane wyszukiwanie JSON-ów nie widzi.
-- **Następny krok**: skaner v7, który w `Resources*.mpk` dekoduje/wycina bloki `EZST` (pod priorytet 1 i 2, w tym benchmark `4700001` i `.etsb`) oraz bloki `.cine` (`c159410d`, pod priorytet 3).
+- **Zrobione w tej sesji (2026-11-18, druga część):** (a) `tools/sciezki_vfs.py`
+  → `index/mpk/sciezki_vfs.jsonl` — **11 278 prawdziwych ścieżek VFS z bazy**
+  (974 pełnych `.cine` z `cutscenes.cine_path` — wzorzec `qhrw` trafiał tylko 14,
+  2 429 hashowalnych `.graph`, w tym `Char/graph/cutscene/*` z
+  `fenbao_cutscene_info.cutscene_graph`, 804 `.etsb` z benchmarkiem
+  `sxd_longwenbiaoji.etsb`); (b) **skaner v7** (`WWM_MPK_Skaner_v7.zip`,
+  160 860 B, SHA-256 `81431bf2b46c7f678b1214104a3a47fc6c5e3d9cd11220a64cb071d1d529e338`,
+  Dysk id `12X8MPOLISbOnEeeAy8i5yJiKRt1DPaZu`; kity v4–v6 w koszu):
+  25 451 kandydatów z realnych ścieżek + **sonda zawartości bloków EZST**
+  (AES-ECB prefiks w czystym Pythonie + początek ramki zstd, sygnatury
+  `c159410d`/Storyline/`client/dialogs`/`4700001`; brakujący moduł zstd
+  `SKANUJ.bat` doinstalowuje SAM — właściciel nie uruchamia nic ręcznie;
+  bez niego sonda treści jest jawnie pomijana). Szczegóły i ograniczenia:
+  [dziennik](EXPERIMENT_LOG.md), wpis 2026-11-18 (2).
+- **Następny krok**: właściciel uruchamia `WWM_MPK_Skaner_v7.zip`
+  (tylko dwuklik na `SKANUJ.bat`; skan może potrwać do ~1 h) i odsyła
+  `WWM_MPK_Skaner_WYNIK.zip` na Dysk. Po wyniku:
+  dekodowanie `ezst_*.bin` (`tools/mpk_artefakty.py`), mapowanie `.cine` →
+  cutsceny po `sciezki_vfs.jsonl` (pole `cutsceny`), Bramka 3 (weryfikacja
+  osi 30161) i grafy Storyline pod priorytety 1–2.

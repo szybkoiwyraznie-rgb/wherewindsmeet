@@ -62,21 +62,55 @@ class TestZapisanaChronologia(unittest.TestCase):
                 kolejnosc.append(kraina)
         self.assertEqual(len(kolejnosc), len(set(kolejnosc)), "kraina wraca po innej")
 
-    def test_sceny_po_numerze_w_krainie(self):
+    def test_sceny_wg_grafu_nastepstw(self):
+        """Porządek scen w krainie szanuje graf następstw; sceny bez krawędzi
+        stoją między łańcuchami po numerze dialogu."""
+        pozycja: dict[tuple[str, int], int] = {}
+        for i, j in enumerate(self.jednostki):
+            if j["t"] in ("scena", "cutscena") and j.get("n") is not None:
+                pozycja.setdefault((j["t"], int(j["n"])), i)
+        krawedzie, _, _ = chronologia._graf_nastepstw(KATALOG / "index")
+        w_grafie = {n for a, b in krawedzie for n in (a, b)}
+        # sceny spoza grafu rosną numerem wewnątrz krainy
         ostatnia, poprzedni = None, None
         for jednostka in self.jednostki:
-            if jednostka["t"] != "scena":
+            if jednostka["t"] != "scena" or int(jednostka["n"]) in w_grafie:
                 continue
             if jednostka["s"] == poprzedni:
                 self.assertGreater(int(jednostka["n"]), int(ostatnia))
             poprzedni, ostatnia = jednostka["s"], jednostka["n"]
 
+    def test_benchmark_przebiegu_z_gry(self):
+        """Potwierdzony w grze ciąg z POI Dragon Pattern Mark stoi w całości,
+        scena po scenie, z cutscenami między swoimi scenami."""
+        pozycja: dict[tuple[str, int], int] = {}
+        for i, j in enumerate(self.jednostki):
+            if j.get("n") is not None:
+                pozycja.setdefault((j["t"], int(j["n"])), i)
+        lancuch = [("scena", 4700037), ("scena", 4700001), ("scena", 4700041),
+                   ("scena", 4700352), ("scena", 4700002), ("scena", 4700003),
+                   ("scena", 4700005), ("scena", 4700377), ("scena", 4700384),
+                   ("scena", 4700385), ("cutscena", 30162), ("cutscena", 30165),
+                   ("scena", 4700068)]
+        pozycje = [pozycja.get(w) for w in lancuch]
+        self.assertNotIn(None, pozycje, f"brak jednostek łańcucha: {lancuch}")
+        self.assertEqual(pozycje, sorted(pozycje), "łańcuch z gry nie rośnie")
+        self.assertEqual(pozycje[-1] - pozycje[0], len(lancuch) - 1,
+                         "łańcuch z gry nie jest ciągły")
+
     def test_cutsceny_przy_scenie_swojej_grupy(self):
+        """Cutscena w krainie stoi albo przy scenie swojej grupy zadań (`g`),
+        albo w miejscu wskazanym przez graf następstw (scena → cutscena)."""
+        _, cuty_po_scenie, cuty_po_cucie = chronologia._graf_nastepstw(
+            KATALOG / "index")
+        z_grafu = ({c for cuty in cuty_po_scenie.values() for c in cuty}
+                   | {c for cuty in cuty_po_cucie.values() for c in cuty})
         przypisane = [j for j in self.jednostki
                       if j["t"] == "cutscena" and j["s"] not in (chronologia.BEZ_GRUPY, "Prolog")]
         self.assertGreater(len(przypisane), 100)
         for jednostka in przypisane:
-            self.assertIn("g", jednostka)
+            self.assertTrue("g" in jednostka or int(jednostka["n"]) in z_grafu,
+                            f"cutscena bez grupy i bez miejsca w grafie: {jednostka}")
             self.assertTrue(jednostka.get("k"))
 
     def test_cutscena_w_prologu_ma_streszczenie(self):
@@ -203,7 +237,11 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         cls.statystyka = czytanka_czysta.zbuduj(
             index=str(KATALOG / "index"), magazyn=str(KATALOG / "tlumaczenie"),
             wyj=Path(cls._katalog.name), zakres="wszystko")
-        cls.tekst = (Path(cls._katalog.name) / "01_sceny_i_cutsceny.md").read_text(encoding="utf-8")
+        # Treść może być pocięta na części (`01_sceny_i_cutsceny_01.md`…) —
+        # testy patrzą na sklejoną całość.
+        cls.tekst = "".join(
+            plik.read_text(encoding="utf-8")
+            for plik in sorted(Path(cls._katalog.name).glob("01_sceny_i_cutsceny*.md")))
 
     @classmethod
     def tearDownClass(cls):
@@ -220,7 +258,9 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
 
     def test_napisy_przerywnikow_sa_w_01(self):
         self.assertIn("Wodzu, obudź się!", self.tekst)
-        reszta = (Path(self._katalog.name) / "03_reszta.md").read_text(encoding="utf-8")
+        reszta = "".join(
+            plik.read_text(encoding="utf-8")
+            for plik in sorted(Path(self._katalog.name).glob("03_reszta*.md")))
         self.assertNotIn("Wodzu, obudź się!", reszta)
 
     def test_mowca_jest_pogrubiony(self):
@@ -258,11 +298,9 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
                       "kwestie bez przekładu poza prologiem idą z gwiazdką")
         self.assertNotIn("[brak przekładu]", poza_prologiem)
 
-    def test_kontekst_bez_polskiego_ma_gwiazdke(self):
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        self.assertNotIn("*(EN)*", tekst)
-        if "# Prolog" in tekst:
-            self.assertIn("\\*", tekst, "karta bez polskiego opisu idzie z gwiazdką")
+    def test_pliku_kontekstu_nie_ma(self):
+        """Plik 02 zlikwidowany na życzenie właściciela — hasła idą do 03 reszta."""
+        self.assertFalse((Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").exists())
 
     def test_mowca_po_lacince(self):
         """Etykiety mówców nie mogą zostać po chińsku ani jako same numery."""
@@ -274,18 +312,6 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
             self.assertIsNone(re.search(r"[\u3400-\u9fff]", mowca),
                               f"mówca po chińsku: {mowca}")
             self.assertFalse(mowca.isdigit(), f"mówca to samo id: {mowca}")
-
-    def test_kontekst_bez_golych_nazw(self):
-        """W 02 nie ma kart z samą nazwą — hasło bez opisu zostaje w 03."""
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        for trafienie in re.finditer(r"^\*\*([^*]+)\*\*$", tekst, re.M):
-            self.fail(f"hasło bez opisu w kontekście: {trafienie[1]}")
-
-    def test_kontekst_bez_opowiesci_z_encyklopedii(self):
-        """Rozdziały fabularne encyklopedii to nie opisy postaci — nie wchodzą do 02."""
-        tekst = (Path(self._katalog.name) / "02_kontekst_scen_i_cutscen.md").read_text(encoding="utf-8")
-        self.assertNotIn("At Blissful Retreat, Jiang Wulang drank alone", tekst)
-        self.assertNotIn("opened his eyes to pitch darkness", tekst)
 
     def test_streszczenie_cutsceny_stoi_w_prologu(self):
         """Streszczenie cutsceny z transkryptu jest w prologu, między Prolog 3 i Prolog 4."""

@@ -48,9 +48,24 @@ def _nazwa(ix, pl: dict[str, str], klucz: str | None) -> str:
     return pl.get(klucz) or ix.en(klucz) or ""
 
 
-def _tytul_grupy(ix, pl: dict[str, str], numer: int, grupa: dict) -> str:
-    tytul = _nazwa(ix, pl, grupa.get("tytul")) or _nazwa(ix, pl, grupa.get("numer_tytulu"))
-    return tytul or f"Grupa {numer}"
+def _tytul_rozdzialu(ix, pl: dict[str, str], grupa: dict) -> str:
+    """Tytuł rozdziału wątku głównego: „Rozdział pierwszy · Nieśmiertelni nie przypłyną”.
+
+    Gra opisuje rozdział trzema tekstami: `numer_tytulu` („Chapter One”),
+    `nazwa` („Heaven Has No Pier”) i `tytul` — nazwa melodii *cipai*
+    („Across the Meadow”), pod którą rozdział występuje na ekranie rozdziałów.
+    Czytelnikowi chronologię wyższego rzędu daje numer z nazwą; melodia
+    zostaje jako ostateczny zapas, gdy obu brakuje.
+    """
+    numer = _nazwa(ix, pl, grupa.get("numer_tytulu"))
+    nazwa = _nazwa(ix, pl, grupa.get("nazwa"))
+    czlony = [czlon for czlon in (numer, nazwa) if czlon]
+    return " · ".join(czlony) or _nazwa(ix, pl, grupa.get("tytul"))
+
+
+def _tytul_lancucha(ix, pl: dict[str, str], numer: int, grupa: dict) -> str:
+    tytul = _nazwa(ix, pl, grupa.get("nazwa")) or _nazwa(ix, pl, grupa.get("tytul"))
+    return tytul or f"grupa {numer}"
 
 
 def _krainy_map(krainy: list[dict]) -> tuple[dict[int, tuple[int, str]], list[str]]:
@@ -80,14 +95,16 @@ def plan(ix, pl: dict[str, str], krainy: list[dict] | None = None) -> list[Blok]
     dostaje pakiet dla tłumacza: typ zadania (wątek główny pierwszy), grupa
     rozdziału po `kolejnosc`, a w grupie łańcuch `pre`/`post`.
 
-    Bloki: „Wątek główny”, „Wątki poboczne (łańcuchy)”, a na końcu pojedyncze
-    zadania pogrupowane krainą w kolejności odwiedzania.
+    Bloki: po jednym na rozdział wątku głównego („Wątek główny — Rozdział
+    pierwszy · …”), po jednym na łańcuch poboczny („Wątek poboczny — <nazwa>”),
+    a na końcu pojedyncze zadania pogrupowane krainą w kolejności odwiedzania.
     """
     uklad = uklad_scen.uloz(ix)
     mapa_krain, kolejnosc_krain = _krainy_map(krainy or [])
 
-    glowne: list[str] = []
-    poboczne: list[str] = []
+    glowne: list[Blok] = []
+    bez_rozdzialu: list[str] = []
+    poboczne: list[Blok] = []
     pojedyncze: dict[str, list[tuple]] = {}
     uzyte: set[str] = set()
 
@@ -102,14 +119,25 @@ def plan(ix, pl: dict[str, str], krainy: list[dict] | None = None) -> list[Blok]
                 klucze.append(klucz)
         if not klucze:
             continue
+        grupa = ix.grupy.get(sekcja.grupa) if sekcja.grupa is not None else None
         if sekcja.typ == WATEK_GLOWNY:
-            glowne += [k for k in klucze if k not in uzyte]
-            uzyte.update(glowne)
+            nowe = [k for k in klucze if k not in uzyte]
+            uzyte.update(nowe)
+            if not nowe:
+                continue
+            tytul = _tytul_rozdzialu(ix, pl, grupa) if grupa else ""
+            if tytul:
+                glowne.append(Blok(f"Wątek główny — {tytul}", "watek", nowe))
+            else:
+                bez_rozdzialu += nowe
             continue
         if sekcja.grupa is not None and len(zadania) >= PROG_LANCUCHA:
             nowe = [k for k in klucze if k not in uzyte]
-            poboczne += nowe
             uzyte.update(nowe)
+            if not nowe:
+                continue
+            tytul = _tytul_lancucha(ix, pl, sekcja.grupa, grupa or {})
+            poboczne.append(Blok(f"Wątek poboczny — {tytul}", "watek", nowe))
             continue
         # pojedyncze zadanie: krainą rządzi przestrzeń zadania
         for numer, klucz in zip(zadania, klucze):
@@ -122,11 +150,10 @@ def plan(ix, pl: dict[str, str], krainy: list[dict] | None = None) -> list[Blok]
             pozycja = (w_krainie[0] if w_krainie else BEZ_KOLEJNOSCI, int(numer))
             pojedyncze.setdefault(nazwa_krainy, []).append((pozycja, klucz))
 
-    bloki: list[Blok] = []
-    if glowne:
-        bloki.append(Blok("Wątek główny", "watek", glowne))
-    if poboczne:
-        bloki.append(Blok("Wątki poboczne (łańcuchy)", "watek", poboczne))
+    bloki: list[Blok] = list(glowne)
+    if bez_rozdzialu:
+        bloki.append(Blok("Wątek główny — zadania bez rozdziału", "watek", bez_rozdzialu))
+    bloki += poboczne
     kolejnosc_pojedynczych = [k for k in kolejnosc_krain if k in pojedyncze]
     kolejnosc_pojedynczych += sorted(k for k in pojedyncze if k not in kolejnosc_pojedynczych)
     for kraina in kolejnosc_pojedynczych:

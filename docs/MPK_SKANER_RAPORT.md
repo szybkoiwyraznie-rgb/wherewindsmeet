@@ -129,3 +129,33 @@ zrzuceniu Lua (`LT1.mpk`).
 - **Artefakty w repo:** `index/mpk/` (pochodne; surowe bajty poza Git —
   patrz `index/mpk/README.md`). `POI storyline` dalej 0 trafień bez
   prefiksu → kit v4 z kandydatami `LuaText/…`.
+
+## 8. Kit v7 (2026-11-18) — czeka na przebieg właściciela
+
+- `WWM_MPK_Skaner_v7.zip` (160 860 B, SHA-256
+  `81431bf2b46c7f678b1214104a3a47fc6c5e3d9cd11220a64cb071d1d529e338`)
+  na Dysku; kity v4–v6 i pierwsze wydanie v7 wycofane do kosza.
+  `SKANUJ.bat` sam doinstalowuje pakiet `zstandard`, gdy Pythonowi brakuje
+  modułu zstd (flaga `--sprawdz-zstd`); bez ręcznych kroków właściciela.
+- Zmiany vs v4–v6: kandydaci z `index/mpk/sciezki_vfs.jsonl` (25 451
+  prawdziwych ścieżek + warianty, w tym 974 pełnych `.cine` z bazy gry)
+  zamiast zgadywanych wzorców; **sonda zawartości bloków EZST** w
+  `Resources.mpkinfo` (AES-ECB prefiks + początek ramki zstd, sygnatury
+  `.cine`/Storyline/`.etsb`/`4700001`) z wycinaniem surowych trafień do
+  `wyciete/ezst_*.bin` + `ezst_trafienia.jsonl`; naprawione gubienie
+  `resources_storyline` w `RAPORT.json`. Szczegóły:
+  `docs/EXPERIMENT_LOG.md`, wpis 2026-11-18 (2).
+- **Przebieg v7 odebrany (2026-11-18):** `MPK_SKANER_WYNIK.zip` + `.z01–.z07`
+  (split-zip, 189 608 873 B łącznie, 39 896 plików; rozpakowane 402 MB).
+  Sonda EZST: 2 601 198 wpisów sondowanych (2 891 pominiętych > 4 MB),
+  magie `gole` 1 581 491 / `EZST` 1 019 706 / `ZSTD` 1, **36 545 trafień**
+  (storyline_json 11 305, storyline_node 2 775, cine_magic 25 179,
+  etsb_ext 47, etsb_sciezka 3, benchmark 22+9), zapisano 215 570 048 B,
+  0 błędów, limit niewyczerpany, backend `compression.zstd` (Python 3.14 —
+  autoinstalacja z SKANUJ.bat nie była potrzebna). Trafienia kandydatów:
+  **978 `.cine` + 2 135 `.graph`** (z 25 451 kandydatów). Skan goły
+  storyline: 10 667 trafień / 72 706 473 B.
+- Wnioski i indeksy pochodne (reguła `Storyline/`, benchmark POI 4700001,
+  ujęcia `.cine`): `docs/EXPERIMENT_LOG.md` wpis 2026-11-18 (3);
+  `index/mpk/cine_ujecia.jsonl`, `etsb_storyline.jsonl`,
+  `storyline_sceny.jsonl`.

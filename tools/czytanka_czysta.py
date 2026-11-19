@@ -3,14 +3,12 @@
 
 1. `01_sceny_i_cutsceny.md` — sceny **i** cutsceny razem, chronologicznie:
    filmy otwierające, prolog w kolejności sprawdzonej z transkryptem, potem krainy
-   w kolejności odwiedzania (sceny po numerze dialogu), na końcu pozostałe pule
+   w kolejności odwiedzania (sceny w porządku grafu następstw), na końcu pozostałe pule
    napisów przerywników.
-2. `02_kontekst_scen_i_cutscen.md` — kontekst do tych samych jednostek i w tej
-   samej kolejności: postacie, encyklopedia, frakcje, miejsca, przedmioty, sztuki
-   walki — wszystko, co pada w danej scenie. Hasło ma pełną kartę przy pierwszym
-   wystąpieniu.
-3. `03_reszta.md` — cała reszta przekładów, której nie ma w 01 ani w 02,
-   pogrupowana według rodzaju danych.
+2. `03_reszta.md` — komplet informacji dodatkowych: cała reszta przekładów,
+   której nie ma w 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowana
+   według rodzaju danych. (Plik 02 z kontekstem scen zlikwidowany na życzenie
+   właściciela — wszystko, co pokazywał, trafia do 03.)
 
 Format kwestii w 01: jedna linia `**Mówca:** tekst` (bez punktora), bez czasów,
 kluczy i tabel; kwestia bez mówcy to goły tekst.
@@ -40,10 +38,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools import indeks as indeks_mod  # noqa: E402
 from tools import chronologia as chronologia_mod  # noqa: E402
-from tools import kolejnosc_gry, kolejnosc_zadan, powiazania_czytanek, pinyin_slownik  # noqa: E402
+from tools import kontekst_cutscen as kontekst_cutscen_mod  # noqa: E402
+from tools import cutsceny_kolejnosc_kwestii as kolejnosc_mod  # noqa: E402
+from tools import kolejnosc_gry, kolejnosc_zadan, pinyin_slownik  # noqa: E402
 from tools import tlumaczenie as tlumaczenie_mod  # noqa: E402
 
-DLUGOSC_KARTY = 600        # ile znaków opisu pokazać w kontekście (reszta w pliku 03)
 PROG_WARIANTU = 48
 PROG_NAGLOWKA_REDAKCJI = 3   # ile kwestii przed pierwszym bliźniakiem należy jeszcze do dialogu sceny
 BEZ_PRZEKLADU = "\\*"   # kwestia bez przekładu: gwiazdka i tekst z gry
@@ -187,29 +186,6 @@ def _imie_do_etykiety(nazwa: str) -> str:
 
 
 _ZH = re.compile(r"[\u3400-\u9fff]")
-
-
-def _etykieta_hasla(ix, nazwa: str) -> str:
-    """Nazwa hasła do pokazania w kontekście (albo pustka, gdy hasło nic nie wnosi).
-
-    Z danych wpadają śmieci: gracz zapisany jako `玩家`/`0`, techniczne
-    „Entity轨道组”, chińskie role („中年男人”). Gracz nie dostaje karty,
-    techniczne śmieci też nie, a chińskie role idą przez słownik nazw mówców.
-    """
-    nazwa = (nazwa or "").strip()
-    if not nazwa or _GRACZ_LAT.match(nazwa) or nazwa.lower() in GRACZ:
-        return ""
-    if nazwa in TECHNICZNE or nazwa.lower() in {t.lower() for t in TECHNICZNE}:
-        return ""
-    if not _ZH.search(nazwa) and not re.search(r"[A-Za-z]", nazwa):
-        return ""            # „0”, myślniki, cyfry
-    if _ZH.search(nazwa):
-        en = _nazwy_en(ix).get(nazwa) or _glosariusz().get(nazwa) or ""
-        if en:
-            nazwa = en
-    if not _dobre_imie(nazwa):
-        return ""
-    return _imie_do_etykiety(nazwa)
 
 
 def _nazwy_en(ix) -> dict[str, str]:
@@ -377,6 +353,7 @@ class Jednostka:
     podtytuly: dict[int, str] = field(default_factory=dict)      # numer linii → nagłówek nad nią
     zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
     streszczenie: int = 0                                     # ile linii na początku to streszczenie
+    wstep: str = ""                                           # wiersz nad nagłówkiem, np. „Interakcja: …”
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -513,18 +490,31 @@ def _dialog_sceny(blok: list[str], bloki: list[list[str]], wiersze: dict[str, in
 
 
 def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
-                     audio: dict[int, str] | None = None
+                     audio: dict[int, str] | None = None,
+                     kolejnosc: list[list[dict]] | None = None,
+                     zh=None,
+                     wlasciciele: dict[str, int] | None = None
                      ) -> tuple[list[str], dict[int, str], list[str]]:
     """Napisy cutsceny w kolejności gry, z osobnymi wariantami i streszczeniem.
 
-    Kolejność bierzemy z numerów wierszy puli `text_msg` — to jedyna oś porządku, jaką
-    gra podaje dla napisów przerywnika (`kn` w chronologii miesza napisy przypisane
-    wprost z tabeli gry z blokami puli). Ten sam przerywnik leży w puli kilka razy:
-    starsza i nowsza wersja napisów (np. 590153–590179 i 591148–591169 w cutscenie
-    30161). Grany jest **najnowszy** blok (najwyższe numery wierszy, patrz
-    `_podziel_na_bloki`), a w nim najpierw dialog sceny, potem treść bez bliźniaka
-    (`_kwestie_sceny`). Starsze wersje schodzą pod nagłówek, żeby nic nie ginęło,
-    ale czytelnik nie dostał dwóch scen splątanych w jedną.
+    Kolejność kwestii, gdy jest, bierzemy ze ścieżki audio pliku `.cine`
+    (`index/cutsceny_kolejnosc_kwestii.jsonl`, patrz
+    `tools/cutsceny_kolejnosc_kwestii.py`) — to pełny przeplot bloków puli
+    `text_msg` (Ruby i gracz w 30161 leżą w dwóch sąsiednich zakresach, a mówią
+    na przemian). Chronologia potrafi też **doczepić** wiersze, których `kn`
+    cutsceny nie znało (blok gracza 591170–591183 leżał dotąd w „Napisach
+    przerywnika"). Dla kwestii spoza chronologii zostaje porządek numerów
+    wierszy puli. Ten sam przerywnik leży w puli kilka razy: starsza i nowsza
+    wersja napisów (np. 590153–590179 i 591148–591169 w 30161). Grany jest
+    **najnowszy** blok, a starsze wersje schodzą pod nagłówek wariantu, żeby
+    nic nie ginęło, ale czytelnik nie dostał dwóch scen splątanych w jedną.
+
+    Gdy podano `zh` (klucz → tekst chiński), bloki spoza chronologii, które
+    prawie wcale nie pokrywają się treścią z blokiem głównym (poniżej 30 %
+    kwestii), dostają uczciwszy nagłówek „Napisy sąsiadujące w puli" —
+    pula trzyma obok siebie wiersze różnych scen (np. recytacja sztuki
+    o Ośmiu Wspaniałych w wierszach 591125–591147 tuż przed blokiem 30161)
+    i to nie są warianty tej cutsceny.
 
     Streszczenie sceny (`k`) stoi **na początku**, zaraz pod nagłówkiem cutsceny.
     """
@@ -533,15 +523,25 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     for numer, klucz in enumerate(napisy):
         pozycja.setdefault(klucz, numer)
 
+    bloki_chrono: list[list[str]] = []
+    pokryte: set[str] = set()
+    for blok in kolejnosc or []:
+        klucze_bloku = [r["k"] for r in blok if r.get("k")]
+        if klucze_bloku:
+            bloki_chrono.append(klucze_bloku)
+            pokryte.update(klucze_bloku)
+    bloki_chrono.sort(key=lambda b: _najwyzszy(b, wiersze), reverse=True)
+
     def do_sortowania(klucz: str) -> tuple:
         numer = wiersze.get(klucz)
         return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
 
-    bloki = _podziel_na_bloki(sorted(pozycja, key=do_sortowania), wiersze)
-    if len(bloki) > 1:
-        kolejnosc = sorted(range(len(bloki)), key=lambda i: _najwyzszy(bloki[i], wiersze),
-                           reverse=True)
-        bloki = [bloki[i] for i in kolejnosc]
+    luzem = [k for k in sorted(pozycja, key=do_sortowania) if k not in pokryte]
+    bloki = bloki_chrono + (_podziel_na_bloki(luzem, wiersze) if luzem else [])
+    if not bloki_chrono and len(bloki) > 1:
+        porzadek_blokow = sorted(range(len(bloki)),
+                                 key=lambda i: _najwyzszy(bloki[i], wiersze), reverse=True)
+        bloki = [bloki[i] for i in porzadek_blokow]
         sygnatury = _sygnatury([k for blok in bloki for k in blok], pl)
         dialog, obce = _dialog_sceny(bloki[0], bloki, wiersze, sygnatury)
         bloki = [dialog] + ([obce] if obce else []) + bloki[1:]
@@ -550,6 +550,15 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     podtytuly: dict[int, str] = {}
     powtorzone: list[str] = []
     widziane: set[str] = set()
+
+    liczba_chrono = len(bloki_chrono) or 1
+    baza_norm: set[str] = set()
+    if zh and bloki:
+        for blok in bloki[:min(liczba_chrono, len(bloki))]:
+            for k in blok:
+                nz = kolejnosc_mod._norm(zh(k) or "")
+                if nz:
+                    baza_norm.add(nz)
 
     streszczenie = [k for k in wiersz.get("k") or [] if k]
     if streszczenie:
@@ -564,6 +573,21 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
             opis = (f"wiersze {min(numery)}–{max(numery)}" if numery and min(numery) != max(numery)
                     else f"wiersz {numery[0]}" if numery else "wiersze bez numeru")
             naglowek = f"Inny wariant napisów tej cutsceny ({opis})"
+            if zh and baza_norm and numer_bloku >= liczba_chrono:
+                normy = [nz for nz in (kolejnosc_mod._norm(zh(k) or "") for k in blok) if nz]
+                trafione = sum(1 for nz in normy
+                               if any(nz in b or b in nz for b in baza_norm))
+                if normy and trafione * 10 < len(normy) * 3:
+                    naglowek = (f"Napisy sąsiadujące w puli przerywników ({opis}) — "
+                                "zapewne inna scena w pobliżu")
+                    # gdy nazwa nagrania któregoś wiersza zdradza cudzą cutscenę,
+                    # wskazujemy ją wprost (dowód z danych, nie zgadywanie)
+                    cudze = {wlasciciele.get(kontekst_cutscen_mod.rdzen_audio(
+                                 (audio or {}).get(wiersze.get(k)) or ""))
+                             for k in blok} - {None} if wlasciciele else set()
+                    cudze -= {int(wiersz.get("n") or 0) % 10**8}
+                    if len(cudze) == 1:
+                        naglowek += f" (są tu nagrania cutsceny {cudze.pop()})"
         czeka_na_naglowek = bool(naglowek)
         for klucz in blok:
             tekst = pl.get(klucz)
@@ -580,10 +604,112 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
     return klucze, podtytuly, powtorzone
 
 
+def _mowcy_cutsceny(klucze: list[str], ix, pl, porzadek,
+                    wiersze_napisow: dict[str, int],
+                    audio_napisow: dict[int, str],
+                    audio_kluczy: dict[str, str]) -> dict[str, str]:
+    """Mówcy kwestii cutsceny + bezpieczna propagacja po plikach nagrań.
+
+    Identyfikacja wprost: krok dialogu sceny (`_mowca_klucza`) albo nazwa
+    nagrania (`mowca_z_audio`) — z audio wiersza w kontekście **i** z audio
+    kwestii `.cine` osobno (kontekst potrafi mieć generyczne `npc_NN`, gdy
+    `.cine` ma `pma_NN`). Potem propagacja, wyłącznie w obrębie tej jednej
+    cutsceny:
+
+    1. **Jeden plik audio to jeden głos** — gdy część wierszy tego samego
+       nagrania ma mówcę, a identyfikacje są zgodne, etykieta przechodzi na
+       pozostałe wiersze tego nagrania (w 30161 `sxdm7_npc_07` kryje cztery
+       wiersze, z czego kontekst zna Ruby tylko dla dwóch).
+    2. **Rodzina placeholderów `..._npc_NN`** ścieżki `.cine`: gdy co
+       najmniej dwa nagrania rodziny są zidentyfikowane i wszystkie wskazują
+       tę samą postać, pozostałe nagrania rodziny dostają tę etykietę
+       (ścieżka 30161 nazywa głos Ruby `sxdm7_npc_*`, a jej prawdziwe
+       nagrania `cs_zlxl_hx_*` kontekst zna dla części wierszy). Przy
+       jakiejkolwiek niezgodności identyfikacji nic nie propagujemy.
+    """
+    mowcy: dict[str, str] = {}
+    pliki: dict[str, set[str]] = {}
+    for klucz in klucze:
+        numer = wiersze_napisow.get(klucz)
+        ctx = (audio_napisow.get(numer) if numer is not None else None) or ""
+        cine = audio_kluczy.get(klucz) or ""
+        mowcy[klucz] = (_mowca_klucza(klucz, ix, pl, porzadek)[0]
+                        or kontekst_cutscen_mod.mowca_z_audio(ctx)
+                        or kontekst_cutscen_mod.mowca_z_audio(cine))
+        for plik in (ctx, cine):
+            if plik:
+                pliki.setdefault(plik, set()).add(klucz)
+    for grupa in pliki.values():        # 1. jeden plik audio = jeden głos
+        znani = {mowcy[k] for k in grupa if mowcy[k]}
+        if len(znani) == 1:
+            mowca = next(iter(znani))
+            for k in grupa:
+                mowcy[k] = mowcy[k] or mowca
+    rodziny: dict[str, dict[str, str]] = {}
+    for klucz in klucze:                # 2. rodzina placeholderów `_npc`
+        cine = audio_kluczy.get(klucz) or ""
+        rdzen = kontekst_cutscen_mod.rdzen_audio(cine)
+        if rdzen.endswith("_npc"):
+            wpis = rodziny.setdefault(rdzen, {})
+            wpis[cine] = wpis.get(cine) or mowcy[klucz]
+    for rdzen, nagrania in rodziny.items():
+        znani = {m for m in nagrania.values() if m}
+        if len(znani) == 1 and sum(1 for m in nagrania.values() if m) >= 2:
+            mowca = next(iter(znani))
+            for klucz in klucze:
+                if audio_kluczy.get(klucz) in nagrania:
+                    mowcy[klucz] = mowcy[klucz] or mowca
+    return mowcy
+
+
+def _wlasciciele_nagran(index: str | Path) -> dict[str, int]:
+    """Rdzeń nazwy nagrania → cutscena, której scenariusz `.cine` go używa.
+
+    Tylko rdzenie jednoznaczne (jedna cutscena po zwinięciu klonów
+    `no % 10**8`: 40000030246 → 30246). Dzięki temu blok „Napisy
+    sąsiadujące" może uczciwie wskazać właściciela, gdy któryś wiersz
+    niesie nagranie cudzej cutsceny (591126 `…_cs_nzgzcj_dqgz` → 30435).
+    Rdzenie wielu cutscen (placeholdery `…_npc`, domeny `vo_shenxiandu_*`)
+    odpadają — nie identyfikują sceny.
+    """
+    plik = Path(index) / "cutsceny_sciezka_audio.jsonl"
+    if not plik.exists():
+        return {}
+    rdzenie: dict[str, set[int]] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            wpis = json.loads(linia)
+            for kwestia in wpis.get("kwestie") or []:
+                rdzen = kontekst_cutscen_mod.rdzen_audio(kwestia.get("audio") or "")
+                if rdzen:
+                    rdzenie.setdefault(rdzen, set()).add(int(wpis["no"]) % 10**8)
+    return {rdzen: nums.pop() for rdzen, nums in rdzenie.items() if len(nums) == 1}
+
+
+def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
+    """Chronologia kwestii cutscen ze ścieżek audio `.cine` (gdy indeks istnieje).
+
+    `index/cutsceny_kolejnosc_kwestii.jsonl` buduje
+    `tools/cutsceny_kolejnosc_kwestii.py`; bez niego czytanka wraca do
+    porządku numerów wierszy puli.
+    """
+    plik = Path(index) / "cutsceny_kolejnosc_kwestii.jsonl"
+    if not plik.exists():
+        return {}
+    wynik: dict[int, list[list[dict]]] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            wpis = json.loads(linia)
+            wynik[int(wpis["no"])] = wpis.get("bloki") or []
+    return wynik
+
+
 def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
-                             krainy: list[dict] | None = None) -> list[Jednostka]:
+                             krainy: list[dict] | None = None,
+                             index: str | Path | None = None) -> list[Jednostka]:
     """Chronologia jest zapisana w `index/chronologia.jsonl`; tu tylko czytamy kolejność."""
     nazwy_pl = _nazwy_krain(ix, pl, krainy or [])
+    poi_scen = _poi_scen(ix, pl, index) if index else {}
 
     def sekcja(nazwa: str) -> str:
         polska = nazwy_pl.get(nazwa)
@@ -595,6 +721,13 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
     wiersze_napisow = _wiersze_napisow(ix, porzadek)
     klucze_wierszy = {w["wiersz"]: w["k"] for w in ix.cutsceny_kontekst.get("napis", [])
                       if w.get("wiersz") and w.get("k")}
+    kolejnosc_cutscen = _kolejnosc_kwestii_cutscen(index) if index else {}
+    wlasciciele_nagran = _wlasciciele_nagran(index) if index else {}
+    numery_cutscen = {int(w["n"]) for w in chronologia if w["t"] == "cutscena"}
+    # wiersze przejęte przez chronologię cutscen znikają z „Napisów przerywnika"
+    przejete = {r["k"] for numer, bloki in kolejnosc_cutscen.items()
+                if numer in numery_cutscen
+                for blok in bloki for r in blok if r.get("k")}
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -618,6 +751,12 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 przestrzenie |= gdzie
+                if not mowca:
+                    # mówca z nazwy nagrania (jak w cutscenach) — prologi to
+                    # też napisy puli, krok dialogu sceny zwykle ich nie zna
+                    numer_wiersza = wiersze_napisow.get(klucz)
+                    audio = audio_napisow.get(numer_wiersza) if numer_wiersza else None
+                    mowca = kontekst_cutscen_mod.mowca_z_audio(audio or "")
                 if _okrzyk(ix.zh(klucz)):
                     mowca = ""
                 linie.append((mowca, klucz))
@@ -652,13 +791,20 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                     osoby.append((pid, imie))
             jednostki.append(Jednostka(
                 "scena", f"Scena {numer}", sekcja(wiersz["s"]), linie,
-                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby))
+                {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby,
+                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else "")))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
+            kolejnosc = kolejnosc_cutscen.get(numer)
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
-                                                            audio_napisow)
-            linie = [(_mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)[0], klucz)
-                     for klucz in klucze]
+                                                            audio_napisow, kolejnosc,
+                                                            zh=ix.zh,
+                                                            wlasciciele=wlasciciele_nagran)
+            audio_kluczy = {r["k"]: r["a"] for blok in kolejnosc or []
+                            for r in blok if r.get("k") and r.get("a")}
+            mowcy = _mowcy_cutsceny(klucze, ix, pl, porzadek,
+                                    wiersze_napisow, audio_napisow, audio_kluczy)
+            linie = [(mowcy.get(klucz, ""), klucz) for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             liczba_streszczenia = sum(1 for k in wiersz.get("k") or [] if k)
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
@@ -668,13 +814,25 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         elif rodzaj == "napisy":
             linie = []
             for klucz in wiersz.get("k") or []:
+                if klucz in przejete:
+                    continue        # kwestia poszła do swojej cutsceny (chronologia `.cine`)
                 if linie and linie[-1][1] == klucz:
                     continue
                 mowca, gdzie = _mowca_klucza(klucz, ix, pl, porzadek, mowcy_napisow)
                 linie.append((mowca, klucz))
+            if not linie:
+                continue            # cały blok przejęty przez cutsceny
+            etykieta = wiersz.get("e") or "Napisy przerywnika"
+            if przejete and etykieta.startswith("Napisy przerywnika — wiersze "):
+                numery = sorted(wiersze_napisow[k] for _m, k in linie
+                                if k in wiersze_napisow)
+                if numery:      # po oddaniu kwestii cutscenom zakres bywa węższy
+                    etykieta = (f"Napisy przerywnika — wiersze {numery[0]}–{numery[-1]}"
+                                if numery[0] != numery[-1]
+                                else f"Napisy przerywnika — wiersz {numery[0]}")
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             jednostki.append(Jednostka(
-                "napisy", wiersz.get("e") or "Napisy przerywnika",
+                "napisy", etykieta,
                 "# Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)",
                 linie, osoby=osoby))
     return jednostki
@@ -743,6 +901,7 @@ _PAMIATKI_PRZESTRZENIE = (
     ("nazwa", "equip_items", "name"),
     ("wlasciciel", "curio_owner", "owner_name"),
     ("pamiec", "text_msg", "content"),
+    ("motyw", "curio_theme", "history_name"),
 )
 
 
@@ -821,6 +980,28 @@ def _tekst_nazwy(ix, pl, mapa: dict[str, str], ident,
     return (pl.get(klucz) or ("\\\\*" + _z_gry(ix, klucz))).strip(), klucz
 
 
+def _legenda_pamiatki(ix, pl: dict[str, str], mapa_motywow: dict[str, str],
+                      wpis: dict) -> str:
+    """Nazwa legendy pamiątki: nazwa motywu z gry i numer w legendzie.
+
+    Gra podpisuje każdą pamiątkę nazwą legendy (`curio_theme.history_name`,
+    np. „At Heaven's Pier”) i numerem w jej obrębie (`kolejnosc`). Kluczem
+    wiersza w przestrzeni świadków jest numer motywu zapisany jako tekst —
+    dlatego szukamy wprost w mapie motywów, nie przez `_tekst_nazwy`
+    (mapy `index/nazwy.jsonl` używają innych identyfikatorów i mały numer
+    motywu mógłby trafić w cudzy wpis).
+    """
+    klucz = mapa_motywow.get(str(wpis.get("motyw") or ""))
+    if not klucz:
+        return ""
+    przeklad = pl.get(klucz)
+    tekst = (przeklad or (GWIAZDKA + _z_gry(ix, klucz))).strip()
+    if not tekst.strip(GWIAZDKA + " "):
+        return ""
+    kolejnosc = wpis.get("kolejnosc")
+    return f"{tekst} · {kolejnosc}" if kolejnosc else tekst
+
+
 def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
               katalog: str | Path) -> list[str]:
     """Pamiątki (przedmioty z historią): właściciel, nazwa i cała historia.
@@ -874,6 +1055,10 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
         uzyte.add(klucz_historii)
         karty.append(f"**{tytul}**")
         karty.append("")
+        legenda = _legenda_pamiatki(ix, pl, mapy["motyw"], wpis)
+        if legenda:
+            karty.append(legenda)
+            karty.append("")
         karty.extend(_blok_tekstu(zrodlo, bool(historia)))
         karty.append("")
         statystyka["pamiatki"] = statystyka.get("pamiatki", 0) + 1
@@ -884,6 +1069,49 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
 
 
 _POI_PLIK = "poi.jsonl"
+
+
+def _poi_scen(ix, pl: dict[str, str], katalog: str | Path) -> dict[int, str]:
+    """Scena → nazwa POI, który ją wywołuje (interakcja w świecie gry).
+
+    Powiązanie POI→scena pochodzi z `index/mpk/poi_storyline_sceny.jsonl`
+    (skrypt `interact_storyline` POI gra tę scenę — patrz
+    `tools/poi_storyline_sceny.py`; benchmark: POI 200046001 „Dragon Pattern
+    Mark” → scena 4700001). Nazwa POI jak w sekcji POI pliku 03: najpierw
+    polski przekład, bez niego tekst z gry z gwiazdką. POI bez nazwy nie
+    podpisujemy — lepszy brak wstępu niż goły numer.
+    """
+    plik_poi = Path(katalog) / _POI_PLIK
+    plik_sceny = Path(katalog) / "mpk" / "poi_storyline_sceny.jsonl"
+    if not plik_poi.is_file() or not plik_sceny.is_file():
+        return {}
+    nazwy = _wczytaj_nazwy(katalog)
+    numer = _przestrzen(ix, "active_interact_way", "button_name")
+    mapa: dict[str, str] = {}
+    if numer is not None:
+        for klucz, tekst in ix.teksty.items():
+            if tekst.w and tekst.w[0] == numer:
+                mapa.setdefault(str(tekst.w[1]), klucz)
+    ident_poi: dict[int, object] = {}
+    for wiersz in plik_poi.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        ident_poi[int(wpis["id"])] = wpis.get("nazwa") or wpis.get("id")
+    wynik: dict[int, str] = {}
+    for wiersz in plik_sceny.read_text(encoding="utf-8").splitlines():
+        if not wiersz.strip():
+            continue
+        wpis = json.loads(wiersz)
+        if wpis.get("status") != "sceny":
+            continue
+        nazwa, _klucz = _tekst_nazwy(ix, pl, mapa,
+                                     ident_poi.get(int(wpis["poi"])), nazwy)
+        if not nazwa.strip(GWIAZDKA + " "):
+            continue
+        for scena in wpis.get("sceny") or []:
+            wynik.setdefault(int(scena), nazwa)
+    return wynik
 
 
 def _poi(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
@@ -1000,204 +1228,13 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         if jednostka.sekcja != ostatnia_sekcja:
             out += [jednostka.sekcja, ""]
             ostatnia_sekcja = jednostka.sekcja
+        if jednostka.wstep:
+            out += [jednostka.wstep, ""]
         out.append(f"## {jednostka.etykieta}")
         out.extend(linie)
         out.append("")
         zrobione.add(jednostka.etykieta)
     return out, uzyte, zrobione
-
-
-def _tekst(ix, pl: dict[str, str], klucz: str | None) -> tuple[str, bool]:
-    """(tekst, czy_polski) — polski z magazynu, a gdy brak, angielski z danych gry."""
-    if not klucz:
-        return "", True
-    if klucz in pl:
-        return pl[klucz], True
-    tekst = ix.teksty.get(klucz)
-    if tekst is None:
-        return "", True
-    return _czysty(tekst.en or tekst.zrodlo or ""), False
-
-
-def _tozsamosc(ix, pl, wpis: dict) -> tuple[str, bool]:
-    """Krótkie „kim jest” z encyklopedii (`tozsamosc`), a nie opowieść.
-
-    Wpisy encyklopedii mają tylko rozdziały fabularne (`historie`) — to streszczenia
-    scen, nie opisy postaci, więc ich nie bierzemy. Zostaje etykieta tożsamości,
-    np. „回春堂主人” → „Master of the Vernal Hall”, „叛徒” → „The Traitor”.
-    """
-    czesci: list[str] = []
-    opis_pl = True
-    for klucz in wpis.get("tozsamosc") or []:
-        tekst, jest_pl = _tekst(ix, pl, klucz)
-        if tekst and tekst not in czesci:
-            czesci.append(tekst)
-            opis_pl = opis_pl and jest_pl
-    return " · ".join(czesci), opis_pl
-
-
-def _karta_encyklopedii(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
-    """Hasło encyklopedii: imię i tożsamość. Rozdziałów fabularnych nie pokazujemy."""
-    row = ix.encyklopedia.get(int(pid)) if str(pid).isdigit() else None
-    if not row:
-        return "", "", True
-    nazwa, _ = _tekst(ix, pl, row.get("nazwa"))
-    if not nazwa:
-        nazwa, _ = _tekst(ix, pl, row.get("inna_nazwa"))
-    opis, opis_pl = _tozsamosc(ix, pl, row)
-    return nazwa, opis, opis_pl
-
-
-def _karta_osoby(baza, ix, pl, pid: str) -> tuple[str, str, bool]:
-    """Postać mówiąca: imię z danych gry i tożsamość z encyklopedii, jeśli jest."""
-    row = ix.postacie.get(int(pid)) if str(pid).isdigit() else None
-    if not row:
-        return "", "", True
-    nazwa, _ = _tekst(ix, pl, row.get("n"))
-    wpis = baza.encyklopedia_po_kluczu.get(row.get("n")) or {}
-    opis, opis_pl = _tozsamosc(ix, pl, wpis)
-    return nazwa, opis, opis_pl
-
-
-def _karta_nazwy(ix, pl, nazwa: str, encje: dict) -> tuple[str, str, bool]:
-    """Postać znana tylko z imienia w obsadzie: imię plus tożsamość z encyklopedii."""
-    wpis = encje.get(nazwa) or {}
-    opis, opis_pl = _tozsamosc(ix, pl, wpis)
-    return nazwa, opis, opis_pl
-
-
-def _karta(baza, ix, pl: dict[str, str], tabela: str, rid: str) -> tuple[str, str, bool]:
-    """Karta hasła: nazwa, opis i informacja, czy opis jest po polsku."""
-    if tabela == "encyklopedia":
-        return _karta_encyklopedii(baza, ix, pl, rid)
-    if tabela == "osoba":
-        return _karta_osoby(baza, ix, pl, rid)
-    kolumny = (baza.tabele.get(tabela) or {}).get(rid) or {}
-    nazwa, opis, opis_pl = "", "", True
-    for kolumna, klucze in kolumny.items():
-        for klucz in klucze:
-            tekst, jest_pl = _tekst(ix, pl, klucz)
-            if tekst and not nazwa and _NAZWA.search(kolumna):
-                nazwa = tekst
-    if tabela not in _NARRACYJNE:
-        opisowe = [k for k in kolumny if _OPIS.search(k)]
-        opisowe.sort(key=lambda k: _OPIS_KOLEJNOSC.index(k) if k in _OPIS_KOLEJNOSC else len(_OPIS_KOLEJNOSC))
-        for kolumna in opisowe:
-            for klucz in kolumny[kolumna]:
-                tekst, jest_pl = _tekst(ix, pl, klucz)
-                if tekst and len(tekst) > len(opis):
-                    opis, opis_pl = tekst, jest_pl
-                    break
-            if opis:
-                break
-    if nazwa and opis and (opis in nazwa or nazwa in opis):
-        opis = ""
-    return nazwa, opis, opis_pl
-
-
-def _dodaj(karty: list[str], linia: str) -> None:
-    """Dopisuje kartę, ale nie powtarza jej, gdy ta sama linia stoi już wyżej."""
-    if linia and (not karty or karty[-1] != linia):
-        karty.append(linia)
-
-
-def _plik_kontekstu(ix, jednostki: list[Jednostka], pl: dict[str, str], baza,
-                    zrobione: set[str] | None = None) -> tuple[list[str], set[str], int]:
-    """Kontekst do każdej jednostki w kolejności z pliku 01.
-
-    Hasło dostaje pełną kartę przy pierwszym wystąpieniu, a przy kolejnych —
-    samo imię lub nazwę, żeby dało się prześledzić, kto i co wraca w scenie.
-    Kolejność w obrębie jednostki: najpierw mówiący, potem hasła z tekstu.
-    """
-    teksty = {}
-    for numer, jednostka in enumerate(jednostki):
-        if not jednostka.linie:
-            continue
-        zrodla = [ix.zh(klucz) for _m, klucz in jednostka.linie]
-        teksty[f"u{numer}"] = ("\n".join(z for z in zrodla if z), jednostka.przestrzenie)
-    wzmianki = powiazania_czytanek.skanuj_wzmianki_w_scenach(baza, teksty)
-    encje_po_zh: dict[str, dict] = {}
-    for wiersz in ix.encyklopedia.values():
-        for pole in ("nazwa", "inna_nazwa"):
-            klucz = wiersz.get(pole)
-            for wariant in (ix.zh(klucz), ix.en(klucz), pl.get(klucz or "")):
-                if wariant:
-                    encje_po_zh.setdefault(wariant, wiersz)
-
-    out: list[str] = []
-    widziane: dict[tuple[str, str], bool] = {}
-    pokazane_nazwy: dict[str, bool] = {}
-    uzyte: set[str] = set()
-    ostatnia_sekcja = None
-    ktory = 0
-    for numer, jednostka in enumerate(jednostki):
-        if not jednostka.linie:
-            continue
-        if zrobione is not None and jednostka.etykieta not in zrobione:
-            continue
-        hasla: list[tuple[str, str]] = [
-            ("osoba", pid) if pid and pid.isdigit() and int(pid) in ix.postacie else ("nazwa", imie or pid)
-            for pid, imie in jednostka.osoby]
-        for tabela, ridy in (wzmianki.get(f"u{numer}") or {}).items():
-            hasla.extend((tabela, rid) for rid in ridy)
-        karty: list[str] = []
-        for para in hasla:
-            if para[0] == "nazwa":
-                nazwa, opis, opis_pl = _karta_nazwy(ix, pl, para[1], encje_po_zh)
-            else:
-                nazwa, opis, opis_pl = _karta(baza, ix, pl, *para)
-            nazwa = _etykieta_hasla(ix, nazwa)
-            if not opis:
-                # bez opisu nie ma czego pokazać — hasło zostaje w pliku 03
-                continue
-            # to samo hasło bywa w danych pod dwoma kluczami (postać + nazwa);
-            # powtórka nie wnosi treści, więc się nie pojawia
-            if nazwa and nazwa in pokazane_nazwy:
-                continue
-            if para in widziane:
-                continue
-            widziane[para] = True
-            if nazwa:
-                pokazane_nazwy[nazwa] = True
-            skrocony = len(opis) > DLUGOSC_KARTY
-            tresc_opisu = opis
-            if skrocony:
-                # w kontekście tylko zajawka; pełny tekst zostaje w pliku 03
-                tresc_opisu = opis[:DLUGOSC_KARTY].rsplit(" ", 1)[0] + "…"
-            if not opis_pl and tresc_opisu:
-                tresc_opisu = f"\\*{tresc_opisu}"
-            # hasła zużywamy z pliku 03 tylko wtedy, gdy pokazaliśmy pełny opis
-            if not skrocony:
-                if para[0] == "nazwa":
-                    uzyte.update(k for grupa in (encje_po_zh.get(para[1]) or {}).get("historie", [])
-                                 for k in grupa)
-                elif para[0] == "osoba":
-                    wiersz = ix.postacie.get(int(para[1])) or {}
-                    if wiersz.get("n"):
-                        uzyte.add(wiersz["n"])
-                    wpis = baza.encyklopedia_po_kluczu.get(wiersz.get("n")) or {}
-                    for klucz in (wpis.get("nazwa"), wpis.get("inna_nazwa")):
-                        if klucz:
-                            uzyte.add(klucz)
-                    for grupa in wpis.get("historie") or []:
-                        uzyte.update(k for k in grupa if k)
-                else:
-                    kolumny = (baza.tabele.get(para[0]) or {}).get(para[1]) or {}
-                    uzyte.update(k for klucze in kolumny.values() for k in klucze)
-            if nazwa and tresc_opisu:
-                _dodaj(karty, f"**{nazwa}:** {tresc_opisu}")
-            elif nazwa:
-                _dodaj(karty, f"**{nazwa}**")
-            else:
-                _dodaj(karty, tresc_opisu)
-        if not karty:
-            continue
-        ktory += 1
-        if jednostka.sekcja != ostatnia_sekcja:
-            out += [jednostka.sekcja, ""]
-            ostatnia_sekcja = jednostka.sekcja
-        out += [f"## {jednostka.etykieta}", ""] + karty + [""]
-    return out, uzyte, ktory
 
 
 def _haslo(nazwa: str, opisy: list[str]) -> str:
@@ -1206,29 +1243,54 @@ def _haslo(nazwa: str, opisy: list[str]) -> str:
 
 
 def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, pl,
-                  krainy: list[dict] | None) -> list[str]:
-    """Sekcja „Zadania i wątki” w kolejności łańcucha gry, nie alfabetycznie."""
+                  krainy: list[dict] | None, luzne: list[str] | None = None) -> list[str]:
+    """Sekcja „Zadania i wątki” w kolejności łańcucha gry, nie alfabetycznie.
+
+    `luzne` to linie bez hasła z tej samej kategorii: gdy któraś jest nazwą
+    zadania z planu (zadanie ma przetłumaczoną nazwę, ale żadnego opisu),
+    staje pod nagłówkiem swojego rozdziału/łańcucha i znika z listy — reszta
+    zostaje w `luzne` do wypisania po sekcji.
+    """
     z_klucza: dict[str, str] = {}
     for nazwa, klucz in klucze_nazw.items():
         z_klucza.setdefault(klucz, nazwa)
+    dostepne: set[str] = set(luzne or ())
     out: list[str] = []
     wypisane: set[str] = set()
     for blok in kolejnosc_zadan.plan(ix, pl, krainy):
         linie = []
         for klucz in blok.klucze:
             nazwa = z_klucza.get(klucz)
-            if not nazwa or nazwa in wypisane or nazwa not in opisy:
+            if nazwa and nazwa not in wypisane and nazwa in opisy:
+                wypisane.add(nazwa)
+                linie.append(_haslo(nazwa, opisy[nazwa]))
                 continue
-            wypisane.add(nazwa)
-            linie.append(_haslo(nazwa, opisy[nazwa]))
+            tekst = pl.get(klucz)
+            if tekst and tekst in dostepne and tekst not in wypisane:
+                wypisane.add(tekst)
+                dostepne.discard(tekst)
+                linie.append(tekst)
         if linie:
             out += [f"## {blok.tytul}", ""] + linie + [""]
+    if luzne is not None:
+        luzne[:] = [linia for linia in luzne if linia in dostepne]
     reszta = [nazwa for nazwa in sorted(opisy, key=str.lower) if nazwa not in wypisane]
     if reszta:
         out += ["## Pozostałe zadania i wątki", ""]
         out += [_haslo(nazwa, opisy[nazwa]) for nazwa in reszta]
         out.append("")
     return out
+
+
+def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
+    """Czy opis nie mówi nic ponad nazwę hasła.
+
+    Odpada opis równy nazwie (z dokładnością do końcowej interpunkcji) albo
+    będący jej urywkiem. Opis, który nazwę ZAWIERA, ale dodaje własną treść
+    („Prosty drewniany pierścień jue, nic szczególnego.”), zostaje — dawny
+    warunek `nazwa not in tekst` wycinał każdy opis zaczynający się nazwą.
+    """
+    return tekst.strip(" .!?…") == nazwa.strip(" .!?…") or tekst in nazwa
 
 
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
@@ -1256,7 +1318,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
                 zbior.add(("nazwa", nazwa))
                 if len(zrodlo.w) > 2 and isinstance(zrodlo.w[2], str):
                     klucze_nazw[etykieta + "\x00" + nazwa] = zrodlo.w[2]
-            if tekst != nazwa and tekst not in nazwa and nazwa not in tekst:
+            if not _opis_powtarza_nazwe(tekst, nazwa):
                 if tekst not in sekcje[etykieta][nazwa]:
                     sekcje[etykieta][nazwa].append(tekst)
         else:
@@ -1273,8 +1335,9 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             wlasne = {klucz.split("\x00", 1)[1]: wartosc
                       for klucz, wartosc in klucze_nazw.items()
                       if klucz.startswith(etykieta + "\x00")}
-            out += _sekcja_zadan(sekcje[etykieta], wlasne, ix, pl, krainy)
-            out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
+            luzne = sorted(bez_nazwy.get(etykieta, []), key=str.lower)
+            out += _sekcja_zadan(sekcje[etykieta], wlasne, ix, pl, krainy, luzne)
+            out.extend(luzne)
             out.append("")
             continue
         for nazwa in sorted(sekcje.get(etykieta, {}), key=str.lower):
@@ -1293,41 +1356,29 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
 
     wyj.mkdir(parents=True, exist_ok=True)
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
-                  "kontekst": 0, "bez_przekladu": 0}
+                  "bez_przekladu": 0}
 
-    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy)
-    tresc, uzyte, zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
-    (wyj / "01_sceny_i_cutsceny.md").write_text(
-        _naglowek("Sceny i cutsceny",
-                  "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
-                  "pieśni na końcu, bo w grze nie ma ich na początku: "
-                  "sceny i cutsceny przemieszane w kolejności występowania.") + "\n".join(tresc) + "\n",
-        encoding="utf-8")
-    statystyka["plikow"] += 1
+    jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
+    tresc, uzyte, _zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
+    pliki_scen = _zapisz_czesci(
+        wyj, "01_sceny_i_cutsceny", "Sceny i cutsceny",
+        "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
+        "pieśni na końcu, bo w grze nie ma ich na początku: "
+        "sceny i cutsceny przemieszane w kolejności występowania.",
+        tresc, statystyka)
 
-    baza = powiazania_czytanek.zbuduj_baze(ix)
-    tresc_kontekstu, uzyte_kontekstu, ktore = _plik_kontekstu(ix, jednostki, pl, baza, zrobione)
-    statystyka["kontekst"] = ktore
-    (wyj / "02_kontekst_scen_i_cutscen.md").write_text(
-        _naglowek("Kontekst scen i cutscen",
-                  "Te same jednostki i ta sama kolejność co w pliku 01: postacie, encyklopedia, "
-                  "frakcje, miejsca, przedmioty i sztuki walki wymienione w scenie. Wchodzą tylko "
-                  "hasła, które gra naprawdę opisuje; pełna karta stoi przy pierwszym wystąpieniu, "
-                  "przy kolejnych samo imię albo nazwa. Opis dłuższy niż "
-                  f"{DLUGOSC_KARTY} znaków jest ucinany wielokropkiem — całość zostaje w pliku 03.") + "\n".join(tresc_kontekstu) + "\n",
-        encoding="utf-8")
-    statystyka["plikow"] += 1
+    tresc_reszty = _reszta(ix, pl, uzyte, statystyka, krainy)
+    tresc_reszty += _zbiory(ix, pl, uzyte, statystyka)
+    tresc_reszty += _pamiatki(ix, pl, uzyte, statystyka, index)
+    tresc_reszty += _poi(ix, pl, uzyte, statystyka, index)
+    pliki_reszty = _zapisz_czesci(
+        wyj, "03_reszta", "Reszta",
+        "Komplet informacji dodatkowych: wszystkie przekłady, "
+        "których nie ma w pliku 01, pogrupowane rodzajem.",
+        tresc_reszty, statystyka)
 
-    tresc_reszty = _reszta(ix, pl, uzyte | uzyte_kontekstu, statystyka, krainy)
-    tresc_reszty += _zbiory(ix, pl, uzyte | uzyte_kontekstu, statystyka)
-    tresc_reszty += _pamiatki(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
-    tresc_reszty += _poi(ix, pl, uzyte | uzyte_kontekstu, statystyka, index)
-    (wyj / "03_reszta.md").write_text(
-        _naglowek("Reszta", "Przekłady, których nie ma w plikach 01 i 02, pogrupowane rodzajem.")
-        + "\n".join(tresc_reszty) + "\n", encoding="utf-8")
-    statystyka["plikow"] += 1
-
-    (wyj / "README.md").write_text(_readme(statystyka, zakres), encoding="utf-8")
+    (wyj / "README.md").write_text(
+        _readme(statystyka, zakres, pliki_scen, pliki_reszty), encoding="utf-8")
     statystyka["plikow"] += 1
     return statystyka
 
@@ -1336,14 +1387,95 @@ def _naglowek(tytul: str, opis: str) -> str:
     return f"# Where Winds Meet — {tytul}\n\n{opis}\n\n"
 
 
-def _readme(statystyka: dict, zakres: str) -> str:
+# Budżet jednej części pliku treści: pliki po kilkanaście megabajtów są
+# nieporęczne w podglądzie, więc tniemy na części po ~2,5 MB — najchętniej
+# na granicy sekcji (`# `) albo jednostki (`## `), nigdy w środku dialogu.
+_CZESC_BUDZET = 2_500_000
+
+
+def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
+    """Tnie treść na części po ~`budzet` bajtów, na logicznych granicach.
+
+    Całość w budżecie → jedna część (plik zostaje pod starą nazwą).
+    Granice w kolejności chęci: nagłówek (`# `/`## `) zaraz po przekroczeniu
+    budżetu; hasło (`**…`) lub linia po pustej, gdy nagłówka długo nie ma
+    (listy w 03); dowolna linia dopiero przy podwójnym zapasie. Gdy cięcie
+    wypada w środku sekcji (`# `), nowa część dostaje powtórzony nagłówek
+    sekcji z dopiskiem „(ciąg dalszy)”, żeby było widać, skąd pochodzi tekst.
+    """
+    czesci: list[list[str]] = []
+    biezaca: list[str] = []
+    bajty = 0
+    sekcja = ""
+    poprzednia = ""
+    # Sekcje list (03) nie mają nagłówków w środku: po przekroczeniu budżetu
+    # o `zapas` wolno ciąć na haśle (`**…`) albo po pustej linii, a po
+    # podwójnym zapasie — na dowolnej linii, żeby część nie rosła bez końca.
+    zapas = max(budzet // 10, 1)
+    for linia in linie:
+        if linia.startswith("# "):
+            sekcja = linia
+        naglowek = linia.startswith("# ") or linia.startswith("## ")
+        luzna = linia.startswith("**") or poprzednia == ""
+        tnij = biezaca and bajty > budzet and (
+            naglowek
+            or (bajty > budzet + zapas and luzna)
+            or bajty > budzet + 2 * zapas)
+        if tnij:
+            czesci.append(biezaca)
+            biezaca = []
+            bajty = 0
+            if sekcja and not linia.startswith("# "):
+                biezaca = [sekcja[:2] + sekcja[2:].strip() + " (ciąg dalszy)", ""]
+                bajty = len(biezaca[0].encode("utf-8")) + 2
+        biezaca.append(linia)
+        bajty += len(linia.encode("utf-8")) + 1
+        poprzednia = linia
+    if biezaca:
+        czesci.append(biezaca)
+    return czesci
+
+
+def _zapisz_czesci(wyj: Path, baza: str, tytul: str, opis: str,
+                   linie: list[str], statystyka: dict) -> list[str]:
+    """Zapisuje treść w jednej lub kilku częściach i zwraca nazwy plików."""
+    czesci = _czesci(linie)
+    nazwy: list[str] = []
+    for numer, czesc in enumerate(czesci, start=1):
+        if len(czesci) == 1:
+            nazwa, doklejka = f"{baza}.md", ""
+        else:
+            nazwa = f"{baza}_{numer:02d}.md"
+            doklejka = f" — część {numer} z {len(czesci)}"
+        (wyj / nazwa).write_text(
+            _naglowek(tytul + doklejka, opis) + "\n".join(czesc) + "\n",
+            encoding="utf-8")
+        statystyka["plikow"] += 1
+        nazwy.append(nazwa)
+    return nazwy
+
+
+def _wiersze_readme(pliki: list[str], opis: str) -> str:
+    """Wiersze tabeli README: jeden plik albo kolejne części z numeracją."""
+    if len(pliki) == 1:
+        return f"| `{pliki[0]}` | {opis} |"
+    return "\n".join(
+        f"| `{nazwa}` | {opis} — część {numer} z {len(pliki)} |"
+        for numer, nazwa in enumerate(pliki, start=1))
+
+
+def _readme(statystyka: dict, zakres: str,
+            pliki_scen: list[str], pliki_reszty: list[str]) -> str:
     return f"""# Czytanka Where Winds Meet
 
 | plik | zawartość |
 |---|---|
-| `01_sceny_i_cutsceny.md` | sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu |
-| `02_kontekst_scen_i_cutscen.md` | kontekst do tych samych jednostek w tej samej kolejności: tylko hasła, które gra naprawdę opisuje — pełna karta raz, powtórki się nie powtarzają, bez punktora |
-| `03_reszta.md` | przekłady spoza 01 i 02, pogrupowane rodzajem; tu też hasła bez opisu i pełne teksty kart uciętych w 02 |
+{_wiersze_readme(pliki_scen, "sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu")}
+{_wiersze_readme(pliki_reszty, "komplet informacji dodatkowych: wszystkie przekłady spoza 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowane rodzajem")}
+
+Pliki treści cięte są na części po ~2,5 MB (granice tylko na nagłówkach sekcji
+i jednostek; sekcja przecięta w środku zaczyna kolejną część nagłówkiem
+z dopiskiem „(ciąg dalszy)”), bo wielkich plików nie da się wygodnie przeglądać.
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
 i tabel; kwestia bez mówcy to goły tekst.
@@ -1354,7 +1486,7 @@ Etykiety mówców zapisane w grze tylko po chińsku są transliterowane na łaci
 Zakres: **{zakres}**.
 
 Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
-{statystyka['kontekst']} jednostek z kontekstem, {statystyka['reszta']} pozycji w reszcie,
+{statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
 {statystyka.get('zbiory', 0)} kart zbiorów, {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) i {statystyka.get('poi', 0)} punktów na mapie (POI — z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.

@@ -311,10 +311,10 @@ class TestCzytankaDoCzytania(unittest.TestCase):
     def czytaj(self, nazwa: str) -> str:
         return (self.wyj / nazwa).read_text(encoding="utf-8")
 
-    def test_trzy_pliki_po_jednym_na_rodzaj(self):
+    def test_dwa_pliki_tresci_bez_kontekstu(self):
+        """Plik 02 zlikwidowany — zostają 01, 03 i README."""
         self.assertEqual(sorted(p.name for p in self.wyj.glob("*.md")),
-                         ["01_sceny_i_cutsceny.md", "02_kontekst_scen_i_cutscen.md", "03_reszta.md",
-                          "README.md"])
+                         ["01_sceny_i_cutsceny.md", "03_reszta.md", "README.md"])
 
     def test_kwestia_ma_mowce_i_tekst_w_jednej_linii(self):
         tresc = self.czytaj("01_sceny_i_cutsceny.md")
@@ -358,3 +358,74 @@ class TestCzytankaDoCzytania(unittest.TestCase):
     def test_gracz_nazywa_sie_youxia(self):
         self.assertEqual(self.czytanka.GRACZ["你"], "Youxia")
         self.assertEqual(self.czytanka.GRACZ["player"], "Youxia")
+
+class TestCzesciPlikow(unittest.TestCase):
+    """Cięcie wielkich plików treści na części (`_czesci`)."""
+
+    def setUp(self):
+        from tools import czytanka_czysta
+
+        self.czytanka = czytanka_czysta
+
+    def test_calosc_w_budzecie_to_jedna_czesc(self):
+        linie = ["# Sekcja", "", "## Scena 1", "tekst"]
+        self.assertEqual(self.czytanka._czesci(linie, budzet=10_000), [linie])
+
+    def test_ciecie_na_naglowku_i_ciag_dalszy(self):
+        linie = ["# Kraina", ""]
+        for numer in range(40):
+            linie += [f"## Scena {numer}", "x" * 100]
+        czesci = self.czytanka._czesci(linie, budzet=1000)
+        self.assertGreater(len(czesci), 1)
+        for czesc in czesci[1:]:
+            self.assertEqual(czesc[0], "# Kraina (ciąg dalszy)")
+            self.assertTrue(czesc[2].startswith("## Scena"),
+                            f"cięcie w środku jednostki: {czesc[2][:40]}")
+
+    def test_lista_bez_naglowkow_tnie_sie_na_hasle(self):
+        linie = ["# Lista", ""] + [f"**Hasło {numer}:** " + "y" * 90
+                                   for numer in range(40)]
+        czesci = self.czytanka._czesci(linie, budzet=1000)
+        self.assertGreater(len(czesci), 1)
+        for czesc in czesci[1:]:
+            self.assertEqual(czesc[0], "# Lista (ciąg dalszy)")
+            self.assertTrue(czesc[2].startswith("**Hasło"))
+
+
+class TestOpisyNazw(unittest.TestCase):
+    """Dopasowanie opisów do nazw w pliku 03."""
+
+    def setUp(self):
+        from tools import czytanka_czysta
+
+        self.czytanka = czytanka_czysta
+
+    def test_opis_rowny_nazwie_odpada(self):
+        self.assertTrue(self.czytanka._opis_powtarza_nazwe("Miecz", "Miecz"))
+        self.assertTrue(self.czytanka._opis_powtarza_nazwe("Miecz.", "Miecz"))
+        self.assertTrue(self.czytanka._opis_powtarza_nazwe("Mie", "Miecz"))
+
+    def test_opis_zawierajacy_nazwe_z_wlasna_trescia_zostaje(self):
+        # dawny warunek `nazwa not in tekst` wycinał taki opis w całości
+        self.assertFalse(self.czytanka._opis_powtarza_nazwe(
+            "Prosty drewniany pierścień jue, nic szczególnego.",
+            "Prosty drewniany pierścień jue"))
+
+
+class TestLegendaPamiatki(unittest.TestCase):
+    """Nazwa legendy (motywu) na karcie pamiątki."""
+
+    def setUp(self):
+        from tools import czytanka_czysta
+
+        self.czytanka = czytanka_czysta
+
+    def test_przeklad_z_numerem_w_legendzie(self):
+        linia = self.czytanka._legenda_pamiatki(
+            None, {"klucz": "Przy Niebiańskiej Przystani"}, {"3": "klucz"},
+            {"motyw": 3, "kolejnosc": 1})
+        self.assertEqual(linia, "Przy Niebiańskiej Przystani · 1")
+
+    def test_brak_motywu_to_pusta_linia(self):
+        self.assertEqual(
+            self.czytanka._legenda_pamiatki(None, {}, {}, {"motyw": 99}), "")

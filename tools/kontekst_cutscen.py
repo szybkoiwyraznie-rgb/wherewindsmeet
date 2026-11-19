@@ -96,6 +96,48 @@ ZNANE_IMIONA_CUTSCEN_EN = frozenset(
     }
 )
 
+# Mówcy rozpoznawani z nazwy nagrania (ścieżki audio `.cine` i `sound_data`).
+# Tylko pewniki: kody postaci w ścieżkach `_cs_` (inicjały pinyin, potwierdzone
+# treścią sceny) — generycznego `npc_NN` nie tykamy, bo nie identyfikuje postaci.
+PREFIKSY_MOWCOW_CS: dict[str, str] = {
+    "vo_sm_sxdm4_cs_zlxl_hx": "Ruby",          # 红线 Hongxian, cutscena 30161
+}
+
+# Końcówki nazw nagrań gracza (po odcięciu numerów): pma/pmb = player male/B,
+# player_m / player_f = jawne nagrania gracza. `_npc_` w nazwie wyklucza —
+# bywa, że tuż po nim stoi `pma` jako licznik (np. `vo_sm_sxd_npc_pma_44`,
+# w danych przypisane do „Guest A").
+_TOKENY_GRACZA = frozenset({"pma", "pmb", "pmc", "pm"})
+
+_RE_OGON_AUDIO = re.compile(r"(?:_\d+|_ui)+$")
+
+
+def rdzen_audio(audio: str) -> str:
+    """Nazwa nagrania bez ogona numerów (`vo_x_npc_07` → `vo_x_npc`)."""
+    return _RE_OGON_AUDIO.sub("", audio or "")
+
+
+def mowca_z_audio(audio: str) -> str:
+    """Mówca wynikający wprost z nazwy nagrania („Youxia", imię) albo ''.
+
+    To identyfikacja z danych (ścieżka dźwiękowa cutsceny nazywa głos),
+    a nie podpowiedź `mowca_en` z podobnego tekstu — tych czytanka unika.
+    """
+    if not audio:
+        return ""
+    rdzen = _RE_OGON_AUDIO.sub("", audio)
+    for prefiks, mowca in PREFIKSY_MOWCOW_CS.items():
+        if rdzen == prefiks:
+            return mowca
+    if rdzen.endswith(("player_m", "player_f")):
+        return "Youxia"
+    if "_npc_" in audio:
+        return ""
+    if rdzen.rsplit("_", 1)[-1] in _TOKENY_GRACZA:
+        return "Youxia"
+    return ""
+
+
 # Dopasowanie prefiksów `audio` (dłuższe / bardziej szczegółowe zawsze przed ogólnymi!)
 VO_DOMENY: list[tuple[str, str, str, int | None, tuple[int, ...]]] = [
     ("vo_xinshou", "PROLOG_WOZ", "Prolog — nocny powóz: Jiang Yan i Chen Zixi", None, ()),
