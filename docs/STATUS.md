@@ -144,6 +144,15 @@ we wcześniejszej wskazówce. Suche i właściwe importy bez odrzuceń; skan
 **623 testy OK**, kontrola repozytorium OK (630 wpisów indeksu); przekład
 AI-tymczasowy, bez testu w grze.
 
+**Kontynuacja `il`–`im`:** 202 nowe przekłady scen o ostrzu i powrocie
+(grupa 5242, 110) oraz dawnych przyjaciołach (5248, 92). Magazyn
+**138 866** przekładów, **489 544** miejsca (28,37%). Sonda scen tych grup:
+116 i 98 bazowych kluczy, 0 braków; pozostałych tekstów zadań nie badano.
+Suche i właściwe importy bez odrzuceń; skan 202 linii bez CJK, nie-NFC
+i miękkich dywizów, podziały wierszy zgodne ze źródłem. **623 testy OK**,
+kontrola repozytorium OK (632 wpisy indeksu); przekład AI-tymczasowy,
+bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

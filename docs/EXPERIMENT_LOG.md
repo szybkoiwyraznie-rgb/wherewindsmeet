@@ -2767,3 +2767,11 @@ pozostałych tekstów zadań nie badano. Skan 304 linii bez CJK, nie-NFC
 i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem.
 623 testy i kontrola repozytorium OK (630 wpisów); AI-tymczasowe, bez
 testu w grze.
+
+**Ostrze i papryczki (`il`–`im`):** 110 + 92 nowe przekłady, magazyn
+138 866, 489 544 miejsc (28,37%). Suche i właściwe importy oraz późniejsze
+poprawki bez odrzuceń. Sonda bazowych kluczy dostępnych scen grup 5242
+i 5248: odpowiednio 116 i 98 kluczy, 0 braków. To nie jest sonda całych
+zadań. Skan 202 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(632 wpisy); przekład AI-tymczasowy, bez testu w grze.
