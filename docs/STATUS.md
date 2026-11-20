@@ -3,11 +3,17 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (wpis 22d w dzienniku):** runda 5 — **CELE ZADAŃ UKOŃCZONE,
-8 199 z 8 199**; `tasks_ending_data` **18/18**. Runda 6 (`ccs_text_msg`,
-5 229 braków) w toku: **4 957** zrobione (partie `cz`, `da`–`fh`).
-Magazyn **134 046**. Zostało 272. Następny krok: dalsze partie r6 po 80.
-Testy do odświeżenia na końcu rund.
+**Najnowsze (wpis 22e w dzienniku):** **runda 6 UKOŃCZONA** —
+`ccs_text_msg` **5 282 z 5 282**, brak 0 (sonda domykająca; commit
+`f259028`, magazyn **134 398**). Partie `cz`–`fm` (w tym ostatnie
+`fi`–`fm`, +80/+80/+80/+80/+32). Rzeczywista liczba tekstów tabeli to
+5 282, nie 5 229 — wcześniejszy licznik rundy się rozjechał; miarodajna
+jest sonda po kluczach, nie suma partii. Rundy 4, 5 i 6 domknięte.
+Następny krok: wybór kolejnej tabeli do tłumaczenia (kandydaci wg braków:
+`text_msg` 99 357/103 975, `debate_guider_dialog_data` 52 425/60 512,
+`branch_data` 7 679/8 854, `buff` 4 366/9 549, `programmer_text_msg`
+4 128/4 139). Testy odświeżone po zamknięciu rundy: `run_tests.py`
+**623 OK**, `check_repository.py` OK (566 wpisów indeksu).
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,

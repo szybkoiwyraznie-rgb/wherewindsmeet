@@ -2607,3 +2607,16 @@ Księga ukrytych brzmień · 天泉→Studnia Niebios · 听杏村→Wioska More
 (magazyn 133 886 → **134 046**, commit `6863c14`). Importy bez odrzuceń.
 Terminy: 鸟鹭→Czapla · 有为村→Wioska Obfitych Plonów · 豫章/洪都→Yuzhang/
 Hongdu (przekład prozy 滕王阁序 — fragment) · 九公子→Dziewiąty Panicz.
+
+**Runda 6 — UKOŃCZONA: 5 282 z 5 282.** Partie `fi`–`fm`
+(magazyn 134 046 → **134 398**, commity `f598c5d`, `084e928`, `854c284`,
+`9e71092`, `f259028`). Importy bez odrzuceń, `--na-sucho` 80/0 (ostatnia
+partia `fm` 32/0). Sonda domykająca: `ccs_text_msg` **5 282/5 282,
+brak 0**. Rzeczywista liczba tekstów tej tabeli (5 282) jest o 53 wyższa
+od pierwotnego szacunku 5 229 — licznik rundy rozjechał się wcześniej
+(po `ex` 1 072 vs sonda 1 152; po `fb` 752 vs 912); rozstrzyga zawsze
+`len(ccs)`, nie suma partii. Terminy z domknięcia: 悬赏发布→Wystawianie
+nagród za głowy · 焚草→Wypal trawę · 话术卡→Karta perswazji ·
+泛泛之交→„ledwie znajomi” (EN „Respected” błędne, tłumaczone z ZH) ·
+王家村·崇德坊→Wioska Wang · Zaułek Cnoty · 柴府→Posiadłość Chai ·
+酒葫芦·不破→Tykwa wina · Niezniszczalna.
