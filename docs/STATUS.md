@@ -49,6 +49,10 @@ właściciela (folder pakietów, id `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`):
 https://drive.google.com/file/d/1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu/view
 Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
 (styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
+Obok leży **Czytanka v19** (`WWM_Czytanka_PL_v19.zip`, 6 597 845 B,
+SHA-256 `fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
+id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`): epizody 75 127/167 500,
+kontekst scen 58 464/97 686, dodatkowe 127 975/455 592.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

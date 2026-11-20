@@ -3276,3 +3276,19 @@ Powód osobnego wpisu: pierwsza próba wydania trafiła do `dist/` pod nazwą
 `WWM_Latka_PL_v0.6.0.zip` i **nie została wgrana na Dysk** — właściciel nie
 mógł jej znaleźć. Wydania instalowalne zawsze nazywać `WWM_Spolszczenie_PL_v*.zip`
 i po zbudowaniu wgrywać na Dysk (krok „build” nie obejmuje uploadu).
+
+## 2026-11-20 (17) — Czytanka v19 na Dysku
+
+`WWM_Czytanka_PL_v19.zip`, 6 597 845 B, SHA-256
+`fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
+zestaw `przetlumaczone`, płeć `oba` (jak v18). Zawartość:
+
+| plik | bajtów | przetłumaczone / wszystkich |
+|---|---:|---:|
+| `README.md` | 102 641 | — |
+| `epizody.md` | 8 412 742 | 75 127 / 167 500 |
+| `kontekst_scen.md` | 11 190 836 | 58 464 / 97 686 |
+| `dodatkowe.md` | 20 156 560 | 127 975 / 455 592 |
+
+Budowa: `buduj_czytanki.py --indeks index --magazyn tlumaczenie --wersja 19`.
+Wgrana na Dysk (id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`), obok łatki v0.6.0.
