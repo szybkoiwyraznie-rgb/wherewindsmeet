@@ -1098,6 +1098,7 @@
 {"k": "8214323952c25118", "pl": "Rozproszenie Małej Mgły"}
 {"k": "8214f290a3937703", "pl": "Podróżny."}
 {"k": "821575ef760a93d3", "pl": "Dzwonek błogosławieństw - Orzące Wzgórze 2 - Dowolna kolejność"}
+{"k": "82159cc131cb7946", "pl": "Bądźcie spokojni, będziemy się troszczyć o tego małego nieśmiertelnego od węgla jak o największy skarb!"}
 {"k": "821643a12513f7cd", "pl": "Mały przedmiot zakazany; daje niewiele punktów kolekcjonerskich komnaty."}
 {"k": "82164c2795ee3df0", "pl": "Wróć, duszo"}
 {"k": "8216cb992ccff422", "pl": "Przytłaczająca Potęga"}
@@ -2335,6 +2336,7 @@
 {"k": "846c7e5b4f338993", "pl": "Żegnasz się z Ruby i dajesz jej czerwoną pelerynę, którą wcześniej dla niej przygotowano."}
 {"k": "846cb4e015d0e56e", "pl": "Bezpłatna wymiana w sklepiku rocznicowym"}
 {"k": "846d64c99f7a97c6", "pl": "Uczeń Przystani Słowa, który na co dzień jest zajęty obserwacją gwiazd."}
+{"k": "846dfa14e3b47fa8", "pl": "Nadchodzi zima, nie znajdą jedzenia. Bez pomocy Szkoły Moistów umrą z zimna i głodu."}
 {"k": "846e4ae28ec67220", "pl": "Kto najbliżej wieży nad wodą, ten pierwszy ogląda księżyc; kto najbliżej przeprawy, ten pierwszy wsiada do łodzi - nieprawdaż? Chcesz pływać po całym świecie, a sakiewka pusta i nie wyskrobiesz ani grosza? Nic straconego! Opanuj te trzy sposoby, a przemkniesz się na każdą łódź, popłyniesz bez troski i obejrzysz cały świat!"}
 {"k": "846e96ae2ed241df", "pl": "Szalonemu starcowi nie daje spokoju przyczyna śmierci przywódczyni Zhu Yu. Niektórzy rodzą się po to, by umrzeć za świat. Są tacy, którzy z życia przechodzą w śmierć nie dlatego, że nie chcą żyć, a pragną umrzeć, lecz dlatego, że nie mogą żyć, a mogą umrzeć."}
 {"k": "846ee5ee4d4655fb", "pl": "Skoro przystałeś do Gospodarstwa i jesteś moim domownikiem, to jesteś pod moją opieką."}
@@ -2537,6 +2539,7 @@
 {"k": "84c690ef45a2b713", "pl": "Obyczaje: zbiory"}
 {"k": "84c6ef205484cdf7", "pl": "Upiorne wojsko nagle odchodzi…"}
 {"k": "84c75ed2382a5f23", "pl": "…Ech, ano nic. Ten stary Zhang, Zhang Bliznowaty z Osady Poskromionych Koni, nie wiadomo, co się z nim porobiło."}
+{"k": "84c7ae190bd79531", "pl": "(parska chłodno) Pliszko, wróć."}
 {"k": "84c98a42a3e9b81c", "pl": "#YPodziemne nurty się zatykają — powódź zalega i nie ustępuje#E. Ta rzecz nie leży w ludzkich możliwościach — a jednak właśnie w nich leży.\n#YW ukrytych nurtach Żółtej Rzeki żyje dziwny karp, który pożera szlam; gdyby udało się go oswoić#E…… — drugi rok ery Yuanfeng\n\n                                                                                  \n（Dopisek drobnymi, kościstymi znakami）\nOswajanie dziwnego karpia…… nie wiadomo, jakim lekarstwem. Wydaje się, że w Rejestrach Silver Needle nic takiego nie ma.\n\n\n"}
 {"k": "84ca3c0ad97554ac", "pl": "Szyba przednia"}
 {"k": "84caa6b29b64ca0f", "pl": "Uczeń Przystani Słowa 1"}
@@ -3005,6 +3008,7 @@
 {"k": "859c3260b5f9d592", "pl": "Tian Yuanzhou"}
 {"k": "859cd227b9d84273", "pl": "Rysunek konturowy baimiao"}
 {"k": "859cf2409554a969", "pl": "Obszar ograniczenia budowy 6"}
+{"k": "859cf424094fe895", "pl": "A ty, młoda damo? Zostajesz czy wracasz do domu?"}
 {"k": "859d26d830f72943", "pl": "Walcz ze złotopawilonowcami"}
 {"k": "859d859a30a221e4", "pl": "Klejnot izby handlowej"}
 {"k": "859e4b0f598785d3", "pl": "Jedwabna Nić: Ulewa, st. 31 · Zwykła"}
@@ -3186,6 +3190,7 @@
 {"k": "85edfad9f6aaf7dc", "pl": "Czekaj na brata Zhao"}
 {"k": "85efc75691e60e44", "pl": "Jakże lekko powiewa szata z jedwabiu, jej skraj wraca z wiatrem.\nPo użyciu odblokowuje na 7 dni okres próbny wyglądu “Mgła i Kwiat”."}
 {"k": "85f128aadc8ad0ba", "pl": "Napierśnik Dymu Wyżyny Long"}
+{"k": "85f1c82846921e57", "pl": "(dygocząc) Jak… jak się dostali do środka?!"}
 {"k": "85f1cedc32ae3696", "pl": "Przywołanie światła obrysu"}
 {"k": "85f2ab06f178f264", "pl": "#c6d6c5Pędzel Rozkwitu"}
 {"k": "85f31526fa4ab37a", "pl": "Pomocnik sprzątający kuchnię w Gospodzie Gościnnej, mieszka w Zaułku Bocznej Bramy i zarabia tu na życie."}
@@ -3977,6 +3982,7 @@
 {"k": "876cd5c24027cc65", "pl": "Skrzynia broni: Lotny Sokół, st. 51"}
 {"k": "876cd604a88a8107", "pl": "Napis na ścianie"}
 {"k": "876d3d35338e1ffe", "pl": "Zapisuje dawne dzieje Meng Shenga, Mistrza Moistów z czasów Walczących Królestw, i pana Yangcheng z państwa Chu."}
+{"k": "876d479e32095358", "pl": "Czy Wielka Mistrzyni nie mówiła o nowym tropie? Ech, oni kryją się w cieniu, a my jesteśmy na widoku. Gdzie ich szukać…?"}
 {"k": "876dbbd8b664fcf1", "pl": "Jianghu i mała dziewczynka"}
 {"k": "876e6cf8090c27b8", "pl": "Jeśli nie wpadniesz w pułapkę, to wielka szkoda."}
 {"k": "876eab5f8381c50b", "pl": "Przekazać list, przekazać ogień"}
@@ -5904,6 +5910,7 @@
 {"k": "8afe7cbaebee8eaa", "pl": "“Zachodzi słońce, wracamy razem, dzbanek napoju dla sąsiadów. Nucąc, zamykam plecioną furtkę, na chwilę zostaję zwykłym chłopem.” Uczniowie Przystani Słowa uprawiają tu ziemię i studiują, a domy mieszkalne sąsiadują z uczelnią. Starzy rolnicy uczą sztuki uprawy, uczniowie zaś przekazują nauki badań. Wieś i gabinet to jedno i dwa zarazem."}
 {"k": "8b00349aaa419afd", "pl": "Bracie, tę drogę trzeba przetrzeć."}
 {"k": "8b005c3ad4c7fe92", "pl": "Wędrowiec - miecz - Błysk Prawdziwego Smoka"}
+{"k": "8b011a5081352125", "pl": "Ale kto go rozwiąże, będzie miał kwalifikacje Wielkiego Mistrza lub mistrza rzemiosła."}
 {"k": "8b02641ab9f20104", "pl": "$T(5175) znów zabłąkał się na głównej ulicy południowej bramy i tym razem przypadkiem wtargnął na cudze kocie terytorium, gdzie otoczyła go gromada kotów…"}
 {"k": "8b03ce9fac6e5c35", "pl": "Potem ten zwyczajny kij wymiótł kurz wszystkich swarów pod niebem; potem ludzie sławili prawdziwego smoka, który na nim spoczywał i miał zjednoczyć góry i rzeki. Potem świat się odmienił, potem wdzięczność i uraza zamieniły się miejscami. Potem ona miała go zabić mieczem, którym nauczył ją władać."}
 {"k": "8b03e40976e5d4ba", "pl": "Idąc za dziećmi, odnajdujesz Ducha Latającej Wiewiórki. Okazuje się, że dzieci wierzą, iż jego orzeszki piniowe mają cudowną moc."}
