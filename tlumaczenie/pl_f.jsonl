@@ -463,6 +463,7 @@
 {"k": "f0d626da711db2de", "pl": "Zaśnij"}
 {"k": "f0d73ca13fc4e20c", "pl": "Jezioro Serca: obszar drogowskazu Tysiąca Nocy 4"}
 {"k": "f0d7d87f2c7e6776", "pl": "Ukryte prawa jianghu"}
+{"k": "f0d7df3340248b58", "pl": "Kto ma pieniądze, niech da pieniądze; kto nie ma, niech doda gwaru — pożyczę trochę boskiej mocy i wyjmę ten miecz z brzucha!"}
 {"k": "f0d940a86e39df69", "pl": "Dwudzieste piąte dziecko Miau Miau.\nOwoc jednej upojnej nocy Miau Miau z wiejską kotką, gdy przechodził przez Gospodę Bez Zazdrości.\nWidać, jak ważne jest kastrowanie."}
 {"k": "f0d9855a4c7532ca", "pl": "Mingzhu"}
 {"k": "f0dac362237a95af", "pl": "Gwardzista wyższej rangi z Urzędu Cnoty Wojennej."}
@@ -1126,6 +1127,7 @@
 {"k": "f20adc71354a3afa", "pl": "Zdjąć truciznę poprzedników, położyć kres cierpieniom schyłkowego wieku."}
 {"k": "f20ae76363421533", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Splecione Gwiazdy lub Objęty Nefryt (st. 110) w jakości niebieskiej lub fioletowej, a z niskim prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YŁamanie Bambusa: Pył#E."}
 {"k": "f20bc1146d6312d5", "pl": "Otrzymujesz 1 Sovereign Star na 4 tury"}
+{"k": "f20bf95fc4be69fc", "pl": "Gdzie ta księga rachunkowa..."}
 {"k": "f20c408aaa262721", "pl": "Li Wa! Uspokój się! To już minęło!"}
 {"k": "f20ce623641f08ce", "pl": "#e3e7d7Tajny Agent Dworu"}
 {"k": "f20d1f5c4d84669d", "pl": "To raczej moja kwestia"}
@@ -1409,6 +1411,7 @@
 {"k": "f289daf8ba346b6a", "pl": "Bambusowa Latająca Ryba 21"}
 {"k": "f28a528a52f41bf7", "pl": "Cotygodniowe wyzwanie Jednych Drzwi - Kwadratowe pudełko"}
 {"k": "f28ac3d14a8a866a", "pl": "Wedle wskazówek Shu Rujina spróbuj zbudować łódź błogosławieństwa"}
+{"k": "f28b08504a23d27e", "pl": "Szybciej, oberwijcie łodygi i liście, zostawcie korzenie i zanieście do Ziołowej Sali,"}
 {"k": "f28b5c3e64e3da90", "pl": "Znajdź tajemniczą postać"}
 {"k": "f28bd447acef95f2", "pl": "Udaj się do paleniska"}
 {"k": "f28d4d156225ae06", "pl": "Dzień z życia Młodego Pana — ślad pędzla ducha"}
@@ -2400,6 +2403,7 @@
 {"k": "f46d2c531b94ee89", "pl": "Ling Quan"}
 {"k": "f46dcd8ee864d19c", "pl": "Ukryta Góra - mapa zabawy w chowanego - szybkie dobieranie"}
 {"k": "f46de5ec23170d2c", "pl": "O! Co się znowu stało?"}
+{"k": "f46e428a42578550", "pl": "Pręciki kwiatu złotej lampy do wina żółtych źródeł... pachnie, naprawdę pachnie!"}
 {"k": "f46e76d577289df1", "pl": "Zwój Szat: Nieujarzmiona Wola"}
 {"k": "f46f748e2e364acc", "pl": "Chi Yuchuan"}
 {"k": "f46fb315621c0eeb", "pl": "Zapisane po obejrzeniu zwłok w zrujnowanej chacie"}
@@ -2464,6 +2468,7 @@
 {"k": "f48ab2b7731787f2", "pl": "Podejdź i rozlicz się z nimi"}
 {"k": "f48ad8fd220d82c6", "pl": "Księga opisuje Pałac Chongyuan i jego osobliwości; to niedokończone dzieło Wędrowca."}
 {"k": "f48c96eaa7789339", "pl": "Ukryta Góra, Pawilon Boskiego Rzemiosła (Wzgórze Sosnowego Wiatru)"}
+{"k": "f48d4cebdf010576", "pl": "Te kandyzowane wiśnie siostra na pewno pokocha — powiem, że kupił je dla mnie brat Chen!"}
 {"k": "f48e267f0a9a8ac1", "pl": "Bambusowa Latająca Ryba 9"}
 {"k": "f48e4ed4e866fdd2", "pl": "Miau Miau - Parkour wichru - Północne Równiny 4"}
 {"k": "f48e9c8342052b38", "pl": "Marcowe Fajerwerki"}
@@ -3355,6 +3360,7 @@
 {"k": "f63138d313743014", "pl": "Chen Shezhi jest w Mieście Moistów pierwszy raz i trochę się obawiasz, że znów zrobi coś głupiego. Pamiętasz, że w swojej liście pragnień zapisał, iż poszuka w #a66829dzielnicy mieszkalnej obok Dzielnicy Cieni#E tańczącego mechanizmu. Postanawiasz odszukać go tam nazajutrz."}
 {"k": "f6315672d7b9649c", "pl": "Chcesz ujrzeć moje oblicze Dharmy czy prawdziwe oblicze, mała duszo?"}
 {"k": "f63259ea0929d13f", "pl": "Sprawdź, czemu kociak miauczy"}
+{"k": "f6333615108fc6ec", "pl": "...Odejdź dalej."}
 {"k": "f6334e4763893a92", "pl": "Student z Samotnej Chmury, zafascynowany architekturą mostu przy wejściu do Przystani Słowa."}
 {"k": "f6339aab7ff1d4ba", "pl": "Zwykły mieszkaniec gór Ukrytej Góry."}
 {"k": "f6354ae3fc09a108", "pl": "Górnictwo"}
@@ -4589,6 +4595,7 @@
 {"k": "f85adac0b8edd849", "pl": "Szabla Tnąca Śnieg · Odmiana"}
 {"k": "f85b025d3f644e36", "pl": "Mała łódź"}
 {"k": "f85b6487584fa159", "pl": "Rozpal tę Duszę"}
+{"k": "f85b6ced6d6fac23", "pl": "Nie, skąd znowu wziąłeś te podarte szaty..."}
 {"k": "f85beb4183420638", "pl": "Co?!"}
 {"k": "f85c289e166b3897", "pl": "Idź, dzieciaku, pobaw się z tamtymi dziećmi. Daj mi spokój."}
 {"k": "f85e8c71bf7b63c4", "pl": "Moja droga, odtąd naprawdę będę się starał zarabiać."}
@@ -4642,6 +4649,7 @@
 {"k": "f87714ef272b4ad9", "pl": "Gdzieś na kwaterze jest pewien dziwny człek…"}
 {"k": "f87716ae6b6f217c", "pl": "Namaluj portret Xue Zhiqiana"}
 {"k": "f87800fd24f44d7f", "pl": "Zapisane po rozmowie z Zhang Tiemengiem"}
+{"k": "f879770c18f5ba7d", "pl": "Ech, ten pieprz to trzeba kupować tutaj, ma odpowiedni smak!"}
 {"k": "f879b6a83780dd08", "pl": "Pogoda: Śpiący Taoista"}
 {"k": "f87a0372bc802b1e", "pl": "Wypadają najwyżej fioletowe elementy zestawów Płukany Kwiat i Gruszkowy Śnieg, st. 61.\n(Nagolenniki nie wypadają.)"}
 {"k": "f87a8d96b8197c7b", "pl": "Uczeń Hali Orki i Nauk, bardzo zadowolony z pola szczypioru wyhodowanego własnymi rękami, a nawet nieco dumny."}
@@ -6808,6 +6816,7 @@
 {"k": "fc6103c08421ad8d", "pl": "Tai chi i opadłe liście"}
 {"k": "fc6117a24a20fb99", "pl": "Cenny nóż"}
 {"k": "fc614d9d47e0281e", "pl": "Szansa na trafienie krytyczne przy wyrębie rośnie o 20% na 10 min.\n\nNaraz może działać tylko jeden efekt “Potrawy”."}
+{"k": "fc61b40d8cc511df", "pl": "Pan domu? Dawno go nie widziałem."}
 {"k": "fc62efc09571c365", "pl": "Drut żelazny"}
 {"k": "fc63476ad6f13321", "pl": "Zheng Wenyuan"}
 {"k": "fc634abd68f60dad", "pl": "Gniew Atakuje Serce"}
@@ -7749,6 +7758,7 @@
 {"k": "fe1149fb34148a12", "pl": "Wymagane    #e9a358wczytywanie#E do odblokowania"}
 {"k": "fe121dda52e6c586", "pl": "…Nie… nie… tak być nie powinno."}
 {"k": "fe137ebff177dde3", "pl": "Śmierć Zhang Huaishena"}
+{"k": "fe13897c9813f09e", "pl": "Ty tam! Kibicuj kotu Xiaoshanowi!"}
 {"k": "fe14d52a94b178da", "pl": "Długa włócznia za poduszkę, wino w gardle; jedno upojenie rozwiewa tysiąc trosk."}
 {"k": "fe14de3092454099", "pl": "Wypytaj Chena Shezhiego"}
 {"k": "fe1520a92bd856f1", "pl": "Wędrowny wojownik Przystani Słowa, który mija Górę Ukrytego Księżyca. Bezradny wobec braci ze szkoły, wiecznie toczących spory, rozważa, czy by im nie zatkać ust."}
@@ -8092,6 +8102,7 @@
 {"k": "feafbe92bff86ade", "pl": "Woń nardu otwiera zastoje śledziony; dodany w małej ilości do leków na śledzionę i żołądek wybornie budzi qi śledziony."}
 {"k": "feb0a61abf943483", "pl": "A wuj Jiang? Muszę jeszcze iść w jianghu i go szukać…"}
 {"k": "feb12c0b849a97ca", "pl": "Hu Laosan"}
+{"k": "feb169627abf504e", "pl": "Tysiąc mórg pola, sto wołów. Żona, dzieci i ciepłe kang."}
 {"k": "feb1bfd9a0990a4b", "pl": "Bracie, to, co tam szeleściło, to był zając!"}
 {"k": "feb1d09be4b82367", "pl": "Kupon rezonansu: obniża o 10% cenę zakupu Wijącego się Dźwięku.\nPo odebraniu ważny 30 dni, używany automatycznie przy zakupie Wijącego się Dźwięku; każdy przedmiot daje jedną zniżkę."}
 {"k": "feb2095f709da97e", "pl": "Krąg Płukanego Kwiatu, st. 100"}
