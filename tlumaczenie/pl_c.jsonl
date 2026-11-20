@@ -470,6 +470,7 @@
 {"k": "c0d7a0be2fda9b56", "pl": "Ukończ w ciągu 00:00"}
 {"k": "c0d7d3c757c112ab", "pl": "Pieśń Poetycka: Rozstrzygnięcie"}
 {"k": "c0d7d6002383f441", "pl": "Dobra robota! Psie syny! Jak można tak traktować dziewczynę! Gdyby nie pan Hong Si… dawno bym już…"}
+{"k": "c0d7f8e212c2d6ee", "pl": "Na razie zrzućmy wykopany ignam tutaj, za kilka dni się nim zajmiemy!"}
 {"k": "c0d88241d0de7130", "pl": "Odepchnięcie gracza 5"}
 {"k": "c0da05111487a34d", "pl": "Element zestawu: Rozłupana Góra, st. 61"}
 {"k": "c0da085bbd660a54", "pl": "Po pierwsze bogactwo, po drugie spokojna podróż, po trzecie sława i sukces!"}
@@ -839,6 +840,7 @@
 {"k": "c18d8f09cb26ebd7", "pl": "Pancerz"}
 {"k": "c18e9099a9d42b2e", "pl": "Jesteś Zhuge Ha?"}
 {"k": "c18f2de54f248e5f", "pl": "Czarny ekran ogólny 501"}
+{"k": "c18f738a69b81a2a", "pl": "Ech, ma pan rację, rozumiem."}
 {"k": "c18f999fdb09b195", "pl": "Ech… uff… mało brakowało, a bym się wywrócił… aż mi gwiazdy w oczach stanęły… uff…"}
 {"k": "c190650a42a35c89", "pl": "Walka traw to chińska zabawa ludowa, zwana też walką stu traw; za Dynastii Północnych i Południowych nazywano ją “deptaniem stu traw”, a za Tang “walką traw” lub “walką stu traw”. Wyrosła ze zbierania ziół leczniczych. Ma dwie główne odmiany: “walkę uczoną” i “walkę zbrojną”. W “walce uczonej” gracze wymieniają nazwy kwiatów i ziół w parach równoległych wersów, a wygrywa ten, kto zna ich więcej; w “walce zbrojnej” zaczepia się o siebie łodyżki albo ogonki liści i ciągnie, a przegrywa ten, czyja się zerwie."}
 {"k": "c190a76bd46ff21a", "pl": "Włącz tryb moistycznego rzemiosła i postaw co najmniej dwa elementy. Najpierw wejdź w tryb budowy"}
@@ -1762,6 +1764,7 @@
 {"k": "c33d2d4a14231e57", "pl": "#YPiwnica Blissful Retreat#E"}
 {"k": "c33d4527d641fe83", "pl": "Warunki zgłoszenia"}
 {"k": "c33e891e024abd1a", "pl": "Nie trzeba było go puszczać. Ale żałować może tylko żywy… Jak człowiek umrze, to umarł i nie ma nic!"}
+{"k": "c33f0844f82e6f65", "pl": "Gdzie idziecie?"}
 {"k": "c33f40ba53cb787e", "pl": "…Brat Biao i siostrzyczka Biao?"}
 {"k": "c33f8711fe2c37b0", "pl": "Liu Siniang"}
 {"k": "c33fd3ed36b08523", "pl": "Ech… bajdurzysz trzy po trzy."}
@@ -2225,6 +2228,7 @@
 {"k": "c4136cc8ecdd70ee", "pl": "O ciotkę Han"}
 {"k": "c41389f226a18c82", "pl": "Dziki kwiat w dwóch barwach, złotej i srebrnej. Można go użyć jako leku.\n\nZwany też złoto-srebrnym pnączem, pnączem mandarynek albo pnączem czapli. Pnie się i nie więdnie przez zimę, stąd nazwa rendong, “znoszący zimę”. Kwitnie w trzecim i czwartym miesiącu; świeżo rozwinięte kwiaty mają białe pręciki i płatki, a po dwóch, trzech dniach żółkną. Stare i nowe kwitną razem, żółć i biel odbijają się w sobie, dlatego zwą go kwiatem złota i srebra. Studzi gorąco, usuwa trucizny i rozprasza wiatr i gorąco."}
 {"k": "c413b93af0d21f39", "pl": "Przyciski kierunków góra, dół, lewo i prawo to odpowiednio {}{}{}{}.\nGdy ikona konia znajdzie się w polu, #Ynaciśnij odpowiedni przycisk#E.\nAby oswoić konia, wykonaj zadanie poprawnie."}
+{"k": "c414269426f5604c", "pl": "Poszedł stąd, nie wtrącaj się."}
 {"k": "c41473ba2f05d5d0", "pl": "Pani Fang"}
 {"k": "c41483b04a308542", "pl": "No właśnie, jestem jeszcze młoda, po co mi w głowie te miłosne wzdychania?"}
 {"k": "c415e4563be81e15", "pl": "Wiatr w lesie, wąski księżyc zachodzi; rosa na szatach, czysta cytra rozłożona.\nUkryta woda płynie ścieżką kwiatów, wiosenne gwiazdy otaczają chatę krytą strzechą."}
@@ -2644,6 +2648,7 @@
 {"k": "c4cb92e15d0b2837", "pl": "Pogadaj ze starszą siostrą"}
 {"k": "c4cccf9f2afb740f", "pl": "Lou Xiaoying"}
 {"k": "c4cd4d5604ccdf8d", "pl": "Zezwól na interakcję: księżyc 1"}
+{"k": "c4cd99be8ddf349a", "pl": "Ej, czemu zmiana jeszcze nie przyszła?"}
 {"k": "c4cdaf0809df50ee", "pl": "Wysoki wazon"}
 {"k": "c4ce1858843536bc", "pl": "Fu Daxing"}
 {"k": "c4ce5bf37fc99bde", "pl": "Podsłuchaj rozmowę służek"}
@@ -2760,10 +2765,12 @@
 {"k": "c505bb7d52a6343c", "pl": "Pchnij i otwórz drzwi"}
 {"k": "c50648a5c04c631b", "pl": "No dobrze, przepraszam, przepraszam! Chodź szybko!"}
 {"k": "c50711c15c25bbf7", "pl": "Pan Shi nagle atakuje. Na szczęście w porę zjawia się Yingying i przyjmuje cios na siebie, osłaniając cię.\nYingying odpowiada gradem miedzianych monet, a na ramiona spływają jej złote włosy: to ona jest Paniczem ze Wschodniej Bramy, którego tak długo szukasz!\nPan Shi wyjawia, jak Panicz ze Wschodniej Bramy stracił władzę i siłę wewnętrzną. Yingying resztkami sił każe ci wyprowadzić wszystkich w bezpieczne miejsce."}
+{"k": "c5073ff22594588c", "pl": "Haha, hahaha..."}
 {"k": "c50848327e2dd397", "pl": "Zakończenie 2"}
 {"k": "c5087ac66af04fd8", "pl": "Przybywa do Kaifengu, złotem sypie hojnie!"}
 {"k": "c5088ac9bc18377b", "pl": "Nie martw się, A'zu…"}
 {"k": "c508bb607ac390d8", "pl": "Chłopiec z Miotłą - seria 01 - taniec wiśni"}
+{"k": "c509cc224da86a12", "pl": "Chyba się upiłeś — widziałeś Hazardowego Świętego z Kaifengu?"}
 {"k": "c50b00679eed6aba", "pl": "Zheng E F1 - blok z prawej"}
 {"k": "c50b0e773ab1b62d", "pl": "Jezioro Serca: obszar drogowskazu Tysiąca Nocy 2"}
 {"k": "c50b1f8a2acb2012", "pl": "Uczeń kultu Xuanyuan, niezbyt towarzyski i dość tajemniczy."}
@@ -3448,6 +3455,7 @@
 {"k": "c647cf86315fd9c5", "pl": "Niewidzialność na starcie"}
 {"k": "c648e9c27abd3567", "pl": "Skrzynia Czopowa P 2 - 8"}
 {"k": "c649858a82aee12d", "pl": "Otwarta książka"}
+{"k": "c64a1e43931323a1", "pl": "Ech, na południu też niespokojnie!"}
 {"k": "c64a2fcd26a41743", "pl": "Sprawiedliwość w przebraniu"}
 {"k": "c64a68857676af53", "pl": "Opowieść o Yi Dao i młodym bohaterze."}
 {"k": "c64a8f874a25e66e", "pl": "Otrzymujesz 7 odświeżeń ważnych tylko w tej turze, przez 4 tury"}
@@ -4227,6 +4235,7 @@
 {"k": "c7ad7d43860ca7b8", "pl": "Gan Chuanpu"}
 {"k": "c7ada74ab4272adc", "pl": "Wiatr ciepły w pełni lata, czas na wspólne zabawy. Jaskółeczka specjalnie przygotowała “Woreczek niespodzianek: Lekkie Białe Pióra”, by zabawić You Xia."}
 {"k": "c7ae1a44e0a79f95", "pl": "Życzenie przyjąłem, teraz pokaż mi swoją szczerość."}
+{"k": "c7ae271a82de441e", "pl": "Ty, dziewczyno, masz więcej rozumu niż ci panicze, co tylko mówią „ładnie, ładnie”."}
 {"k": "c7ae8bdd194c626c", "pl": "To ty? Co cię tu sprowadza?"}
 {"k": "c7aef95e584979f0", "pl": "You San'er"}
 {"k": "c7af64d315a0d87b", "pl": "Tong Liang"}
@@ -5652,6 +5661,7 @@
 {"k": "ca4c214b10e80ce9", "pl": "Nieśmiertelny z jeleniem długowieczności - dźwięk 3"}
 {"k": "ca4cb3b4ad2421dd", "pl": "Zwinny krok. Wybuch qi"}
 {"k": "ca4ce861607241e0", "pl": "Uczeń Hali Orki i Nauk, który na polu szczypioru marzy o powrocie do czasów Walczących Królestw i podbiciu świata dzięki wiedzy rolniczej."}
+{"k": "ca4d06a8569c5112", "pl": "Masz jeszcze gwoździe? Kilka na gwałt!"}
 {"k": "ca4d08827e1cf499", "pl": "Waga Serca"}
 {"k": "ca4db0043df178c4", "pl": "Hexi: obszar 2 poziomu - Przełęcz Yumen"}
 {"k": "ca4f4d931cd05717", "pl": "Wahania Zdrowia"}
@@ -5697,6 +5707,7 @@
 {"k": "ca62103e51939d6d", "pl": "List od An Ya"}
 {"k": "ca6292ef678d9e9e", "pl": "Wyzwanie przełomu X"}
 {"k": "ca6341d5820f62a7", "pl": "Ye Wanshan (grupa): Niegasnący Ogień Wojny"}
+{"k": "ca64fc0030742baa", "pl": "Hik... jeszcze miskę... panno Chunhua..."}
 {"k": "ca653808e114b5bb", "pl": "Ech, początek lata powinien być czasem rywalizacji o nagrody, a teraz słychać tylko wiatr zgrzytający na murach miasta…"}
 {"k": "ca68d0b6da547fb5", "pl": "Każdy nosi maskę; tylko jedne maski widać, a innych nie."}
 {"k": "ca6911e69f94acb4", "pl": "Łamigłówka z Puchową Trawą - Puchowa Trawa na kole wodnym, podwójne 6"}
@@ -6114,6 +6125,7 @@
 {"k": "cb18cd90ba745cc7", "pl": "Uczeń Przystani Słowa, który po niedawnym przetasowaniu obowiązków miał szczęście wylosować dobry los i został przydzielony do Jadalni; często zakrada się na zaplecze, by podjadać, i widać już, że przybiera na wadze."}
 {"k": "cb1b7e9ebe9e3c63", "pl": "Odprowadzasz wzrokiem Xue Chou i ucznia Dziewięciu Nurtów zwanego Kongkong'erem, aż znikają w mroku nocy. Serce ściska ci niepokój: gdzie teraz jest ciotka Han? Czy nic jej nie jest? Zimny księżyc milczy, wiatr nie poniesie wieści. Zaciskasz dłoń na broni: nie pytając, co cię czeka, pójdziesz naprzód."}
 {"k": "cb1bbcc2bde8592c", "pl": "Wieloosobowo: Wąż Chwytający Chmury - 5 graczy"}
+{"k": "cb1cb3757a050d1e", "pl": "Jak myślisz, co łączy Złodzieja Gwiazd z naszym panem?"}
 {"k": "cb1ce72f7b54ac1e", "pl": "W Hangzhou i okolicach"}
 {"k": "cb1d94839e82d50d", "pl": "Uruchom czytanie wiatru"}
 {"k": "cb1e8475832d0b1e", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Deszcz w Porę lub Osmantusowy Księżyc (st. 56) w jakości niebieskiej lub fioletowej. Polecany dla ścieżki #YKruszenie Skał: Potęga#E."}
@@ -6151,6 +6163,7 @@
 {"k": "cb2f3b45c7a74252", "pl": "Pomów z uczniem przy wejściu"}
 {"k": "cb2f58cf975d7ba9", "pl": "Złoty Kolos - obszar efektu mgły"}
 {"k": "cb30b64c7391e9b0", "pl": "Lodowa rzeźba: Świecąca Perła"}
+{"k": "cb30dc4e73ee4c70", "pl": "Guibao, przynieś kilka koszy oleju tungowego!"}
 {"k": "cb30e1d932d5f100", "pl": "Stary tajny list"}
 {"k": "cb313c8f33866c4f", "pl": "E tam, czcze… czcze słowa! A właśnie, jak dawno magazyniera Du nie było?"}
 {"k": "cb319814c2f2ef08", "pl": "Odszukaj starego przyjaciela starszego Studni Niebios"}
@@ -7943,6 +7956,7 @@
 {"k": "ce7181125ba3759d", "pl": "Ocena w toku…"}
 {"k": "ce723b55fcd11b6d", "pl": "Podniosłam cię tylko z pobocza."}
 {"k": "ce7244408b239958", "pl": "Potem przejdziesz do innego wielkiego tartaku i zapłata pójdzie w górę jak na drożdżach! Teraz trzeba trochę dołożyć, ale przyszłość jest świetlana!"}
+{"k": "ce72e4c9ca0dee90", "pl": "Ech, szkoda moich piwonii, ci ludzie je zniszczyli!"}
 {"k": "ce72f0a87d44d0e8", "pl": "Odszukaj swoją komnatę"}
 {"k": "ce74af0811c2610b", "pl": "…Moja Śnieżka, którą wychowałem w trudzie i znoju, porwana przez Upiorną Panią, żeby była jej upiornym dzieckiem, uuu… $T(3110), każde moje słowo to prawda. Jak nie wierzycie, zajrzyjcie do mojej izby."}
 {"k": "ce74c37fa18500c5", "pl": "Bracia Bai wcale nie chcieli zagarnąć nagrody dla siebie - po prostu uważali, że Chang Buxiu daje za dużo zadośćuczynienia rodzinom poległych braci, i stąd wziął się spór. Oni też mają swoje racje. Spraw jianghu doprawdy nie sposób rozsądzić."}
@@ -8464,6 +8478,7 @@
 {"k": "cf64369d5e67e461", "pl": "Dawne miejsce Wioski Morelowej"}
 {"k": "cf6455a77acd61fb", "pl": "Kamień węgielny           "}
 {"k": "cf64c02a602a9d81", "pl": "Przywilej odblokowuje się, gdy Urok osiągnie etap Lśniącej Poświaty."}
+{"k": "cf64efb274ca0fd2", "pl": "Dwóch pijaków, i tu przyszli pić."}
 {"k": "cf6646f6e31558e2", "pl": "Liu Wielka Stopa"}
 {"k": "cf66a6d367fa20ad", "pl": "Skrzynia broni: Splecione Gwiazdy, st. 71"}
 {"k": "cf672efd3f0b89f2", "pl": "Muchuang-1"}
@@ -8532,6 +8547,7 @@
 {"k": "cf8490a9873a0cf6", "pl": "Scena czwarta — interakcja z Cai Hongiem"}
 {"k": "cf84eac341f62cc7", "pl": "Czyli od chwili, gdy pana porwał, do chwili, gdy postawił na ziemi, wcale nie widział pan Pana Orła na własne oczy!"}
 {"k": "cf8561f564cd1112", "pl": "Potoczny Mówca"}
+{"k": "cf85a228b3e43915", "pl": "A co tam! I tak nikt go naprawdę nie widział..."}
 {"k": "cf868ca30e017603", "pl": "- Qing, Zou Bingtai, “Gawędy z Pawilonu Południowego Wiatru”"}
 {"k": "cf87079cb10b2e7d", "pl": "Pewien młodzieniec w Ukrytej Górze, że się upierał przy trzymaniu kota, został wygnany z domu. Prosi cię, byś wraz z nim przekonał rodziców — aliści wynik snać będzie nie taki, jako myśli…"}
 {"k": "cf878b3bb99eca05", "pl": "Wewnątrz hełmu jest wypukły napis pismem pieczęciowym, który podaje imię dowódcy oddziału."}

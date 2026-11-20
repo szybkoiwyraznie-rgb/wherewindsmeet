@@ -288,6 +288,7 @@
 {"k": "107dd6971ae9b5d5", "pl": "Orzeł nad Qinghe"}
 {"k": "107e5c855221e27f", "pl": "※ Losowo otrzymasz jedno z poniższych wzmocnień"}
 {"k": "107ebcae35ed2d3e", "pl": "Odbierz chustkę ludziom ze Złotego Pawilonu"}
+{"k": "107ebfa7907e76f2", "pl": "O, jaka werwa! Coś dobrego się stało?"}
 {"k": "107ec1c34603cdda", "pl": "Nagolenniki"}
 {"k": "107ee800830f5528", "pl": "Wyskakująca strona do czytania — strzępek karty (2)"}
 {"k": "107ef9062e3195cc", "pl": "Wei Meng"}
@@ -1637,6 +1638,7 @@
 {"k": "12f1f6cb36c8ca20", "pl": "Cecha karwaszy: legendarna 1"}
 {"k": "12f2b5b5af7e8f50", "pl": "Złota Ropucha - Ryczące Piaski 7"}
 {"k": "12f3112bbba3d85f", "pl": "Szpaki mynah wypowiadają słowa, od których cierpnie skóra. Sądząc po obrączkach, ktoś je celowo chowa.\nCzyżby górskie duchy trzymały je w niewoli?"}
+{"k": "12f3179e2a81133c", "pl": "Ojej, nie pchajcie się! Popatrzcie na loże na drugim piętrze, prosto na lampion — chcecie widzieć, to tam!"}
 {"k": "12f374d7572cbefd", "pl": "Ciało jest drzewem bodhi, umysł — zwierciadłem jasnym. Zwierciadło jest czyste — gdzież osiadłby pył?"}
 {"k": "12f46a49c48b5a7f", "pl": "Talerz"}
 {"k": "12f47da698799748", "pl": "Tian Wen"}
@@ -2398,6 +2400,7 @@
 {"k": "14464a7b75e39577", "pl": "Notatki spisujące doświadczenia w leczeniu, wyłącznie dla wędrownych lekarzy Zielonego Potoku."}
 {"k": "1446947cced2c71d", "pl": "Zobacz, co u Yuanyuan"}
 {"k": "1446c39d2cff84f8", "pl": "Geografia: Przysiółek Rączych Koni"}
+{"k": "1447a870626f4da7", "pl": "Mów ciszej, co jeśli ktoś usłyszy."}
 {"k": "1447e99c8a504c87", "pl": "Pytanie do Ciebie"}
 {"k": "1448034e53f46250", "pl": "Ukończ „Powrót na Obłoczny Szczyt: wstąpienie w przestworza”"}
 {"k": "14484cdc18239a1e", "pl": "Oddajesz raport ze śledztwa jako dowód Zhou Chengguanowi. Zgodnie z prawem Stary Li trafia do lochu, a Zhou Chengguan przysięga, że po tym tropie wyrwie z korzeniami miejską melinę, gdzie potajemnie zarzyna się i sprzedaje woły orne."}
@@ -2765,6 +2768,7 @@
 {"k": "14eb443f50ac0b3c", "pl": "Pieśni i tańce Upojnego Cienia sławne są w całym świecie. Goście Upojnego Cienia z różnych państw zjeżdżają z dalekich stron do Kaifengu, by wspólnie ucztować."}
 {"k": "14eb6a41750ee41f", "pl": "Czcigodny Źródła Światła"}
 {"k": "14ebbbbc5bd2fece", "pl": "Do krainy umarłych."}
+{"k": "14ec2ed6fc82645e", "pl": "Niech będzie, poczekaj chwilę."}
 {"k": "14ece261d9efdcb4", "pl": "Korekta zaawansowana poz. 97: Brzęk Stali · Cień"}
 {"k": "14ecfc6810cce71d", "pl": "Przełom: wzm. St. 3"}
 {"k": "14ed6616d26fa28f", "pl": "Zwłoki dziewczynki B"}
@@ -3167,6 +3171,7 @@
 {"k": "15acb2de842fccbb", "pl": "Uczeń Przystani Słowa, skłonny do niedbałości."}
 {"k": "15ad0b65c2def842", "pl": "Szkarłatny los krwi: Śmierć"}
 {"k": "15ad41b7725b7e8f", "pl": "Pozłacany domokrążca"}
+{"k": "15ad44eebf59745d", "pl": "Jeszcze nas nie znasz? Za dziesięć odwagi nie odważyłbym się drukować gazetki!"}
 {"k": "15ad6422ffe33933", "pl": "Wróć do miejskiej bramy"}
 {"k": "15ae12525751856b", "pl": "Ten panicz chełpił się, że wykupi wszystkie kwiaty na dziesięć li wokoło."}
 {"k": "15ae764c0b1bf2e3", "pl": "Hau, hau, hau, hau, hau!!"}
@@ -3386,6 +3391,7 @@
 {"k": "161871e79ed7c1e1", "pl": "Odbierz poprzednią nagrodę"}
 {"k": "1619e7957eed0fae", "pl": "Zapisane po zdobyciu skrzydeł latawca"}
 {"k": "161b694dba94bcda", "pl": "Nóż myśliwski 2"}
+{"k": "161b6dd50b76648a", "pl": "Mówisz, że twoja kuzynka Fuling i Song Yu są zaręczeni już jakiś czas,"}
 {"k": "161b783ced701a8f", "pl": "Rozmawiaj z Ai Mei (opcjonalnie)"}
 {"k": "161be7d8043f9e77", "pl": "Pamiątka z zajazdu 3"}
 {"k": "161c32a2b7678de0", "pl": "\nTen wisi najniżej ze wszystkich papierowych latawców — złożony nieco niezgrabnie, ale wielkie znaki „Mi” wyglądają znajomo.\nPo rozłożeniu widać życzenie dziecka —\nJa, Mi, razem z Su, zostaniemy jednym z Trzech Wybitnych Szkoły Moistów!\nPod spodem uwaga pismem bieżącym —\nTo wam brakuje jeszcze jednej osoby. Mi, staraj się znaleźć trzeciego towarzysza."}
@@ -3644,6 +3650,7 @@
 {"k": "1694046c3423e9f4", "pl": "Czułość pod pancerzem"}
 {"k": "169413c76c71f69d", "pl": "Za ten dar Trupie Ostrze przysiągł, że nigdy nie podniesie tego miecza na Zhong Wangchou. Ech, pewnie i on nie przewidział, że po latach przyjdzie mu walczyć z Zhongiem na śmierć i życie i będzie musiał rzucić miecz i bić się gołymi pięściami."}
 {"k": "16961154e5495eea", "pl": "Porozmawiaj ze starszym Yangiem"}
+{"k": "1696960792b1ab14", "pl": "Owszem, list z domu — urodziła się córka, matka i dziecko zdrowi."}
 {"k": "1696cbcab2429e78", "pl": "Rozmawiaj z ową trójką i zbieraj ślady"}
 {"k": "1696f42dfa30fed3", "pl": "Trumna w górę, fortuna w ręce."}
 {"k": "16977c50b778c7bb", "pl": "Przepustka: sezon 2"}
@@ -4081,6 +4088,7 @@
 {"k": "17719f9fbe7a8f08", "pl": "Jedna przysięga złożona, jedno pragnienie spełnione, setki i tysiące bohaterów zawarło braterstwo krwi. Kilka kresek, gdy fałsz udawał prawdę, nie skryje tego, co w sercu. Choćby skrawka gór i rzek nie oddamy, nawet za cenę życia; przegnamy północnych najeźdźców i odbijemy Yan i Yun."}
 {"k": "1771aa7887e1a4a8", "pl": "Obszar alarmowy na 1 piętrze (zwijanie kości)"}
 {"k": "1771c85ebfa1b66e", "pl": "Nuty xiao"}
+{"k": "1772534d6e82c084", "pl": "Co się dzieje z twoim koniem! Wciąż się łasi do mojej Fangfang!"}
 {"k": "1773526d896a3660", "pl": "Taktyki Jianghu chenxin18"}
 {"k": "17739d50e7ba86d0", "pl": "Zresztą co z tego, że szczere? Czy w twoich oczach szczere uczucie to jakaś wielka rzadkość?"}
 {"k": "1773afb1305aca48", "pl": "Tryb niedostępny w tej sekcie."}
@@ -5425,6 +5433,7 @@
 {"k": "19d047387776f7bc", "pl": "Komu brak włosów, ten wstydzi się, gdy straci perukę."}
 {"k": "19d09f481c64951d", "pl": "Mały, zakurzony woreczek — w środku jajadem koń i kartka bez podpisu.\nNa kartce:\nPożyczę konia na trzy lata — zwrócę parę. Twoja prawość, panie, wyryta mi w sercu na zawsze."}
 {"k": "19d0f2b3e3423f98", "pl": "Ech, ty, ty, rozumu ci brak?"}
+{"k": "19d16353830fe1f5", "pl": "Przestań się głupio uśmiechać! Odpocząłeś — wracaj do roboty!"}
 {"k": "19d2441e71c31f7b", "pl": "Klient przed sklepem 2"}
 {"k": "19d3024a26ff4752", "pl": "Zapisane za dnia w okolicy Klasztoru Wczesnego Przebudzenia po rozmowie z Gu Pu"}
 {"k": "19d34853dd69ef3f", "pl": "“Siedząc, patrzę na chmury i wody” to melodia, którą mędrzec Cen ułożył na wysokiej górze nad Przystanią Nieśmiertelnych, patrząc w górę na chmury na niebie i w dół na płynące wody. Brzmi w niej oderwanie od marności świata i zdanie się na naturę, a przez to i jego przekonanie: “gdy świat zszedł z drogi, odejdź w ukrycie”."}
@@ -6317,6 +6326,7 @@
 {"k": "1b6f56ef266edf5e", "pl": "Tysiącletni Prom - Jin Shijie - Lina Wiodąca Ostrze - kopnięcie w czerwonym blasku"}
 {"k": "1b6fba106c5f2697", "pl": "Rozpoczęto partię madżonga"}
 {"k": "1b7020b7d82a08c0", "pl": "Wędrowny medyk"}
+{"k": "1b70f58eb2791459", "pl": "Dobrze, meldujcie na bieżąco każde ślady."}
 {"k": "1b71452873c7c418", "pl": "Na tych wodach handel cudzym życiem nazywa się “łowieniem złotych kwiatów”. Jeśli jakiś wodny zbój zechce przyjąć zlecenie, wiesza na puszczonym na wodę złotym kwiecie tabliczkę ze swoim przydomkiem."}
 {"k": "1b717150d221a2e5", "pl": "Niebo ciemnieje, a nefrytowy dysk się kruszy"}
 {"k": "1b71b3e19b8d2c0c", "pl": "Rozmieść"}
@@ -6488,6 +6498,7 @@
 {"k": "1bc00e4c641ae310", "pl": "Uderzenie w Ziemię"}
 {"k": "1bc04e6e03471ad9", "pl": "Ta sztuka nazywa się Fletem Tysiąca Fal. Kto zrozumie jej tajniki, może dźwiękiem fletu przesyłać głos, władać wiatrem i przemierzać piaski."}
 {"k": "1bc0896214bd6672", "pl": "Oddaj podobizny Mo Yuwangowi"}
+{"k": "1bc0acdbbcea978e", "pl": "Widok Jeziora Yan naprawdę nieziemski..."}
 {"k": "1bc179605085ecbf", "pl": "Niedźwiedzie zadanie"}
 {"k": "1bc17c2edfeef075", "pl": "Wieloosobowo: Stary Flisak P3, pismo - wobec"}
 {"k": "1bc1b33c85baff21", "pl": "Boczne poły (dół)"}
@@ -6773,6 +6784,7 @@
 {"k": "1c45b4998eb307d5", "pl": "Zapis Snu o Konfucjuszu"}
 {"k": "1c462308b734ebc6", "pl": "Spójrz w lustro"}
 {"k": "1c466380581c1bd0", "pl": "Dawna cena transakcji"}
+{"k": "1c4774eed661f559", "pl": "Używamy bambusa z gór Shanyin, rosnącego po kilka lat — bardzo sprężysty!"}
 {"k": "1c480cdd92da7d4a", "pl": "Starannie przyrządzona pieczona bułka"}
 {"k": "1c484c997b534c52", "pl": "Orzeł potrafi spać z jednym okiem otwartym, więc trzeba pilnować obu stron. Tak przez trzy, cztery dni. Pomacasz mu pierś: schudł. Spojrzysz w oczy: już nie dzikie, bez ognia, patrzy łagodnie. Wtedy orzeł jest twój."}
 {"k": "1c4867b187d22a2e", "pl": "Kaplica Generała, podziemia poziom 3 - 5"}
@@ -7707,6 +7719,7 @@
 {"k": "1e098bf8a4d342aa", "pl": "Kusznik"}
 {"k": "1e09929df5eb1de4", "pl": "Uratuj wieśniaka z jaskini"}
 {"k": "1e0a65fbf52a51cc", "pl": "Zniszczony chwost od miecza, lecz wciąż widać, jak misterny był niegdyś.\nWyniosła panienka zrzekła się kiedyś całej swej dumy dla ukochanego.\nPrzy kaganku, by wywołać jego uśmiech, z całych sił wyćwiczyła swój kunszt.\nNiestety bezlitosna wojna ich rozdzieliła.\nA teraz, gdy znów się spotkali, gorycz zamyka jej usta i w trwodze nie śmie dać się poznać."}
+{"k": "1e0a80d2b779e070", "pl": "Przecież wiesz, że siostry Fuling zajęte są prowadzeniem Przytułku Błogosławieństwa,"}
 {"k": "1e0a957a250533cd", "pl": "Weng Zhiyi"}
 {"k": "1e0afdfa902731f2", "pl": "Lek regulujący krew: pobudza jej krążenie, usuwa zastoje, rozprasza zgrubienia i uśmierza ból."}
 {"k": "1e0b43c80540b799", "pl": "Tabliczka Stu Kwiatów w Boju"}
@@ -8230,6 +8243,7 @@
 {"k": "1eea44bb2e05cf83", "pl": "Orkiestra starców"}
 {"k": "1eea78ca49c6c4c3", "pl": "Xue Ji, Feng Qizheng"}
 {"k": "1eea8a6f41494087", "pl": "Korozja"}
+{"k": "1eeb5d3056e2d199", "pl": "My, robotnicy, choć zarabiamy na chleb w pocie czoła, też musimy umieć odpocząć, nie?"}
 {"k": "1eec09966a1f26db", "pl": "Żebrak Cao"}
 {"k": "1eec7051705cbd60", "pl": "Kaifeng - Upojny Cień - Gałązka Cynamonowca 3"}
 {"k": "1eec73ae8d89a81c", "pl": "Późną nocą po wyprawie do hanowego grobowca z podwórza Zhuge Feifei dobiega pijacki, wesoły gwar…"}
@@ -8494,6 +8508,7 @@
 {"k": "1f61824dd4508b8f", "pl": "Xiao Zhao z książką z Targu Duchów przychodzi do ciebie, przysięgając, że dotrze do prawdy o rycerzu z powieści… I tak zaczyna się wasza — pełna wrzawy i kurzu — przygoda w Qinghe."}
 {"k": "1f61870d56532b4e", "pl": "Portal 5-1"}
 {"k": "1f61a91a9858e951", "pl": "Wejdź w miejsce wspomnienia"}
+{"k": "1f6283330c12a13a", "pl": "Widać, że już wkrótce otworzą kanał i popłynie woda."}
 {"k": "1f62cd790bff49b6", "pl": "Służy do wymiany przedmiotów w sklepie przepustki bojowej."}
 {"k": "1f62d3d1e683d7a0", "pl": "Song Xiaozhuang"}
 {"k": "1f62dd2172e9a191", "pl": "Stojak na kaligrafie"}
