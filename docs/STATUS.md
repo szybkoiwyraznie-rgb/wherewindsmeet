@@ -125,6 +125,15 @@ Import próbny i właściwy bez odrzuceń; skan 40 pozycji bez CJK i nie-NFC,
 z zachowaniem liczby podziałów wierszy. Kontrola repozytorium OK; 623 testy
 wykonano przed `hz`. Przekład AI-tymczasowy, bez testu w grze.
 
+**Kontynuacja `ia`–`ig`:** 583 dalsze przekłady powiązanych scen grupy
+5208; magazyn **138 360** przekładów, **489 544** miejsca (28,26%). Sonda
+obejmuje 720 różnych bazowych kluczy scen i wskazuje jeden nieuzupełniony
+klucz `36a9e7f1c95b82ff`, którego źródło to spacja. Nie oznacza to pełnego
+przekładu innych tekstów zadań. Każda partia przeszła suchy i właściwy
+import bez odrzuceń. Skan 583 pozycji: bez CJK i nie-NFC, liczba podziałów
+wierszy zgodna ze źródłem. **623 testy OK**, kontrola repozytorium OK
+(626 wpisów indeksu). Przekład pozostaje AI-tymczasowy, bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

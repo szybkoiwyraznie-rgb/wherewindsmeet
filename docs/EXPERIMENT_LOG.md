@@ -2746,3 +2746,14 @@ bez CJK i nie-NFC, liczba podziałów wierszy zgodna ze źródłem. Po imporcie
 sonda wskazuje jeszcze 584 brakujące bazowe klucze powiązanych scen tej
 grupy, bez oceny innych tekstów zadania. Kontrola repozytorium OK; 623 testy
 przeprowadzono przed tą partią. Przekład AI-tymczasowy, bez testu w grze.
+
+**Poselstwo i Hexi (`ia`–`ig`):** 81 + 78 + 81 + 75 + 81 + 82 + 105
+= 583 nowych przekładów, magazyn 138 360, 489 544 miejsc (28,26%). Suchy
+i właściwy import każdej partii bez odrzuceń; poprawiono również nazwę
+Rozdzieracza Świtu po sprawdzeniu istniejącego przekładu. Sonda grupy 5208
+obejmuje 720 różnych bazowych kluczy dostępnych scen; pozostał jeden brak
+`36a9e7f1c95b82ff` (źródło to spacja), celowo pominięty. Nie oznacza to
+kompletności pozostałych tekstów zadań. Skan 583 pozycji bez CJK i nie-NFC,
+liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
+repozytorium OK (626 wpisów indeksu); przekład AI-tymczasowy, bez testu
+w grze.
