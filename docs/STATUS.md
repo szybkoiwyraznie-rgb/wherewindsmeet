@@ -162,6 +162,15 @@ odrzuceń; skan 110 pozycji bez CJK, nie-NFC i miękkich dywizów, podziały
 wierszy zgodne ze źródłem. **623 testy OK**, kontrola repozytorium OK
 (635 wpisów indeksu). Przekład AI-tymczasowy, bez testu w grze.
 
+**Kontynuacja `iq`–`ir`:** 144 nowe przekłady scen grup 5029, 5025,
+5032 i 5095. Magazyn **139 120** przekładów, **489 544** miejsca (28,42%).
+Sonda dostępnych bazowych kluczy powiązanych scen: odpowiednio 77, 27,
+24 i 26 kluczy, bez braków; nie obejmuje pozostałych tekstów zadań.
+Importy i poprawki bez odrzuceń; skan 144 pozycji bez CJK, nie-NFC i
+miękkich dywizów, liczba podziałów wierszy zgodna ze źródłem. **623 testy
+OK**, kontrola repozytorium OK (637 wpisów indeksu). Przekład AI-tymczasowy,
+bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

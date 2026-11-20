@@ -2783,3 +2783,11 @@ importy oraz poprawki bez odrzuceń. Sonda dostępnych scen grup 5246, 5017,
 bez badania pozostałych tekstów zadań. Skan 110 pozycji bez CJK, nie-NFC
 i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem. 623 testy
 i kontrola repozytorium OK (635 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Młoty, smok, zabójca i wilk (`iq`–`ir`):** 73 + 71 = 144 nowe
+przekłady; magazyn 139 120, 489 544 miejsc (28,42%). Próby suche, importy
+i poprawki bez odrzuceń. Sonda scen grup 5029, 5025, 5032, 5095: 77, 27,
+24, 26 dostępnych bazowych kluczy, bez braków; nie obejmuje pozostałych
+tekstów zadań. Skan 144 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(637 wpisów); AI-tymczasowe, bez testu w grze.
