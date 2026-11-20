@@ -37,6 +37,17 @@ ich z góry. Wniosek: runda 7 = sceny wątku głównego 燕南
 (2 053 klucze, ~26 partii po 80) + `guider_tujian_data` (1 516);
 tabele całomapowe dopiero na żądanie.
 
+**Runda 7 w toku (2026-11-19):** dialogi sceniczne wątku głównego 燕南.
+Lista kluczy jest reprodukowalna: `tools/lista_rundy7.py` (kolejność:
+zadanie → scena → kwestia; identyfikatory wariantów płci zwijane do klucza
+bazowego przez `indeks.warianty`). Razem **1 815** kluczy; zrobione
+**560** (partie `ga`–`gf`, magazyn **134 878**). Zostało 1 255.
+Konwencja nazw obowiązująca w dialogach: 墨门 → „Szkoła Moistów”,
+墨山道 → „Szkoła Mo”/„Szkoła Moistów”, 巨子 → „Wielki Mistrz” (żeńsko
+„Wielka Mistrzyni”), 长老 → „starszy”/„starsza”, 兼爱 → „powszechna
+miłość”, 飞天城 → „Latające Miasto”, 金乌窠 → „Gniazdo Złotego Kruka”,
+司南剑客 → „Szermierz z Kompasem”, 孤云 → „Samotna Chmura”.
+
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
 `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md`
