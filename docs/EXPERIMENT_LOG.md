@@ -2576,3 +2576,10 @@ Terminy: 悬壶→Uzdrowiciel · 牙行→dom pośrednictwa · 心法/内功→d
 wewnętrzna/siła wewnętrzna · 帮派→gildia · 堂主→przełożony Sali ·
 聚义厅→Sala Braterstwa · 精元→esencja życia · 百业等级→poziom fachu ·
 江湖→jianghu · 大相国寺→Wielka Świątynia Cesarska · 藏经阁→Pawilon Sutr.
+
+**Runda 6, ciąg dalszy: 3 837 z 5 229.** Partie `en`–`et` po 80
+(magazyn 132 366 → **132 926**, commit `71721c2`). Importy bez odrzuceń.
+Poprawka przed importem: `6f5a345` — sztuczne łamanie w środku słowa
+(无名 „Bez\nimienny”, 限定 „Limito\nwany”) scalone do „Bez imienia”
+i „Limitowany”. Terminy: 牙行→dom pośrednictwa · 风华录→kolekcja
+wyglądów · 聚义厅→Sala Braterstwa · 段位→ranga · 侠客行→Wędrówka Rycerza.
