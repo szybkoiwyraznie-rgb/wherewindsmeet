@@ -79,7 +79,7 @@
 — 16.
    klucz: 74ba07c5a6de4a39
    EN: You escape with Zheng, but are hit by debris and lose consciousness. When you wake up, you find yourself in the Luminous Tomb outside Sorrowfield Village.
-   PL: Ratując chłopca A Zhenga ucieczką z morza ognia, zostałeś trafiony spadającym głazem i straciłeś przytomność. Nie wiedzieć, ile czasu minęło, nim ocknąłeś się w grobowcu ródł poza Wsią Da’an.
+   PL: Ratując chłopca A Zhenga ucieczką z morza ognia, zostałeś trafiony spadającym głazem i straciłeś przytomność. Nie wiedzieć, ile czasu minęło, nim ocknąłeś się w Świetlistym Grobowcu poza Wsią Da’an.
 
 — 17.
    klucz: 74cbd83ec6f44a54
