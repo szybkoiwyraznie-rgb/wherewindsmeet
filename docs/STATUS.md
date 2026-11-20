@@ -5,8 +5,8 @@ akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
 **Najnowsze (wpis 22d w dzienniku):** runda 5 — **CELE ZADAŃ UKOŃCZONE,
 8 199 z 8 199**; `tasks_ending_data` **18/18**. Runda 6 (`ccs_text_msg`,
-5 229 braków) w toku: **4 157** zrobione (partie `cz`, `da`–`ex`).
-Magazyn **133 246**. Zostało 1 072. Następny krok: dalsze partie r6 po 80.
+5 229 braków) w toku: **4 477** zrobione (partie `cz`, `da`–`fb`).
+Magazyn **133 566**. Zostało 752. Następny krok: dalsze partie r6 po 80.
 Testy do odświeżenia na końcu rund.
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02

@@ -2590,3 +2590,9 @@ Poprawka przed importem: `b1aae67` — CJK w PL (`Nasze眼`) zamienione na
 „Nasze oczy rozsiane…”. Terminy: 投壶→rzut do dzbana · 轻功→lekkość
 ruchu · 鸣金→Uderzenie dzwonu · 万相集→Galeria Wszechrzeczy ·
 令名→tytuły sławy · 牙行→dom pośrednictwa · 庄园入梦→sen w posiadłości.
+
+**Runda 6, ciąg dalszy: 4 477 z 5 229.** Partie `ey`–`fb` po 80
+(magazyn 133 246 → **133 566**, commit `3626343`). Importy bez odrzuceń,
+`--na-sucho` 80/0 za każdym razem. Terminy: 绣金楼→Pawilon Złotego Haftu ·
+销金窟→Złoty Dom · 结义→zaprzysiężeni bracia · 访学→uczony w gościnie ·
+独孤求败→Mistrz bez równego sobie · 开蛊→rozpieczętowanie gu.
