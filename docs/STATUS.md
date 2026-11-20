@@ -85,6 +85,16 @@ tekstów. Skorygowano też wcześniejszą wskazówkę dotyczącą konia Nocna
 Warta. Importy i kontrola repozytorium bez błędów, **623 testy OK**.
 Przekład jest AI-tymczasowy i nie został przetestowany w grze.
 
+**Kontynuacja `hi`–`hq`:** dalszych **627** przekładów scen, w tym
+wspomnienia o wuju Jiangu, święta, spór poetów oraz historie z Liangzhou.
+Łącznie od `gz` dodano **1 170** przekładów; magazyn **137 254**,
+**489 544** miejsca (28,04%). Po sondzie grup objętych `hi`–`hq`
+pozostawiono celowo dwa niejasne klucze scen: `36a9e7f1c95b82ff`
+(oryginał to spacja) i `e270aeb347f21655` (oryginał `??`, EN „Channels”).
+Pozostałe dostępne w sondzie klucze tych grup nie wykazują braków.
+Sonda dotyczy tylko powiązanych scen, nie wszystkich tekstów zadań.
+623 testy i kontrola repozytorium OK po `hq`; brak testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

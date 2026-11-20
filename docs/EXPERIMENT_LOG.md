@@ -2695,3 +2695,19 @@ poprawiono zwrot do żółwia; w `hh` trzy sformułowania oraz wcześniej
 błędną wskazówkę zadania `9d3d4d3f856d74f0` o koniu Nocna Warta.
 Skan 543 linii PL: 0 CJK, 0 nie-NFC. `check_repository.py` OK (601 wpisów
 indeksu), 623 testy OK; przekład niesprawdzony w grze.
+
+**Dalsze sceny (`hi`–`hq`):** 61, 53, 86, 97, 82, 36, 75, 75, 62
+nowe przekłady — łącznie 627; z `ha`–`hh` razem 1 170. Magazyn 137 254
+przekłady, 489 544 miejsc (28,04%). Wybrano zadania grup 5159, 5163,
+5165, 5167, 5169, 5171, 5174, 5175, 5177–5179, 5181, 5194–5196, 5202,
+5207, 5210, 5211, 5216–5219, 5222, 5224, 5225, 5228, 5230, 5232–5234,
+5236, 5237, 5245, 5247, 5249; część to późniejsze historie, nie deklaracja
+wczesnej lokalizacji. Sonda kluczy bazowych scen z powiązań tych grup po
+`hq`: 716 przypisań do grup, 2 braki — `36a9e7f1c95b82ff` (spacja)
+i `e270aeb347f21655` (`??`, EN „Channels”). Pozostawiono je bez przekładu
+z powodu niejasnego źródła; sonda nie obejmuje pozostałych tekstów. Suchy
+i właściwy import każdej partii: 0 odrzuconych. Po imporcie ujednolicono
+Fanlou i Upojny Cień w `ho`/`hp` oraz nazwy miejsc w `hj`; poprawiono
+kwestię z tokenem w `hk`. Skan `ha`–`hq`: 1 170 linii PL bez CJK i bez
+nie-NFC. `check_repository.py` OK (610 wpisów indeksu), 623 testy OK;
+brak weryfikacji przekładu w grze.
