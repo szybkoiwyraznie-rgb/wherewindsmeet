@@ -3,6 +3,28 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+**Sprostowanie zakresu i stan (2026-11-19):** właściciel wskazał, że
+wcześniej zaproponowano sceny wczesnego wątku głównego oraz 1 516 braków
+`guider_tujian_data`, a nie tłumaczenie całej gry. Odpowiedź odnosząca się
+do 28,48% całej gry jako miary tego planu była myląca. Pierwotne ~2 053
+braki scen oparto na filtrze przestrzeni zadań, który nie dowodzi ani miejsca,
+ani kolejności sceny; nie jest to wiarygodny licznik wyłącznie wczesnej gry.
+Sonda głównych zadań grupy 1: 665 dostępnych bazowych kluczy powiązanych
+scen, 0 braków, bez dowodu kompletności całej pierwszej ćwiartki fabuły.
+Historyczny filtr `lista_rundy7.py` ma obecnie 853 braki, ale obejmuje też
+późniejsze lokacje i nie określa reszty uzgodnionego zakresu.
+
+`guider_tujian_data` po partii `iw`: **117/1 524**, **1 407 braków**
+(po głównym źródle klucza); wcześniejsze `gn`–`gp` dodały 71, a `iw` 38.
+To osobna tabela; `building_default_items` ma 2 143/2 650, 507 braków,
+nie wszystkie z nich muszą dotyczyć poradnika ani wczesnej gry. Kontynuować
+Compendium zgodnie z pierwotną propozycją; sceny dobierać na podstawie
+rzeczywistego kontekstu wczesnej gry, nie całej gry ani samego numeru grupy.
+Po `iw`: magazyn 139 440 przekładów; 623 testy i kontrola repozytorium OK
+(642 wpisy); import po próbie suchej bez odrzuceń. AI-tymczasowe, bez testu
+w grze. Wcześniejsze partie poza zakresem pozostają w magazynie; nie należy
+ich przedstawiać jako postępu w tym zakresie.
+
 **Najnowsze (wpis 22e w dzienniku):** **runda 6 UKOŃCZONA** —
 `ccs_text_msg` **5 282 z 5 282**, brak 0 (sonda domykająca; commit
 `f259028`, magazyn **134 398**). Partie `cz`–`fm` (w tym ostatnie

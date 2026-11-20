@@ -2799,3 +2799,17 @@ i 161 dostępnych bazowych kluczy, bez braków; nie obejmuje pozostałych
 tekstów zadań. Skan 282 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
 podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
 (641 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Sprostowanie obiecanego zakresu; Compendium `iw`:** wcześniejsze
+przedstawienie 28,48% całej gry jako odpowiedzi o pozostałym zakresie było
+mylące. Plan obejmował wczesny wątek główny i 1 516 ówczesnych braków
+`guider_tujian_data`. Pierwotny filtr przestrzeni zadań nie ustala położenia
+ani czasu scen i pierwotne ~2 053 nie jest pewnym licznikiem pierwszej
+ćwiartki. Obecnie historyczny filtr ma 853 braki, ale zawiera późniejsze
+sceny; w grupie 1 zadań głównych sonda dostępnych powiązanych scen ma 665
+bazowych kluczy i 0 braków, bez gwarancji pokrycia całej ćwiartki fabuły.
+`iw`: +38 haseł; `guider_tujian_data` 117/1 524, 1 407 braków. Osobno
+`building_default_items` 2 143/2 650, 507 braków po głównym źródle kluczy;
+nie należy przypisywać całej tabeli wczesnemu Compendium. Import i próba
+sucha bez odrzuceń, skan 38 pozycji OK, 623 testy i kontrola repozytorium
+OK (642 wpisy). Przekład AI-tymczasowy, bez testu w grze.
