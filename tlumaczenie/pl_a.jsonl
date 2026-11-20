@@ -1601,6 +1601,7 @@
 {"k": "a2be9765aedff2c7", "pl": "Mały kamień dostrojenia: Strażnik Śniegu"}
 {"k": "a2bf0b10adaff631", "pl": "Wydarzenie: Stroje i Gliniane Figurki"}
 {"k": "a2bf2d7a69899bfe", "pl": "Obszar nowicjuszy - zakaz drogowskazów"}
+{"k": "a2bf5b858607c476", "pl": "Wczoraj zarzuciłem sieć i wyciągnąłem wielką rybę, ale nim zaczęliśmy jeść, zabrała ją Starsza Siostra..."}
 {"k": "a2bfa4ee9d19ff64", "pl": "Zakończenie drugie"}
 {"k": "a2c01376355fc8f9", "pl": "Scena trzecia — druga rozmowa z Chen Shezhim"}
 {"k": "a2c043c16fbd134d", "pl": "Niech Budda błogosławi, oby mistrz Miaoshan szybko wrócił do Qinghe."}
@@ -1642,6 +1643,7 @@
 {"k": "a2cc035d8840dedc", "pl": "Tak... chodźmy stąd..."}
 {"k": "a2cce8cbfa8b9940", "pl": "Teraz mój miecz i moja ręka krzyczą… o twoją śmierć."}
 {"k": "a2cd50690d4ae800", "pl": "Wypytaj wieśniaka, co się wydarzyło"}
+{"k": "a2cd5c2a8968c7e3", "pl": "Kto wymyślił te pestki dyni?"}
 {"k": "a2ce45adff624a68", "pl": "Skała z wodospadem 1"}
 {"k": "a2ce6bda7d383535", "pl": "Harmonia Wszechrzeczy - Qinchuan - Wioska Wyłamanej Bramy"}
 {"k": "a2cf96cd2432fb37", "pl": "Do Krainy Sundara, palić kadzidła?"}
@@ -1703,6 +1705,7 @@
 {"k": "a2eb12dd395cceec", "pl": "Konie w galopie"}
 {"k": "a2eb3c3d4a0ce45b", "pl": "Ogródek z ziołami leczniczymi, troskliwie pielęgnowany przez uczniów Zielonego Potoku; nawet przechodząc obok, czuć orzeźwiający zapach kwiatów ziół."}
 {"k": "a2eb431e5dfa25be", "pl": "Ochraniacze ramion i pas"}
+{"k": "a2ebbed09f0f7407", "pl": "Aż tyle lat minęło..."}
 {"k": "a2ebc23d389804b4", "pl": "O, przyjaciele! Spójrzcie, kto przyleciał jak skowronek!"}
 {"k": "a2ec54058cfe5cb3", "pl": "Rozkład grobowca jest surowy i misterny — badaj jego głębiny z Zhuge, jeno strzeż się sideł zastawionych na niebacznych…"}
 {"k": "a2ec5a54f621d763", "pl": "Jingshu"}
@@ -2820,6 +2823,7 @@
 {"k": "a4ea51c4fcc71251", "pl": "Poddaję się… Już nie mogę biec…"}
 {"k": "a4eac2b12315e174", "pl": "Zatrzymanie · włócznia B2"}
 {"k": "a4eb1f75b93e83b2", "pl": "Nagroda: pokonanie szefa Widz Przypływu"}
+{"k": "a4ebadb43cbc47c1", "pl": "Ludzie są dla ciebie uprzejmi i nie liczą, a ty bierzesz na serio!"}
 {"k": "a4ecd909ead52e53", "pl": "Spotkaj się z bratem Zhao"}
 {"k": "a4ed68640649d0d2", "pl": "Jedna Gałązka Wiosny w Ogniu"}
 {"k": "a4edcdd90983dc93", "pl": "Porozmawiaj z Panem Czwartym Odwróconym"}
@@ -3260,11 +3264,13 @@
 {"k": "a5a4d93ee312d11f", "pl": "Upiorny Panicz - obszar dozwolony"}
 {"k": "a5a60b6ba4c41b41", "pl": "Edycja wyglądu - przerywnik, wersja dziarska"}
 {"k": "a5a65e2958b164a7", "pl": "Eskorta D (młody mężczyzna)"}
+{"k": "a5a6807d8611f576", "pl": "Nie uciekać, jak niby? Nie odważę się zadrzeć z Salą Atramentu! Te dranie pamiętliwe, będą cię ścigać na krańce świata!"}
 {"k": "a5a6f87c9b693155", "pl": "Ej, jak się stąd wychodzi?"}
 {"k": "a5a70c49d278743e", "pl": "Kwarc, kwarc, bracie z zakonu, może popatrzysz?"}
 {"k": "a5a75d15568643df", "pl": "Shar pei: leży płasko"}
 {"k": "a5a76950daeb069b", "pl": "Bu Fu"}
 {"k": "a5a79a17f934dde7", "pl": "Gruszka"}
+{"k": "a5a7aa767faa977a", "pl": "No właśnie! Jak leczyć chrapanie? Tak dalej, to żony nie będę miał!"}
 {"k": "a5a7e0caef2ca834", "pl": "Na przykład: kto dał wam monety tangowskie i jacy zuchy z gościńca pomogli je przewieźć do miasta…"}
 {"k": "a5a7eea4be8fd5a8", "pl": "Kotek: Yueyue"}
 {"k": "a5a857df6d744e55", "pl": "Po użyciu poznasz recepturę: Zaśnieżona balustrada."}
@@ -3666,6 +3672,7 @@
 {"k": "a6540a09fd656e07", "pl": "Pawilon Leżącej Tęczy: budynek dwupiętrowy otwarty"}
 {"k": "a6547c6eb5532a17", "pl": "Skrzynia broni: Płukany Kwiat, st. 31"}
 {"k": "a655624d20033927", "pl": "Opowieści o duchach i bogach to bajdy. Ludzie się boją, więc wymyślają sobie duchy."}
+{"k": "a655f8e7d614951f", "pl": "Popatrzcie, ile chcecie? Ukroję na świeżo!"}
 {"k": "a655fae491f3866f", "pl": "Liu Ke"}
 {"k": "a656107e99c71dea", "pl": "Statystyki"}
 {"k": "a656331d79fce32c", "pl": "Uczony Wang"}
@@ -3885,6 +3892,7 @@
 {"k": "a6b3a7cbc4af1bb2", "pl": "Grzmot w Ruchu"}
 {"k": "a6b3ab24e74567a3", "pl": "Gui Hong"}
 {"k": "a6b44a1b23b62b1b", "pl": "Ceremonia ślubna jest uroczysta, wszyscy na ciebie patrzą, lepiej nie chodzić po sali…"}
+{"k": "a6b4f05670410ede", "pl": "...hm! Dobrze, ten koniec dobry"}
 {"k": "a6b525c8b3cfc0e2", "pl": "Upiorna Dłoń - obszar drogowskazu 1"}
 {"k": "a6b5867bc6f22fa1", "pl": "Ślizg: rozwinięcie"}
 {"k": "a6b592710f24203f", "pl": "Wzniosły"}
@@ -3900,6 +3908,7 @@
 {"k": "a6bb5a68c985f242", "pl": "Woda z Niebios: Taras Gonggonga"}
 {"k": "a6bdc9a377de3513", "pl": "Dzbanek Łez Rozstania"}
 {"k": "a6bdf15999aed941", "pl": "Gao Ting"}
+{"k": "a6bdf782feee3756", "pl": "Handlarz mówi, że te owoce zerwane dziś rano; kupić?"}
 {"k": "a6be40c8d7431328", "pl": "Udaj się do Kaifengu na poszukiwanie Qin Ruolan"}
 {"k": "a6be70067638b8a8", "pl": "Spokojnie, Ruby jest tutaj, ludzie z karawany mają na nią oko, nie zgubi się. Idź się rozerwać."}
 {"k": "a6bf72162a9c381b", "pl": "Przyznawana za udział w wydarzeniu z zagadką sprawy zaginionego eskortera. Można wyświetlić na profilu."}
@@ -5370,6 +5379,7 @@
 {"k": "a95f27eb091405af", "pl": "Dzięki! Gdyby nie ty, zjadłyby mnie dziś te wilki."}
 {"k": "a95f313836709166", "pl": "Figurka teatru cieni wykonana na podobieństwo Króla Małp."}
 {"k": "a95fcae080fc7183", "pl": "Barwne jak brokat i jak zorza, kwitną od wiosny aż po lato."}
+{"k": "a9608e7cbf91cde7", "pl": "Jeszcze jedną, jeszcze jedną!"}
 {"k": "a960943ce34373e8", "pl": "Bohater Czterech Mórz - Stróż Grobów - Obszar: przyjęcie zadania"}
 {"k": "a960a1d7a702f1d1", "pl": "Nastrój majowej przerwy — Król Bez Oblicza"}
 {"k": "a96154fe5e0c6736", "pl": "Do wymiany na zbroję co najmniej fioletowej jakości."}
@@ -5937,6 +5947,7 @@
 {"k": "aa609eccb08c6e63", "pl": "Porozmawiaj z kimś z okolicy"}
 {"k": "aa60b9fadd290bc1", "pl": "Dzielni chłopcy, dzielne dziewczęta… wszyscy w końcu giną w jianghu. Też chcesz umrzeć gdzieś daleko, żeby nawet kości nie…"}
 {"k": "aa613a2920aa1ae4", "pl": "Liang Zhonghe"}
+{"k": "aa6154f5c5811f27", "pl": "Aj! Nie trzeba! Bierzcie!"}
 {"k": "aa61853a3a417a46", "pl": "Shenshu Xiuzhen"}
 {"k": "aa63799e99e654f4", "pl": "Pomocnik ze sklepu z herbatą"}
 {"k": "aa63e0c699191558", "pl": "Mroczny las, trawa drży na wietrze; generał nocą napina łuk."}
@@ -6767,6 +6778,7 @@
 {"k": "abd9f6a0d7e902dc", "pl": "Więzień Stacji Nadrzecznej, znany tam z niezwykłego podejścia do życia. Wszyscy go znają."}
 {"k": "abdb1d131983b64e", "pl": "Mała Lu"}
 {"k": "abdb1d9c03db3dc2", "pl": "Jestem tylko grzesznikiem, który tu pokutuje."}
+{"k": "abdb27feaacdff3e", "pl": "Szefie! Nie gapcie się na widowisko! Ile to kosztuje? Błagam, róbcie interes!"}
 {"k": "abdb7e81fcc9d586", "pl": "Odwiedź Huan Langa"}
 {"k": "abdc108760bc74fd", "pl": "Rozmawiaj z Li Baiwu"}
 {"k": "abdc7e70a5ac25b5", "pl": "Hej, powiedz, co tam jest dobrego w środku?"}
@@ -6779,6 +6791,7 @@
 {"k": "abe1cf9c4477230a", "pl": "Napełnij wyschłą studnię „wodą”"}
 {"k": "abe43b120fb99f28", "pl": "Te buty pasują."}
 {"k": "abe4a92228e132dc", "pl": "Wyjdź wyjściem z tajnego przejścia"}
+{"k": "abe50634e58c1f74", "pl": "Dość gadania, idziemy! Jak się spóźnimy, nic nie zobaczymy!"}
 {"k": "abe565a4ec4f1e4f", "pl": "Kieszeń mała, a świat w niej wielki; z całą swoją sztuką na kraj świata!"}
 {"k": "abe62444abfe0b76", "pl": "Chenbi"}
 {"k": "abe67e4d73413a61", "pl": "Wypełniłeś wszystkie ankiety. Dziękujemy za wsparcie Where Winds Meet!"}
@@ -7217,6 +7230,7 @@
 {"k": "aca2a07e1de51879", "pl": "Stanie przy ladzie (kobieta)"}
 {"k": "aca39a438ba31e76", "pl": "Ruiny Północnego Przymierza - wykrywanie poziomów podziemi"}
 {"k": "aca3e63787aa5ae6", "pl": "Zwykła cebula dymka z Congwangping, soczysta i słodka."}
+{"k": "aca447e42f525029", "pl": "Kiedyś Czarna Smocza Warownia była wspaniała, ale nie wytrzymała ludzi z Sali Atramentu, co co parę dni robili obławę..."}
 {"k": "aca468c19e3d96c7", "pl": "Wspólny Doping"}
 {"k": "aca4c85ba79a2ef7", "pl": "Skrzydła"}
 {"k": "aca550ce4a7b8550", "pl": "Gdy sąsiednie stragany się zwijają, przed straganem Shi Bao zawsze zbiera się gromadka psiaków.\nSiedzą rzędem, machają ogonami i czekają z zadartymi łebkami. Shi Bao dmucha, fu-ha, fu-ha, na kiełbaski prosto z rusztu, a potem rwie je na kawałki i karmi psiaki.\nPsiaki myślą: ten człowiek to naprawdę bardzo, bardzo dobre bóstwo.\nTuryści schodzący z góry myślą: psy mają najlepsze nosy; skoro im smakuje, musi być dobre.\nA Shi Bao myśli: kto powiedział, że zanętę rzuca się tylko przy łowieniu ryb?"}
@@ -7347,6 +7361,7 @@
 {"k": "acdf63fe8b6f9d8f", "pl": "Burek"}
 {"k": "ace0116ebfc7e87e", "pl": "Dobre uczynki — zadanie pochwalne — Góra Tai"}
 {"k": "ace0cdf104387912", "pl": "Po użyciu otrzymasz Sławę bohatera “Widzący Bez Oblicza”."}
+{"k": "ace0ea6ca09c8586", "pl": "Co robić..."}
 {"k": "ace12cfc98088d00", "pl": "Poza: Błaganie"}
 {"k": "ace19c6defce0589", "pl": "Małpy wytresowane tajemnymi sposobami przez Złoty Pawilon, należące do Oddziału Cienistego Splotu; walczą zakrzywionymi szablami.\n\nWierne podłemu stylowi swych panów, mają szable pokryte śmiertelną trucizną.\n\nTo udany owoc wieloletnich doświadczeń ze Śniącymi Kukłami, które Oddział Cienistego Splotu Złotego Pawilonu prowadził na małpach."}
 {"k": "ace1d836920587b2", "pl": "He, he, przecież He Wanchun już rozwiązał twoją zagadkę, czyż nie?"}
@@ -7890,6 +7905,7 @@
 {"k": "adcc50d994cbf8c0", "pl": "Czym jest życie? Zjeść, wypić i za potrzebą pójść. Odpuść, a świat od razu szerszy…"}
 {"k": "adcc74661a01f133", "pl": "Melodia III [Nad Falą · Mnogie Dźwięki]"}
 {"k": "adcc7e326fdf49ad", "pl": "Hao Shuai"}
+{"k": "adcc9360d80432eb", "pl": "Chcesz zginąć? Jak ona usłyszy, wyrwie ci język i da psom!"}
 {"k": "adcc960b0a5bc2e0", "pl": "Uratuj gościa"}
 {"k": "adcca27d5d4df67c", "pl": "Dou'er jest bliźniaczą siostrą Nuo'er. Jak wszystkie dzieci kocha toczyć bambusowe obręcze, lecz jej obręcz zawsze się przewraca i często płacze z irytacji."}
 {"k": "adccce90defa9b9e", "pl": "Zadanie nowicjusza - zwłoki chłopca 1"}
@@ -8046,6 +8062,7 @@
 {"k": "ae1edaaed5a6180e", "pl": "Ech, kiedyś szło, ale teraz, jak pieniądz przestał być pieniądzem, to i takie drobiazgi słabo idą."}
 {"k": "ae1f7820768564e6", "pl": "On? A, ostatnio dołożyli ludzi do patroli, to z góry przydzielili chłopaka, żeby tylko parzył herbatę i nosił wodę."}
 {"k": "ae2039c61d0f4d41", "pl": "Uczeń Warsztatu Monet, pierwszego z czterech warsztatów Dziewięciu Nurtów, który trzyma w ręku ekonomiczną żyłę szkoły. Choć dopiero uczeń zewnętrzny, ma ogromne szanse na awans!"}
+{"k": "ae207d7c8ec565ae", "pl": "Ty... chcesz może starą odzież?"}
 {"k": "ae20abe68593c841", "pl": "Prowadź śledztwo dalej"}
 {"k": "ae20d83c5ed8383e", "pl": "Demon Guqina - Talent Krainy Bohaterów 2"}
 {"k": "ae215d6870336b87", "pl": "Zhang Kang"}
@@ -8319,6 +8336,7 @@
 {"k": "ae9318a3ae422664", "pl": "Historia o doktorze Tian i jego dwóch uczniach."}
 {"k": "ae952d75950f6021", "pl": "Wen Xiaoxu"}
 {"k": "ae9561d32e18a9a6", "pl": "Pokonać Bez Oblicza"}
+{"k": "ae95b4cc91b8311a", "pl": "Spróbuj! Spróbuj! Nie wezmę pieniędzy! Moje mandarynki na pewno smaczne!"}
 {"k": "ae95b53d0148d5d7", "pl": "Kiedy nie wiążą cię sprawy sekty, w samotnych ćwiczeniach łatwiej odkryć własną drogę."}
 {"k": "ae961c95f753599c", "pl": "Skorupa żółwia do wróżenia. Wróżenie ze skorup polega na wrzuceniu monet do tarczy ze skorupy, rzuceniu ich i odczytaniu wypadłego znaku, by osądzić pomyślność lub zły los."}
 {"k": "ae966f043fed6b78", "pl": "Głos mi siadł... co ja jutro zrobię..."}
