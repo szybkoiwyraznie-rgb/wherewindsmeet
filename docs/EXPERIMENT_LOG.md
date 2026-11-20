@@ -2683,3 +2683,15 @@ kluczy scen zadań dla grup 5254–5260 i 5296: po przypisaniu do grup
 odpowiednio 11, 10, 4, 9, 8, 10, 2 i 13 kluczy, 0 braków w każdej.
 Sonda grupy 5306: 121 kluczy, 0 braków po `gy`. Kontrola repozytorium OK
 (593 wpisy indeksu), 623 testy OK po `gz`. To nie jest test w grze.
+
+**Wybrane historie (`ha`–`hh`):** odpowiednio 64, 46, 79, 70, 66, 73,
+68 i 77 nowych kluczy scen (razem 543), magazyn 136 627 przekładów i
+489 544 miejsca (27,91%). Sceny grup 5250, 5252, 5253, 5261–5276, 5293,
+5294, 5327, 5336–5338 wybierano indywidualnie; niektóre dotyczą późniejszego
+Liangzhou. Po imporcie sonda dostępnych powiązań scen z zadaniami wykazała
+609 przypisań kluczy bazowych do grup, 0 braków. Nie obejmuje innych tekstów
+ani momentu odblokowania. Kontrole suche i importy bez odrzuceń. W `hd`
+poprawiono zwrot do żółwia; w `hh` trzy sformułowania oraz wcześniej
+błędną wskazówkę zadania `9d3d4d3f856d74f0` o koniu Nocna Warta.
+Skan 543 linii PL: 0 CJK, 0 nie-NFC. `check_repository.py` OK (601 wpisów
+indeksu), 623 testy OK; przekład niesprawdzony w grze.

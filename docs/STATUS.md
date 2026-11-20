@@ -75,6 +75,16 @@ różnych przypisań do grup i 0 braków; nie oznacza to pełnego pokrycia
 pozostałych tekstów tych zadań. 623 testy OK i kontrola repozytorium OK
 po `gz`; bez testu przekładu w grze.
 
+**Kontynuacja `ha`–`hh`:** **543** nowe przekłady, magazyn **136 627**
+przekładów i **489 544** miejsca w grze (27,91%). Sceny wybierano na
+podstawie powiązań z zadaniami, również z późniejszego Liangzhou — nie są
+one wszystkie scenami początku gry. Sonda grup 5250, 5252–5253, 5261–5276,
+5293–5294, 5327 i 5336–5338 wykazała 0 braków w bazowych kluczach scen
+tych zadań (609 przypisań do grup); nie obejmuje pozostałych rodzajów
+tekstów. Skorygowano też wcześniejszą wskazówkę dotyczącą konia Nocna
+Warta. Importy i kontrola repozytorium bez błędów, **623 testy OK**.
+Przekład jest AI-tymczasowy i nie został przetestowany w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.
