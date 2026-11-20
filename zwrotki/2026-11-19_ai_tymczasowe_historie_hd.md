@@ -34,7 +34,7 @@
 — 7.
    klucz: 05f960bff934246d
    EN: When you sleep… do you mean dreams?
-   PL: Widziałeś to we śnie? Chodzi ci o marzenie senne?
+   PL: Podczas snu? Chodzi ci o marzenie senne?
 
 — 8.
    klucz: c39aa4177d78cdb8
