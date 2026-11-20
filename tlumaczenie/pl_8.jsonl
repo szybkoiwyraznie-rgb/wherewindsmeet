@@ -1284,6 +1284,7 @@
 {"k": "8258a2a0f6a83d01", "pl": "Spotkanie - Ostatni Pielgrzym - Na zewnątrz Drzewnej Łodzi"}
 {"k": "82593172e27ac8a0", "pl": "Wontony ze wszelkich możliwych składników. W jednej misce każdy ma inny kolor, a na sto sztuk przypada sto smaków - niezwykle wyśmienite."}
 {"k": "82593313ebae08a2", "pl": "Góry złota i srebra 3 (do scen, bez interakcji)"}
+{"k": "825baf6b0cfb061b", "pl": "Naciśnij {}, aby włączyć Czytanie wiatru."}
 {"k": "825bb128badd3c0a", "pl": "Oddaj mapę przemarszu"}
 {"k": "825bca8a59f71d96", "pl": "Dnia czwartego starszy Zhan znów wzywa cię do siedziby Zhao Pu."}
 {"k": "825c4b253ebff467", "pl": "Zezwól na interakcję: księżyc 3"}
@@ -5307,6 +5308,7 @@
 {"k": "8991d2f0ae146532", "pl": "Zapis Dostarczonej Radości"}
 {"k": "89926ce4ee19a5a8", "pl": "Mówiłaś, że Chudy Arhat zostawił w Liangzhou więcej niż jeden cud. Gdzie, oprócz świątyni?"}
 {"k": "89928da855e65503", "pl": "Khe… To Pan Rzeki! Pan Rzeki wrócił…"}
+{"k": "8992a76f9849f0e6", "pl": "Tryb eksploracji „Przeprawa po kamieniach” jest dostępny tylko wtedy, gdy wskazówki do zagadek ustawiono na #Y„Swobodną eksplorację”#E.\nAby zmienić ustawienie, zakończ rozmowę i przejdź do ustawień gry.\nTryb można wybrać tylko tutaj. Po wybraniu #Ynie można go zmienić#E, więc zastanów się uważnie."}
 {"k": "8992f22a5021c509", "pl": "Krata się ruszyła! Ale dalej nie puszcza, musi być jeszcze jedna dźwignia!"}
 {"k": "8993c7e74896d1c9", "pl": "Trzeba zniszczyć pąki, wtedy pnącza puszczą."}
 {"k": "899423670be1b442", "pl": "Kunszt walki niezrównany, całe jianghu drży."}
@@ -6278,6 +6280,7 @@
 {"k": "8b5976a5ca19bc22", "pl": "(Limit tygodniowy: 0000/0000)"}
 {"k": "8b59d32d3990d972", "pl": "Miau Miau - Symulacja marszu - teren zewnętrzny - Most Zhongdu"}
 {"k": "8b59f6fada382f57", "pl": "Uczeń Studni Niebios, który przybył na pomoc w wojnie."}
+{"k": "8b5a7b6e43a6420a", "pl": "Bez wskazówek trasy: ukończ zadanie przez #Yswobodną eksplorację#E, aby pełniej zanurzyć się w rozgrywce.\nTen tryb przypomina lochy Boskiego Rzemiosła, takie jak Więzienie Ukrytej Mgły czy Ruiny Wiszącej Rzeki.\nWalka będzie większym #Ywyzwaniem#E."}
 {"k": "8b5a8b6d31a9f769", "pl": "Odporność 1 - mała słabość na wiatr"}
 {"k": "8b5b04cd47371781", "pl": "Rozmawiaj z wodzem dzieci"}
 {"k": "8b5b4a4ad81bdcce", "pl": "Skrzynia napierśnika, st. 16 · Powrót Jaskółki"}
@@ -8252,6 +8255,7 @@
 {"k": "8f10e6aa7cde3b5e", "pl": "Mała Siedemnastka, tak jak ja, jest jednym z uchodźców z Yanyun, nad którymi pieczę mieli panowie z Wiszącego Miecza. Ci łajdacy przyszli z wielką siłą, a Mała Siedemnastka ma prostą duszę, boję się, że stanie mu się coś złego!"}
 {"k": "8f116f759350d2fb", "pl": "Dzika woda równo z mostkiem nad strumieniem,\nfale targają kwiaty rdestu.\nRąbię bambus, plotę zielony kosz,\nprzed drzwiami rozstawiam sieci na kraby."}
 {"k": "8f135e4cf8297259", "pl": "Gęsia stopa"}
+{"k": "8f14692a7b61351b", "pl": "Gliniane instrumenty xun o kształcie ptaków leżą w różnych miejscach Qingzhou. Sikory chętnie #Ybawią się nimi, rzucając je sobie#E."}
 {"k": "8f152f0f3e5a6c2c", "pl": "Test oceny poezji 1"}
 {"k": "8f155ea3117e505c", "pl": "Zapisane po oddaniu mieszka Wei Shanrenowi"}
 {"k": "8f1570c7db316801", "pl": "To nie liście z najlepszej pory, tylko… tylko liście z pory, kiedy kończyłem lekcje."}
@@ -8762,6 +8766,7 @@
 {"k": "8ff40482932de839", "pl": "Uczeń wewnętrzny Dziewięciu Nurtów"}
 {"k": "8ff418570c800255", "pl": "Po użyciu otrzymasz Sławę bohatera “Świeżo Zahartowane Ostrze”."}
 {"k": "8ff42d7e3c446b81", "pl": "Sala Czerwonego Smoka - członkowie"}
+{"k": "8ff468d1346487c8", "pl": "Zdiagnozuj chorobę i ulecz mistrza Miaoshana"}
 {"k": "8ff47e4ce2758f50", "pl": "Rao Lusi"}
 {"k": "8ff54831cbd71daf", "pl": "Puder, który wyszedł z pałacu dawnych Tang; robi się go głównie z wybornego prosa. Wybiela cerę i upiększa twarz, tyle że jest nieco drogi."}
 {"k": "8ff5f681763d48d4", "pl": "Qiao Shaoren przyjmuje list, a dowiedziawszy się o usychaniu pszenicy, wpada w szał. Od razu postanawia wrócić do Miasteczka Łaski i razem z Obozem Hedao zająć miasteczko i składy. Zanosi się na wielką burzę; jak się to skończy, trzeba zapytać pojutrze."}

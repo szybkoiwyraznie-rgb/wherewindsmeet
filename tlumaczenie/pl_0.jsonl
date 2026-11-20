@@ -33,9 +33,11 @@
 {"k": "0010cf5de0b3359c", "pl": "Ryba Zaczepka"}
 {"k": "00114df3edf37a4e", "pl": "Yu Yiyong"}
 {"k": "0011c01d91c6e216", "pl": "Nieprawidłowa opcja. Wybierz ponownie"}
+{"k": "00123ee392c96149", "pl": "Wybór sposobu perswazji"}
 {"k": "00125bb68e4566d7", "pl": "Odjedź sam kopalnianym wózkiem"}
 {"k": "00130bd5f5aeede3", "pl": "Po co trudzić się snami w niebiańskich pałacach, skoro w kamiennej grocie można spokojnie układać pięć dzików?\n\nDzik za dnia się kryje, nocą wychodzi; ma czarną sierść i jest bardzo agresywny. Żyje zwykle w górskich lasach, czasem pojawia się na polach, a ludzie nazywali go “Czarnolicym”. Świnia, jedno z sześciu zwierząt domowych, była bardzo bliska dawnym ludziom i symbolizowała siłę. W epokach Qin, Han i Sześciu Dynastii, jeszcze bliskich starożytności, dzika otaczano czcią. Za Song zwyczaj ten osłabł, lecz Kitanowie wciąż wierzyli, że dzik może obdarzyć człowieka cudowną siłą i jest istotą niemal boską."}
 {"k": "00139871e6b83521", "pl": "Grot równy, serce niespokojne. Za jednym zamachem, cios za ciosem - oto sekret."}
+{"k": "0014d55a09cc6a84", "pl": "Uczniowie mogą wykorzystać twoją nieuwagę i porozumieć się ze wspólnikami za pomocą tajnej techniki przekazywania głosu. Użyj #YCzytania wiatru#E, aby odnaleźć oszukujących, a następnie #YDotyku meridianów#E, by zablokować ich meridiany i powstrzymać oszustwo."}
 {"k": "00166c99b9a3e9d5", "pl": "Czy mogę cię jeszcze o coś poprosić, wędrowcze…?"}
 {"k": "0016791cf2f4c33a", "pl": "Piesek: Sai Qing"}
 {"k": "0016c7da468a9740", "pl": "Ascetyczny mnich 63"}
@@ -2206,6 +2208,7 @@
 {"k": "040d1b7a4f6e90e1", "pl": "Przełęcz Dasan: zakaz wspinaczki"}
 {"k": "040d44cf8ae7c1d7", "pl": "Skrzynia Gromu Niebios P 2 - 3"}
 {"k": "040dab3635c0eda8", "pl": "Jak śmiesz, szczeniaku!"}
+{"k": "040df0bbc4ce2f28", "pl": "Nie wszystkie nowo zakupione złote ropuchy zostały ustawione w pałacu. Jeśli zobaczysz pusty postument, pomóż umieścić na nim ropuchę."}
 {"k": "040e0f4fece37c34", "pl": "Księga rachunkowa z liści topoli"}
 {"k": "040e6ad1b4993cca", "pl": "0 godz. 0 min"}
 {"k": "040e73491c5e3173", "pl": "Naprawdę już nie szukasz? To przecież nasza szansa na sławę!"}
@@ -2402,6 +2405,7 @@
 {"k": "0465ea5934dc0668", "pl": "Ukryte zadanie — po ukończeniu podzadania wejdź w interakcję z Tuo — nagroda"}
 {"k": "04660fb43875c217", "pl": "Parasol Strażnika Śniegu · Powrót Jaskółki"}
 {"k": "046635683e07396f", "pl": "Po użyciu otrzymasz Sławę bohatera “Z Nieba Nie Spadają Placki”."}
+{"k": "04672a25b369994a", "pl": "#YStrzel do sikory, gdy trzyma instrument xun lub ma go właśnie złapać#E. Ptak, zajęty unikaniem strzał, upuści instrument, który możesz podnieść."}
 {"k": "04675200c2efd4fb", "pl": "Pałacowa lina z grotem - unik w prawo"}
 {"k": "0467b7f619ba5ecb", "pl": "No… no, dzieciaczki…"}
 {"k": "046876adad904252", "pl": "Krótki miecz"}
@@ -3316,6 +3320,7 @@
 {"k": "05f1e65adf13d7e9", "pl": "Twój tatuś?"}
 {"k": "05f20dd35c2170a0", "pl": "Uczeń kultu Xuanyuan 5"}
 {"k": "05f2526a989aa6c3", "pl": "Ciotka Li"}
+{"k": "05f2f10d6d10534e", "pl": "Kronika Sztuk Walki to niezwykła księga, w której Wędrowcy zapisali swoje podróże przez góry i rzeki.\nZawiera rozmaite historie z różnych regionów i jest pomocna dla osób stawiających pierwsze kroki w jianghu.\nBadaj opisane w niej historie, aby zdobywać #Ypostęp eksploracji#E i odbierać cenne #Ynagrody#E."}
 {"k": "05f3752e609e501c", "pl": "Konfucjański uczony, pełen zapału, lecz zupełnie nie umiejący hodować szczypioru."}
 {"k": "05f3c77fd519929a", "pl": "List Ren Shanzhonga."}
 {"k": "05f3e298553766aa", "pl": "Mroczny Klejnot: Woń Skalnej Wiosny"}
@@ -3589,6 +3594,7 @@
 {"k": "067b097f949302b0", "pl": "Księga opisująca krajobraz i osobliwości Lśniącej Otchłani; dzieło Wędrowca."}
 {"k": "067becc970c59ce3", "pl": "Bliźniacze ostrza Złotej Inkrustacji"}
 {"k": "067bfb18482fa01f", "pl": "Zdobywany w interesie Łuskowca handlarza; zbierz komplet, aby użyć go w turnieju Właścicieli ziemskich!"}
+{"k": "067c9731dce4ed23", "pl": "Pojedynek na słowa: użyj kart perswazji z #Yprofesji uczonego#E, aby szybko przekonać rozmówcę."}
 {"k": "067d53747d0a7896", "pl": "Ha, ha! Dobrze, że pamiętasz!"}
 {"k": "067e7319d24f25b6", "pl": "Księga opisuje osobliwości Brzoskwiniowej Kotliny; to nieukończone dzieło Wędrowca."}
 {"k": "067f2725630898a8", "pl": "Do strojenia ekwipunku st. #Y41#E: następna cecha strojenia będzie na pewno #Yzłota i o pełnej wartości#E.\nMożna zdobyć, przetwarzając ekwipunek tego samego stopnia z odpowiadającą cechą początkową."}
@@ -3763,6 +3769,7 @@
 {"k": "06cd0d7b02e4ac3e", "pl": "Du Pośrednik"}
 {"k": "06cd74686d456957", "pl": "Siostrzyczko, ja… ech… nie myślałam, że w tak młodym wieku już…"}
 {"k": "06ce59633e8b70c9", "pl": "Panienko! Nic ci nie jest?"}
+{"k": "06cea0cd085fe77c", "pl": "Przełączenie na panel umiejętności Uzdrowiciela"}
 {"k": "06cf32cd03937374", "pl": "Za Lu…"}
 {"k": "06cf43dabaa23ac8", "pl": "Poszukiwacz wiatru: Ukryta Góra"}
 {"k": "06cfac652d0e7d27", "pl": "Yan Chi pomógł ci przeliczyć wszystkie pieniądze, które zostawił Qian Duoduo, i zebrać je w jeden skarb, ofiarowany Północnemu Przymierzu."}
@@ -4224,7 +4231,9 @@
 {"k": "07a672ee43a8ae2c", "pl": "Podobno urządzają jakiś tam turniej i za grube pieniądze najmują mistrzów z jianghu, żeby uczyli walki na Przeprawie Tianjin!"}
 {"k": "07a6ba54d6174e88", "pl": "Letnia zdrapka"}
 {"k": "07a7ab7931063c30", "pl": "Muszę je wszystkie dobrze zapamiętać, żeby na następnym egzaminie w akademii być pierwszym!"}
+{"k": "07a85c34b20befb9", "pl": "Gdy #Ypoziom zrozumienia#E osiągnie wymagany próg, #Ypodpatrzysz technikę#E.\nJeśli nie osiągniesz progu w wyznaczonym czasie, #Rpróba się nie powiedzie#E."}
 {"k": "07a8b7136f2894a1", "pl": "N-niemożliwe… Może i nie umiem rozróżniać koni, ale mój Er Ma jest jak ja: nieskrępowany… kocha wolność…"}
+{"k": "07a96bbb547cae28", "pl": "Skrzynia z węzłem"}
 {"k": "07aa0825167e261e", "pl": "W drodze do domu miałem nawet przywidzenia, widziałem, jak na wysokiej wieży na górze biją się dwaj nieśmiertelni…"}
 {"k": "07ab39ba47c4aa8f", "pl": "A teraz jeszcze w Gospodzie Bez Zazdrości w Przystani Nieśmiertelnych stało się coś takiego."}
 {"k": "07ab9ba3ba91bcaa", "pl": "Lu Zhaolei"}
@@ -4552,6 +4561,7 @@
 {"k": "083e1fe96ad2e2fa", "pl": "Shen Yong"}
 {"k": "083eb33d61121554", "pl": "Yang Cun!!"}
 {"k": "083ec3e7cc7acbdb", "pl": "Znowu toczycie długi, zacięty pojedynek."}
+{"k": "083f801d3416e675", "pl": "Wskazówki prowadzą trasą #Ygłównego zadania#E aż do końca opowieści.\nRozrzucone wskazówki, tajemnice i nagrody trzeba odnaleźć samodzielnie.\nPoziom trudności walki jest #Yniższy#E."}
 {"k": "083fa5502902b401", "pl": "Drewniany latawiec: prawe skrzydło"}
 {"k": "083fa8004ea4285e", "pl": "Bao Sanlang"}
 {"k": "083fdabe26e8f10a", "pl": "Pokonaj Śniące Kukły"}
@@ -5872,6 +5882,7 @@
 {"k": "0aac07b0e661e407", "pl": "Spokojnie, już wszystko przygotowałem. Ktoś na pewno zdoła go wywabić."}
 {"k": "0aac3bc1b9653c17", "pl": "Gorzki Ogień - pocisk papierowej lalki"}
 {"k": "0aad0bd25724d6ad", "pl": "Niebo wysokie, ziemia rozległa, a wszystko ma swój czas. W piątym roku ery Huangwu Sun Quan kazał z żelaza i stali z Wuchang wykuć Miecz Wieków i Szablę Wieczności, każde długie na trzy stopy i dziewięć cali. Później sławni płatnerze wykuli tysiące podróbek tego miecza i prawdziwy zginął między nimi. W jianghu powiadają, że kto zdolny, rozpozna prawdziwy miecz i zgłębi z niego tajniki sztuk walki."}
+{"k": "0aad2836a845ec11", "pl": "Użyj prawej gałki, aby przesunąć #Ymały krąg celownika#E do większego kręgu i utrzymać go tam przez chwilę."}
 {"k": "0aad2a82cd2826a5", "pl": "Weźmy choćby moją siostrzyczkę."}
 {"k": "0aad46c29444cde2", "pl": "Wskazówka: Wadżra"}
 {"k": "0aad8bd79ec0bb2c", "pl": "W Niebie Najwyższej Swobody czekają jeszcze niezałatwione sprawy, nie możesz na razie wyjść."}
@@ -6976,12 +6987,14 @@
 {"k": "0cb3080d19200305", "pl": "Przyznawana za wybór na dziekana Przystani Słowa. Można wyświetlić na profilu."}
 {"k": "0cb32aa6adc456ed", "pl": "Pieczona dynia z północy"}
 {"k": "0cb3f80101093da7", "pl": "Su Yanzhi"}
+{"k": "0cb4bf7c4eb8e70b", "pl": "Głowa feniksa jest czopem, a okrągły dzban — gniazdem. W tym miedzianym dzbanie brakuje głowy feniksa. Znajdź ją i użyj techniki #YChwytu Gwiazdy i Księżyca#E, aby umieścić ją w dzbanie i go otworzyć."}
 {"k": "0cb4db6a700017f4", "pl": "Dobieranie przeciwników: 00:00"}
 {"k": "0cb66b0854bf3af9", "pl": "Xiang"}
 {"k": "0cb67b38fdd2089e", "pl": "“Ojej, Sai Qing, gdzieś ty się podziewał! Znów się sam ufarbowałeś?” “Hau, hau!”\nCo kilka dni w farbiarni rozgrywa się niemal ta sama rozmowa. Mówią czasem młode siostry i bracia, którzy przyszli niedawno, czasem babcie i dziadkowie, którzy przepracowali tu pół życia. A szczekający piesek jest zawsze ten sam: łaciaty Sai Qing. Ludzie lubią piękne tkaniny, Sai Qing też. Sai Qing jest bardzo grzeczny i nigdy nie psoci; ilekroć rozwiesza się świeżo ufarbowane sztuki tkaniny, robi obchód, jakby powierzono mu jakieś zadanie, i ogląda tkaninę dokładnie. Bez obaw, tkaninie nic się nie dzieje, tylko łaciatemu pieskowi przybywa czasem kilka świeżych wzorów.\n“Sai Qing! Dziś suszymy nowe tkaniny!”\nFarbiarnia nadąża za modą i stojaki do suszenia nigdy nie stoją puste. W pogodne dni wytworne tkaniny wiszą wysoko, a wiatr je unosi, pstre i falujące, jakby chciały ufarbować samo niebo. Ludzie mają ulubione kolory, Sai Qing też. W świecie Sai Qinga błękit jest najpiękniejszy i najbogatszy. Ciemny błękit jest jak niebo przed wschodem słońca, wilgotne od rosy; jasny błękit jak niebo w letnie południe, od którego psu robi się ciepło na sercu… Sai Qing patrzy na świeże cętki na swoim futrze i myśli, że jest bardzo zdolny, bo zabrał ze sobą dalekie błękitne niebo."}
 {"k": "0cb6aa0ef4b47c30", "pl": "Tej nocy pijmy, aż padniemy — nie trzeba wracać…"}
 {"k": "0cb7ed9f3d78c24a", "pl": "Korekta poz. 100: Brzęk Stali · Tęcza"}
 {"k": "0cb82fb7ab6d6992", "pl": "Kanały pod Kaifengiem są głębokie i rozległe; to wymarzone schronienie dla wszelkiego brudu i występku. Ponad dziesięć lat temu Hong Si, pałając nienawiścią do Dziewięciu Nurtów, założył tu Bractwo Beztroski i poprzysiągł, że wyrówna z nimi dług krwi. Potem, dla swych zamysłów zemsty, opuścił Kaifeng z dziećmi Li Xia, a bractwo z wolna zostało bez przywódcy. Po powrocie Hong Si zebrał na nowo rozsypane jak piasek Bractwo Beztroski i ostatecznie uczynił z niego zbójecką potęgę, na której wspomnienie mieszkańcy Kaifengu bledną."}
+{"k": "0cb83aa14e705ed4", "pl": "Dwa obszary celowania: za pomocą obu gałek przesuń #Ycelowniki#E jednocześnie do odpowiednich kręgów i utrzymaj je tam przez chwilę."}
 {"k": "0cb8d22ff79dcfae", "pl": "„Opieka poporodowa nad dziczą”"}
 {"k": "0cb91daf33d84d14", "pl": "Element zestawu: Lotny Sokół, st. 96 · Zwykła"}
 {"k": "0cb92432f45632a2", "pl": "Tak chciały niebiosa. Technikę naszego pawilonu oddam ci zaraz… Podejdź bliżej, usiądź ze mną w powozie."}
