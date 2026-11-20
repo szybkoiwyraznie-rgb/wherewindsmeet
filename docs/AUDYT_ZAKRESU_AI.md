@@ -172,6 +172,41 @@ przypisanie do kitów ambientowych pochodzi z `spawn_kit_sid_no`; sceny
 ambientowe sterowane drzewami zachowań serwera nie mają kitu w danych klienta
 — dlatego grupa „bez powiązania” jest tak duża.
 
+### Ograniczanie geograficzne kwestii wyzwalanych w świecie
+
+Kwestie z grupy „wyzwalane w świecie” mają relację `r` do
+`spaces.*.spawn_kit_dict#<kit>`, a kit ma pozycję XYZ w
+`index/mpk/sceny_ambient_kity.jsonl`. Dzięki temu **10 683 z 11 369**
+kluczy (94%) da się przypisać do miejsca w świecie; 709 nie ma pozycji
+(brak `spawn_kit_dict` albo kitu w indeksie). Narzędzie:
+`python3 tools/barks_regiony.py` (kotwica domyślna = pierwszy kit prologu,
+X -1330, Z -110; `--kotwica`, `--siatka`, `--promien`, `--slotki`, `--json`).
+
+Pierścienie od kotwicy (odległość w płaszczyźnie XZ):
+
+| promień | klucze |
+|---|---:|
+| ≤200 m | 378 |
+| ≤400 m | 1 339 |
+| ≤800 m | 3 413 |
+| ≤1 600 m | 5 742 |
+| ≤3 200 m | 6 605 |
+| ≤6 400 m | 8 859 |
+
+Największe klastry (siatka 400 m): X -1200/Z 0 — 800 kluczy (170 m od
+kotwicy, okolica startu), X -4400/Z -5600 — 766 (6,3 km), X -2000/Z 0 — 727,
+X -1200/Z 400 — 561, X -2000/Z 400 — 552, X -2400/Z 400 — 540.
+
+**Wybór partii:** `--promien 400 --slotki dist/region_400.txt` zapisuje klucze
+od najbliższego; z tej listy `tools/buduj_paczke.py --tylko-sloty` buduje
+pakiet dla tłumacza. Pierwsza partia pilotażowa: 60 najbliższych kwestii
+(zwrotka `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aa.md`) — import
+60/60, 0 odrzuceń, magazyn **139 713** (28,54%).
+
+Ograniczenie: odległość od startu to przybliżenie „co gracz zobaczy
+najpierw”, a nie kolejność fabuły; klastry na krańcach mapy mogą należeć do
+późniejszych zadań.
+
 ## Dlaczego właściciel nadal widzi angielskie napisy
 
 - Najnowsza **łatka** w obiegu to `v0.5.0` z 2026-11-18, zbudowana ze zwrotki

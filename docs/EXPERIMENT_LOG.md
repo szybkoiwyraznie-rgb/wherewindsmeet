@@ -2922,3 +2922,35 @@ zmieniły — zmieniła się ich interpretacja.
 **Ograniczenie:** w danych klienta nie ma znacznika oddzielającego odżywkę
 związaną z zadaniem od swobodnego banteru NPC; przypisanie mapy ani kitu nie
 dowodzi, kiedy gracz daną kwestię usłyszy.
+
+## 2026-11-20 (3) — geografia kwestii wyzwalanych w świecie + partia pilot 60
+
+**Pytanie właściciela:** czy da się zawęzić 11 369 kwestii wyzwalanych
+w świecie, np. geograficznie wokół miejsca, w którym odpala się przykład
+(scena `1026070`, relacja `spaces.s501.trap#6600990`).
+
+**Ustalenia:**
+- Przykład nie ma pozycji (pułapka `trap` nie występuje w indeksie kitów), ale
+  **inne** kwestie z tej grupy mają relację `spaces.*.spawn_kit_dict#<kit>`,
+  a kit ma XYZ w `index/mpk/sceny_ambient_kity.jsonl`.
+- Pokrycie geograficzne: **10 683 z 11 369** kluczy (94%); 709 bez pozycji
+  (brak relacji `spawn_kit_dict` albo kitu w indeksie).
+- Nowe narzędzie `tools/barks_regiony.py`: kotwica domyślna = pierwszy kit
+  scen prologu (X -1330,09, Z -109,59), pierścienie co 200–6 400 m, klastry
+  400 m, `--slotki` zapisuje listę kluczy od najbliższego. Testy:
+  `tests/test_barks_regiony.py` (3 przypadki, dane syntetyczne).
+
+**Pierścienie od startu:** ≤200 m — 378, ≤400 m — 1 339, ≤800 m — 3 413,
+≤1 600 m — 5 742, ≤3 200 m — 6 605, ≤6 400 m — 8 859. Największe klastry:
+X -1200/Z 0 — 800 kluczy (170 m), X -4400/Z -5600 — 766 (6,3 km),
+X -2000/Z 0 — 727.
+
+**Partia `barks_start_aa` (pilot):** 60 najbliższych kwestii z pierścienia
+≤200 m (handlarze, grajkowie, bywalcy zajazdu, pijacy przy stole — jednolinijkowe
+odzywki). Plik `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aa.md`, przekład
+z ZH z pomocą EN. Import: 60 miejsc, 60 nowych, 0 odrzuconych; magazyn
+139 653 → **139 713** (28,54%). Skan PL bez CJK. Pakiet roboczy:
+`dist/paczka_barks_pilot` (`buduj_paczke --tylko-sloty`).
+
+**Kontrole:** `run_tests.py`, `check_repository.py`. Przekład AI-tymczasowy,
+bez testu w grze.

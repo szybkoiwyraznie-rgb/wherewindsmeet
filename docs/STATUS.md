@@ -24,7 +24,11 @@ poza zakresem. **Zainstalowana łatka `v0.5.0` (112 405 przekładów) nie zawier
 partii tymczasowych** — bez nowej łatki z bieżącego magazynu właściciel nadal
 widzi po angielsku treści, które już są przetłumaczone. Następny krok:
 zbudować łatkę `v0.6.0` z magazynu, potem domknąć nazwy Compendium (486)
-i wybrane sceny pierwszej prowincji. W tej sesji doszło 79 opisów szkół sztuk
+i wybrane sceny pierwszej prowincji. Geograficznie da się te kwestie zawęzić: **10 683 z 11 369** mają pozycję
+w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 378,
+≤400 m — 1 339, ≤800 m — 3 413, ≤1 600 m — 5 742. Pierwsza partia 60
+najbliższych kwestii jest w magazynie (**139 713**, 28,54%), 0 odrzuceń.
+W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
 `zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`). **628 testów** i kontrola
 repozytorium OK (w tym 5 nowych testów `tools/audyt_zakresu.py`); przekład AI-tymczasowy, bez testu w grze.
