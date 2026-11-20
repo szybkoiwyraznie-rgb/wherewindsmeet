@@ -9,7 +9,7 @@
 — 2.
    klucz: 2509cec733a63b30
    EN: This tip came from Cheng Xiaohan. The target's hiding inside the Forsaken Quarter. Here's the silver for the informant. Go now, don't be late!
-   PL: Tym razem wiadomość przysłał Cheng Xiaohan. Czeka w dzielnicy Za Boczną Bramą. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
+   PL: Tym razem wiadomość przysłał Cheng Xiaohan. Czeka w Zaułku Bocznej Bramy. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
 
 — 3.
    klucz: cf2becad811a25df
@@ -64,7 +64,7 @@
 — 13.
    klucz: 26ba6c35dfa4277f
    EN: This tip came from Lian Dong. The target's hiding inside the Fairgrounds. Here's the silver for the informant. Go now, don't be late!
-   PL: Tym razem wiadomość przysłał Lian Dong. Czeka na targowisku rozrywek. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
+   PL: Tym razem wiadomość przysłał Lian Dong. Czeka w Dzielnicy Uciech. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
 
 — 14.
    klucz: d918699eb58ce72c
@@ -74,7 +74,7 @@
 — 15.
    klucz: 08a2729bf7277ca4
    EN: Right there by the cockfight stall in the Fairgrounds! I saw it with my own eyes!
-   PL: Na własne oczy widziałem to przy stoisku do walk kogutów na targowisku rozrywek!
+   PL: Na własne oczy widziałem to przy stoisku do walk kogutów w Dzielnicy Uciech!
 
 — 16.
    klucz: 44da085608d76673
@@ -109,7 +109,7 @@
 — 22.
    klucz: beedf10537d340de
    EN: This tip came from He Yan. The target's hiding inside the Bustling Abode. Here's the silver for the informant. Go now, don't be late!
-   PL: Tym razem wiadomość przysłał He Yan. Czeka w Tętniącej Rezydencji. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
+   PL: Tym razem wiadomość przysłał He Yan. Czeka w Domu Bujnego Kwiecia. Oto srebro dla informatora. Ruszaj, nie spóźnij się!
 
 — 23.
    klucz: ab64f529ff1401e3
@@ -119,12 +119,12 @@
 — 24.
    klucz: 0715695dc92bc545
    EN: I'm telling you, I was crouched right by the wall near the Velvet Shade's Bustling Abode... I saw the whole thing with my own eyes!
-   PL: Mówię ci, kryłem się pod ścianą Tętniącej Rezydencji w Upojnym Cieniu i wszystko widziałem!
+   PL: Mówię ci, kryłem się pod ścianą Domu Bujnego Kwiecia w Upojnym Cieniu i wszystko widziałem!
 
 — 25.
    klucz: 836da885dfe28b1b
    EN: I remember the guy! He looked like one of those Well of Heaven Disciples, flashing handfuls of gold and silver, trying to shove it at the lady!
-   PL: Pamiętam, wyglądał na ucznia Niebiańskiego Źródła. Trzymał w dłoniach złoto i srebro i uparcie chciał je jej wcisnąć!
+   PL: Pamiętam, wyglądał na ucznia Studni Niebios. Trzymał w dłoniach złoto i srebro i uparcie chciał je jej wcisnąć!
 
 — 26.
    klucz: 0d5fa0062a3b22e4
