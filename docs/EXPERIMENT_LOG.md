@@ -3060,3 +3060,46 @@ plotki o Sekcie Dziewięciu Nurtów i Beztroskich.
 
 **Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od
 kotwicy to przybliżenie „co gracz zobaczy najpierw”.
+
+## 2026-11-20 (7) — domknięcie pierścienia ≤1 000 m (partie `am`–`aw`)
+
+**Cel:** dokończyć preferencyjny promień z polecenia właściciela („najchętniej
+<1 000 m”) po domknięciu obowiązkowego <400 m.
+
+**Metoda bez zmian:** `barks_regiony.py --promien 1000 --slotki` (tylko bez
+przekładu, od najbliższej kwestii) → zwrotka `.md` → `import_zwrotki.py
+--na-sucho` → import → przeliczenie listy. Partie: `am`–`ap` po 200, `aq` 203,
+`ar`–`av` po 200, `aw` 97. Każda: 200/200 (lub 203/203, 97/97) nowych,
+0 odrzuceń, skan linii `PL:` bez CJK.
+
+**Wynik:** magazyn 141 883 → **143 983** przekłady (29,41%). Pierścień:
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | **100%** |
+| ≤1 600 m | 5 952 | 4 540 | 1 412 | 76,3% |
+| ≤3 200 m | 6 832 | 4 557 | 2 275 | 66,7% |
+| ≤6 400 m | 9 097 | 4 568 | 4 529 | 50,2% |
+
+Lista robocza `--promien 1000`: 2 100 → 1 700 (`an`) → 1 500 (`ao`) → 1 300
+(`ap`) → 1 097 (`aq`) → 897 (`ar`) → 697 (`as`) → 497 (`at`) → 297 (`au`)
+→ 97 (`av`) → **0** (`aw`). W tej sesji przetłumaczono 2 247 kwestii
+z pierścienia ≤1 000 m (11 partii).
+
+**Treść partii:** targ i przekupnie (ryby, gruszki, ciastka różane, lampiony,
+latawce, figurki z ciasta), kamieniarze i warsztat szkutniczy, porty
+(przeprawa Linjin, Wansheng, Gracetown), „siedemdziesiąt dwa źródła”, szkoła
+i uczniowie, kaplica przodków i plotki o młodym panu, Sala Zielonego Węża
+vs Sala Krwawej Łuski, urzędnicy i arsenał, świątynie (Pałac Najwyższej
+Jedności), Cytaty z Księgi Pieśni i klasyków w przekładzie swobodnym.
+
+**Uwaga o formacie:** wpis z wielowierszowym `EN:` łamie parser zwrotki
+(`zlamana_linia`) — `EN:`/`PL:` muszą być jednoliniowe; wielowierszowy tekst
+źródłowy sklejać spacjami.
+
+**Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od
+kotwicy to przybliżenie „co gracz zobaczy najpierw”. Plik pierścieni:
+`dist/postep_kregi.json` (poza Git).
