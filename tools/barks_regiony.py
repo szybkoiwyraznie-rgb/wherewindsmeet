@@ -130,7 +130,7 @@ def zbierz(index, magazyn, *, mapy: set[int] | None = None) -> tuple[dict[str, l
         for element in scena.get("e", ()):
             slot = element[4] if len(element) > 4 and element[3] else element[2]
             klucz = slot[1:] if slot.startswith("@") else slot
-            if klucz in ix.teksty and not magazyn.przeklad(klucz):
+            if klucz in ix.teksty and (magazyn is None or not magazyn.przeklad(klucz)):
                 klucze.append(klucz)
         if not klucze:
             continue
@@ -205,6 +205,7 @@ def main(argv=None) -> int:
     parser.add_argument("--siatka", type=int, default=400, help="bok klastra w metrach (domyślnie 400)")
     parser.add_argument("--promien", type=int, help="zapisz klucze w tym promieniu od kotwicy")
     parser.add_argument("--slotki", help="plik wyjściowy z listą kluczy (jeden na linię, od najbliższego)")
+    parser.add_argument("--wszystkie", action="store_true", help="licz też kwestie już przetłumaczone (postęp pierścieni)")
     parser.add_argument("--json", action="store_true")
     arguments = parser.parse_args(argv)
     try:
@@ -216,7 +217,9 @@ def main(argv=None) -> int:
             if wpis is None:
                 raise RegionyError(f"nie ma krainy {arguments.kraina!r}")
             mapy = set(wpis.get("mapy") or ())
-        punkty, bez_pozycji = zbierz(arguments.indeks, magazyn, mapy=mapy)
+        punkty, bez_pozycji = zbierz(
+            arguments.indeks, None if arguments.wszystkie else magazyn, mapy=mapy
+        )
         if not punkty:
             raise RegionyError("brak kwestii z pozycją — sprawdź index/ i magazyn")
         ix = indeks_mod.wczytaj(arguments.indeks, teksty=False)

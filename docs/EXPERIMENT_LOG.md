@@ -2954,3 +2954,36 @@ z ZH z pomocą EN. Import: 60 miejsc, 60 nowych, 0 odrzuconych; magazyn
 
 **Kontrole:** `run_tests.py`, `check_repository.py`. Przekład AI-tymczasowy,
 bez testu w grze.
+
+## 2026-11-20 (4) — partia `barks_start_ab` (170 kwestii) i ewidencja pierścieni
+
+**Polecenie właściciela:** „tłumacz pierścieniami; na pewno <400 m, a najchętniej
+<1000 m”. **Metoda:** `tools/barks_regiony.py --promien 1000 --slotki` daje
+wyłącznie nieprzetłumaczone klucze od najbliższej; z tej listy 170 kolejnych
+kwestii (handel, grajkowie, pijacy, noworoczny smok, dzieci, koty, stragany).
+
+**Wynik:** zwrotka `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ab.md`,
+import 170/170, 0 odrzuceń; magazyn 139 713 → **139 883** (28,57%).
+Skan PL bez CJK.
+
+**Ewidencja:** nowy [POSTEP_KREGI.md](POSTEP_KREGI.md) z tabelą pierścieni
+(razem / przetłumaczone / pozostało) liczona narzędziem (`--wszystkie` vs
+domyślnie). Stan po partii `ab`:
+
+| pierścień | razem | przetłumaczone | pozostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 236 | 148 |
+| ≤400 m | 1 372 | 263 | 1 109 |
+| ≤800 m | 3 596 | 413 | 3 183 |
+| ≤1 000 m | 4 523 | 423 | 4 100 |
+| ≤1 600 m | 5 952 | 440 | 5 512 |
+| ≤3 200 m | 6 832 | 457 | 6 375 |
+| ≤6 400 m | 9 097 | 468 | 8 629 |
+
+Do pierścieni wchodzą też wcześniejsze przekłady AI (stąd 423 przy 230 nowych).
+709 kwestii grupy nie ma pozycji — poza pierścieniami, do osobnego klucza
+(`trap`, `entity`) albo danych z bazy gry.
+
+**Narzędzie:** `barks_regiony.py` dostał `--wszystkie` (licz też gotowe
+przekłady), żeby dało się liczyć postęp bez zapisywania stanu w pliku.
+**Kontrole:** `run_tests.py`, `check_repository.py`.
