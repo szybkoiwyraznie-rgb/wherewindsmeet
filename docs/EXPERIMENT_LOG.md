@@ -2791,3 +2791,11 @@ i poprawki bez odrzuceń. Sonda scen grup 5029, 5025, 5032, 5095: 77, 27,
 tekstów zadań. Skan 144 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
 podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
 (637 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Szczurek Pip i Brzydka Niang (`is`–`iv`):** 71 + 72 + 74 + 65 =
+282 nowe przekłady; magazyn 139 402, 489 544 miejsc (28,48%). Próby suche,
+importy i poprawki bez odrzuceń. Sonda scen grup 5015, 5021, 5016: 73, 85
+i 161 dostępnych bazowych kluczy, bez braków; nie obejmuje pozostałych
+tekstów zadań. Skan 282 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(641 wpisów); AI-tymczasowe, bez testu w grze.

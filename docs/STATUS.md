@@ -171,6 +171,15 @@ miękkich dywizów, liczba podziałów wierszy zgodna ze źródłem. **623 testy
 OK**, kontrola repozytorium OK (637 wpisów indeksu). Przekład AI-tymczasowy,
 bez testu w grze.
 
+**Kontynuacja `is`–`iv`:** 282 nowe przekłady scen o Szczurku Pipie
+(grupy 5015 i 5021) i Brzydkiej Niang (5016). Magazyn **139 402**
+przekłady, **489 544** miejsca (28,48%). Sonda dostępnych bazowych kluczy
+powiązanych scen tych grup: odpowiednio 73, 85 i 161 kluczy, bez braków;
+nie obejmuje pozostałych tekstów zadań. Importy i poprawki bez odrzuceń;
+skan 282 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów
+wierszy zgodna ze źródłem. **623 testy OK**, kontrola repozytorium OK
+(641 wpisów indeksu). Przekład AI-tymczasowy, bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.
