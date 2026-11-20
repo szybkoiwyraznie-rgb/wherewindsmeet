@@ -84,7 +84,7 @@ Kolejność: od najbliższej kwestii względem kotwicy prologu (X -1330, Z -110)
     klucz: 6b8223f5ca076238
     ZH: 古有公孙大娘舞剑器，今有我康万缕挥菜刀！
     EN: Lady Gongsun of old was known for her sword dance. And now I, Kang Wanlu, shall be known for my cleaver!
-    PL: Dawniej公孙大娘 tańczyła z mieczem, dziś ja, Kang Wanlü, wymachuję tasakiem!
+    PL: Dawniej pani Gongsun tańczyła z mieczem, dziś ja, Kang Wanlü, wymachuję tasakiem!
 
 ## pierscien6400 013
 
