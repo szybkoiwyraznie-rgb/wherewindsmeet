@@ -7353,6 +7353,7 @@
 {"k": "8f73b994a2870fc2", "pl": "Taniec ryb i smoków"}
 {"k": "8f741a89b5aaf074", "pl": "Zaślepka: rozgrywka “Malowany placek głodu nie zaspokoi”. Gromadzisz zaufanie, zdobywasz wiarę kupców z Targu Pachnącej Pszenicy, wydajesz pieniądz kredytowy i w końcu zbierasz pokaźną zapłatę w zbożu."}
 {"k": "8f757eb9521d2d57", "pl": "Obejrzawszy zwłoki, spostrzegasz, że to zaiste poseł Królestwa Jiangnan. Wszystko, coś ujrzał i przeżył, budzi w tobie wątpliwość: poseł przybył tu przecież na spotkanie z ukochaną Qin Ruolan — czemuż nagle oszalał? A gdzie podziała się Qin Ruolan, co miała tu ćwiczyć melodię?\nNie pojmujesz tego, jeno miejsce to snać pełne knowań i nie godzi się tu długo bawić, a sprawa Księgi z inskrypcjami yin wielce jest ważka — po namyśle więc postanawiasz, że pierwsze jest zadanie."}
+{"k": "8f75bb302640d061", "pl": "Czas mknie, lata płyną. Czy dzisiejszy Kaifeng zdoła rozbudzić w sercu samotnego starca wspomnienie owego, co niegdyś mu towarzyszył?"}
 {"k": "8f75ed104b73b890", "pl": "Co ty tu robisz?"}
 {"k": "8f763777bb59fdc5", "pl": "Książkowy robak"}
 {"k": "8f7663aaa1f8cd28", "pl": "Qi Hong"}
@@ -7366,9 +7367,11 @@
 {"k": "8f79b6c8bedd1cf8", "pl": "Mieszkaniec Hangzhou 105"}
 {"k": "8f7a8e043b720c04", "pl": "Rozmowa w środku 2"}
 {"k": "8f7b20536cb6c3ac", "pl": "Mnich"}
+{"k": "8f7bbfc89bc24077", "pl": "Podejdź do mnicha, co omdlał z głodu"}
 {"k": "8f7be365c98eef9b", "pl": "Kto uleczy sto trosk — czarny ekran"}
 {"k": "8f7c3066c38c4859", "pl": "Hm, zapach w sam raz. Podam mu."}
 {"k": "8f7c6e3c833c3908", "pl": "Liu Qingyan"}
+{"k": "8f7c91932a4e0aee", "pl": "Przeszedłszy wszelkie próby i trudy, rycerz zdał wewnętrzny egzamin szkoły Dziewięciu Nurtów; idź do Ni Laoshan i zostań uczniem wewnętrznym, by uczyć się prawdziwej, przedniej sztuki Dziewięciu Nurtów."}
 {"k": "8f7dd6e3c1d9f276", "pl": "Bezcenne Życie"}
 {"k": "8f7f8da062034cff", "pl": "Mechaniczny żołnierz"}
 {"k": "8f7f9c3b6b26e803", "pl": "Lin Wanzhao"}
@@ -7437,6 +7440,7 @@
 {"k": "8f9e9336b11550fa", "pl": "Lampion"}
 {"k": "8f9f77f3507e4316", "pl": "Hełm Dymu Wyżyny Long · Powrót Jaskółki"}
 {"k": "8f9feebdbc71f6a5", "pl": "Dzwon nurkowy w górę"}
+{"k": "8fa0096a15eb64c5", "pl": "Odwiedź chorego, który ogłosił nagrodę, i podlecz jego słabość"}
 {"k": "8fa0b6462c52f3c9", "pl": "Ostatni odwrót"}
 {"k": "8fa0f94078034eec", "pl": "Dzieciątko płacze, piersi chce… dajmy mu bułeczkę, niech się uciszy…"}
 {"k": "8fa1db543b436fe6", "pl": "W ciągu jednej nocy… zmarł…?"}
@@ -7452,8 +7456,11 @@
 {"k": "8fa46b57e2dd1da0", "pl": "Rękawice bojowe Złotej Inkrustacji · Na próbę"}
 {"k": "8fa6409449e98505", "pl": "…Jeśli jesteś z jianghu, nie mieszaj się w sprawy urzędników. Te wody są głębokie. Każdy niech wiosłuje swoją łodzią."}
 {"k": "8fa69f61efbf908f", "pl": "Jujuby z Qingzhou zwano dawniej jujubami rodu Le, jujubami z Qi albo złotymi jujubami z Qingzhou, a potocznie małymi albo pięknymi jujubami. “Najważniejsze sztuki dla dobra ludu” piszą: “W Qingzhou rosną jujuby rodu Le, mięsiste, o drobnej pestce, soczyste i wyborne, najlepsze pod niebem. Starcy powiadają, że przywiózł je z Yan i zasadził Yue Yi, gdy pokonał Qi”. Su Shi chwali je też w “Lesie zapisków Dongpo”: “Jujuby z Qi są słodkie, ale nie mdłe, wzmacniają śledzionę i dodają sił; podróżni zabierają je w daleką drogę zamiast suchego prowiantu”. Widać z tego, jak bardzo je ceniono."}
+{"k": "8fa6b0454f2e3add", "pl": "Owa „złotorodna czara” w twych rękach to zaiste nocnik?! Niedobrze — stałeś się największym podejrzanym na zjeździe bohaterów; znajdź sposób, by się oczyścić z zarzutu."}
+{"k": "8fa6c39db21f3e0b", "pl": "W Zielnych Bezdrożach snać zawsze kręci się jakieś dziecko, co chyłkiem przypatruje się bijatykom… Wedle jego słów szuka on następcy swej rodowej, przedniej sztuki. Czyżby dziecko zaiste miało jakieś sztuki walki?"}
 {"k": "8fa70e950a821ce3", "pl": "#a66829Przed chatką w Lesie Powracających Latawców#E kręci się nieznajoma staruszka; niepewnie szuka śladów dawnego przyjaciela…"}
 {"k": "8fa7b8cb025dbd22", "pl": "Otwierasz zawiniątko od Pana Rzeki,\na w nim stara, zniszczona maska nuo, którą Er Ma tak cenił\nKrew z maski rozpływa się w wodzie\nDziwna wielka ryba wydaje żałosny jęk\ni powoli krąży wokół maski nuo, stając się “pławą” wskazującą, gdzie jest bestia strzegąca wód"}
+{"k": "8fa7db27b28d7b56", "pl": "Klęska żywiołu nie ma litości, ale ludzie mają serca. Rycerzu, na odbudowę wioska pilnie potrzebuje wielkiej ilości $T(26_540010)!"}
 {"k": "8fa8a9b4bdfab0d6", "pl": "Chang Man'er"}
 {"k": "8fa8c453971e9603", "pl": "Jest wiele rzeczy, które An Ning nie rozumie: dlaczego tak się stało, dlaczego tatuś i mamusia jeszcze nie wrócili, dlaczego grzmot na zewnątrz nie ustaje. Ale przynajmniej towarzyszy mu śpiew siostry, dzięki któremu na krótko widzi we śnie rodziców."}
 {"k": "8fa8f327ff99c59e", "pl": "Skądże."}
@@ -7461,8 +7468,10 @@
 {"k": "8fa989b20b7cd795", "pl": "Mężu…"}
 {"k": "8fa9ff63ea61fc02", "pl": "Mapa Hutuo"}
 {"k": "8faa3268d55272e7", "pl": "Tian Han"}
+{"k": "8faa3fe2fcc58065", "pl": "Wieczorem pomów z Yaya"}
 {"k": "8fac6d4dbf7a0266", "pl": "#c3dcc9Tułacz Jianghu"}
 {"k": "8fac99b125710d1a", "pl": "Taoista Xuanyi"}
+{"k": "8fad1394fc8200bf", "pl": "Lat temu szesnaście Kitanie ruszyli na południe; rycerze, usłyszawszy wieść, pociągnęli na północ, hen nad Hutuo…"}
 {"k": "8fad2efc1e679782", "pl": "Osobliwa mysz - Ogród Nefrytowego Lasu 1"}
 {"k": "8fae0c56a2feb00e", "pl": "Rzemieślnik-statysta 3"}
 {"k": "8fae228e079f6911", "pl": "Ukryta Góra - scena bossa Qianye - powtórka zadania"}
@@ -7587,6 +7596,7 @@
 {"k": "8fea4d387bb8648e", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Splecione Gwiazdy lub Objęty Nefryt (st. 51) w jakości niebieskiej lub fioletowej oraz dodatkowo jedne notatki ścieżki Łamanie Bambusa: Pył."}
 {"k": "8feab969609d0960", "pl": "Zbiór: Żeń-szeń Łez Buddy"}
 {"k": "8fead5cc93e10436", "pl": "Przestraszona dziewczyna"}
+{"k": "8feb9beed9a776bb", "pl": "Jeno najlepsza geomancja i najstosowniejsza pora zdolają wyhodować Kwiat Wielbiący Księżyc. O tym osobliwym kwiecie #Hkrąży wieść, że pozwala dotknąć prawdziwej istoty wszechrzeczy.#E"}
 {"k": "8fec55eeee2fda1f", "pl": "Taki jestem głodny… Oddałem ci już resztę dziczyzny i dzikich ziół, nie czekaj dłużej, zaczynaj!"}
 {"k": "8fed7d5c0c4bfa04", "pl": "Jiangnan Skrzynia skarbów - Kadź na wodę"}
 {"k": "8fee35c1daed460e", "pl": "Karaś w sosie sojowym"}
@@ -7609,6 +7619,7 @@
 {"k": "8ff8acf471abb041", "pl": "Przepustka: Pewne Zwycięstwo (mobilne)"}
 {"k": "8ff91db77f17e93d", "pl": "Przymiarka kreatora: kobieta 12"}
 {"k": "8ff91fd2c7b35e69", "pl": "Ręcznie rysowany schemat mechanizmu na dnie jeziora, dziś rozmyty atramentem i słabo czytelny."}
+{"k": "8ff9a4851dc8a3ef", "pl": "Nie wiedzieć, cóż za przednie myśli ma jaśnie pan Zhao, aliści w takiej chwili jeno przytakiwać… prawdaż!"}
 {"k": "8ffa082a6d26121a", "pl": "Gazeciarz"}
 {"k": "8ffa4cd5473ebdf0", "pl": "Wiceminister robót publicznych"}
 {"k": "8ffb1ce12aafa0f5", "pl": "Pijany Pięściarz - poz. 91 - Pijane Cienie Gór i Rzek"}
