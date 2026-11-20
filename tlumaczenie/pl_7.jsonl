@@ -2412,6 +2412,7 @@
 {"k": "7464ad4dd1cddc88", "pl": "Mistrz miał rację. Młody generał Zhang już umarł. Nadchodzą niespokojne czasy i to nie jest już nasze Hexi."}
 {"k": "7465614c0e2422d7", "pl": "Barki zbożowe na Żółtej Rzece"}
 {"k": "74665472a7ffc1c6", "pl": "Sfałszowany Pai Gow"}
+{"k": "74666d76f30ad40e", "pl": "Jedzenia przywracającego zdrowie można używać tylko poza walką.\nW zakładce jedzenia w torbie możesz je wyposażyć i ustawić próg automatycznego użycia. #YPoza walką#E, gdy #Yzdrowie spadnie poniżej ustawionego progu#E, postać #Yautomatycznie będzie spożywać#E wyposażone jedzenie, aż zdrowie wzrośnie powyżej tego progu."}
 {"k": "746677ff19959330", "pl": "Po otwarciu otrzymasz: Skrzynia wsparcia przełomu sztuk tajemnych ×5, Nefryt Echa ×20."}
 {"k": "746692667508d8aa", "pl": "Był tam wielki wodny smok?"}
 {"k": "746701fee05eff0e", "pl": "Zhou Honglang z Jiangnanu"}
@@ -2726,6 +2727,7 @@
 {"k": "75048220328a5a91", "pl": "Wang Yuan"}
 {"k": "7504b8de1a5588cc", "pl": "Chcesz poznać dawne dzieje tej ziemi — wpierw odszukaj Wędrowca w Suixiang."}
 {"k": "7504eaa101a7a335", "pl": "Nagroda za 1. miejsce w tygodniowym rankingu próby: Stary Flisak. Można wyświetlić na profilu."}
+{"k": "7505351df0fd649e", "pl": "Boskie Rzemiosło — udoskonalanie"}
 {"k": "7505aa574c9e8e17", "pl": "Udowodnię im wszystkim… że nie ma na świecie żadnego Orła!"}
 {"k": "7505e296d3590ccc", "pl": "Na malowanej łodzi można ustawiać elementy nastroju ze zwierzętami, np. psy, koty, żurawie.\nOdblokowuje się automatycznie po awansie łodzi. Można go ustawić bezpośrednio w warstwie budowy łodzi, bez użycia."}
 {"k": "75062ec81ed816bb", "pl": "Spokojnie, bracie, ktoś widział, jak koń pobiegł drogą na zachód. Zaraz go poszukamy!"}
@@ -7072,6 +7074,7 @@
 {"k": "7cf1d2fc167e326f", "pl": "Element zestawu: Deszcz w Porę, st. 61"}
 {"k": "7cf2bc3dba71b141", "pl": "Skrzynia ognistej ropy"}
 {"k": "7cf2cdf2fd9d0e0f", "pl": "Myślało tylko: czemu taka zwykła trawka jak ona nie może być w niczym wspaniała? Myślało i myślało, aż rozkwitł kwiat, nadeszła wiosna, a feeria barw rozkwitła jednym małym kwiatkiem na jej niezwykłej duszy."}
+{"k": "7cf2fa302264f1ce", "pl": "Podczas podpatrywania nie można używać sztuk walki ani technik lekkości. Jeśli patrolujący przeciwnicy cię #Rzauważą#E, wyrzucą cię z tego miejsca.\nPodejdź do przeciwnika od tyłu lub z góry i użyj #YDotyku Pustki#E, aby go obezwładnić."}
 {"k": "7cf3c1f518048ac6", "pl": "Rybacy wyjmują z muszli świeżą mięczaki i gdy budyń jajeczny jest w trzech czwartych ścięty, parzą je razem z nim.\nMięso małży jest pyszne, więc cały budyń pachnie morzem.\nGdy potrawa wychodzi z garnka, unosi się aromat, a budyń wygląda jak lotos wynurzający się z wody, stąd nazwa: małże w lotosie."}
 {"k": "7cf4873ea12db008", "pl": "Specjalnie Krojony Łeb Barana"}
 {"k": "7cf4d14006ac1384", "pl": "Po użyciu poznasz recepturę: Kamienna brama szczególna."}
