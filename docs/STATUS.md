@@ -67,6 +67,14 @@ dowodzi kompletności innych tekstów ani dostępności zadań na początku gry.
 Partie importowano po kontroli `--na-sucho`, bez odrzuconych wpisów;
 przekład pozostaje **AI-tymczasowy**, niesprawdzony w grze.
 
+**Dalsza partia `gz`:** 62 nowe kwestie związane ze Świętem Smoczych
+Łodzi oraz odbudową gospody, wybrane z grup 5254–5259 i 5296. Magazyn
+**136 084** przekłady, **489 544** miejsca w grze (27,80%). Sonda po
+bazowych kluczach scen zadań: grupy 5254–5260 i 5296 mają łącznie 67
+różnych przypisań do grup i 0 braków; nie oznacza to pełnego pokrycia
+pozostałych tekstów tych zadań. 623 testy OK i kontrola repozytorium OK
+po `gz`; bez testu przekładu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

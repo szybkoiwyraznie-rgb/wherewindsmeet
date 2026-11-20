@@ -2675,3 +2675,11 @@ powiązaniach; nie obejmuje innych rodzajów tekstów ani nie potwierdza
 momentu dostępności w grze. Compendium 79/1 524. Bez weryfikacji w grze.
 Lokalna kontrola po `gy`: `check_repository.py` OK (592 wpisy indeksu),
 `run_tests.py` **623 testy OK**.
+
+**Dziecięce spotkania i odbudowa gospody (`gz`):** 62 nowe przekłady
+scen z grup 5254–5259 i 5296, suchy i właściwy import bez odrzuceń;
+magazyn 136 084 przekłady, 489 544 miejsca (27,80%). Sonda bazowych
+kluczy scen zadań dla grup 5254–5260 i 5296: po przypisaniu do grup
+odpowiednio 11, 10, 4, 9, 8, 10, 2 i 13 kluczy, 0 braków w każdej.
+Sonda grupy 5306: 121 kluczy, 0 braków po `gy`. Kontrola repozytorium OK
+(593 wpisy indeksu), 623 testy OK po `gz`. To nie jest test w grze.
