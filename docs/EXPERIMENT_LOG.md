@@ -2821,3 +2821,10 @@ bez potwierdzenia momentu odblokowania poszczególnych haseł w grze. Próby
 suche, importy i poprawki bez odrzuceń; skan 99 bez CJK, nie-NFC i miękkich
 dywizów, liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
 repozytorium OK (645 wpisów). Przekład AI-tymczasowy, bez testu w grze.
+
+**Compendium, podróż i umiejętności (`ja`):** 35 nowych przekładów,
+łącznie `ix`–`ja` +134. `guider_tujian_data` 251/1 524, 1 273 braki
+według głównego źródła klucza. Próba sucha i import bez odrzuceń; skan 134
+nowych pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów wierszy
+zgodna ze źródłem. 623 testy i kontrola repozytorium OK (646 wpisów).
+Moment odblokowania w grze niezweryfikowany; przekład AI-tymczasowy.

@@ -3,6 +3,15 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+**Najnowsze — Compendium `ja` (2026-11-19):** 35 kolejnych instrukcji
+podróżowania, koni, sztuk osobliwych i odbić; `guider_tujian_data` ma teraz
+**251/1 524**, **1 273 braki** według głównego źródła klucza. W bieżącej
+kontynuacji `ix`–`ja` dodano 134 przekłady. Moment odblokowania poszczególnych
+haseł nie jest potwierdzony w grze. Import i próba sucha bez odrzuceń; skan
+134 pozycji bez CJK, nie-NFC i miękkich dywizów, podziały wierszy zgodne ze
+źródłem. 623 testy i kontrola repozytorium OK (646 wpisów). Przekłady są
+AI-tymczasowe, bez testu w grze.
+
 **Najnowsze — Compendium `ix`–`iz` (2026-11-19):** 99 nowych
 przekładów (44 + 28 + 27), przede wszystkim podstawy walki, eksploracji,
 towarzyszy i leczenia. `guider_tujian_data`: **216/1 524**, **1 308 braków**
