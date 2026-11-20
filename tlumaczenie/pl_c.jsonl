@@ -71,6 +71,7 @@
 {"k": "c01c9e2a390c598d", "pl": "Ukryj się za parawanem"}
 {"k": "c01d1c8d663b6879", "pl": "Ściana z kamiennych płyt"}
 {"k": "c01d8034956c18c5", "pl": "Najbogatszy pod niebem, pan Weiyang."}
+{"k": "c01d96bdc7fa9334", "pl": "W tym roku ryż na górze dobrze rośnie..."}
 {"k": "c01e224a05ad9978", "pl": "Zamek Lu Bana: Trzy Przejścia 9"}
 {"k": "c01e36df7c95ba64", "pl": "Odnajdujesz zgubiony mechanizm Lian Linga, ale pies go pogryzł i przez to Lian Ling przegrywa pojedynek. Lian Ling przysięga, że następnym razem na pewno nie przegra! Choć masz wrażenie, że wynik tego pojedynku wcale nie był ważny."}
 {"k": "c01e6e9ecce64a6d", "pl": "Jeden łyk i choćby człowiek był nie wiem jak zmęczony, od razu nabierał sił."}
@@ -842,6 +843,7 @@
 {"k": "c1866e16d72c9b20", "pl": "Wang Fugui"}
 {"k": "c1870a7bba909589", "pl": "Chodźcie zobaczyć latawce, wszelkie wzory są!"}
 {"k": "c18730dfaf6b26e2", "pl": "Pomów z Wei Zhixi i wybadaj całą sprawę."}
+{"k": "c18732d86ace0e6f", "pl": "Widziałeś, jak boski uczony wymachuje pędzlem, istna płynąca woda i chmury..."}
 {"k": "c187b309154a6583", "pl": "Zwój tajnych dziejów świata wojowników, w którym spisano sekrety panicza Wuheng i Świętego Złodzieja."}
 {"k": "c188acef1313b8f3", "pl": "Pochodzenie Zhao Tiego"}
 {"k": "c188c7e354b7ac39", "pl": "Wojownik Pustyni"}
@@ -1317,6 +1319,7 @@
 {"k": "c24f667a1e489c83", "pl": "Barwnik według nowej, własnej sztuki farbiarskiej Pawilonu Pierzastych Szat; proces jest zawiły, a odzież nabiera jeszcze wspanialszych barw.\n“Szaty z jutrzenki, brokat z zórz, w tysiącu postaci; chmurne szczyty, chmurne turnie, sto razy na nowo rodzone”. Podobno cesarz Zhongzong z dynastii Tang, Li Xian, ujrzawszy pierwszy raz tę sztukę, tak się zachwycił, że napisał ten wiersz i nadał jej imię “barwienia różanych obłoków”.\nTen barwnik można użyć tylko do stroju Mroczny Sen Południa."}
 {"k": "c24f8854f673edc0", "pl": "Nowy dzban na wodę"}
 {"k": "c24fb2ded35d1778", "pl": "Chen Bai odszedł. Przybył z sercem pełnym zapału, a odchodzi pełen zwątpienia. Takie są czasy zamętu."}
+{"k": "c25028c8ceccbb99", "pl": "Pierwszorzędna siarka, mielona tylko z rdzenia kamienia, pomoże ci wzbić się w przestworza!"}
 {"k": "c2505074543cbbd4", "pl": "Nie obchosi mnie! Nie wesmies na siebie, to jesteś s Pfiewięciu Nultuf!"}
 {"k": "c25182429035eadc", "pl": "Prze-przeze mnie? Ty… ty…"}
 {"k": "c2518bc4c004d23c", "pl": "(Zastępczy przerywnik rozgrywki, nie wersja ostateczna)\nGdy wszystko zostało spakowane,\nYinge znów poprowadziła wszystkich pieszo w głąb śnieżnej doliny.\nDaleka Śnieżna Dolina Yuntai tonęła w blasku zachodu."}
@@ -1489,6 +1492,7 @@
 {"k": "c2987781aed25eff", "pl": "Chunjin"}
 {"k": "c29a5829996f87ac", "pl": "Lihui"}
 {"k": "c29ae27c272da9c6", "pl": "Tak pilnie strzeżone, to musi być zakazane miejsce Szkoły Moistów. Lepiej się wynieść, zanim mnie zauważą."}
+{"k": "c29afd918d60d973", "pl": "Ptaszku, ptaszku, dotrzymuj mi towarzystwa; dla ciebie wziąłem dwudziestoletni kredyt na ptaki!"}
 {"k": "c29bd64aee4a17a1", "pl": "Bracie Zhao, wiesz, co to takiego?"}
 {"k": "c29d7d463725a23a", "pl": "Jakże mógłbym… odmówić? Proszę, bierz…"}
 {"k": "c29e3761a6cf7ff7", "pl": "Kosz węgla drzewnego do codziennego ogrzewania.\n“Węgiel to drewno wypalone, co zachowało swą moc; w zimne miesiące pali się nim, by się ogrzać; nie dymi i nie płonie płomieniem, dlatego jest cenny”. - Xu Shen z czasów Wschodnich Han, “Objaśnienie znaków”"}
@@ -1785,6 +1789,7 @@
 {"k": "c333cd8423d499f7", "pl": "Nie złość się. Od złości robią się zmarszczki. "}
 {"k": "c33484470d6fab37", "pl": "Ciężka Jazda"}
 {"k": "c334a113c8242219", "pl": "Feng Drugi"}
+{"k": "c334d8a99ebed42c", "pl": "Do licha, to przez tych mistrzów Qiongqi za miastem; Wielka Mistrzyni też nic nie robi."}
 {"k": "c334fb24bb503ae5", "pl": "Wybierz się z odwiedzinami do Xiao Shi"}
 {"k": "c3353bdcf8f94e7e", "pl": "Trumna, co nie tonie"}
 {"k": "c336c67278b3f853", "pl": "Szybki jak błyskawica"}
@@ -3216,6 +3221,7 @@
 {"k": "c5ad3fa206091389", "pl": "Braciszku, kiedy my wreszcie zjemy pachnące placki?"}
 {"k": "c5ad54d863d688ab", "pl": "Do zgłębiania Drogi Wewnętrznej.\n#HUmiejętność pasywna:#E Każde zadanie obrażeń z 10% szansą nakłada 1 stos Płaczu Krwią na 5 s, zadającego obrażenia co sekundę, do 5 stosów. Gdy stosy na celu dojdą do 5, zostaną natychmiast usunięte i zadadzą jednorazowo wysokie obrażenia. Ponowne nałożenie odnawia czas."}
 {"k": "c5ad67b1a6945323", "pl": "Uczeń Hali Orki i Nauk, który właśnie oprowadza wszystkich po Bazarze Wiecznego Kwitnienia pod wielkim drzewem."}
+{"k": "c5adedc9a8370ff8", "pl": "Raz, dwa, raz, dwa, stąpaj, stąpaj!"}
 {"k": "c5ae3ae869ce72f5", "pl": "Blokada HP na 49.9"}
 {"k": "c5ae6f91d94098b9", "pl": "Xiao Tianyun"}
 {"k": "c5ae7e3538468a93", "pl": "Skarby Xiaoba"}
@@ -4678,6 +4684,7 @@
 {"k": "c84e6f9f4ed68802", "pl": "Do Mglistego Lasu pójdę i już, nikt mi tego nie wyperswaduje!"}
 {"k": "c84efc634a973f30", "pl": "Wu Ye"}
 {"k": "c84f5f44f592cfcb", "pl": "Piętnaście lat temu cały Kaifeng wiedział: kobiety, którymi “Nian Gun” się nasycił, zabijał jednym cięciem."}
+{"k": "c84fa61ebfbd4b21", "pl": "Zapisałem wszystkie ruchy, wrócimy, to potrenujemy..."}
 {"k": "c85151af8f09ac75", "pl": "Po użyciu usuwa #Yurazy wewnętrzne#E."}
 {"k": "c8519da354b59bf2", "pl": "Ano. Dom Bujnego Kwiecia to mieszkanie uczniów Upojnego Cienia."}
 {"k": "c8520340bbf045c1", "pl": "Gospoda Bez Zazdrości - budowa 2"}
@@ -5187,6 +5194,7 @@
 {"k": "c933efe02bca38ad", "pl": "Obszar zadania 3700264"}
 {"k": "c93448bce05f70c3", "pl": "Efekt sprawdzający"}
 {"k": "c9352264e7d541e6", "pl": "Ubogi starzec"}
+{"k": "c935289f4c0a42d1", "pl": "Nie myśl ciągle o zabawie! Co złego w Pawilonie Boskich Rzemiosł?"}
 {"k": "c9365ba9e696a683", "pl": "Strzała bez Lotek"}
 {"k": "c9373dd29ea5f21c", "pl": "Wkradnij się do Popielnej Jamy i poszukaj Małego Fu"}
 {"k": "c9378ed1ab1eb2ef", "pl": "Bezimienny szkarłatny owoc, ledwie wyczuwalnie pachnący kwiatem śliwy."}
