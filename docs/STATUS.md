@@ -35,8 +35,14 @@ w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 
 pierścień ≤1 600 m domknięty w 100% (5 952/5 952, partie `ax`–`bd`),
 pierścień ≤3 200 m domknięty w 100% (6 832/6 832, partie `be`–`bj`);
 wszystkie progi do 6 400 m są **domknięte w 100%** (partie `bk`–`bu`).
-Kolejny zakres: 6 400–12 000 m — zostało **1 824** kwestie
-(`dist/region_12000.txt`). Magazyn **148 512** (**30,34%**).
+Pierścień 6 400–12 000 m domknięty partiami `bv`–`cb` (**1 824/1 824**),
+a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
+`--slotki` zwraca pustkę („brak kwestii z pozycją”). Domknięta jest też
+**cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
+— w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
+Magazyn **151 045** (**30,85%**). Z magazynu zbudowano gotową łatkę
+`dist/WWM_Latka_PL_v0.6.0.zip` (151 389 kluczy, 12,6 MB) — podmienia teksty
+w grze (`one_click_patch.py --tylko-magazyn --wydanie v0.6.0`); nie testowana w grze.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

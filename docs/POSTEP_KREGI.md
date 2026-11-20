@@ -84,10 +84,12 @@ Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
 Pierścień **≤3 200 m domknięty w 100%** (6 832/6 832). Zostaje najdalszy
 próg ≤6 400 m: **9 097/9 097 (100%)** — domknięty partiami `bk`–`bu`.
 
-Magazyn po partii `bu`: **148 512** przekładów (**30,34%**).
-Kolejny próg do zrobienia: 6 400–12 000 m — **1 824** kwestie
-(`dist/region_12000.txt`); poza tym ~429 kwestii bez pozycji lub dalej niż 12 km. Przekład AI-tymczasowy,
-bez testu w grze.
+**Pierścień ≤12 000 m domknięty w 100%** — 10 940/10 940 (partie `bv`–`cb`,
+1 824 kwestie), po czym `--slotki` zwraca „brak kwestii z pozycją”.
+**Cała grupa kwestii wyzwalanych w świecie jest przełożona: 11 713 kluczy,
+0 bez przekładu**, w tym **773 kwestie bez pozycji** w świecie (partie `cc`
+250 i `cd` 459, lista `dist/region_bez_pozycji.txt`). Magazyn: **151 045**
+przekładów (**30,85%**). Przekład AI-tymczasowy, bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)
 → 697 (`as`) → 497 (`at`) → 297 (`au`) → 97 (`av`) → **0** kluczy (`aw`,
@@ -113,8 +115,9 @@ poprzednia, bez ręcznego śledzenia numerów.
 
 - Odległość od startu to przybliżenie „co gracz zobaczy najpierw”, nie kolejność fabuły.
 - Część kwestii występuje w kilku scenach; do pierścienia trafia najbliższe wystąpienie.
-- 709 kwestii bez pozycji wymaga innego klucza (np. `trap`, `entity`) albo danych z bazy gry.
-- Pierścienie pokrywają 10 683 z 11 369 kwestii grupy: po domknięciu ≤6 400 m
-  zostaje jeszcze **1 586 kwestii dalszych niż 6 400 m** (do 11 085 m) oraz
-  ok. **686 bez pozycji** — to nie „koniec całości”, tylko koniec geografii
-  wokół startu gry.
+- 773 kwestie bez pozycji nie mają współrzędnych kitu; przełożono je bez
+  przypisania do miejsca (partie `cc`, `cd`, lista `dist/region_bez_pozycji.txt`).
+- Grupa kwestii wyzwalanych w świecie (`spaces.*`) liczy 11 713 kluczy:
+  10 940 z pozycją (wszystkie w promieniu ≤12 000 m) + 773 bez pozycji —
+  całość ma przekład. To domyka zakres „pojedynczych odzywek NPC”;
+  poza nim pozostają sceny zadań i teksty bez relacji do `spaces.*`.

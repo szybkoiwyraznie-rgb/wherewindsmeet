@@ -3227,3 +3227,36 @@ poprawione i zreimportowane osobnym commitem. Poza tym 0 odrzuceń, wszystkie
 
 Następny zakres: 1 824 kwestie w pierścieniu 6 400–12 000 m
 (`dist/region_12000.txt`) + ~429 kwestii bez pozycji w świecie.
+
+## 2026-11-20 (15) — pierścień ≤12 000 m i cała grupa barks domknięta
+
+Partie `bv`–`cb` (6 × 250 + 324 = **1 824** kwestie) z pierścienia
+6 400–12 000 m, potem partie `cc` (250) i `cd` (459) dla kwestii
+**bez pozycji** w świecie. Magazyn 148 512 → **151 045** (30,85%).
+0 odrzuceń importu, 0 CJK w liniach `PL:`.
+
+| promień | razem | przetłumaczone | zostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 |
+| ≤400 m | 1 372 | 1 372 | 0 |
+| ≤800 m | 3 596 | 3 596 | 0 |
+| ≤1 000 m | 4 523 | 4 523 | 0 |
+| ≤1 600 m | 5 952 | 5 952 | 0 |
+| ≤3 200 m | 6 832 | 6 832 | 0 |
+| ≤6 400 m | 9 097 | 9 097 | 0 |
+| ≤12 000 m | 10 940 | 10 940 | 0 |
+
+Grupa kwestii wyzwalanych w świecie (`spaces.*`, poza kitami ambientowymi
+i scenami zadań): **11 713 kluczy, 0 bez przekładu** — 10 940 z pozycją
+i 773 bez pozycji. Po partii `cb` narzędzie zwróciło
+`{"ok": false, "powod": "brak kwestii z pozycją — sprawdź index/ i magazyn"}`,
+co jest oczekiwanym sygnałem wyczerpania listy (nie tworzy pliku).
+
+Uwaga metodyczna: wcześniejsza liczba „~429 bez pozycji” była różnicą
+11 369 − 10 940 na przybliżonym podziale z audytu. Faktyczny zbiór bez
+pozycji to **773** klucze (skrypt odtwarzający logikę `zbiersz()` bez
+filtrowania scen bez relacji `spaces.*` daje zawyżone 12 777 — takich scen
+narzędzie nie liczy). Lista robocza: `dist/region_bez_pozycji.txt`.
+
+Poza zakresem pozostają: teksty bez relacji do `spaces.*`, sceny zadań
+i kity ambientowe (te ostatnie były robione wcześniej osobnymi partiami).
