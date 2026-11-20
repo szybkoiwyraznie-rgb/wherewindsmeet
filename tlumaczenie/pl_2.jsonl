@@ -44,6 +44,7 @@
 {"k": "2013a04191c30e09", "pl": "Siostro, ja nie chcę iść…"}
 {"k": "2013c0d841143473", "pl": "Polecane: Echo, Lód z Tuszu (M)"}
 {"k": "2013f9c3fcf39b00", "pl": "Chai Zhong zamierza ruszyć na południe, potrzebuje jednak mapy przemarszu kitańskiej jazdy, by jej unikać. Liczy, że pomożesz mu jej poszukać w Luancheng."}
+{"k": "20144474e8182bd7", "pl": "Ty… sprowadziłaś żołnierzy? Skąd ich wzięłaś?"}
 {"k": "2014d2e0f0b37deb", "pl": "Zastępco… oni chyba są mocni… Może tak… mądry pies nie pcha się pod kij, przyjdziemy innym razem…"}
 {"k": "2015be3e83ab7622", "pl": "Jiang?"}
 {"k": "201700ca8af38e69", "pl": "Gorące Uznanie"}
@@ -2661,6 +2662,7 @@
 {"k": "24d4185f69591da8", "pl": "Woda ofiarna argha"}
 {"k": "24d481b6ea1280ea", "pl": "Gliniany Dzik 102 - Luancheng"}
 {"k": "24d48389fba2b5e3", "pl": "Łamigłówka z Puchową Trawą - Puchowa Trawa przy kole wodnym, podwójne 5"}
+{"k": "24d4a2d15444b92c", "pl": "Masz rację. Ostrze jest już przy jego gardle. Dlaczego ręka, która je trzyma, miałaby należeć do kogoś innego?"}
 {"k": "24d53b0cccd0541a", "pl": "Chwiejna Góra · Pijany Nefryt"}
 {"k": "24d5762801620e97", "pl": "Wzmocnienie atrybutów"}
 {"k": "24d64a64d99850e6", "pl": "Woźnica Hu"}
@@ -4067,6 +4069,7 @@
 {"k": "276c2f003e36600f", "pl": "Nic nie znaczę… ale wiem (zaciska pięść, gwałtownie się odwraca), że żołnierze walczą tylko dlatego, że wierzą, iż wódz ich nie zawiedzie. Takie zaufanie…"}
 {"k": "276c84bfb6038e01", "pl": "Shen Haoyang, uczeń Wzburzonych Fal, napotkał na południowym brzegu Hutuo oddział kitańskiej konnicy i stoczył ciężką walkę…   "}
 {"k": "276ccb2c45fcdc00", "pl": "Amur biały"}
+{"k": "276d63eb4ef1f852", "pl": "Wszyscy jesteśmy Zhangami. Co za różnica?"}
 {"k": "276dab66c6ff7d6f", "pl": "Trzeba wyposażyć wierzchowca"}
 {"k": "276e786faecea663", "pl": "Odnowienie przywódcy za:"}
 {"k": "276e8338fc8215ae", "pl": "Wachlarz - powalenie (podstawa)"}
@@ -5396,6 +5399,7 @@
 {"k": "29c18c7f80320aa0", "pl": "Więc to jest ten dziwny kwiat z Mglistego Lasu, o który wszyscy się kłócą. Oddać go braciom Bai, dać czatującemu pod drzwiami Chang Buxiu czy zanieść właścicielowi Pawilonu Skarbów i zagarnąć nagrodę dla siebie?"}
 {"k": "29c1a4ee82a2d860", "pl": "He Qi"}
 {"k": "29c1bea1b08e0a43", "pl": "List do Jiang"}
+{"k": "29c2c37a502aa78a", "pl": "A przed kilkoma dniami nastąpiła jednoczesna zmiana warty i ludzi w wojsku. Wykorzystał okazję. Całkiem nieźle się spisał."}
 {"k": "29c36e100aa344e5", "pl": "Na razie wygląda na to, że tylko on pasuje do “Wuque”, którego szukam."}
 {"k": "29c3f04591303321", "pl": "Wczytywanie…"}
 {"k": "29c4012321122f68", "pl": "Król Małp wrócił z dalekiej wędrówki cały w ranach. Konając, zostawił tu swoją koronę dla nowego króla."}
@@ -5744,6 +5748,7 @@
 {"k": "2a66945f2f19a6ea", "pl": "Znacznik śledzenia błędu świecy"}
 {"k": "2a66cf6ce5adabd7", "pl": "Qiao Hesheng"}
 {"k": "2a66f78161cff8d7", "pl": "Gospoda Bez Zazdrości - piwnica"}
+{"k": "2a67335ba49c7d1c", "pl": "Z ukrytego pokoju przyszło polecenie, żeby wypuścić wszystkich lekarzy sprowadzonych w tym miesiącu. Powiedziano też… żeby nie wzywać kolejnych."}
 {"k": "2a677c2a85183af9", "pl": "Chyba… tak?"}
 {"k": "2a6860fbb19896f4", "pl": "Wypytaj Yuelu"}
 {"k": "2a6862f3e5290b04", "pl": "Wszyscy tu jesteście ludźmi jianghu, którzy coś znaczą… Chyba nie patrzycie równie krótkowzrocznie?"}
@@ -6398,6 +6403,7 @@
 {"k": "2ba22e3b2835e3fe", "pl": "Ale ja już sporo “ofiarowałem”…"}
 {"k": "2ba23a9d9d03b4d5", "pl": "Nigdy mu nie wierzyłem. Dopiero po jego śmierci, kiedy zająłem się naprawą posągu, zrozumiałem, że mówił prawdę."}
 {"k": "2ba2719ae1f3388d", "pl": "Robotnicy od lodu"}
+{"k": "2ba277f7be4da939", "pl": "Spakujmy się i odejdźmy."}
 {"k": "2ba2fe1e075904bc", "pl": "Haftowana Szata"}
 {"k": "2ba3d68dcdc5220f", "pl": "Stół budowniczego"}
 {"k": "2ba4b590ab79d435", "pl": "Pani Liu"}
@@ -6568,6 +6574,7 @@
 {"k": "2bed8ce8fd279cb5", "pl": "Długi stolik do herbaty"}
 {"k": "2bedb8b762d17a4c", "pl": "Mówię o tym Pawilonie Pierzastych Szat. Odkąd go otwarto, kobiety na północy naśladują stroje z Jiangnanu."}
 {"k": "2bede170da0915f9", "pl": "#YPojedynek na słowa#E wkrótce się rozpocznie, wypatrujcie!"}
+{"k": "2beef28d85d92759", "pl": "…To ty."}
 {"k": "2bef60cf4fa67946", "pl": "Potężni wrogowie: poznanie rzeczy"}
 {"k": "2bef6d09ff0dfcdd", "pl": "Mglisty Las — uruchomienie zadania"}
 {"k": "2bf03615a3db83fa", "pl": "Uczeń lecznicy"}
@@ -7912,6 +7919,7 @@
 {"k": "2e6977d696e47376", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Mglista Wierzba lub Nieznający Chłodu (st. 100) w jakości niebieskiej lub fioletowej, a z niskim prawdopodobieństwem także dodatkowy złoty element wyposażenia oraz dodatkowo jedne notatki ścieżki Jedwabna Nić: Nefryt."}
 {"k": "2e69e52dbabe581d", "pl": "Listy rodzinne starego sternika"}
 {"k": "2e6a4862818a42e2", "pl": "Ruan Tianba"}
+{"k": "2e6a5485e200b48e", "pl": "Dla ciebie nie musi wychodzić."}
 {"k": "2e6b1fd2b5d2dc40", "pl": "Xiao Shouze"}
 {"k": "2e6bb1d04189b759", "pl": "Sprawdzono: {数量}"}
 {"k": "2e6c4b0708bc0163", "pl": "Przejrzyj rozrzucone towary"}
