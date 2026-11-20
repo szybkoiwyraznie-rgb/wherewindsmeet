@@ -14,8 +14,8 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | ≤800 m | 3596 | 3596 | 0 | 100% |
 | ≤1000 m | 4523 | 4523 | 0 | **100%** |
 | ≤1600 m | 5952 | 5952 | 0 | **100%** |
-| ≤3200 m | 6832 | 6119 | 713 | 89,6% |
-| ≤6400 m | 9097 | 6130 | 2967 | 67,4% |
+| ≤3200 m | 6832 | 6832 | 0 | **100%** |
+| ≤6400 m | 9097 | 6843 | 2254 | 75,2% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -56,6 +56,11 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_bc` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bc.md` | 200/200, 0 odrzuceń |
 | `barks_start_bd` | 212 | ≤1600 m — **domknięcie** | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bd.md` | 212/212, 0 odrzuceń |
 | `barks_start_be` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_be.md` | 150/150, 0 odrzuceń |
+| `barks_start_bf` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bf.md` | 150/150, 0 odrzuceń |
+| `barks_start_bg` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bg.md` | 150/150, 0 odrzuceń |
+| `barks_start_bh` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bh.md` | 150/150, 0 odrzuceń |
+| `barks_start_bi` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bi.md` | 150/150, 0 odrzuceń |
+| `barks_start_bj` | 113 | ≤3200 m — **domknięcie** | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bj.md` | 113/113, 0 odrzuceń |
 
 Razem w pierścieniu ≤1 000 m: **4 330 kwestii** w partiach `aa`–`aw`
 (60 + 170 + 10 × 200 + 8 × 200 + 203 + 97) plus 193 kwestie przetłumaczone
@@ -64,9 +69,10 @@ wcześniej w innych partiach — daje to **4 523 / 4 523 = 100%**.
 Pierścienie **≤200 m, ≤400 m, ≤800 m i ≤1 000 m są domknięte w 100%**.
 Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
 (<1 000 m) oraz ≥ piersień ≤1 600 m (5 952/5 952) mają pełny przekład.
-Następny próg ≤3 200 m: 6 119/6 832 (89,6%), zostało 713.
+Pierścień **≤3 200 m domknięty w 100%** (6 832/6 832). Zostaje najdalszy
+próg ≤6 400 m: 6 843/9 097 (75,2%), zostało 2 254 — poza wczesną grą.
 
-Magazyn po partii `be`: **145 545** przekładów (29,73%). Przekład AI-tymczasowy,
+Magazyn po partii `bj`: **146 258** przekładów (29,88%). Przekład AI-tymczasowy,
 bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)
@@ -79,10 +85,10 @@ kluczy (`ax` → 1 012 `ay` → 812 `az` → 612 `ba` → 412 `bb` → **0** `bd
 ```
 python3 tools/barks_regiony.py                          # pierścienie i klastry
 python3 tools/barks_regiony.py --wszystkie              # to samo, z gotowymi przekładami
-python3 tools/barks_regiony.py --promien 3200 --slotki dist/region_3200.txt
-python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_region_3200 \
+python3 tools/barks_regiony.py --promien 6400 --slotki dist/region_6400.txt
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_region_6400 \
     --wersja 1 --data 2026-11-20 --tlumaczenie tlumaczenie \
-    --tylko-sloty dist/region_3200.txt --bez-zip
+    --tylko-sloty dist/region_6400.txt --bez-zip
 ```
 
 Lista `--slotki` zawiera wyłącznie kwestie **bez** przekładu, posortowane od

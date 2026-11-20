@@ -3152,3 +3152,26 @@ Lista `--promien 3200` dała 863 kluczy; partia `be` (150) → magazyn
 nocna warta), pan Rzeki i „dobre czasy”, oddziały najemne czekające
 na rozkazy pana Wei, ćwiczenia wojskowe, wiejskie plotki o rzezi
 w Beztroskiej Przystani, kołysanki i pieśni robocze.
+
+## 2026-11-20 (11) — domknięcie pierścienia ≤3 200 m (partie `bf`–`bj`)
+
+Sześć partii (150+150+150+150+150+113 = 863 kwestie) domknęło pierścień
+≤3 200 m w 100% (6 832/6 832). Magazyn 145 545 → **146 258** (29,88%).
+0 odrzuceń, `PL:` bez CJK; listy robocze 863 → 713 → 563 → 413 → 263 →
+113 → **0**.
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | 100% |
+| ≤1 600 m | 5 952 | 5 952 | 0 | 100% |
+| ≤3 200 m | 6 832 | 6 832 | 0 | **100%** |
+| ≤6 400 m | 9 097 | 6 843 | 2 254 | 75,2% |
+
+Treść: szlaki górskie i nocleg na szczycie, klasztor Miłosiernego Serca
+i wątek „kwiatów Buddy”, wioska Fuma i konie, targ Qingzhou i Sala
+Atramentu, sekta Kuchennego Noża, bandyci ukryci w jaskiniach, cytaty
+z klasyków i inskrypcji. **Pierścienie do 3 200 m — cały obszar wczesnej
+gry w promieniu dobrego kwadransa marszu — mają pełny przekład.**
