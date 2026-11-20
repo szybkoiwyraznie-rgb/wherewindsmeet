@@ -146,6 +146,7 @@
 {"k": "e05171893f734141", "pl": "Kto tam?!"}
 {"k": "e051d6e302a0f742", "pl": "Bon na strój: Kres Kwitnienia (3 dni)"}
 {"k": "e0534b8a4e46a0cb", "pl": "Odnowa"}
+{"k": "e0541e50d82b5027", "pl": "Wyślij sygnał w wybranym kierunku. Gdy towarzysz go wyczuje, pobiegnie tam, aby się z tobą pobawić."}
 {"k": "e0554aee57179054", "pl": "To jego osły. Kto bierze bez pytania, ten kradnie."}
 {"k": "e05576a6298e6ce9", "pl": "Modliszka - Brzeg Przyszłego Życia"}
 {"k": "e0558c9e5b6d82b7", "pl": "Tai chi głuszenia ryb: Kaifeng"}
@@ -675,6 +676,7 @@
 {"k": "e153a7cb449b8d55", "pl": "Bracie Feng, całą drogę słyszę rozmowy o otwarciu i zamknięciu góry. Co to właściwie znaczy?"}
 {"k": "e153ee900bb36659", "pl": "Rozmawiaj z Liu Jiaxin"}
 {"k": "e1540861aac48924", "pl": "Dar próby wyglądu"}
+{"k": "e1540922f47a4adf", "pl": "Poznani wędrowcy jianghu co tydzień przysyłają losowe prezenty. Im więcej ich znasz, tym lepsze nagrody."}
 {"k": "e1549042ad2a95f2", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Płukany Kwiat lub Gruszkowy Śnieg (st. 91) w jakości niebieskiej lub fioletowej, a z pewnym prawdopodobieństwem także dodatkowy złoty element wyposażenia oraz dodatkowo jedne notatki ścieżki Jedwabna Nić: Ulewa."}
 {"k": "e154ea332ea2d248", "pl": "Bohater: Szczere Wyznanie"}
 {"k": "e155b9f82095c657", "pl": "Nagroda wydarzenia “Blask Lampionów”"}
@@ -7358,6 +7360,7 @@
 {"k": "ed8afab8eabae7dd", "pl": "Wypytaj Huishuna o receptę"}
 {"k": "ed8b3dad1f281080", "pl": "Ukryta broń Kwiat Śliwy… Skarb, którego ciotka Han szukała tyle lat, i to właśnie tutaj!"}
 {"k": "ed8b67c5ad13764a", "pl": "Jiangnan - mapa zabawy w chowanego"}
+{"k": "ed8b6f269fb71ed6", "pl": "Głaskanie"}
 {"k": "ed8c45bea11b9ab0", "pl": "Plan sceny dla wielu osób 1"}
 {"k": "ed8cc2ae0419df19", "pl": "Pochwycenie Wschodniego Wiatru I"}
 {"k": "ed8cfae1a50b53b6", "pl": "Stolarnia + wieża węzłowa"}
@@ -7530,6 +7533,7 @@
 {"k": "eddbd77f43437dee", "pl": "Shen Zhou"}
 {"k": "eddc7a545687853d", "pl": "Portret konia, który własnoręcznie namalowałeś, wiernie oddający każdy szczegół. Na pewno pozwoli mu rozpoznać swojego konia numer dwa."}
 {"k": "edddeddef77323aa", "pl": "Napierśnik"}
+{"k": "edded93fc1da253f", "pl": "Użyj #Yprzywołania#E, aby towarzysz natychmiast do ciebie wrócił. Użyj #Ypodniesienia#E, aby wziąć go na ręce (wymaga 4. poziomu więzi z klanem)."}
 {"k": "eddf0b4d312c0d35", "pl": "Oddaj osty Luhua"}
 {"k": "ede001e00531f900", "pl": "Biesiada płynących czarek"}
 {"k": "ede01036d9c19dfc", "pl": "Starszy, ponad dwieście osób przekroczyło już Urwisko Westchnień. Na zewnątrz może być jeszcze czterysta…"}
@@ -7702,6 +7706,7 @@
 {"k": "ee296a709e4aedde", "pl": "Już wiem! Zrobię naczynie o podwójnych ściankach. Wsypiemy proszek do środka, a ogrzejemy zewnętrzną część."}
 {"k": "ee2a054f93346888", "pl": "Jubileuszowa Gra Planszowa 134"}
 {"k": "ee2e336c2d70b4e8", "pl": "dzieciak dziadka Pana wrócił z wieściami o niektórych sąsiadach. "}
+{"k": "ee2ed389532f21a1", "pl": "Jak wydawać polecenia?"}
 {"k": "ee2f14c653291be4", "pl": "Pociesz Śnieżynkę"}
 {"k": "ee2f1f8290bdd617", "pl": "Nowy element budowy fachów 665"}
 {"k": "ee2f34752024944c", "pl": "Nie trzeba, dziękuję."}
@@ -7909,6 +7914,7 @@
 {"k": "ee994f96c0190eee", "pl": "Gra zastąpiona madżongiem;Wielbłąd i kot przegrywają żetony i odchodzą, zostajesz tylko ty i tajemnicza kobieta;Kobieta ma wyraźnie więcej żetonów niż ty;Proponuje ostatnią rozgrywkę o wszystko"}
 {"k": "ee99da5f8a5cf2e4", "pl": "Za mało materiałów"}
 {"k": "ee99e297e59cd796", "pl": "Podążaj za dźwiękiem pipy"}
+{"k": "ee99eb62380bb553", "pl": "Podczas wędrówek po jianghu spotkasz różne osoby oznaczone szczególnym symbolem nad głową."}
 {"k": "ee9a0afcec4756f8", "pl": "List gończy za Trupim Ostrzem; nagroda: tysiąc taeli złota."}
 {"k": "ee9a261a2fd82566", "pl": "Dziewięciobarwny Jeleń (góra i dół)"}
 {"k": "ee9a4bd4263ec7b1", "pl": "Pakiet emotek: wierzchowiec"}
