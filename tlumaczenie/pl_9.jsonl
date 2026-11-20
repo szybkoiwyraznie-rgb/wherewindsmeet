@@ -1,5 +1,6 @@
 {"k": "9000873036272a73", "pl": "Feniksy naprzeciw siebie, wyszyte złotą nicią; piwonie po nocnym kapuśniaczku. Jasne lustro odbija nowy strój, lekkie skronie, smukła twarz."}
 {"k": "90010899ae0d8300", "pl": "Pani Zhao"}
+{"k": "90024d55662309ca", "pl": "W godzinie zi udaj się do bocznej sali"}
 {"k": "90026ecd13e73803", "pl": "Woźnica: Dziewięć Nurtów"}
 {"k": "90027f24d6cbbf3e", "pl": "Bezimienna Włócznia: +obrażenia technik ładowanych"}
 {"k": "900299c67749b19d", "pl": "Idź dalej naprzód"}
@@ -19,6 +20,7 @@
 {"k": "9007af3a99173b32", "pl": "Dźwięk - Spichlerz Wyrównawczy - wieża, górny poziom"}
 {"k": "90080084f1cecada", "pl": "Miedziak: tryb pędzla"}
 {"k": "900962fbaaa818a5", "pl": "Bezcenny skarb"}
+{"k": "900a28771ab5ff56", "pl": "Odnajdź świecę „ogień” i zapal lampę"}
 {"k": "900ac9ce4114f14e", "pl": "Przymiarka nagrody ścieżki sezonu 5"}
 {"k": "900b252181ad97da", "pl": "I co teraz?"}
 {"k": "900cb227441a2729", "pl": "Miau, miau, miau. (daje znak, żeby spojrzeć w bok)"}
@@ -62,9 +64,11 @@
 {"k": "901ffbf73867cb31", "pl": "Szesnaście lat temu, korzystając z zamętu w Kaifengu, Hong Si wywiózł z siedziby Dziewięciu Nurtów dwoje dzieci."}
 {"k": "902315178d8ec953", "pl": "Qi kitańskiej jazdy (dowódca ciężkozbrojnych)"}
 {"k": "902367ef58bc66ad", "pl": "Kwestia wstępna roli Qi Zhao (miejsce zarezerwowane)"}
+{"k": "9023e7ec44ebbc9a", "pl": "Idź za Feng Jishengiem szukać drogi wyjścia"}
 {"k": "90259aade7665046", "pl": "Porzucona droga ratunku"}
 {"k": "9025b0d17f96faef", "pl": "Rzeźbienie steli w Suzhou"}
 {"k": "9027b609ed3d9699", "pl": "$T(11003)"}
+{"k": "90282046d32eb0b8", "pl": "Wysadź proch"}
 {"k": "90289843c156ee3e", "pl": "Sztuka moistów to wprawdzie pomniejsza ścieżka, ale więcej nauki nie zaszkodzi. Daj mi posłuchać jeszcze chwilkę…"}
 {"k": "902a7c943c8f715b", "pl": "Szczur w Skórze Tygrysa"}
 {"k": "902b806dc6ff0de4", "pl": "Wypadają najwyżej złote nagolenniki zestawów Objęty Nefryt, Czarny Pancerz i Wierny Słusznej Sprawie, st. 81."}
@@ -81,6 +85,7 @@
 {"k": "9030c870e5ce63c4", "pl": "Skrzynia Łowienia Księżyca - Północ Przeprawy Jing 9"}
 {"k": "90315b3e222615aa", "pl": "Czemu wyglądasz, jakbyś się szykowała do ucieczki?"}
 {"k": "903173c2b2cc3264", "pl": "Wyjątkowy drewniany skarabeusz"}
+{"k": "9031e5c514cc2b8c", "pl": "Rozmowa Zhao Ya z Chen Xiaomin"}
 {"k": "9032525ee4a91dce", "pl": "Zbieracz grobów - sobowtór jednorazowy"}
 {"k": "90326e0a11ad829a", "pl": "Rzemieślnik z Mrocznej Doliny, który uwielbia pieczone mięso, zwłaszcza z orzeszkami piniowymi!"}
 {"k": "9032b7a9d132945f", "pl": "Zdobyte w gnieździe pod okapem Wieży Tianyi"}
@@ -115,6 +120,7 @@
 {"k": "90443ab32aca27f7", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Nefrytowy Czerpak lub Zmienne Oblicze (st. 16) w jakości niebieskiej lub fioletowej. Polecany dla ścieżki #YBrzęk Stali: Tęcza#E."}
 {"k": "9044872ea758bd17", "pl": "Wystawa scen: noc"}
 {"k": "9044d9ef5d4e8895", "pl": "Skrzynia broni: Rozcięcie Chmur, st. 31"}
+{"k": "904519f9301036c2", "pl": "Rozmawiaj z panią Hu"}
 {"k": "9045dece7eff0183", "pl": "Ciociu Han, bez obaw. Na pewno cię uratuję."}
 {"k": "9046935343f75e98", "pl": "Zimno"}
 {"k": "904698266947cf04", "pl": "Prawie na pewno! Do tego znalazłem w okolicy trochę niebieskich płatków…"}
@@ -125,8 +131,10 @@
 {"k": "9049767ddd97e7b5", "pl": "Wędrowiec - Talent Krainy Bohaterów 1"}
 {"k": "904986a15b632b5e", "pl": "Pszenicę dzieli się na ozimą i jarą. Ozima wymaga w zimie niskich temperatur, by przejść jarowizację, dlatego sieje się ją jesienią."}
 {"k": "9049a32388e01aa5", "pl": "Odłamek brązowego gongu II"}
+{"k": "9049fa8f99a234b0", "pl": "Idź za mechanicznym ptaszkiem"}
 {"k": "904a432130eb2b3b", "pl": "Skoro tak się upierasz, nauczę cię zasad jianghu."}
 {"k": "904a646c815694f1", "pl": "Ej, tutejsi jesteście? Co się stało z Przystanią Nieśmiertelnych?"}
+{"k": "904ac6bc146c677f", "pl": "#YZłam#E ostatni zamek"}
 {"k": "904b9ae3d4ee1011", "pl": "“Od młodu kochał naukę, żył w ubóstwie, a dach mu przeciekał; w obawie, że dawne księgi zamokną, rozpostarł nad nimi swoją kołdrę. Księgi ocalały, a kołdra przemokła do cna”."}
 {"k": "904be5ae6c5452f0", "pl": "Bambusowa Latająca Ryba - Dolina Mroku 3"}
 {"k": "904bf86fa01a6411", "pl": "Hełm Wzlotu Orła, st. 41"}
@@ -137,6 +145,9 @@
 {"k": "904e616ccfb54e91", "pl": "Klucz dziwnego kształtu"}
 {"k": "904fea50b49fffe5", "pl": "Modliszka - Szczyt Blasku Buddy - Obóz"}
 {"k": "9050fc40693dd0f9", "pl": "Taras Nefrytowej Rosy - Chwytanie Gwiazd, Łowienie Księżyca 02"}
+{"k": "90518051ca8bcdfe", "pl": "Jeszcze dzień później (po „Zapiskach hodowli drewnianego orła”)"}
+{"k": "9052078c2021d08f", "pl": "Zapędź Małą Dziewiętnastkę do Tang Yiduo"}
+{"k": "9052b3ffe479af47", "pl": "Pokonaj potężnego wroga"}
 {"k": "9053713bb3c99fe0", "pl": "A $T(5011) zasługuje na zaufanie?"}
 {"k": "9053f89ac46e07e1", "pl": "Panna Xiu"}
 {"k": "905446a0d26ab970", "pl": "W Hangzhou mieszka pewien stateczny starzec-uczony, jeno snać obyczajów płochych, bo wciąż wędruje po świecie, szukając pięknych niewiast…"}
@@ -185,6 +196,7 @@
 {"k": "90698beb72734681", "pl": "Qingzhou, Bezmiar Uczuć - obszar rozpoczęcia"}
 {"k": "9069a76959459a8f", "pl": "Powiadają, że Hua Jieyu tylko raz w życiu była pijana. Mistrzyni sekty Zhou Qiang, widząc ją wtedy, rzekła ze śmiechem: “Smuklejsza i pełniejsza niż piękność z obrazu, wino w wonnej skórze zmienia się w mgłę”. Odtąd Hua Jieyu zwą Kwiatem Jabłoni, a wino z kwiatów jabłoni stało się jej znakiem. Lecz od tamtej pory, choćby wychyliła tysiąc czarek, nikt już nie ujrzał jej takiej jak owego dnia."}
 {"k": "906a1f2a084f6441", "pl": "Karty ye zi"}
+{"k": "906a5be7d0f82002", "pl": "Znów spotkajcie się w Qinchuanie"}
 {"k": "906aef23123d4bc9", "pl": "Starszy Peng odszedł — i cóż dalej, dokąd iść?\nJin Zhongyuan i Jaskółka snać mają swoje zamysły; idź i wypytaj oboje po kolei."}
 {"k": "906bca860db8357b", "pl": "Kamień przekazu: Niedościgły Pęd"}
 {"k": "906cd9f93280a6a8", "pl": "Chen Xidong służył niegdyś dawnemu panu domu Fanów. Najął się tu do pracy tylko po to, by odzyskać pamiątkę po dawnym panu i uczcić jego pamięć."}
@@ -194,6 +206,7 @@
 {"k": "906d7e3ba38e26b1", "pl": "Boss - Skarbiec Zapieczętowany - Jingniang P 1"}
 {"k": "906efc7936cfe892", "pl": "Ogłoszenie z Hangzhou 4 - dzielnica urzędów"}
 {"k": "906f230a72c170c3", "pl": "Sosna w Śniegu"}
+{"k": "907125abd138f951", "pl": "Czytaniem wiatru spróbuj przeprawić się przez rzekę"}
 {"k": "9071f2a6b5a916f7", "pl": "Nowy element budowy fachów 680"}
 {"k": "90725b77620a2bb9", "pl": "Zakurzony pierścień łuczniczy"}
 {"k": "90727af05dade779", "pl": "Jedwab piękności"}
@@ -263,6 +276,7 @@
 {"k": "9092d16c8172ddc3", "pl": "A'wang"}
 {"k": "90936075478783bd", "pl": "Zawieszka Przechylonego Pucharu, st. 51"}
 {"k": "90945426713d379f", "pl": "Pas (tył) i kwiaty"}
+{"k": "9094a88fe19b0530", "pl": "Odwiedź okoliczne hafciarki"}
 {"k": "9094dd3598ae062b", "pl": "Wyczerpanie: redukcja obrażeń"}
 {"k": "9094ece541ea1dac", "pl": "Kamień pagody III"}
 {"k": "9095c6e5a14c6e49", "pl": "Gospodarz Ogrodu Wolnych Chwil, który na co dzień razem z żoną prowadzi rodzinne gospodarstwo i sprzedaje świeże produkty własnej roboty."}
@@ -283,12 +297,14 @@
 {"k": "909d6e50914fb395", "pl": "Feng Ruzhi - Talent Krainy Bohaterów 3"}
 {"k": "909e210d2c459fc6", "pl": "Malowany latawiec"}
 {"k": "909f5900f55ea567", "pl": "Przypatrz się — niejednemu kamiennemu lwu brakuje haftowanej kuli; idź w stronę południowo-zachodnią i odzyskaj owe zagubione kule."}
+{"k": "909fd7d37617fd0a", "pl": "Zbadaj okolicę więzienia Qinghe"}
 {"k": "90a026f972dbee5e", "pl": "Wielka słabość"}
 {"k": "90a07d036655a79e", "pl": "Po użyciu otrzymasz Sławę bohatera “Mistrz Przetrwania”."}
 {"k": "90a1e04e9a01dd6f", "pl": "#RGra nie została jeszcze w pełni zoptymalizowana — wysokie rozdzielczości mogą powodować laga. Wybieraj ostrożnie.#E"}
 {"k": "90a21677ccbf90b8", "pl": "Jakże lekko powiewa jedwabna szata, a lekka poła wraca z wiatrem.\nUżyj tego bonu, aby odblokować na 3 dni próbę wyglądu “Dziewiąta Lombardowa Izba”."}
 {"k": "90a217004b4236d8", "pl": "Mapa brzegu Beixi"}
 {"k": "90a31ca67a042e28", "pl": "Wen Ling"}
+{"k": "90a35a91e7a809e5", "pl": "Znów spotkajcie się na Północnej Wyżynie"}
 {"k": "90a483a4183e03b1", "pl": "Dai Diandian"}
 {"k": "90a58891441521c7", "pl": "Kamienna studnia w śniegu"}
 {"k": "90a5a147c65f6f1a", "pl": "Pokonaj wyznawców Kultu Xuanyuan i uwolnij uwięzionych"}
@@ -309,8 +325,11 @@
 {"k": "90ad679e8bf36d28", "pl": "Pas (przód) i dół: wzór"}
 {"k": "90ae42993fc96de4", "pl": "Uczy sztuki tajemnej #YMiecz na Tysiąc Li#E\nSmok wędruje przez niebo i zostawia ślad na tysiąc li."}
 {"k": "90ae9993b71aff70", "pl": "Nagroda za 1. miejsce w tygodniowym rankingu próby: Bezimienny Generał (Łamanie Bambusa: Wiatr). Można wyświetlić na profilu."}
+{"k": "90afcaca9002fb0c", "pl": "Próba płynnego przejścia"}
+{"k": "90b0156eb6958c3b", "pl": "Czekaj do nocy"}
 {"k": "90b075e7b61e6ce0", "pl": "Dziwnie się ostatnio zachowujesz"}
 {"k": "90b08e9d293ba9b3", "pl": "Daozhi"}
+{"k": "90b091732f4a8f8f", "pl": "Przejdź przez obrotowy mechanizm"}
 {"k": "90b0bf01c85f666e", "pl": "Polecenie Przystani Słowa: Wzburzone Fale"}
 {"k": "90b0e6c3100f8e4e", "pl": "Za czasów Yang Wu Huainan nawiedzały wojny i klęski, a głód był straszny, toteż wielu uchodźców uciekło do Wuyue i osiadło w Hangzhou."}
 {"k": "90b12801d64b8f33", "pl": "Wei Zixun"}
@@ -329,6 +348,7 @@
 {"k": "90b72d56f14a8be8", "pl": "Hua Luan"}
 {"k": "90b8e8e2b79999b6", "pl": "Zhu Po"}
 {"k": "90b9a609a67143f2", "pl": "Gospoda Bez Zazdrości - piwnica z winem, duży obszar podziemny 4"}
+{"k": "90b9fe2327c76cdb", "pl": "Odnajdź Wędrowca i zdobądź mapę Półwyspu Związku Atramentu"}
 {"k": "90ba11fbf2cab5d2", "pl": "Tylko że w obecnej sytuacji…"}
 {"k": "90ba5ae132ef21bd", "pl": "Labirynt Wielkich Przemian — nagrody za nieodebrane skrzynie"}
 {"k": "90ba7389d31bd299", "pl": "Dwórka służąca od czasów poprzedniej dynastii, która ma przyjaciółkę o imieniu Zhiting. Lecz Zhiting wiele lat temu opuściła pałac."}
@@ -337,6 +357,7 @@
 {"k": "90bc57c8c91bcf3b", "pl": "Nauczyciel Przystani Słowa pełniący dyżur, który nie wierzy w duchy i bóstwa."}
 {"k": "90bc75174ba2de0f", "pl": "…Xiaotie, zapytam cię jeszcze raz: co się woła, kiedy się bije żelazne kwiaty?"}
 {"k": "90bcedf6e2707807", "pl": "Panienko… Jeśli panienka źle się czuje, poszukam go za panienkę."}
+{"k": "90be31b08b60ee48", "pl": "Potrząśnij dzwonkiem obrzędowym"}
 {"k": "90be59b928d1b906", "pl": "Qiu He"}
 {"k": "90bec902b525fe69", "pl": "Tylko że dobre wino i mięso za tamtymi cynobrowymi wrotami pożerają ludzi."}
 {"k": "90becd9eb1cdf6ae", "pl": "Nagroda współtworzenia wielkiej mapy"}
@@ -344,6 +365,7 @@
 {"k": "90bf305d75a6b2cf", "pl": "Nie można brać tych samych nagród wielokrotnie."}
 {"k": "90bf9a634a02ebd1", "pl": "Dziewięć Warstw Wiosny · Rzadka"}
 {"k": "90c22bc6d451aadf", "pl": "Pigułka nieśmiertelności, którą Dziewięć Nurtów wyłudza pieniądze. W rzeczywistości to tylko kulki brudu wytarte z ciała."}
+{"k": "90c2f28f6988e726", "pl": "Odnajdź źródło dźwięku"}
 {"k": "90c4b65ba7d24c49", "pl": "Obcy kupiec, który szykuje interesy z Wsią Króla Pnączy."}
 {"k": "90c5346b1e1aa1eb", "pl": "Ulecz Cheng Da"}
 {"k": "90c5933abbf664a4", "pl": "Dlaczego… dlaczego… Nieśmiertelny chce zniszczyć owoc długowieczności…\nNie… owocu długowieczności nie wolno zniszczyć… Widziałem… jedno ziarno…\nStrażnik Nieśmiertelnego zabrał je na dno Lśniącej Otchłani. Muszę go odnaleźć…"}
@@ -374,18 +396,22 @@
 {"k": "90d08b3dd28a54a2", "pl": "Pole czaru od punktu do punktu"}
 {"k": "90d0bfaf47019bfc", "pl": "Przekreślona Tabliczka"}
 {"k": "90d0c9711ea4cce2", "pl": "Osiągnięcie wątku pobocznego — wszystko dobrze za pierwszym razem"}
+{"k": "90d0ce1b2f79f05e", "pl": "Czekaj do godziny zi i porozmawiaj z Qian Feifei"}
 {"k": "90d0dca7e662e690", "pl": "Zbadaj ślady krwi na ziemi"}
 {"k": "90d1c22faec9e380", "pl": "Po użyciu poznasz recepturę: Duszona dzika gęś."}
+{"k": "90d407af84f5fdfb", "pl": "Pomóż śmiałkowi i pokonaj kitajskich żołnierzy"}
 {"k": "90d4442d9d9613c3", "pl": "Wypad - korekta botów SI L3"}
 {"k": "90d571db9d89bbd6", "pl": "Szkoda… wszystko się zmieniło…"}
 {"k": "90d57adfef0cfe9f", "pl": "Huang Shijiu"}
 {"k": "90d60251091c720d", "pl": "Tyran - efekt wizualny lśniących oczu"}
+{"k": "90d61285d201200f", "pl": "Pokonaj przeciwnika i osłoń Złotorodną Czarę"}
 {"k": "90d7d579c80c8377", "pl": "Obszar dozwolony: Gospoda Bez Zazdrości"}
 {"k": "90d8ccd33a4b6c8b", "pl": "He Yeguang"}
 {"k": "90d8f2128a66bd28", "pl": "Dobrze, przez wzgląd na to wino pożyczę wam trochę pieniędzy."}
 {"k": "90d94f3d7ba5641c", "pl": "Etap dla dwojga F1 - bezwład gracza w lewo"}
 {"k": "90db09aaab43fbeb", "pl": "Światło Buddy"}
 {"k": "90db2eb306fbcee0", "pl": "Obejrzyj buty"}
+{"k": "90db6881ad6cb772", "pl": "Naśladuj ruchy Cui Fenga"}
 {"k": "90dc0007947fe799", "pl": "List od Shi Jingtiana"}
 {"k": "90dc191e5ae9c66b", "pl": "Ul - 20"}
 {"k": "90dc455d2272e6df", "pl": "- “Pieśni z Chu”"}
@@ -400,6 +426,7 @@
 {"k": "90e0ace32546ecd8", "pl": "Wiersz - barwa"}
 {"k": "90e162b057666543", "pl": "Teraz za grę w szachy dopłacają jeszcze za występ. Kto nie skorzysta, ten straci!"}
 {"k": "90e19ae3247c9314", "pl": "Wstąpienie do sekty: Ogród Grusz"}
+{"k": "90e2401ee1605e66", "pl": "Zbadaj szachownicę"}
 {"k": "90e245d72c941c4f", "pl": "Zbiór: dziki żeń-szeń"}
 {"k": "90e2d2d42f488f9d", "pl": "Wiersz o Bramie Jinyang"}
 {"k": "90e30824c4b7ce9c", "pl": "Święty Hazardu z Kaifengu znał Pana Drogi Zhu Youshenga, zanim jeszcze powstało Dziewięć Nurtów; wiele łupów trafiło przez jego ręce na Targ Duchów. Był bezczelny ponad miarę, kradł nawet wtedy, gdy go ścigano, a mimo to wielu uczniów Dziewięciu Nurtów darzy go podziwem."}
@@ -418,6 +445,8 @@
 {"k": "90ea33e83a7b127f", "pl": "Do wyboru: nagroda twierdzy albo Próby Miecza poz. 13 w trybie solo."}
 {"k": "90eb861e3ee66e61", "pl": "Most stał nad wodą już za Tang; jest tak stary, że trudno ustalić, skąd się wziął i kto go zbudował.\nZhang Hu pisał: “Bez deszczu góry zawsze wilgotne, bez chmur woda sama w cieniu. Zerwany Most porósł dzikim mchem, w pustym dziedzińcu głęboko opadłe kwiaty”.\nW Hangzhou jest ciepło i śnieg pada rzadko; lecz gdy przez noc spadnie obfity śnieg, mgliste wierzby na moście i grobli bieleją, rosiste trawy kładą się jak wstęgi u sukni, a srebrny most okrywa biel: widok piękny ponad wszelki wyraz."}
 {"k": "90eba102a7b60979", "pl": "“Długowieczna dziewczyna” to nazwa melodii ci, pierwotnie tytuł utworu z tangowskiego Urzędu Muzyki, znanego też jako “Dziewczyna o złym losie” albo “Długowieczna dziewczyna z Xihe”. Druga część “Śpiewanych wierszy Tang” mówi: “Melodia ‘Długowiecznej dziewczyny’ musiała od początku łączyć się z jakąś postacią i opowieścią, jak ‘Dziewczyna z Puyang’, ‘Praczka jedwabiu’ czy ‘Pani Spełnionych Życzeń’, lecz szczegółów nie sposób już dociec. Skoro melodia pochodzi z Xihe, i opowieść zapewne stamtąd, toteż utwór nazwano ‘Długowieczną dziewczyną z Xihe’ - nie przypadkiem”."}
+{"k": "90ec73d4356d9268", "pl": "Podsłuchaj nocnego zebrania we Wsi Da’an"}
+{"k": "90ec81a163d2b307", "pl": "Do zobaczenia"}
 {"k": "90eccf8e8eeb2b5b", "pl": "Wędrowiec: Zielne Bezdroża"}
 {"k": "90ed5dd6166e89af", "pl": "Huśtawka kołysze się na linach wśród cichego śmiechu, wiatr gładzi czarne włosy, a serce odpoczywa."}
 {"k": "90ed764e99074f87", "pl": "Przyznawana za udział w wydarzeniu “Więź Jaskółek” po osiągnięciu odpowiedniego poziomu. Można wyświetlić na profilu. Duplikat zamieni się w 100 Nefrytu Echa."}
