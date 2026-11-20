@@ -2486,3 +2486,36 @@ takiej linii zostawić pustą linię — inaczej `format_paczki.czytaj_wpisy`
 uznaje następną linię za ciąg dalszy i zwraca `zlamana_linia`. Dwie takie
 sytuacje złapał `--na-sucho` przed importem (partia f); naprawione.
 
+## 2026-11-19 (22a) — runda 4 i 5 UKOŃCZONE; start rundy 6
+
+**Runda 4** (opisy zadań) domknięta wcześniej: 3 536/3 536.
+
+**Runda 5 — cele zadań (`tasks · task_target_str`): 8 199 z 8 199.**
+Partie `ci`–`cx` po 80 (ostatnia 119) plus `cy` dla `tasks_ending_data`
+(**18**, nie 8 — manifest po patchu 2.4 pokazuje więcej wpisów `name`).
+Magazyn 127 832 → **129 169**. Każda partia: sonda glosariusza, heredoc,
+kontrola 80 PL/80 kluczy + skan CJK/cyr/`\u00ad`/NFC, `--na-sucho`
+(80 nowych / 0 odrzuconych), import, commit, push. Odrzucone w każdej
+partii: **0** (jedyny wyjątek: partia `dd`, gdzie trzy klucze były
+wymyślone — usunięte przed importem; oraz `cz` z fizyczną nową linią
+w `PL:`, zamienioną na literalne `\n`).
+
+Naprawy w trakcie rundy 5: „okokonionym” → „kokonowym”; „cesarskiej jady”
+→ „pieczęć cesarską Czterech Mórz”; „Gwarny Przybytek” → odmiana
+„Gwarnego Przybytku”; „Kitów” → „Kitanów” (spójność z resztą magazynu);
+„Zdemaśkuj” → „Zdemaskuj”; „brodatą sakiewkę” → „brokatową sakiewkę”;
+„Jiaa” → „Jia”; rezygnacja z „Księga Miecza Canglang” na rzecz formy
+używanej w partiach r5.
+
+**Runda 6 — `ccs_text_msg` (5 229 braków, nie 4 952): 557 zrobione.**
+To etykiety interfejsu, komunikaty systemowe i opisy aktywności; sporo
+powtórzonych ciągów „数据加载中…” (same chińskie znaki bez `en`) —
+te tłumaczone jako „Wczytywanie danych.” (bez `\n`, bo oryginał bywa
+wielolinijkowy). Partie: `cz`, `da`–`df` po 80 (wyjątek `dd`: 77).
+Konwencje: `N重` → `St. N` (zgodnie z magazynem), `N重镜` → `Zwierciadło:
+St. N`, 长鸣玉 → Nefryt Echa, 不羡仙 → Gospoda Bez Zazdrości, 止戈 → arena,
+话术 → dar wymowy, 悬壶 → leczenie zawieszone, 燕云十六声/Where Winds Meet
+zostaje po angielsku.
+
+Następny krok: dalsze partie `ccs_text_msg` do 5 229, potem `text_msg`
+(~99 357 braków — największa tabela) i na końcu tabele luźne.
