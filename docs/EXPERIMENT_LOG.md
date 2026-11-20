@@ -2428,3 +2428,27 @@ sandboxa sprawdzać `git log` i `/tmp` przed dalszą pracą; zwrotki trzymać
 w repo (są wersjonowane), nie tylko w `/tmp`.
 
 Pozostało w rundzie 3: **388 listów**. Potem rundy 4–8.
+
+## 2026-11-19 (21d) — runda 3 (e–g): 755 z 1 023 listów fabularnych
+
+W tej turze doszły trzy partie po 40 listów (`tasks_envelop_data · text`):
+**(e) +40** (`e40efe3`), **(f) +40** (`74107f7`), **(g) +40** (`3ed3485`).
+Runda 3 stoi na **755 z 1 023** (403/669 list + 350 to/from + 4 melodie);
+magazyn **116 389** (23,77%). Wszystkie wpisy indywidualnie z pełnym
+kontekstem ZH+EN; 0 odrzuconych w każdej partii.
+
+Zakres tej porcji: listy o marionetkach, pożegnania z Przystanią Słowa,
+dziennik wyprawy, skarga do Bogini Księżyca, testament Water Lady, listy
+Zhang Yichao i Lu Li, memoriały o podatkach, Niebiański Rachunek Qinga,
+pamiętnik Du Chongwei o Ding Xiao, opowieść o Zou Yizhou i Yang Qianyan,
+noworoczne podarunki Przymierza Północy, dziennik ucznia o „ściąganiu
+należności” od zbójców, traktat o pędzlu Wu Daoxuana.
+
+Sprawdzone po tych partiach: `tools/run_tests.py` **623/623 OK** (exit 0),
+`tools/check_repository.py` OK (327 wpisów indeksu), `git diff --check` czysty.
+
+Uwaga warsztatowa: przy polach `PL:` z wieloma akapitami trzeba po każdej
+takiej linii zostawić pustą linię — inaczej `format_paczki.czytaj_wpisy`
+uznaje następną linię za ciąg dalszy i zwraca `zlamana_linia`. Dwie takie
+sytuacje złapał `--na-sucho` przed importem (partia f); naprawione.
+
