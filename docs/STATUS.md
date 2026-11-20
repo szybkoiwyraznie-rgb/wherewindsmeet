@@ -107,6 +107,17 @@ przekładów, **489 544** miejsca (28,06%). Sonda bazowych kluczy scen tych
 grup: 0 braków. Kontrola repozytorium i **623 testy OK**; przekładu nie
 testowano w grze.
 
+**Kontynuacja `ht`–`hy`:** łącznie **390** nowych przekładów scen:
+`ht` 84 (grupa 5191), `hu` 43 (5199), `hv` i `hw` 146 (5206),
+`hx` i `hy` 117 (5100). Magazyn **137 737** przekładów, **489 544**
+miejsca w grze (28,14%). Sonda bazowych kluczy dostępnych powiązanych
+scen: odpowiednio 88, 46, 152 i 129 kluczy, bez braków; nie obejmuje
+innych tekstów zadań ani nie dowodzi ich pełnego przekładu. Importy po
+próbach suchych bez odrzuceń; skan 390 przekładów bez CJK i nie-NFC,
+podziały wierszy zgodne z chińskim źródłem. **623 testy OK** i kontrola
+repozytorium OK (616 wpisów indeksu). Przekład AI-tymczasowy, nie był
+sprawdzany w grze; zakres nie jest potwierdzeniem lokacji ani momentu gry.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

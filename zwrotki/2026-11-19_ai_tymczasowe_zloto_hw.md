@@ -54,7 +54,7 @@
 — 11.
    klucz: f5a314fa69fbb81b
    EN: Huff… puff… Why are you running off so quickly, Wanderer? We can barely keep up!
-   PL: Uff! Wędrowcze, tak szybko pobiegłeś, że ledwo za tobą nadążyliśmy.
+   PL: Uff! Wędrowcze, tempo było takie szybkie, że ledwo udało nam się nadążyć.
 
 — 12.
    klucz: 09e56da94eb1dd45
@@ -74,7 +74,7 @@
 — 15.
    klucz: 0ed9ea184039428c
    EN: Haven't you been here all along? Huh? What is that you're holding?
-   PL: Przecież przez cały czas byłeś sam. Co tam trzymasz?
+   PL: Przecież cały czas nikogo z tobą nie było. Co tam trzymasz?
 
 — 16.
    klucz: 9ff28b28b5d1a0bd
@@ -119,7 +119,7 @@
 — 24.
    klucz: f42a09e9431b4fce
    EN: You lean over the well, peering into its depths, and see a single leaf fall. \nCountless springs of sweet water gush from the bottom. The moment you look up... \nThousands of golden tendrils sprout from the withered branches—
-   PL: Pochylasz się nad studnią i widzisz spadający liść.\nZ dna tryskają liczne strumienie czystej wody. Podnosisz głowę…\nNa suchych gałęziach wyrastają tysiące drobnych złotych pędów.
+   PL: Pochylasz się nad studnią i widzisz spadający liść.\nZ dna tryskają liczne strumienie czystej wody. Podnosisz głowę…\nNa suchych gałęziach wyrastają tysiące drobnych złotych pędów —
 
 — 25.
    klucz: dbea7251cc65531b
@@ -174,7 +174,7 @@
 — 35.
    klucz: 4521dd645e90f1ae
    EN: Huh? Wanderer, did you find any clues about my ancestor? Where is she?
-   PL: Hm? Znalazłeś jakiś ślad mojej przodkini? Gdzie ona jest?
+   PL: Hm? Masz jakieś wieści o mojej przodkini? Gdzie ona jest?
 
 — 36.
    klucz: 74d6f48771960755
@@ -314,12 +314,12 @@
 — 63.
    klucz: d2f165b152712174
    EN: A great ship sails from the depths of the sky. It questions, it roars— \n"Where are you—where are you—"
-   PL: Z głębin nieba nadpływa wielki statek. Pyta i ryczy: „Gdzie jesteście? Gdzie jesteście?”.
+   PL: Z głębin nieba nadpływa wielki statek. Pyta i ryczy: —\n„Gdzie jesteście? Gdzie jesteście?”.
 
 — 64.
    klucz: afee7fdb0097b562
    EN: You perform the Tang military dance recorded in the manual, \nstirring the vast memories of this colossal entity.
-   PL: Tańczysz wojenny taniec Tangów opisany w zapisie i budzisz ogrom wspomnień tej olbrzymiej istoty.
+   PL: Tańczysz wojenny taniec Tangów opisany w zapisie,\nbudząc ogrom wspomnień tej olbrzymiej istoty.
 
 — 65.
    klucz: 5e38848f7f00002e

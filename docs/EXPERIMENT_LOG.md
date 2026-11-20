@@ -2728,3 +2728,14 @@ bez odrzuceń. Sonda dostępnych bazowych kluczy scen grup 5173, 5188, 5189,
 5192 i 5278: 0 braków, bez stwierdzenia kompletności wszystkich tekstów
 tych zadań. Skan 36 linii PL bez CJK i nie-NFC; `check_repository.py` OK
 (612 wpisów), 623 testy OK. Brak testu w grze.
+
+**Pielgrzym, twierdza, Kraina Złota i źródło (`ht`–`hy`):**
+84 + 43 + 80 + 66 + 67 + 50 = 390 nowych przekładów. Magazyn 137 737,
+489 544 miejsc (28,14%). Każdą partię zaimportowano po próbie suchej,
+bez odrzuceń; poprawki `hw` i `hy` również zweryfikowano przed importem.
+Sonda scen grup 5191, 5199, 5206 i 5100: odpowiednio 88, 46, 152 i 129
+różnych kluczy bazowych, 0 braków. Sonda nie obejmuje pozostałych tekstów
+ani nie dowodzi kompletności zadań. 390 przekładów po imporcie: bez CJK
+i nie-NFC, liczba fizycznych podziałów wierszy zgodna ze źródłem.
+`check_repository.py` OK (616 wpisów), 623 testy OK; poprawki po testach
+dotyczyły tylko dwóch kwestii. Przekładu nie sprawdzano w grze.
