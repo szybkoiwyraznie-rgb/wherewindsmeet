@@ -3,10 +3,10 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (wpis 22c w dzienniku):** runda 5 — **CELE ZADAŃ UKOŃCZONE,
+**Najnowsze (wpis 22d w dzienniku):** runda 5 — **CELE ZADAŃ UKOŃCZONE,
 8 199 z 8 199**; `tasks_ending_data` **18/18**. Runda 6 (`ccs_text_msg`,
-5 229 braków) w toku: **2 637** zrobione (partie `cz`, `da`–`ef`).
-Magazyn **131 806**. Zostało 2 592. Następny krok: dalsze partie r6 po 80.
+5 229 braków) w toku: **3 277** zrobione (partie `cz`, `da`–`em`).
+Magazyn **132 366**. Zostało 1 952. Następny krok: dalsze partie r6 po 80.
 Testy do odświeżenia na końcu rund.
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02

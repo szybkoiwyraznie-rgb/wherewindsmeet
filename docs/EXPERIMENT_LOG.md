@@ -2562,3 +2562,17 @@ Terminy: 东主→gospodarz (gildii) · 应律之人→ten, kto słucha wiatru �
 Kwiecia · 红销铺→Kramy Szkarłatnego Jedwabiu · 夹钟→Jiazhong ·
 摸金→Grobowiec Fortuny · 稷下→Akademia Jixia · 侠境→Kraina Bohaterów ·
 五禽戏→ćwiczenia pięciu zwierząt · 稷下要闻→Wieści z Akademii Jixia.
+
+**Runda 6, ciąg dalszy: 3 277 z 5 229.** Partie `eg`–`em` po 80
+(magazyn 131 806 → **132 366**, commit `3c64018`). Importy bez odrzuceń,
+`--na-sucho` 80 nowych / 0 odrzuconych za każdym razem. Uwaga: po
+awarii sandboxa lokalny wskaźnik cofnął się do bazy `45b4be3` i push
+został odrzucony — stan odtworzono z `origin` (m.in. partia `eg`
+z pliku tymczasowego), magazyn scalony z remote bez utraty wpisów.
+Poprawki przed importem: brak literówek; ujednolicono 烟柳 → Mglista
+Wierzba, 南烛 → Południowa Świeca, 千金楼 → Pawilon Tysiąca Sztuk Złota.
+
+Terminy: 悬壶→Uzdrowiciel · 牙行→dom pośrednictwa · 心法/内功→droga
+wewnętrzna/siła wewnętrzna · 帮派→gildia · 堂主→przełożony Sali ·
+聚义厅→Sala Braterstwa · 精元→esencja życia · 百业等级→poziom fachu ·
+江湖→jianghu · 大相国寺→Wielka Świątynia Cesarska · 藏经阁→Pawilon Sutr.
