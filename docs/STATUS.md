@@ -9,10 +9,8 @@ akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 `fi`–`fm`, +80/+80/+80/+80/+32). Rzeczywista liczba tekstów tabeli to
 5 282, nie 5 229 — wcześniejszy licznik rundy się rozjechał; miarodajna
 jest sonda po kluczach, nie suma partii. Rundy 4, 5 i 6 domknięte.
-Następny krok: wybór kolejnej tabeli do tłumaczenia (kandydaci wg braków:
-`text_msg` 99 357/103 975, `debate_guider_dialog_data` 52 425/60 512,
-`branch_data` 7 679/8 854, `buff` 4 366/9 549, `programmer_text_msg`
-4 128/4 139). Testy odświeżone po zamknięciu rundy: `run_tests.py`
+Dalszy zakres ustalono według potrzeb właściciela poniżej, zamiast
+tłumaczyć całe tabele. Testy odświeżone po zamknięciu rundy 6: `run_tests.py`
 **623 OK**, `check_repository.py` OK (566 wpisów indeksu).
 
 **Zakres wg potrzeb właściciela (2026-11-19)** — właściciel potrzebuje
@@ -34,14 +32,15 @@ Czyli **~2 100 kwestii**, nie 163 000. `text_msg` (103 975) i
 wczesnej grze brakuje z nich odpowiednio **265** i **30 899** kluczy,
 ale gros debat dotyczy późnych regionów, więc nie ma sensu tłumaczyć
 ich z góry. Wniosek: runda 7 = sceny wątku głównego 燕南
-(2 053 klucze, ~26 partii po 80) + `guider_tujian_data` (1 516);
+(po deduplikacji wariantów 1 815 kluczy, ~23 partie po 80); następny
+kandydat: `guider_tujian_data` (1 516);
 tabele całomapowe dopiero na żądanie.
 
 **Runda 7 w toku (2026-11-19):** dialogi sceniczne wątku głównego 燕南.
 Lista kluczy jest reprodukowalna: `tools/lista_rundy7.py` (kolejność:
 zadanie → scena → kwestia; identyfikatory wariantów płci zwijane do klucza
 bazowego przez `indeks.warianty`). Razem **1 815** kluczy; zrobione
-**560** (partie `ga`–`gf`, magazyn **134 878**). Zostało 1 255.
+**480** (partie `ga`–`gf`, magazyn **134 878**). Zostało 1 335.
 Konwencja nazw obowiązująca w dialogach: 墨门 → „Szkoła Moistów”,
 墨山道 → „Szkoła Mo”/„Szkoła Moistów”, 巨子 → „Wielki Mistrz” (żeńsko
 „Wielka Mistrzyni”), 长老 → „starszy”/„starsza”, 兼爱 → „powszechna

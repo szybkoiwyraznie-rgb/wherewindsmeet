@@ -124,7 +124,7 @@
 — 25.
    klucz: 351f4edd7e1d7077
    EN: Alright, alright, stealth means small numbers... I'm putting my life in your hands!
-   PL: Dobrze, już dobrze — wiem, że do tropienia im mniej ludzi, tym lepiej… To moje życie, Feng Jisheng, powierzam tobie, wędrowcze!
+   PL: Dobrze, już dobrze — wiem, że do tropienia im mniej ludzi, tym lepiej… Ja, Feng Jisheng, powierzam ci swoje życie, wędrowcze!
 
 — 26.
    klucz: 1b2338ad40ce439b
@@ -309,7 +309,7 @@
 — 62.
    klucz: 8134e9ec2939252d
    EN: A thousand ordinary people couldn't achieve what you all do in a single step.
-   PL: Wasz jeden krok to sto, tysiąc pospolitych ludzi nie dorówna…
+   PL: Waszemu jednemu krokowi nie dorówna może nawet stu czy tysiąc zwykłych ludzi…
 
 — 63.
    klucz: 2b150eea75e41d3f
@@ -394,7 +394,7 @@
 — 79.
    klucz: 4abe1bb15113d61c
    EN: So why did we run away? Why do we hide in the Haven, turning a deaf ear to the screams of the dying right outside?!
-   PL: Więc czemu Szkoła Mo się wycofała? Skryła się w tej odciętej od świata krainie brzoskwiń i na wołanie płaczu tuż za murem zatyka uszy?!
+   PL: Więc czemu Szkoła Mo się wycofała? Skryła się w tej odciętej od świata krainie brzoskwiń i na płacz i wołanie tuż za murem zatyka uszy?!
 
 — 80.
    klucz: 1894a111f0ca0ae4

@@ -9,7 +9,7 @@
 — 2.
    klucz: 277997fbd10fc08a
    EN: The odds of success are fifty-three percent. If we succeed, we resolve both our internal and external crises.
-   PL: Szansa powodzenia: sto pięćdziesiąt trzy. Jeśli się uda, zażegnamy i wewnętrzne, i zewnętrzne kłopoty.
+   PL: Szansa powodzenia: pięćdziesiąt trzy procent. Jeśli się uda, zażegnamy i wewnętrzne, i zewnętrzne kłopoty.
 
 — 3.
    klucz: 9b46c2cbecb64632
@@ -24,7 +24,7 @@
 — 5.
    klucz: 15f84565da87a740
    EN: Mohist artisans have innovated for a thousand years. A problem unsolvable today may be solved tomorrow. Calculating the present with the math of the past... makes you obsolete.
-   PL: Rzemieślnicy Szkoły Moistów nowatorzą dzień po dniu od tysiąca lat, nigdy nie spoczywając. Co dziś nierozwiązywalne, jutro może być rozwiązane. Liczyć dzisiejsze sprawy dawną rachubą… to znaczy być przestarzałym.
+   PL: Rzemieślnicy Szkoły Moistów dzień po dniu tworzą nowe rozwiązania od tysiąca lat, nigdy nie spoczywając. Co dziś nierozwiązywalne, jutro może być rozwiązane. Liczyć dzisiejsze sprawy dawną rachubą… to znaczy być przestarzałym.
 
 — 6.
    klucz: 148deff838fa7c57
@@ -64,7 +64,7 @@
 — 13.
    klucz: 7437fc91432b972a
    EN: Fifty-three percent. The odds of victory outweigh those of defeat. Why do you refuse?
-   PL: (zbita z tropu) Sto pięćdziesiąt trzy — szans więcej niż strat. Czemu więc nie można?
+   PL: (zbita z tropu) Pięćdziesiąt trzy procent — szanse zwycięstwa są większe niż porażki. Czemu więc nie można?
 
 — 14.
    klucz: 903a09dc7ced5a27
@@ -269,7 +269,7 @@
 — 54.
    klucz: eb7c6963aa96e537
    EN: We're short on time. Let's split up, investigate, and meet back at the Fengputer at dusk. Sound good?
-   PL: Bracie Feng, czasu mamy mało. Rozdzielmy się i zbierzmy wieści, a o zmierzchu spotkajmy się przy liczarchu. Dobrze?
+   PL: Bracie Feng, czasu mamy mało. Rozdzielmy się i zbierzmy wieści, a o zmierzchu spotkajmy się przy liczarce. Dobrze?
 
 — 55.
    klucz: 832f6dd81fe2ef10

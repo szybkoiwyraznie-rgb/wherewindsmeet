@@ -2620,3 +2620,12 @@ nagród za głowy · 焚草→Wypal trawę · 话术卡→Karta perswazji ·
 泛泛之交→„ledwie znajomi” (EN „Respected” błędne, tłumaczone z ZH) ·
 王家村·崇德坊→Wioska Wang · Zaułek Cnoty · 柴府→Posiadłość Chai ·
 酒葫芦·不破→Tykwa wina · Niezniszczalna.
+
+
+**Runda 7, początek: 480 z 1 815.** Partie `ga`–`gf` po 80
+(magazyn 134 398 → **134 878**). Kolejność: `tools/lista_rundy7.py`,
+sceny zadań głównych w 燕南, klucze wariantów sprowadzone do bazowych.
+Każdy import z próbą `--na-sucho`: 80 nowych, 0 odrzuconych. Początkowy
+wpis STATUS o 560/1 815 był błędny — sześć partii to 480, brak 1 335.
+Uzupełniono korekty językowe `ge` i `gf`; to nadal przekład AI-tymczasowy,
+bez weryfikacji w grze. Kolejny krok: partia `gg`.
