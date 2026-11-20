@@ -398,6 +398,7 @@
 {"k": "10b93c4e68a6ec8b", "pl": "Aha, jeszcze jedno: centralny węzeł jest tu uszkodzony, więc na niższy poziom trzeba iść okrężną drogą przez kanał wodny."}
 {"k": "10b9f0c832b9a25d", "pl": "Złota Nić Długiego Życia"}
 {"k": "10baf20f329e1d10", "pl": "Och! Więc to są prawdziwe “Ogniste Drzewa, Srebrne Kwiaty”!"}
+{"k": "10bbc1c0ad923882", "pl": "Brat Huaishen jest uparty i trzyma się swoich zasad. Nie przejmował się tym, że go lekceważą."}
 {"k": "10bc1c92379fe11b", "pl": "Obszar otoczenia - bractwo Studni Niebios"}
 {"k": "10bc238b5bfd3fa8", "pl": "Papierowy kwiat, pożółkły, z podwiniętymi brzegami."}
 {"k": "10bc3ed28a89811b", "pl": "NPC pomocy słabym"}
@@ -1142,6 +1143,7 @@
 {"k": "120e7ed783644c29", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Nefrytowy Czerpak lub Zmienne Oblicze (st. 61) w jakości niebieskiej lub fioletowej, a z wyższym prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YBrzęk Stali: Tęcza#E."}
 {"k": "120eeac498428516", "pl": "Widziałem takie liście! Zostaw to mnie, zaraz wracam!"}
 {"k": "120f6d033e867bd5", "pl": "Lina windy"}
+{"k": "120fb11284012745", "pl": "He, he. Wędrowcze, naprawdę wiesz, co robisz."}
 {"k": "120fb7e14abcf349", "pl": "o świcie przeprawa rozstrzygnie, kto przeżyje."}
 {"k": "12100434e7dbdfce", "pl": "Nie lękaj się."}
 {"k": "1210552a8637276b", "pl": "Młodzieńcze, naprawdę przeszedłeś na drugą stronę?"}
@@ -3479,6 +3481,7 @@
 {"k": "16723f263e0db904", "pl": "Robotnik A"}
 {"k": "16728ab44a504a62", "pl": "Sługa"}
 {"k": "16729fb40af5af9b", "pl": "×"}
+{"k": "1672d14a6e3c4cbd", "pl": "Rok po roku wracamy nad Złotą Rzekę i Nefrytową Przełęcz, dzień po dniu towarzyszą nam końskie wodze i pierścień ostrza."}
 {"k": "16731da471b457db", "pl": "Zestaw: Rozcięcie Chmur, st. 135"}
 {"k": "167325fbe9e4aa59", "pl": "Córka Lie Yana, jednego z Ośmiu Wspaniałych; podążyła śladem dwóch braci w okolice Ruin Północnego Przymierza, by odnaleźć ojca."}
 {"k": "16734bcb1986a957", "pl": "1. Uczestnik pojedynczego Endless Dungeons ustawiany jest w rankingu na podstawie #YSztuki Walki#E i #Ywyniku rozliczenia solo#E; jeśli dwie Sztuki Walki należą do różnych Dróg, liczy się #Ywynik rozliczenia solo#E i trafia do rankingu Mieszanego.\n2. Rankingi Dróg (w tym Mieszany) i Endless są od siebie niezależne; nagrody można odebrać z obu.\n3. Na koniec każdej fazy Starlit Canvas Wędrowiec otrzyma tylko jedną nagrodę rankingową ze wszystkich klasyfikacji Dróg (w tym Mieszanej) — według najwyższej pozycji.\n4. Klasyfikacje Dróg (w tym Mieszana) otwierają się w fazie 3 Starlit Canvas, po #Y@T[month_4,day_13,time_05:00,type_noLocal;empty]#E."}
@@ -3938,6 +3941,7 @@
 {"k": "176081578bb630ea", "pl": "Piękno w cieniu"}
 {"k": "17615843216bc59c", "pl": "Tyle się natrudziłem tylko dla niego! A on nawet nie docenia mojej pomocy."}
 {"k": "176183ef34d0675f", "pl": "Ukryta Góra - Błyskawiczna dostawa, scenka 2 “Boski Posłaniec”"}
+{"k": "1761eccf4d13ca21", "pl": "Ale… dlaczego leżą tutaj? Czy generał celowo je odłożył?"}
 {"k": "1761fad1882ce46f", "pl": "(zniecierpliwiony) Ta przeklęta ptaszyna."}
 {"k": "17621f2b52d01841", "pl": "Słuchacz Deszczu to osobliwy robak ukrywający się w parasolu. Żyje w żebrach parasola, ma barwę świeżego bambusa i gryzie bambus z odgłosem. Gdy pada, wysuwa się, jakby na szczycie parasola wyrastał szmaragdowy kiełek; gdy niebo się przejaśnia, chowa głowę i kurczy ciało, bez śladu."}
 {"k": "176247c0649dc31b", "pl": "Minerały"}
@@ -4783,6 +4787,7 @@
 {"k": "18f1d2f42d66e33b", "pl": "Hełm Kroku po Falach, st. 96"}
 {"k": "18f23401c6b33cfe", "pl": "Doczekaj wstawki"}
 {"k": "18f29776c2ffae20", "pl": "Zestaw: Nefrytowy Czerpak, st. 56"}
+{"k": "18f2f8bafe511dbf", "pl": "Nie wiem. Huaishen opuścił Wzburzone Fale wiele lat temu."}
 {"k": "18f3368795404f74", "pl": "Pierwszy raz"}
 {"k": "18f336e21ccb4b0a", "pl": "Skryty Dźwięk: Wieczny Rozłam Chmur IV"}
 {"k": "18f4227492c2a994", "pl": "Receptura: podstawowa część ramion"}
@@ -5496,6 +5501,7 @@
 {"k": "1a2a8dfea3699acd", "pl": "Babcia Xu"}
 {"k": "1a2b93b411170d39", "pl": "Pióro C1"}
 {"k": "1a2bafe9ed84402c", "pl": "Bracie Li, jak można stawiać na równi z nami kogoś, kto przywlókł się z jakiejś zapadłej dziury?"}
+{"k": "1a2c7c91079c1838", "pl": "Co to… Wędrowcze, chodź, zobacz."}
 {"k": "1a2d122d11e68ded", "pl": "Gałązka osmantusu o subtelnym zapachu."}
 {"k": "1a2de1b88ca070c4", "pl": "Ts, ts, ależ piękny koń! Krzepki, długonogi, pierwszy raz takiego widzę."}
 {"k": "1a2e5025c56f88eb", "pl": "Pomocnik z szablą tang - unik w przód"}
@@ -6553,6 +6559,7 @@
 {"k": "1c2f263049077d89", "pl": "Droga Wewnętrzna: Bezimienna Włócznia"}
 {"k": "1c2fe86ddb1de167", "pl": "Góry złota i srebra 2 (do scen, bez interakcji)"}
 {"k": "1c3060d299d419b7", "pl": "Srebrne nitki rybne"}
+{"k": "1c306af2c07cd1fe", "pl": "Więc chcesz wejść?"}
 {"k": "1c30818de143249e", "pl": "Odzysk sił"}
 {"k": "1c314d26dd57759d", "pl": "Rozbite Liangzhou - Skoki i pościg za kotem 5"}
 {"k": "1c3158217707704e", "pl": "Pijak"}
