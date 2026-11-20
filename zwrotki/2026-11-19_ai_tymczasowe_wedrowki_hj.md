@@ -49,7 +49,7 @@
 — 10.
    klucz: 0b0dff46f0d27467
    EN: Would you go to #YWhitecrown Fortress#E and the #YHeroes' Graves#E? Play for them and honor their sacrifice.
-   PL: Czy zagrasz dla nich na flecie w #YTwierdzy Białych Głów#E i przy #YGrobach Bohaterów#E, by pocieszyć ich wierne serca?
+   PL: Czy zagrasz dla nich na flecie w #YTwierdzy Białej Korony#E i przy #YKurhanie Bohaterów#E, by pocieszyć ich wierne serca?
 
 — 11.
    klucz: aedfa2528d66e906
