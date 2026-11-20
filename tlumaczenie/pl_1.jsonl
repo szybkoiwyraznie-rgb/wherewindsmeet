@@ -347,6 +347,7 @@
 {"k": "10939f5486458e14", "pl": "Punkty"}
 {"k": "10942defe778c06a", "pl": "Pliszka"}
 {"k": "1094c7114447192b", "pl": "Po użyciu poznasz recepturę: Łuk Wichru i Dymu · Precyzja."}
+{"k": "1094c74e88cd4a76", "pl": "Słodkie napoje z kwiatów! Zapach kwiatów mocny, słodkie i orzeźwiające, spróbujcie!"}
 {"k": "1094e02a2698e2ef", "pl": "Wieloosobowo: Lalkarz Cieni - poz. 91 - Pijane Cienie Gór i Rzek"}
 {"k": "1095b014977e7542", "pl": "Ryba w Stawie · Żar Słońca"}
 {"k": "1095e421ce97a595", "pl": "Monety Czapli służą do kupowania Figur i odświeżania sklepu z Figurami; co turę, poza bazowym dochodem i odsetkami, otrzymujesz dodatkowe Monety Czapli na podstawie serii wygranych/przegranych."}
@@ -1078,6 +1079,7 @@
 {"k": "11c8ed237ae34fa6", "pl": "Zaprowadź Wang Lana do domu pośrednictwa"}
 {"k": "11c9b411b4a7b19d", "pl": "Gdy bogowie się biją, wygrywają czy przegrywają, nas, małe diabełki, to nie dotyczy."}
 {"k": "11ca6cdc8d0c048a", "pl": "Hmf, mało który urzędnik doszedł do takiego stanu jak ja!"}
+{"k": "11cad37e720e2134", "pl": "Odkąd wstąpiłeś w mniszy stan, dawno nie graliśmy w szachy. Kto by pomyślał, że po tonsurze masz mniej czasu niż przedtem."}
 {"k": "11cbe22da586650a", "pl": "Ściana ryglowa w zielony wzór 1"}
 {"k": "11ccb5c0e15ec1c7", "pl": "Wypytaj o całą sprawę"}
 {"k": "11ccd59e31c8467d", "pl": "Biały osioł"}
@@ -1550,6 +1552,7 @@
 {"k": "12a6062e625a7292", "pl": "(Rozgrywka zastępcza, nie wersja ostateczna)\nRozprawiasz się z wilkami i zrywasz Kwiat Wiecznej Młodości."}
 {"k": "12a633e86d8b1d42", "pl": "Rozbiórka rusztowań - Góra Fenglong 1"}
 {"k": "12a67b926567cc1f", "pl": "Lew Uderzający w Bramę"}
+{"k": "12a6d2c0c08cbc56", "pl": "Co za traf, wszystko świeżo przywiezione, wybierajcie do woli!"}
 {"k": "12a6f4e66cae111a", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Chwiejąca się Góra lub Obrońca bez Skazy (st. 105) w jakości niebieskiej lub fioletowej, a z niskim prawdopodobieństwem także dodatkowy złoty element wyposażenia. Pasuje do dowolnej ścieżki."}
 {"k": "12a7be2b1b70fd67", "pl": "ee… ta sztuczka Panicza ze Wschodniej Bramy, jak jej było…"}
 {"k": "12a81dbecd9b4a24", "pl": "Sen na Dziś"}
@@ -2572,6 +2575,7 @@
 {"k": "145dac6f5381c2a6", "pl": "I nie tylko ten jeden. Łez Rozstania, które przez lata chowam pod Wieżą Słodkiego Wina, jest cała góra. Trzeba będzie kiedyś po nie wrócić."}
 {"k": "145e332514abc0ad", "pl": "Tianfu…"}
 {"k": "145e9b5c48769ce2", "pl": "Dach czterospadowy z szczytami"}
+{"k": "145eebf5fcecb568", "pl": "Hm, dziś nie byłem przygotowany, innym razem na pewno wygram!"}
 {"k": "145f3fb65f589797", "pl": "Zobaczymy, która z nas będzie dziś tańczyć na przedzie!"}
 {"k": "145f7720b3cb8521", "pl": "- Tang, “Stela namiestnika wojskowego Chengde Li Baochena”"}
 {"k": "145facdc415ce8de", "pl": "Dwór Zielonego Drewna: konsola dougong"}
@@ -2587,6 +2591,7 @@
 {"k": "1462e56c6925c6d0", "pl": "Zmierzch Wśród Kwiatów"}
 {"k": "14633c60df51c986", "pl": "W godzinie chen staw się u wrót starego Miasta Moistów"}
 {"k": "14634310bfded6e6", "pl": "Przenośny przedmiot do napraw."}
+{"k": "1463a0fa8bafd477", "pl": "*ziew*... nie budź mnie... śpię..."}
 {"k": "1463b79f9dae0811", "pl": "Należy mi się choć trochę uznania za pilnowanie dziecka. Nie wiecie, jak radośnie $T(5037) się dziś śmiało!"}
 {"k": "146403e25eb7e073", "pl": "Napierśnik Wiernego Słusznej Sprawie, st. 71"}
 {"k": "1464b053e7ab43e0", "pl": "Szabla heng: ciężki atak"}
@@ -2972,6 +2977,7 @@
 {"k": "15085801aecc156c", "pl": "Ja też nie. Może to nowy gatunek."}
 {"k": "150866d08e866af3", "pl": "Zhili"}
 {"k": "1508ddbc64b9ab11", "pl": "Ciężka brama"}
+{"k": "1508df33df6e5a73", "pl": "Dwaj mali dobroczyńcy, ja, mnich, też mam historię o Dziewicy Jeleni, posłuchacie?"}
 {"k": "15097aaaebf4f705", "pl": "Drogowskaz wędrowca"}
 {"k": "150ac438cf728278", "pl": "Sława · Yannan 5: prostolinijność - zręczność"}
 {"k": "150ac79f055dd293", "pl": "Mówią, że ukochana uciekła z innym!"}
@@ -3151,6 +3157,7 @@
 {"k": "155ca7366b85d5d2", "pl": "Ruszajcie wraz"}
 {"k": "155cc5817b051a48", "pl": "Ten Xue, nie wiadomo z jakiej dziury się wytoczył, a minę ma wielką; kto by się nim przejmował!"}
 {"k": "155cdf24a1105213", "pl": "Udaj się do Fanlou i znajdź Li Laizuo"}
+{"k": "155d547705c44b79", "pl": "Gdybym miał wolne pieniądze, na pewno bym się przeprowadził do miasta, nie, do portu!"}
 {"k": "155dac9c8e1423f9", "pl": "Gdy wypije to wino, powiedz mu…"}
 {"k": "155e098c8494e690", "pl": "Zjedź na ziemię po linie z zaczepem"}
 {"k": "155e9a7c14b40c81", "pl": "Ten wzór jest żywszy niż poprzedni!"}
@@ -3540,6 +3547,7 @@
 {"k": "1611931120dd4526", "pl": "Siostro, po co tak mówisz?"}
 {"k": "1611ac8b0d90b0a9", "pl": "Spokojna brzoza księżycowa, dym wiedzie zbłąkanych. Złóż ją w ofierze w dzikiej kaplicy na Wyżynie Północnej Góry, a otrzymasz wskazówkę."}
 {"k": "16124bd403d17d7a", "pl": "Tang, Gao Shi\n\n…\nŻołnierze na przedpolu - pół żywych, pół martwych,\na w namiocie wodza piękne wciąż tańczą i śpiewają.\n\n#YNa wielkiej pustyni późna jesień, więdną trawy pogranicza,\nsamotna twierdza w zachodzącym słońcu, coraz mniej walczących.#E\nWódz, obsypany łaskami, zawsze lekce ważył wroga;\nsiły się wyczerpały, a oblężenia przełęczy nie przerwano.\n\n…"}
+{"k": "1612610292c89188", "pl": "Trochę jedwabiu i pachnideł, a gdzie temu do pary czystych wazoników z tajemniczej porcelany, które dziś przyniosłem?"}
 {"k": "1613904bfacda250", "pl": "Dojrzałość"}
 {"k": "16142f2fe8c521c6", "pl": "Zbiór: Czarny kamień igłowy"}
 {"k": "1614574a918e1ae0", "pl": "Element łodzi spacerowej 2.0, 26"}
@@ -3825,6 +3833,7 @@
 {"k": "1696f42dfa30fed3", "pl": "Trumna w górę, fortuna w ręce."}
 {"k": "16977c50b778c7bb", "pl": "Przepustka: sezon 2"}
 {"k": "1697ca2f5ba66a3f", "pl": "Po otwarciu otrzymasz nagrodę straży poz. 7 w trybie solo."}
+{"k": "169819465e1a15ad", "pl": "Nie widziałem tej panienki, może schowała się przed deszczem."}
 {"k": "169982c055fcd2ce", "pl": "Podła bestio! Jeszcze mi się stawiasz? Zatłukę cię batem, ty kundlu! "}
 {"k": "1699b4a6ee78090a", "pl": "Dzięki, chłopcze!"}
 {"k": "1699b70a5b56b30d", "pl": "Informacje o scenie"}
@@ -4045,6 +4054,7 @@
 {"k": "16fe3ad0c0d5e572", "pl": "Jiang Ping zajmuje się leczeniem od piętnastu lat. Pokłon ucznia przed mistrzem spóźnił się o piętnaście lat; ten pierwszy… kto wie, czy nie ostatni. Słysząc o pożodze wojennej w Yannan, Jiang Ping chce przeprawić się na północ od rzeki i nieść ludziom pomoc. Jeden człowiek nie uratuje wszystkich, ale każdy uratowany to jedno życie więcej. Zielony kurhan jest bezimienny, lecz nauka mistrza żyje dalej."}
 {"k": "16fe7c8a6ba6f46c", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Powrót Jaskółki lub Zastygła Rzeka (st. 105) w jakości niebieskiej lub fioletowej, a z pewnym prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YŁamanie Bambusa: Wiatr#E."}
 {"k": "16fe9ad273f208ca", "pl": "Wan Huacong 2"}
+{"k": "16fed15bc583bcd3", "pl": "Znowu pada, w dole mgliście, i na sercu duszno."}
 {"k": "16ff2fe5e7867f9a", "pl": "Dlatego od tamtej uczty ćwiczę ją od czasu do czasu, tylko… kilka miejsc wciąż mi się nie układa."}
 {"k": "16ff5590bd783e11", "pl": "Nagroda za 24000 mistrzostwa w Arsenale"}
 {"k": "17005177de63e949", "pl": "Trzy armie śpiewają w spokoju, dziesięć tysięcy jeźdźców luzuje świszczące groty."}
@@ -4055,6 +4065,7 @@
 {"k": "1701005c299ad9b2", "pl": "Bracie Zhang! Dwie miski pierogów!"}
 {"k": "1701916096c04c54", "pl": "Luo Lanxin"}
 {"k": "1701a5d31e9d878b", "pl": "Uwarz dla Szczurka Pipa osobliwy wywar (2)"}
+{"k": "1702424cff9053b2", "pl": "Popatrzcie, popatrzcie! Świeżo zebrane koszyczki lotosu, jeszcze z wodą jeziora!"}
 {"k": "1703a46954515b7a", "pl": "Jedź do Kaifengu szukać Małej Fu, Lu i Shou"}
 {"k": "170406bb22c62900", "pl": "Udaj się na północne odłogi Mglistego Lasu"}
 {"k": "170449a39ce24e45", "pl": "Kupuje pan kwiaty, młodzieńcze? Świeżo zerwane, dla ukochanej!"}
@@ -4253,6 +4264,7 @@
 {"k": "1765a17b5796e9aa", "pl": "Postęp zbierania: 0/0"}
 {"k": "1765d5c226bdcc40", "pl": "Wieloosobowo: Pan Rzeki"}
 {"k": "1765f69745dd36ff", "pl": "Ognisty Ksitigarbha"}
+{"k": "176612fce6baf907", "pl": "Wiem, zaraz wracam przygotować więcej herbaty i porcelany! Nie pozwolę, by posłowie wyszli z pustymi rękami! Haha!"}
 {"k": "176691febe1eddf0", "pl": "<z oddali>Muszę jeszcze kogoś odszukać, czas na mnie!"}
 {"k": "1766d50bf64a21a2", "pl": "W okolicy #a66829Szczytu Blasku Buddy#E jakaś kobieta gorączkowo czegoś szuka…"}
 {"k": "176729acf6b3612d", "pl": "Zapisane po podarowaniu lotosu stu oczu pieśni złudzeń Qi Xiaoguai"}
@@ -6442,6 +6454,7 @@
 {"k": "1b189cc6866300c0", "pl": "Kukła Shu Zhou, A Mu"}
 {"k": "1b18f3e487b8da53", "pl": "Po co ci… po co ci ta Han Xiangxun?"}
 {"k": "1b194ec0a73d41d5", "pl": "Jeden Okrzyk Tysiąca Obozów: notatki"}
+{"k": "1b19febf78698513", "pl": "Trzask aż niebo drży, małe diabełki uciekają! Kupujecie petardy? Zapewnią domowi pomyślność!"}
 {"k": "1b1ad6e1eaeceb86", "pl": "Przedmiot nosi ślady czasu. Być może Babka Mo, najstarsza mieszkanka Doliny Zmroku, coś o nim wie. Zawiera ślad prowadzący do dawnej rzeczy xxx."}
 {"k": "1b1ae4ebe558943b", "pl": "Ponad zgiełkiem"}
 {"k": "1b1b0e94264edfde", "pl": "Receptura: Napój Wszechrzeczy, ranga V"}
@@ -6575,6 +6588,7 @@
 {"k": "1b5264c0f29140ca", "pl": "Jeden liść, jedno życie - obszar, etap 3, 1"}
 {"k": "1b52c144434e57db", "pl": "Ludzkie życie zna osiem cierpień. Prócz mistrza sekty, Yemo Tiana, w którym płonie cierpienie pięciu skupisk, dzierżący Tabliczki Siedmiu Cierpień to ludzie, którzy zabili najwięcej na świecie, a ich karma i wina są najgłębsze. W ćwiczeniu Trzeciej Straży siła rodzi się z winy: im cięższa karma, tym większa moc. Siedmiu, którzy dzierżą te tabliczki, zakosztowało wszystkich cierpień i oplata ich karma zabijania; zasługują na miano bogów mordu z piekła bez wytchnienia, asurów z piekła."}
 {"k": "1b52e143f68af7c1", "pl": "Zacznij pić razem"}
+{"k": "1b539e3a866aa757", "pl": "Wszystkie rzeczy są puste... czemu to „puste” tak trudno pojąć?"}
 {"k": "1b53cf763742ad47", "pl": "Skoro żadne z nas nie zdoła zatrzymać drugiego, niech każde idzie swoją drogą."}
 {"k": "1b53f4003e65df9d", "pl": "Liu Er"}
 {"k": "1b544f0f04a25ddb", "pl": "Pachnący Śnieg na Szatach"}
@@ -7033,6 +7047,7 @@
 {"k": "1c1bb164b7f175e3", "pl": "Pokaż znak wyścigu Qiao Runowi"}
 {"k": "1c1c81bc7148f71b", "pl": "Wódz Mao"}
 {"k": "1c1d03fea698f3c4", "pl": "Mistrz Groty Duchów kończy mówić, wstaje chwiejnie i rusza ku Przeprawie Żółtych Źródeł.\nPatrzysz na jego plecy: niby trzeźwy, a niby nie.\nCzasem przystaje i obwąchuje słupek przy drodze.\nCzasem się przewraca, ale zaraz się podnosi i pełznie na czworakach.\nPijak i pies, myślisz, w sumie żadna różnica."}
+{"k": "1c1d373c9f02878c", "pl": "To wszystko świeżo zebrane dziś na przedmieściach warzywa i owoce, składam przed Buddą, niech bogowie skosztują świeżego."}
 {"k": "1c1d3a85fe5a88a3", "pl": "Ukryte zadanie — zwab strażników z głównej komnaty"}
 {"k": "1c1e42bfa93e4a0f", "pl": "Karez i Stacja Wiszącego Źródła"}
 {"k": "1c1eaa117f0bda45", "pl": "Dziewięć Nurtów strzeże swoich tajemnic jak oka w głowie. Jeśli chcecie się czegoś dowiedzieć, obawiam się, że musicie pójść tam sami."}
@@ -7468,6 +7483,7 @@
 {"k": "1ce5d2097e4fdd22", "pl": "On, on, on wziął mi, mi tablicę z czasów Qin i prosto, prosto…"}
 {"k": "1ce6c44f2828ec52", "pl": "Mieszkaniec Hangzhou 315"}
 {"k": "1ce6cf88ab9458c7", "pl": "Poczekaj do jutra, do godziny xu"}
+{"k": "1ce6ecc892d51dde", "pl": "Pilnuj języka, nocą opowiadać o duchach, chcesz zginąć!"}
 {"k": "1ce711350577f831", "pl": "Właściciel straganu z przekąskami"}
 {"k": "1ce7b026a947741e", "pl": "Mieszkaniec Wioski Morelowej, który zajmuje się głównie sadzeniem i podlewaniem rehmannii."}
 {"k": "1ce9bbbe771fee72", "pl": "Zatrzymać każdego, kto się wedrze! Słyszeliście?!"}
@@ -8111,6 +8127,7 @@
 {"k": "1e0b7e9c2758c563", "pl": "Tym razem nie położył go wysoko, ale podłoga naprawdę była zbyt śliska."}
 {"k": "1e0c23e2d2eefe2d", "pl": "Phi, coś tam jednak umiesz… Nie dasz, to nie. Idę."}
 {"k": "1e0c36c48df6b635", "pl": "Fang'er"}
+{"k": "1e0c48e93a0a91b4", "pl": "Codziennie podjadasz przekąski, i masz: zęby zepsute!"}
 {"k": "1e0c63173212517e", "pl": "Model Lalkarza Cieni"}
 {"k": "1e0c93460ba22022", "pl": "Potem Feng Nengqi i Pan Orzeł obaj weszli do Ośmiu Wspaniałych. Ot, przeznaczenie."}
 {"k": "1e0ccf3d0d4acccf", "pl": "Napierśnik Brzęku Uzdy, st. 61"}
