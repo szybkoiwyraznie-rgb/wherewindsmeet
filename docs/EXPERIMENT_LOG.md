@@ -3103,3 +3103,10 @@ Jedności), Cytaty z Księgi Pieśni i klasyków w przekładzie swobodnym.
 **Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od
 kotwicy to przybliżenie „co gracz zobaczy najpierw”. Plik pierścieni:
 `dist/postep_kregi.json` (poza Git).
+
+**Ciąg dalszy:** po domknięciu ≤1 000 m lista `--promien 1600` dała 1 412 kluczy;
+partia `ax` (200, ≤1 600 m) → magazyn **144 183** (29,45%), w pierścieniu
+≤1 600 m 4 740/5 952 (79,6%), zostało 1 212. Treść: targ z latawcami
+i ciastkami „prymusa”, herbaciarnie, port i robotnicy, akademie i egzaminy,
+cech kupiecki przewodniczącego Bai, sprzeczki sąsiedzkie, gwara Wu oddana
+swobodną polszczyzną potoczną.
