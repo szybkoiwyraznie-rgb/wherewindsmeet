@@ -2519,3 +2519,25 @@ zostaje po angielsku.
 
 Następny krok: dalsze partie `ccs_text_msg` do 5 229, potem `text_msg`
 (~99 357 braków — największa tabela) i na końcu tabele luźne.
+
+**Runda 6, ciąg dalszy: 1 757 z 5 229.** Partie `df`–`du` po 80 (magazyn
+129 646 → **130 926**, commit `6a8751d`). Wszystkie importy bez odrzuceń;
+dwie partie wymagały poprawek zapowiadanych „na sucho”:
+- `dj`: dopisana linia `tokeny: …` pod `PL:` została uznana za ciąg dalszy
+  tekstu (`zlamana_linia`) — **nie wolno dopisywać linii `tokeny:`**
+  w plikach zwrotek; usunięte, potem 80/80 czysto;
+- `dn`: PL zawierało powtórzone chińskie 分 (zachowane z oryginału) —
+  zamienione na `— [imię zwycięzcy]`.
+
+Pary EN↔PL czytane po każdej partii; poprawki: „Bogactwo”→„chwała”
+(`4f074b5901d10bc5`: „Wielkie Fale”), „Terminator” (uczeń-rzemieślnik),
+„Pastwisko” (牧场), „Otręby”, „Pukanie”, „Zaliczka” (折抵), „Galeria
+Wszechrzeczy w Liangzhou” (凉州万相), „Gospoda Bez Zazdrości” zamiast
+nowego wariantu dla 不羡仙客栈.
+
+Nowe terminy do glosariusza: 渡尘墟→Ruiny Pyłu · 精元→esencja życia ·
+牙行→dom pośrednictwa · 鹊仙桥→Most Srok · 醉花阴→Upojny Cień ·
+乞巧节→Święto Błagania Zręczności · 东君→Władca Wiosny ·
+偃师→konstruktor · 毒障→miazmaty · 化怨→rozproszenie nienawiści ·
+四海行→Wędrówka po Czterech Morzach · 追魂引→Goniec Dusz ·
+天工→Boskie Rzemiosło · 万相→Galeria Wszechrzeczy · 悬壶→uzdrowiciel.
