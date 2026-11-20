@@ -118,6 +118,13 @@ podziały wierszy zgodne z chińskim źródłem. **623 testy OK** i kontrola
 repozytorium OK (616 wpisów indeksu). Przekład AI-tymczasowy, nie był
 sprawdzany w grze; zakres nie jest potwierdzeniem lokacji ani momentu gry.
 
+**Partia `hz`:** 40 dalszych przekładów otwarcia scen poselstwa z grupy
+5208; magazyn **137 777**, **489 544** miejsca (28,14%). To część historii:
+sonda powiązanych scen wskazuje jeszcze 584 nieprzetłumaczone bazowe klucze.
+Import próbny i właściwy bez odrzuceń; skan 40 pozycji bez CJK i nie-NFC,
+z zachowaniem liczby podziałów wierszy. Kontrola repozytorium OK; 623 testy
+wykonano przed `hz`. Przekład AI-tymczasowy, bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

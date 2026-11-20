@@ -2739,3 +2739,10 @@ ani nie dowodzi kompletności zadań. 390 przekładów po imporcie: bez CJK
 i nie-NFC, liczba fizycznych podziałów wierszy zgodna ze źródłem.
 `check_repository.py` OK (616 wpisów), 623 testy OK; poprawki po testach
 dotyczyły tylko dwóch kwestii. Przekładu nie sprawdzano w grze.
+
+**Poselstwo (`hz`):** 40 nowych kluczy z grupy 5208; magazyn 137 777,
+489 544 miejsc (28,14%). Suchy i właściwy import bez odrzuceń, 40 linii
+bez CJK i nie-NFC, liczba podziałów wierszy zgodna ze źródłem. Po imporcie
+sonda wskazuje jeszcze 584 brakujące bazowe klucze powiązanych scen tej
+grupy, bez oceny innych tekstów zadania. Kontrola repozytorium OK; 623 testy
+przeprowadzono przed tą partią. Przekład AI-tymczasowy, bez testu w grze.
