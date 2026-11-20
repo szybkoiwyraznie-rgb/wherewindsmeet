@@ -3121,3 +3121,25 @@ Dalsze progi po tych partiach: ≤3 200 m 5 357/6 832 (78,4%),
 i warsztaty latawców, szkoła i egzaminy, urząd powiatu, cech kupiecki
 (przewodniczący Bai), port i pochówek, drobne scenki rodzinne; gwara Wu
 oddana polszczyzną potoczną.
+
+## 2026-11-20 (9) — domknięcie pierścienia ≤1 600 m (partie `bb`–`bd`)
+
+Po `ba` zostało 612 kluczy; partie `bb` (200), `bc` (200) i `bd` (212)
+zamknęły pierścień ≤1 600 m w 100% (5 952/5 952). Magazyn 144 783 →
+**145 395** (29,70%). Każda partia: komplet, 0 odrzuceń, `PL:` bez CJK.
+Lista robocza ≤1 600 m: 612 → 412 → 212 → **0**.
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | 100% |
+| ≤1 600 m | 5 952 | 5 952 | 0 | **100%** |
+| ≤3 200 m | 6 832 | 5 969 | 863 | 87,4% |
+| ≤6 400 m | 9 097 | 5 980 | 3 117 | 65,7% |
+
+Treść: rezydencja Chenów i domowe plotki, studenci i akademie, Targ
+Kwiatowych Łodzi z żetonami, świątynie (Sala Wojenna, Pięciu Smoczych
+Królów), port i warsztaty szkutnicze, wioska i klęska chorób, pieśni
+robocze (rytmiczne „hopsa” zamiast chińskich wypełniaczy), kołysanki.
