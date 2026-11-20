@@ -1332,11 +1332,13 @@
 {"k": "327dec666ddc7b8b", "pl": "Wejdź do Domu Kwiatów na spotkanie z Qin Ruolan"}
 {"k": "327e1977cd5ffe8d", "pl": "Hę? To… to nie o to chodzi, czy się znam na kwiatach. Przecież przy tym drzewie jest zagroda dla koni, kto tam zamieszka?"}
 {"k": "327e1d6feea0154f", "pl": "Do akcji wkracza mistrz z Weiyang"}
+{"k": "327e262362c776cd", "pl": "(im wyższa dodatkowa nagroda, tym chętniej inni gracze podejmą zadanie)"}
 {"k": "327e68cfdaa29bb6", "pl": "Ten cień, co kuje w krzemień i metal, to…!"}
 {"k": "327ecce0628ef5ad", "pl": "Receptura: Łuk Wleczonego Księżyca · Boskie Ramię"}
 {"k": "327f079209c42815", "pl": "Zabójca B"}
 {"k": "327f2bc4a108b5b4", "pl": "Dziadek Zhao"}
 {"k": "327f374a4b0203f0", "pl": "A jakże, ale Pan Orzeł to nie byle jaki orzeł."}
+{"k": "327f3f78b160bf81", "pl": "Karta poziomu"}
 {"k": "327fc546549fdb29", "pl": "Droga Wewnętrzna: Włócznia Burzy Ośmiu Stron"}
 {"k": "327fcef57a5f7b18", "pl": "Stara księga rachunkowa zgubiona w głębi Morza Cierpień Bodhi; na okładce widnieje znak “Yang”. Karty są poplamione krwią i kurzem, musiała więc leżeć tu już od jakiegoś czasu. Choć to księga rachunkowa, zapisano w niej też trochę domowych drobiazgów. Yangowie to jeden z czterech wielkich rodów Miasteczka Miłosierdzia: może właściciel księgi jest właśnie tam."}
 {"k": "3280d30bc49fb51f", "pl": "Wejście Czterech Niebiańskich Królów Murong Yuan"}
@@ -1381,6 +1383,7 @@
 {"k": "329390d67c88a5bf", "pl": "Skrzynia notatek: Kruszenie Skał: Ciężar, epicka"}
 {"k": "3293bd86b4aa66e2", "pl": "Ulecz Guana Zizai"}
 {"k": "32942ac56ffe820a", "pl": "Pieśń Rybaka"}
+{"k": "329492b6e1832fd8", "pl": "Wykonuj zadania na tym obszarze, by zdobywać fundusze gildii"}
 {"k": "3295267c708eb276", "pl": "Ryba w Wodzie: Najwyższy"}
 {"k": "32953fb70e9976f7", "pl": "Buty: wzór"}
 {"k": "32955791a86ca594", "pl": "Raz spojrzeć, dwa razy spojrzeć, trzy razy spojrzeć - jedynie trojakie spojrzenie jednego serca rozbija wszelkie złudzenia."}
@@ -1404,6 +1407,7 @@
 {"k": "329e55d6a923af30", "pl": "Rejs Lampionów - Budowa łodzi"}
 {"k": "329eb2974b9f2cdc", "pl": "Pałac Cesarski — Wszechwiedzący — pieśń bez serca"}
 {"k": "329ed2f1654d8cc5", "pl": "Coroczna danina z Jiangnanu"}
+{"k": "329ef36230b239ec", "pl": "Wczytywanie…"}
 {"k": "329fdac241359c3d", "pl": "Wojowniczość"}
 {"k": "32a10eaddbb5155a", "pl": "Subiekt od fortuny"}
 {"k": "32a1ab8242c5418d", "pl": "Zdarzenie losowe “Nabrzeże na rozstajach”! Łodzią z pola %s na pole %s!"}
@@ -1422,10 +1426,12 @@
 {"k": "32a83ec15f5e8875", "pl": "Wykwintny Pejzaż"}
 {"k": "32a853fd3bb4a23f", "pl": "Bohater Czterech Mórz - Obszar wyzwalacza: Wędrowiec Dziewięciu Mieczy - Wioska Wyłamanej Bramy"}
 {"k": "32a860e14300ccb9", "pl": "Kamień graniczny"}
+{"k": "32a9879b93670ef4", "pl": "Nowa konfiguracja"}
 {"k": "32aac004c2085b3f", "pl": "Straż - Murong Yuan F2 - technika ładowana - zmiana ciosu 2"}
 {"k": "32aadea0a89e6c9f", "pl": "Owinięcie ramion"}
 {"k": "32ab0e489579a020", "pl": "Gdy kształt spętany, a położenie bez wyjścia, korzyść bierze się z bliska. Wzór kaligrafii pismem trawiastym Wang Xizhi, przechowywany w Studni Niebios. To kopia sporządzona przez uczonego; sens jej sięga poza pędzel."}
 {"k": "32ab7934cfba71fc", "pl": "Kruszenie Skał: Potęga, st. 100"}
+{"k": "32ae1e7039727d75", "pl": "Wczytywanie…"}
 {"k": "32ae2fc3241b5dfb", "pl": "Xiao Lan"}
 {"k": "32b1a712314d28b8", "pl": "Małpi Mędrzec"}
 {"k": "32b1b1ba8e84e651", "pl": "zniknął."}
@@ -1450,6 +1456,7 @@
 {"k": "32b9972f6b446577", "pl": "Wybór cech: Wstrząs Niebios, st. 100 · Wyborna"}
 {"k": "32b9c1402064ded8", "pl": "Strefa uskoku: obszar sprawdzenia efektów"}
 {"k": "32ba31080c5ba4f0", "pl": "Rzemieślnicy z całego kraju, wezwani edyktem do stolicy, by budować Ogród Cesarski, zapełnili po brzegi gospody w zachodniej części miasta."}
+{"k": "32bb81ac82c1ea05", "pl": "Zapisano trzeciego dnia pobytu w pałacu"}
 {"k": "32bbb84ed052acb2", "pl": "Czego się gapisz?"}
 {"k": "32bc55a8fa0bd7c4", "pl": "Nie, masz rację. Panicz Li jest jak słońce i księżyc, ma świecić nad całym światem. Jak mogłam zapragnąć mieć go tylko dla siebie…"}
 {"k": "32bdaccb068647af", "pl": "Bezimienny starzec, który błąka się po pustym domu, jakby czegoś szukał…"}
@@ -1497,6 +1504,7 @@
 {"k": "32d70088f542018c", "pl": "Skrzynia wyboru: Płukany Kwiat, st. 110"}
 {"k": "32d764a8e05a50b7", "pl": "Rozmawiaj z Hao Youxianem"}
 {"k": "32d78a8176ac3116", "pl": "Dobry człowiek z Kaifengu"}
+{"k": "32d7a1f8ee24e300", "pl": "Naraz można podjąć tylko jedno"}
 {"k": "32d7fe95e30ad43e", "pl": "<w myślach> Ten duży i ten mały… Jak ich zostawię, to zanim duży umrze, mały mnie zamęczy swoim płaczem…"}
 {"k": "32d85157a4e4311b", "pl": "Pokonaj strażników Złotego Pawilonu"}
 {"k": "32d87aa5b02f639a", "pl": "Czerwone klony jak ogień — stare drzewa opowiadają uczucia — skalne jaskinie — złote wrota pojawiają się i znikają — bracia jednogłośni — kamienie układają się w góry.\n"}
@@ -1510,6 +1518,7 @@
 {"k": "32dd67ad5a7d02c4", "pl": "Na #a66829południu Morza Cierpień Bodhi#E mnich o imieniu zakonnym Huijing zgubił trzy ważne księgi i bardzo się tym trapi."}
 {"k": "32de2371731b66f1", "pl": "Ascetyczny mnich 44"}
 {"k": "32de86d611d2228d", "pl": "I co z tego? Kto przy zdrowych zmysłach kupi dom, w którym straszy?"}
+{"k": "32df1f02081410ac", "pl": "Autor: imię gracza (sześć znaków)"}
 {"k": "32df4bc882dbcf7c", "pl": "Szanowny gościu, czy serce wytrzyma widok mojej nieziemskiej urody?"}
 {"k": "32df4da2b1fdb906", "pl": "Zhou Yizhou"}
 {"k": "32e0355d40c765bf", "pl": "Powiadają, że jedna z nauk w Pawilonie Wenjin wymaga niemałej siły wewnętrznej. Przy Tarasie Króla Szczypioru jakiś uczeń chodzi strapiony i wzdycha…"}
@@ -1574,6 +1583,7 @@
 {"k": "32fc5613528282f5", "pl": "Rzemieślnikom? W jakim celu?"}
 {"k": "32fcbc2798045f6a", "pl": "Przy beczce wina mężczyzna po kryjomu popija, choć jest już pijany. I nie chce przestać."}
 {"k": "32fd62bab786be17", "pl": "Morze Chmur: Piętrzące się Fale"}
+{"k": "32fd6bfb1e518005", "pl": "Pobierz zasoby podstawowe i ukończ zadanie „Droga do domu”, by odebrać nagrodę\n(raz na konto)"}
 {"k": "32fe0efb0aa7bbcf", "pl": "Oddaj cześć zmarłym"}
 {"k": "32fe643e9eaac1cc", "pl": "Okrzyk bojowy - przyzwanie żołnierzy"}
 {"k": "32fec5789e1d18f4", "pl": "Tfu, wszystko słyszałem. Jak przyszliście w sprawie Cui Xiaojina, to nie mam wam nic do powiedzenia."}
@@ -1583,6 +1593,7 @@
 {"k": "33027570aac4bd95", "pl": "Coś cię jeszcze niepokoi?"}
 {"k": "330279dd8b86974f", "pl": "Dół: wzór"}
 {"k": "330295ae390c5a66", "pl": "Nauki wśród wydm"}
+{"k": "3302f841d01d1713", "pl": "Trzy Przysięgi"}
 {"k": "33030b6123fb4ff4", "pl": "Mieszkaniec Jiangnanu."}
 {"k": "33047134c9946c2b", "pl": "Krążysz w przebraniu i nawet nie wiesz kiedy, a sztuczka Zhuge Ha zostaje rozwiązana"}
 {"k": "3304d5442168d8cb", "pl": "Zima - Sala Qingshou"}
@@ -1611,8 +1622,10 @@
 {"k": "331035759e6d1283", "pl": "Rocznicowa skrzynka podarunkowa"}
 {"k": "3310454f5d72eb9d", "pl": "Bambusowy Kornik 5"}
 {"k": "33117fccae68e71d", "pl": "Gościnny Qingzhou wita was"}
+{"k": "33118fcc4223edc9", "pl": "Awatar — licznik maczet"}
 {"k": "3311fbb3982f9f95", "pl": "Obszar dźwięku - mały pokój 3"}
 {"k": "33127ba9ad3871b5", "pl": "Rodzinny Zestaw Ośmiu Dźwięków"}
+{"k": "3312cb08307eadc6", "pl": "Pobieranie…"}
 {"k": "3312ccfc3db47826", "pl": "Przyjmij przebranie"}
 {"k": "331319622d9e35c2", "pl": "Znak miłości"}
 {"k": "3313d1199c251174", "pl": "Pojedynczy cios kijem (F1)"}
@@ -1628,6 +1641,7 @@
 {"k": "33176355e04f2583", "pl": "Kilka dni temu Sun She poszedł do #a66829Widowiska Ryb i Smoków#E popatrzeć na zabawę i zgubił sakiewkę, a w sakiewce był #a66829akt własności domu#E."}
 {"k": "331764bf4518ffc7", "pl": "Podłoga zewnętrzna: narożnik"}
 {"k": "3317bf40c4ca00d0", "pl": "Dar mysiej radości"}
+{"k": "33180f4dc8652a06", "pl": "Wczytywanie danych."}
 {"k": "33182f62a900b331", "pl": "Wstąpienie do sekty: Trzecia Straż"}
 {"k": "3318598968316050", "pl": "Qingzhou - Ujście - Skrzynia Kraba 11"}
 {"k": "33188456cd61c160", "pl": "Niechaj w jianghu nie okryjecie nigdy hańbą szat, które nosicie, ani szabel, które dzierżycie. "}
@@ -1739,6 +1753,7 @@
 {"k": "335092effb340a12", "pl": "Kotek: Shang Baobao"}
 {"k": "3350eb0747af134b", "pl": "Ee… Czy to aby nie ten człowiek, którego podobno otruto na uczcie?"}
 {"k": "335153d7d4af7344", "pl": "Poza: Taniec pełen ducha"}
+{"k": "33517926747180e6", "pl": "Wklej"}
 {"k": "33517bdcf35a941f", "pl": "Siedząc wśród mglistych wierzb i długo płynącego strumienia, przez cały dzień wdycha się delikatny zapach ziół. Pod okapem często gromadzą się chorzy, wyczekujący cudownego lekarza, który przywróci wiosnę."}
 {"k": "3351aa5cc880cc82", "pl": "Szybciej niż kiedykolwiek przedtem… żeby dostarczyć skrzynkę…"}
 {"k": "3351ada26d17f122", "pl": "Choć nikt nie wydał rozkazu, uczniowie Zielonego Potoku każdy z osobna ruszyli do mostu Zhongdu. Ceną, o którą tym razem walczą, jest odrobina nadziei na życie na polu bitwy."}
@@ -1752,10 +1767,12 @@
 {"k": "335511b00325a245", "pl": "Próba fachów: Nocny Stróż"}
 {"k": "3355d6129e127c13", "pl": "…Naprawdę narobiliśmy wam kłopotu."}
 {"k": "33570304202d98a7", "pl": "Kieszonkowiec z Kaifeng, który ma z Tang Jingchou umowę: jeśli złapią go po raz trzeci, porzuci fach."}
+{"k": "33574cc236dda838", "pl": "Dziś już nagrodzono"}
 {"k": "33576f5ab27568b3", "pl": "To, co tu namalowano, to Pan Nefrytowej Góry… czy nie?"}
 {"k": "3357f66041af5fc1", "pl": "Huai Piqi"}
 {"k": "3357f94a889136f7", "pl": "Podsłuchaj rozmowy we wnętrzu"}
 {"k": "33587909b6d31729", "pl": "List do ciebie, żegnaj"}
+{"k": "3358ebefbae82299", "pl": "Tekst i obraz"}
 {"k": "33590ed906b4c744", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Deszcz w Porę lub Osmantusowy Księżyc (st. 86) w jakości niebieskiej lub fioletowej, a z pewnym prawdopodobieństwem także dodatkowy złoty element wyposażenia oraz dodatkowo jedne notatki ścieżki Kruszenie Skał: Potęga."}
 {"k": "33594a5486d82958", "pl": "“Wściekły Pies”"}
 {"k": "335ad970ea43c5ad", "pl": "Blok 2 - odepchnięcie 2"}
@@ -1770,6 +1787,7 @@
 {"k": "335e8eb3027ce2e5", "pl": "Xiaoya"}
 {"k": "335ea81ed99c009c", "pl": "Śpiąca Małpka"}
 {"k": "335ec0060d476575", "pl": "Zobacz, czy Yan Qiren już przyszedł do siebie"}
+{"k": "335f3640c24b3352", "pl": "Mędrzec-żartowniś"}
 {"k": "335fe199a9149fcc", "pl": "Godło, w którym splatają się płomienie i smok: ogień to Południowy Płomień Li, smok to złoty smok o pięciu pazurach. Złoty smok migocze w płomieniach, jakby chciał spalić świat do jasności. Jeśli oddać to godło doktorowi Tianowi albo Tang Bao, może zdradzą odpowiedź."}
 {"k": "335ff9f8b2ed1857", "pl": "Zupa z jeleniny, jeleniego kośćca i dzikiego żeń-szenia. Wzmacnia krew i siły."}
 {"k": "335ffc94ed60a2a3", "pl": "„Księga obyczajów”"}
@@ -1784,6 +1802,7 @@
 {"k": "3363490edfa5cd96", "pl": "Kruszenie Skał: Potęga - stały 3"}
 {"k": "3364802c47f74c53", "pl": "Upiorny Panicz - Talent Krainy Bohaterów 3"}
 {"k": "3364f9e130ca9e2e", "pl": "Zapisane po oddaniu Xiaodie placka spod posągu bogini"}
+{"k": "33650a369521ec29", "pl": "Świat"}
 {"k": "33655ae49483f5d3", "pl": "Poczciwy stary rolnik z Linqu, który całe życie pracuje na polu, lecz upał go powalił. Szczery i otwarty, ma bardzo donośny głos i szczególnie tęskni za słodkimi brzoskwiniami z rodzinnych stron."}
 {"k": "3365b34bb5ccd367", "pl": "Wszystko, co żyje, rodzi się poddane woli bogów Siedmiu Świateł. Wy, ciemni ludzie, nie ujdziecie już niebiańskiej kary! "}
 {"k": "3365f80801cfc273", "pl": "Zdobycz wina"}
@@ -1824,8 +1843,11 @@
 {"k": "33763cca44487545", "pl": "Urzędnik Hali Jasnych Pism, bystry umysłem, pisze płynnie. W Trzech Halach nazywają go panem Zixu."}
 {"k": "33765c025728239b", "pl": "Dziadek Gongsun - Sztuka Ropuchy"}
 {"k": "3376eb308d993511", "pl": "Chodźcie szybko! Zobaczcie, co znalazłam!"}
+{"k": "3376f9468c7948a7", "pl": "Odsetek pierwszych miejsc"}
+{"k": "3377171738070045", "pl": "Poziom"}
 {"k": "3377218cc8953bf1", "pl": "Ukryty obszar - zwykły - Mały dom"}
 {"k": "337776f339598999", "pl": "Czy mógłbym prosić o trochę wody?"}
+{"k": "33778af42686ed6c", "pl": "Gotów do wypłynięcia"}
 {"k": "33778d47fd672c8e", "pl": "Nie, coś mi tu nie pasuje. Mówi ci coś imię Dwunasty Nieśmiertelny?"}
 {"k": "3377fb2766924ae7", "pl": "Czy duch straszy ludzi, czy to ludzie udają duchy?"}
 {"k": "3378394b1441c8ba", "pl": "Wstępując na wysokość"}
@@ -1833,6 +1855,7 @@
 {"k": "3378fe9cb2f838f0", "pl": "NPC w tle - Północny Ogród Cesarski - malarz 1"}
 {"k": "33793488a8eefc67", "pl": "Wróć i pomów z Lianem"}
 {"k": "337a82b5f89d4b84", "pl": "Tylko dla dzwonu nurkowego"}
+{"k": "337adc64305e36c4", "pl": "Wczytywanie…"}
 {"k": "337b1af87bb40645", "pl": "Nie jestem smarkacz, ja mam po swojej stronie bohatera. Ja… wcale się ciebie nie boję, bo jestem psem, co szczeka zza pańskich pleców!"}
 {"k": "337b7d7de88ceabd", "pl": "Pierwszy żółw zjawia się od razu, a znika po rozmowie z drugim"}
 {"k": "337c13d4d8addeaa", "pl": "Miau Miau - Wieś Obfitych Plonów - Elokwencja"}
@@ -1869,6 +1892,7 @@
 {"k": "338b03ca2a7b5bb7", "pl": "Ekran nagród prób"}
 {"k": "338b42ce03754038", "pl": "Bez oszustwa, ni krzty szwindla! Wujue, znaczy bez szwindla: Misa Skarbów!"}
 {"k": "338c87047f94016c", "pl": "Po otwarciu otrzymasz fioletową zawieszkę ze wskazanego zestawu. Pasuje do dowolnej ścieżki."}
+{"k": "338cf61d791ae244", "pl": "Nie należysz jeszcze do żadnej gildii"}
 {"k": "338d16be56f0d297", "pl": "Chen Shisan"}
 {"k": "338dbd1b77d90150", "pl": "Na granicy litości: brąz · Moc"}
 {"k": "338e40dd750ac488", "pl": "Tyle lat wojen… Nie tylko nasz dom tak wygląda. Przynajmniej jesteśmy z mamą razem."}
@@ -1914,8 +1938,10 @@
 {"k": "339d129a4be3bdf9", "pl": "Su Shiyu"}
 {"k": "339dbbfba7fb2ca4", "pl": "Surowy starszy, który uczy akolitów sztuk walki i medytacji."}
 {"k": "339e4bbea22faca4", "pl": "Ukaż przysięgę Yanyun"}
+{"k": "339e4bdee4358c84", "pl": "Błogosławiona Przeprawa"}
 {"k": "339f67919ebc60a8", "pl": "Rękawy (góra): wzór"}
 {"k": "33a0ab28dea39ce7", "pl": "Wcale cię nie zbywam. Ktoś tam w jeziorze zapłacił mi sowicie, żebym przyszedł."}
+{"k": "33a0f82f46776fd8", "pl": "Wymiana nagród"}
 {"k": "33a14889cf0a3181", "pl": "Kolorowy kamień: frędzle"}
 {"k": "33a2189096fd8008", "pl": "Kielich do wina z czystego złota."}
 {"k": "33a2a80af11eb5fe", "pl": "Dowód ukończenia próby dla uczniów wewnętrznych. Po dwóch poprzednich próbach udaj się do okręgu, by się zapisać."}
@@ -1959,6 +1985,7 @@
 {"k": "33b78ae31dedca94", "pl": "Korekta poz. 70: Brzęk Stali · Tęcza"}
 {"k": "33b7ab2ee26de5ec", "pl": "Oczekiwanie w Lesie Zagubionych Dusz"}
 {"k": "33b7f7ce08e2914b", "pl": "Nie wrócę, nie wrócę. Trzeba iść na miasto, tam się jakoś zarobi…"}
+{"k": "33b8bcbc4c7f570c", "pl": "Koszt cierpliwości 3/3"}
 {"k": "33b8ff12abd68483", "pl": "Po użyciu otrzymasz Sławę bohatera “Zarządca Domu Kai”."}
 {"k": "33b9a6daa517c7d7", "pl": "Kto? Ren Shanzhong?!"}
 {"k": "33ba130844cfceac", "pl": "Gdy wartość preceptów jest niska, graczowi mogą ją wypomnieć Wykonawcy Prawa. Po wypomnieniu wartość preceptów zostaje przywrócona do stanu początkowego.\nNazwa wartości preceptów różni się w zależności od sekty. Midnight Blades zowią ją Punktami Karmy."}
@@ -1999,6 +2026,7 @@
 {"k": "33c899aaac601f96", "pl": "Plan Golden Jar jako trybut — ruszył zgodnie z terminem — za kilka dni dynastia Song otworzy skarbiec i ulży ludziom; wojskowe środki zawiodą — Jiangnan będzie bezpieczne. Nie zapomnij o obietnicy — dołóż wszystkie siływraz — pomóż mi wrócić do Weiyang City.\n"}
 {"k": "33c919e72b0a1ca4", "pl": "“Księga Han” mówi: “Rączy koń zwie się zhui”. Zhui to sierść, w której siwizna przeplata się z bielą. Kitańskie Żelazne Kopyto o takim umaszczeniu zwie się wuzhui.\n“Dzieje Liao” w “Traktacie o żywności i towarach” podają: “Dawnym obyczajem Kitanów bogactwem ich były konie, a siłą - wojsko. Konie puszczali wolno na pastwiska, a wojsko rozpuszczali między lud. Gdy przychodziła wojna, jeźdźcy z napiętymi łukami i zbrojni, wezwani o świcie, stawali w szyku, nim minął ranek. Konie szły za wodą i trawą, ludzie żyli z mleka i sera, napinali mocne łuki i polowali na zwierzynę, by mieć na codzienne potrzeby; suchary i siano - oto cała ich droga. Tak zwyciężali i nikt nie mógł im się oprzeć”. Kitanowie byli ludem koczowniczym, od dawna wędrującym z końmi za wodą i trawą. Od założenia państwa Liao przy Sześciu Wydziałach istniał osobny Urząd Stad Końskich, który doglądał wypasu i rozpłodu stad pałacu Zhangmin. Kitańskie konie bojowe słynęły z wytrwałości, cierpliwości, odwagi i pewnego kroku - stąd nazwa “Kitańskie Żelazne Kopyta”.\nKitańskie Żelazne Kopyta są niewielkie, mają nogi grube i krótkie, kopyta małe i okrągłe, twarde i nieskłonne do pękania; stąpają zwinnie i nawet po wyboistych górskich ścieżkach idą jak po równinie. Są spokojne, zadowalają się lichą paszą, łatwo nabierają ciała i żyją długo; mogą dźwigać ciężary i nosić jeźdźca. To najpospolitsza rasa koni w kitańskim państwie Liao."}
 {"k": "33c94ef8d53572f5", "pl": "Walka w otwartym świecie (UE)"}
+{"k": "33c97d5810ea557d", "pl": "Perłowe Jezioro"}
 {"k": "33c9c382112c5260", "pl": "Ukryte zadanie nie posuwa się w obrębie godziny"}
 {"k": "33ca31a550761b46", "pl": "Opadające Kwiaty"}
 {"k": "33cb0f80e7dbd169", "pl": "Walka o chleb"}
@@ -2064,6 +2092,7 @@
 {"k": "33ee1a1787448906", "pl": "Ranga 5"}
 {"k": "33ee93e10009bf2f", "pl": "Liu Yizui"}
 {"k": "33eeb7caeea74a1b", "pl": "Płyń."}
+{"k": "33ef2d7110f76df5", "pl": "Działka gildii"}
 {"k": "33ef8178227a47b0", "pl": "Wedle słów listu czekaj pięć dni, aż nadejdzie Święto Kwiatów"}
 {"k": "33effed39c4bbfe4", "pl": "Odporność fizyczna"}
 {"k": "33f0a822ee8d8fa3", "pl": "Dawni Chińczycy słowem “chong” określali wszelkie zwierzęta i dzielili je na pięć rodzajów: ptaki to stworzenia pierzaste, zwierzęta czworonożne - futrzaste, żółwie - pancerne, ryby - łuskowate, a człowiek - nagie. “Da” znaczy wielki, starszy, pierwszy. Tygrys należy do stworzeń futrzastych i jest królem zwierząt. “Dachong”, czyli “wielkie stworzenie”, to więc przywódca stworzeń futrzastych, król zwierząt."}
@@ -2087,6 +2116,7 @@
 {"k": "33f741508f8c5b73", "pl": "Oddajesz dziewczynie nefrytowy wisiorek Jeleniego Nieśmiertelnego. Uśmiecha się promiennie i znika,\na ty otrząsasz się jak ze snu i widzisz, że przed tobą nikogo nie ma, tylko płomień świecy się chwieje."}
 {"k": "33f7c1e1bdba0ffc", "pl": "Jedzenie i napoje"}
 {"k": "33f9dad7149cd30a", "pl": "W Sosnowej Zatoce czterej bracia kłócą się o zgubiony skarb; ktoś ich podszczuł i wywlekli wszystkie stare urazy — patrz, już się biorą za łby…"}
+{"k": "33fb8a5a13894419", "pl": "Odblokowano wyższy poziom uprawnień do strojów"}
 {"k": "33fc9eb3f88d6e63", "pl": "Dosiąść Baijie - Huihu"}
 {"k": "33fd11588b6e8e79", "pl": "Huzi"}
 {"k": "33fd24c0c311b48d", "pl": "Wszyscy Naraz!"}
@@ -2099,6 +2129,7 @@
 {"k": "3403f8341781439f", "pl": "Fioletowy kamień melodii: Wzburzony Piasek"}
 {"k": "34044bca475f1e76", "pl": "Technologia upscaling obrazu daje maksymalny przyrost wydajności przy najwyższej jakości grafiki.\n#R*Ta opcja wymusza wyłączenie pozostałych rodzajów antyaliasingu.#E\n#R*DLSS i interpolacja NVIDIA wymagają wsparcia sprzętowego i włączonego DirectX 12.#E"}
 {"k": "3405c3d4f2818651", "pl": "Kuang Anping"}
+{"k": "340702a1c1d21ed3", "pl": "Wczytywanie danych"}
 {"k": "3407a1070857b847", "pl": "Żebranie"}
 {"k": "3407b1c41e0fbd3e", "pl": "No to świetnie! A tu są pijane fasolki, Ruby o nie prosiła. Weźcie i dajcie jej, ja teraz nie mam do tego głowy."}
 {"k": "340847f0954422a1", "pl": "Zaprzyjaźnić się przez walkę 2"}
@@ -2110,6 +2141,7 @@
 {"k": "340c77651214b6bf", "pl": "Obrabowanie grobowca rodu Zheng przed trzydziestu laty wywołało niemałą wrzawę. Rabuś miał wielkiego pecha: nie dość, że w grobowcu natknął się na samego potomka rodu, to jeszcze, uciekając do Zachodniego Kwartału, wślizgnął się przypadkiem do pustej rezydencji Zhengów i wpadł prosto na ścigającego go młodzieńca z tego rodu."}
 {"k": "340d7d814a21617a", "pl": "Rzeka płynie, światło mija; ulotne, na nikogo nie czekają."}
 {"k": "340e9b5434020792", "pl": "Ale jesteś mądry, braciszku! Tak długo bolał mnie brzuszek, a jak wypiłam twój wywar, od razu dużo lepiej!"}
+{"k": "340ef7a2b1924fa2", "pl": "Postęp akcji ratunkowej\nWczytywanie…"}
 {"k": "340f23f535a0ef15", "pl": "Kaligrafia"}
 {"k": "34104ce53e5e792a", "pl": "A jakże, uczyłem się porządnie! Służyłem nawet w Pawilonie Wiosen i Jesieni!"}
 {"k": "3410610b2e748e92", "pl": "Lyu Ye"}
@@ -2158,6 +2190,7 @@
 {"k": "3428c541af80799d", "pl": "Podobno prosionki lubią się chować po deszczu w trawie pod drzewami, więc próbujemy szczęścia."}
 {"k": "3428d65ea18ccebe", "pl": "Igrzyska Jianghu 2.0 - efekt zbierania wrogów"}
 {"k": "342994d6d12303e4", "pl": "Hę? Czego? Masz do mnie sprawę?"}
+{"k": "342997febd02d153", "pl": "Starożytna Droga Zmierzchu"}
 {"k": "34299e9c56294171", "pl": "Czemu jak mężczyzna przychodzi do Fanlou “wydać ucztę” albo “na ucztę”, to wszyscy się rozpływają, jakie to wytworne, a kobiecie nie wolno nikogo “ugościć”?"}
 {"k": "342af1f61de36d47", "pl": "Uszkodzenie Meridianów"}
 {"k": "342c9046de6b6d90", "pl": "Wyrób wyborny: glina i koral VII"}
@@ -2170,6 +2203,7 @@
 {"k": "3430c6aafcf3f28f", "pl": "Znajdź Jia Mao"}
 {"k": "343286bb0fa827ef", "pl": "Obszar ograniczenia umiejętności"}
 {"k": "3432aa896b99a4d9", "pl": "Podobno pewien słynny kucharz z Qinghe chce za darmo uczyć swoich potraw. Kto jednak pragnie zostać jego uczniem, musi przejść próbę. Ten warunek bynajmniej nie odstraszył tłumu chętnych, który zaraz się do niego zbiegł…"}
+{"k": "34334da4d8efbcda", "pl": "Na wschód płynie Wielka Rzeka, a jej fale zmiatają na zawsze wszystkich dawnych bohaterów"}
 {"k": "34336305ee721ddd", "pl": "Wzrost ataku"}
 {"k": "3433c3b142977a40", "pl": "Zestaw: Mglista Wierzba, st. 16"}
 {"k": "3434cf7986d53ca8", "pl": "Rozmawiaj z Li Shunju"}
@@ -2187,12 +2221,14 @@
 {"k": "343937c421af6e4b", "pl": "Czyli nie da się obejrzeć?"}
 {"k": "34394a45d5877e69", "pl": "Potem przysiągłem, że nie stanę już przy kuchni. Ale wtedy cały mój kunszt poszedłby w zapomnienie."}
 {"k": "34395150b12e2aca", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Nefrytowy Czerpak lub Zmienne Oblicze (st. 71) w jakości niebieskiej lub fioletowej, a z niskim prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YBrzęk Stali: Tęcza#E."}
+{"k": "343a7655ae6074d5", "pl": "Dodaj wszystkie"}
 {"k": "343acbd5295fffd9", "pl": "Jeden jednym ciosem dłoni przebił mur na wylot. A drugi wyleciał przez tę dziurę i jednym skokiem wylądował trzy piętra wyżej."}
 {"k": "343c5714eebf94eb", "pl": "Można odblokować w zwoju Czapli w “Szachach Jianghu”."}
 {"k": "343d95be39804e12", "pl": "Druga księga"}
 {"k": "343e48c19da1ed2e", "pl": "Rzemieślnicy Qiongqi to odgałęzienie Szkoły Moistów. Czczą doskonałość techniki, czasem przemieniając ciała, by zdobyć siłę.\n\nWojownik Qiongqi: Ostrze zgłębia kres “ostrza”: z tarczą i włócznią broni się i atakuje według praw mechaniki; choć to zwykły żołnierz, i w nim widać przemyślną zmienność sztuki moistów."}
 {"k": "343e8c17975dc339", "pl": "Jak namielę dużo, dużo ziarna, to we wsi stanie się coś wspaniałego!"}
 {"k": "343fab490c8e4484", "pl": "Wygląd sezonowy - Skrzydła Kompasu"}
+{"k": "343fc08275bf38ea", "pl": "Nagrody za zwycięstwo:"}
 {"k": "34414907021c1587", "pl": "Pies z mięsem"}
 {"k": "34416b275f639beb", "pl": "Czuła siostrzyczka - kopnięcie i zeskok z parasola"}
 {"k": "3442a92ea9977d10", "pl": "Przeciwnik #ffd19cnie ma#E Kamieni Szachowych ani kart"}
@@ -2200,6 +2236,7 @@
 {"k": "34435ad0d1a1f53e", "pl": "Podziel się odkryciem z bratem Zhao"}
 {"k": "34442c6f3622bad7", "pl": "Odkąd zbadał puls Duan Qiuxin, Pei Xinglin wydaje się bardzo przejęty tym, na co ona właściwie choruje…"}
 {"k": "344470e2537bb637", "pl": "Nie do wybrania"}
+{"k": "344499633048b169", "pl": "Brak skrzynek dostępnych w losowaniu"}
 {"k": "3444fa7827da1aee", "pl": "Rywale i przyjaciele"}
 {"k": "344541495d4c2028", "pl": "Poczekaj, aż Yaoyao usiądzie na huśtawce"}
 {"k": "3445433938960a3e", "pl": "Tędy!"}
@@ -2217,6 +2254,7 @@
 {"k": "344bf0f4d19225de", "pl": "Znacznik natychmiastowej śmierci"}
 {"k": "344c6592135c2bd3", "pl": "Ojej, muszę już lecieć… Umówiłam się z całą Przystanią, że będziemy łapać motyle… Wodzu, do zobaczenia!"}
 {"k": "344c6823420def4d", "pl": "Hm? Dziwny węzeł, nie da się go rozplątać."}
+{"k": "344c6d98f179c714", "pl": "Życzenia spełnione"}
 {"k": "344ca4700aa01df3", "pl": "Rozkaz: Bez Napaści"}
 {"k": "344cd645f4565223", "pl": "Po cóż lękać się śmierci"}
 {"k": "344d15362827a9e3", "pl": "Chłopiec z Miotłą - zwarcie 1"}
@@ -2238,8 +2276,10 @@
 {"k": "3455e5e70e4ad69b", "pl": "Dłoń Ukrytego Mędrca - doskonały unik 2"}
 {"k": "34561adc60c6cd7a", "pl": "Wypytaj zarządcę o służbę na dworze Fanów"}
 {"k": "34562b5227d78598", "pl": "Dobrze. To spotkamy się w Pawilonie Wiosen i Jesieni."}
+{"k": "345651e894a1fdb0", "pl": "Miejsce:"}
 {"k": "345656787e7933a2", "pl": "Póki życia, póty żniw; póki żniw, póty niespodzianek!\nIm częściej tniesz, tym szybciej rośnie; im szybciej rośnie, tym częściej tniesz! Wystarczy nie ustawać, dzień po dniu, pokos po pokosie, a z pewnością zetniesz najtłustszy i najjędrniejszy!\nJak mówi przysłowie: im więcej trudu, tym więcej szczęścia."}
 {"k": "345692c151889f04", "pl": "Obszar wykrywania porażki z Wei Yidu"}
+{"k": "3456b0a31db4540e", "pl": "Ranking"}
 {"k": "3456d8f906983e38", "pl": "Król Małp nie rozumiał, czemu tamten musiał odejść, ale nic nie szkodzi - odnajdzie go. Tego dnia ostrożnie włożył tę koronę do skrzyni i ruszył na północ…"}
 {"k": "3457cd444e206083", "pl": "Obejrzyj piec alchemiczny"}
 {"k": "34589c2ae5d7ff99", "pl": "Letian"}
@@ -2326,6 +2366,7 @@
 {"k": "34883688654efad3", "pl": "Po użyciu odblokowuje 3-dniowy okres próbny wierzchowca “Koniarek”."}
 {"k": "34885e65a1192a54", "pl": "Jest z nim już dużo lepiej."}
 {"k": "348863553dac4652", "pl": "Song Er"}
+{"k": "34888eb7be3afd7c", "pl": "Limit etapu: 000/000"}
 {"k": "3488ae86dd104944", "pl": "Zawieszka Wstrząsu Niebios, st. 56"}
 {"k": "3489438d55eb13f8", "pl": "Podgląd pełnoekranowy: Złote Panowanie, zestaw"}
 {"k": "34896a3042864598", "pl": "Mieszkaniec Ruin Latających Niebian, który przeniósł się tu trzy lata temu; może tylko praca pozwala mu choć na chwilę zapomnieć o bólu."}
@@ -2371,6 +2412,7 @@
 {"k": "349679331c5f6fa6", "pl": "Daj włócznię Ge Yue"}
 {"k": "3496816999b8605a", "pl": "Nie boję się. Wy wszyscy się nie boicie… ja też chcę bronić swojego domu."}
 {"k": "34976fe091e33ff4", "pl": "Spotkanie “Bohater i piękność” - obszar przyjęcia"}
+{"k": "34977f6b6eee1f63", "pl": "Każdy pomocnik otrzyma nagrodę w wysokości 100"}
 {"k": "3497892864b62b26", "pl": "Ten chłopak, Huang Chuan, nie zdał egzaminu i mu odbiło! Wczoraj słyszałam, jak sam do siebie wykrzykiwał na podwórzu, że niby zrobi bunt… Aż mi serce kołacze."}
 {"k": "349791355a48136d", "pl": "Rozmawiaj z Li Goushengiem"}
 {"k": "34984d2c4706cb49", "pl": "Namaluj podobiznę #YGapcia#E"}
@@ -2382,6 +2424,7 @@
 {"k": "349afaaa904f0b5f", "pl": "Rogatki przeciwjeździeckie"}
 {"k": "349b60e566d467fb", "pl": "Śnieg i duchy na urwisku"}
 {"k": "349bbf99d31c512e", "pl": "Postęp"}
+{"k": "349bc8ed2ca80a61", "pl": "Jeszcze nikt nie trafił na listę"}
 {"k": "349c42b2db6f6d8f", "pl": "Rozpoznaj prawdziwego informatora po umówionym zawołaniu"}
 {"k": "349d4c893d295916", "pl": "Japoński mnich"}
 {"k": "349dc4fe64f4dd75", "pl": "Długi kamień"}
@@ -2414,10 +2457,12 @@
 {"k": "34a9c632a26b16f2", "pl": "Wielki Miecz: III"}
 {"k": "34aab9f652cf7775", "pl": "Skradzione wino — pierwszy dzban — kraina snu — ukryte opowieści wędrowne"}
 {"k": "34ab0f968b6b3fce", "pl": "Cały świat ugania się za Relikwią, ale hehe - nie złapie.\nBo Relikwia to kotek, który bardzo szybko biega.\nNa co kotu szybki bieg?\nRelikwia też tego nie wie, ale właśnie dzięki swojej szybkości przybiegła z Chang’anu do Liangzhou, a potem z podnóża góry na szczyt.\nŚnieg sypał gęsto. Relikwia skuliła się w śniegu, biała jak śnieg.\nMoże szybki bieg nic nie daje - ważne, dokąd się biegnie. Tak pomyślała Relikwia, nim zamknęła oczy.\nKiedy je otworzyła, była w ciepłym domu, ogień trzaskał, a nieogolony mężczyzna zabrał ją do siebie.\nOd tej pory nie musi już być kotkiem, który szybko biega."}
+{"k": "34ab757a304b42fb", "pl": "Oryginał"}
 {"k": "34acbc2300240f4b", "pl": "Miau Miau - Obrót Gwiazd: układanka przesuwna - Ryczące Piaski"}
 {"k": "34acd8b68aeaa108", "pl": "Pałac Cesarski - Skrzynia Złotej Ropuchy - przed wschodnim urzędem - Obróć i przesuń"}
 {"k": "34acf3a438d85077", "pl": "Ostry smród uderza prosto w ciemię. Ale cóż, może i ta rzecz się do czegoś przyda."}
 {"k": "34adf0757830ed96", "pl": "Warownia 2 do warowni 1"}
+{"k": "34af0b11e23ca336", "pl": "Nagrody gildii"}
 {"k": "34af1c07f78e23d1", "pl": "Pełne Umocnienie"}
 {"k": "34b04b7d2fe26157", "pl": "(Zastępczy przerywnik, nie wersja ostateczna)\nGromada rozpala wieczny ogień,\nYinge jest na razie bezpieczna,\nYinge ocenia, że nadciąga zamieć: teraz najpilniej trzeba zbudować schronienie i piec.\n(Cel etapu zaktualizowany)"}
 {"k": "34b0d12f29105292", "pl": "Starszy do nauki"}
@@ -2489,6 +2534,7 @@
 {"k": "34d5f6c98ddd326d", "pl": "Uczeń Wzgórza Moistów o beztroskim usposobieniu; sądzi, że zamiast się spinać i tracić cierpliwość, lepiej czatować jak wieśniak na zająca i czekać na natchnienie."}
 {"k": "34d74f366e32459b", "pl": "Jadeitowa tarcza, dzień 5-1"}
 {"k": "34d7b3d7298f7743", "pl": "Odźwierny twoimi rękami pomógł przywódcy Zhu dostąpić wyzwolenia. Tym samym zniweczył zamysł Hong Si i ocalił Dziewięć Nurtów.\nLecz dla nich był to zarazem gwałt na wdzięczności i wierności. Tylko śmierć mogła to zakończyć."}
+{"k": "34d8a0c13846f2f0", "pl": "Belka"}
 {"k": "34d8b3dbc1753154", "pl": "Sława · Jiangnan 1: łagodność - wojowniczość"}
 {"k": "34d933f2b9e3ab6c", "pl": "Xie Youning"}
 {"k": "34d984884d467615", "pl": "Li Kostka"}
@@ -2502,6 +2548,7 @@
 {"k": "34de5c9ca4b307c0", "pl": "Jedwabna Nić: Skrzydła, st. 56 · Zwykła"}
 {"k": "34debc911e90882c", "pl": "#e6e6ceAdept Budowy"}
 {"k": "34ded953171fe461", "pl": "Aling"}
+{"k": "34dedaffd3cc55f0", "pl": "Przewijanie"}
 {"k": "34df15369877031a", "pl": "…Zbójów już nie ma, możesz szukać swoich kwiatów."}
 {"k": "34df3191cdc12f8e", "pl": "Chen Xiuhua"}
 {"k": "34dff6db147bd0f9", "pl": "Yang Najmłodszy"}
@@ -2515,6 +2562,7 @@
 {"k": "34e4d50dbd9037e6", "pl": "Najpierw wybierz Sektę"}
 {"k": "34e53c44171afe88", "pl": "Malutki bambusowy pierścień VI"}
 {"k": "34e5704f728d7f12", "pl": "Du Ruoheng"}
+{"k": "34e5a57ba800b8d9", "pl": "Opis aktywności."}
 {"k": "34e600d327d52e6c", "pl": "Wytworny jedwab złożony zmarłemu do grobu."}
 {"k": "34e733ab337a0b70", "pl": "Spal pąki i przeskocz na platformę"}
 {"k": "34e75661dd143ece", "pl": "Jeden z rekwizytów ludowych tańców i ozdób: wiązany z bambusowych łyk, oklejany białym papierem i malowany."}
@@ -2529,6 +2577,7 @@
 {"k": "34eaf906afd860fa", "pl": "Rośliny też czują"}
 {"k": "34eb236f224030c3", "pl": "[Ukryte] Ukryta Góra, Podziemia Boskiego Rzemiosła 05 — NPC — punkt 2 — rozmowa ukończona"}
 {"k": "34eb29a2b03dc114", "pl": "Słomiany żółwik, który zachwalał przekupień przebrany za żółwia. Taki jak żywy: zdaje się, że twórca włożył w niego miłość jak do własnego dziecka."}
+{"k": "34ebcd73d88377d8", "pl": "Doskonalenie receptury"}
 {"k": "34ebd80f0e16d2ae", "pl": "Dziennik Cztery"}
 {"k": "34ebfc5167875051", "pl": "Piwonia Weizi"}
 {"k": "34ec1af044006e26", "pl": "Eunuch."}
@@ -2542,6 +2591,7 @@
 {"k": "34efaa1c453ddbcf", "pl": "Kapitan łodzi"}
 {"k": "34f00218295e7be5", "pl": "- Han, Sima Qian, “Zapiski historyka”, “Traktat o rzekach i kanałach”"}
 {"k": "34f1c8289923106e", "pl": "Tajemnica zakupu konia"}
+{"k": "34f1cadeae307751", "pl": "Użycie umiejętności egzekucji przywraca 20 punktów esencji życia. Przez następne 8 sekund każde leczenie daje dodatkowe 2 punkty esencji życia — najwyżej 5 razy.\n#999999Działa wyłącznie w Ruinach Pyłu#E"}
 {"k": "34f31d944a157293", "pl": "Idziemy. Żywych mamy dość, tych dwoje nam niepotrzebne."}
 {"k": "34f3baabf2760833", "pl": "Pustynni zbóje w przebraniu podstępem nakłaniają was do otwarcia drzwi…;Jest ich za wielu, więc oddajecie pieniądze, by ratować życie, i resztę nocy przesiadujecie w izbie, żaląc się na swój los…"}
 {"k": "34f428a67cabe0c8", "pl": "Zhang Niu"}
@@ -2568,6 +2618,7 @@
 {"k": "34ff9d29fbb0c3e2", "pl": "Obrót i cięcie poziome"}
 {"k": "34ffe97dc296d5ab", "pl": "Cóż pan mówi?"}
 {"k": "3501255a56ebd4cb", "pl": "%s aktywuje #ffd19cGust Set#E: Cloud Step przesuwa #baf5badodatkowo %s pól#E w tej turze; dostaje #baf5baCloud Step ×%s#E"}
+{"k": "3501514738760020", "pl": "Zbierz drużynę"}
 {"k": "3501ce5002fb5e1c", "pl": "Przy wjeździe do wsi pewna gęś rozchorowała się z tęsknoty przed Qixi; jeśli dobry rycerz ją podleczy, może gęś odpłaci mu życzliwością…"}
 {"k": "350417a0d2c6e945", "pl": "Receptura: Łuk Szmaragdowej Krwi · Precyzja"}
 {"k": "350463ffd61b61a0", "pl": "Stwórz lodowisko"}
@@ -2582,11 +2633,13 @@
 {"k": "35089073e0da9623", "pl": "Udaj się do sali wykładowej"}
 {"k": "35092f28b6f257fe", "pl": "Zapach bratniej duszy"}
 {"k": "350940dc1f017c56", "pl": "NPC wyzwania łucznictwa konnego, etap 0"}
+{"k": "350aca69a35d97f3", "pl": "Otręby"}
 {"k": "350b75e41f4d5ee4", "pl": "Spis zaopatrzenia wojskowego"}
 {"k": "350b805ed33c23ce", "pl": "Skrzynia wyboru: Nefrytowy Czerpak, st. 96"}
 {"k": "350bb04c0ec51b2b", "pl": "Malarstwo: wiedza"}
 {"k": "350c212780a0b7e7", "pl": "Liu Qiege zna się na śpiewie i tańcu, a jej życiowym celem jest zostać pierwszą tancerką noży z Liangzhou. Nikt nie może wpłynąć na szybkość, z jaką dobywa ostrza!"}
 {"k": "350c67e599cbad1c", "pl": "Tang, Yuan Zhen\n\n#YWędrowny wojownik nie boi się śmierci,\nboi się tylko, że sprawy nie dokona.#E\nGdy dokona, nie ukrywa imienia -\nnie jestem złodziejem, by chodzić nocą.\n\nW biały dzień jawnie zabił Yuan Anga,\nna dziewięciu traktach twarze pobladły.\nTo serce bierze przykład z wieloryba:\nwieloryb grzbiet wystawia, przecina morze,\nfale rozstępują się na dwie strony.\n\nWieloryb dzieli morze, odbiera mu siłę;\nwojownik ma plan, którego nikt nie przeniknie -\ntrzy stopy żelaznego węża przedłużają żywot dwóch państw."}
+{"k": "350cb4f1eb0504fe", "pl": "Posiadane łącznie"}
 {"k": "350cbe7c9be925c0", "pl": "Zamyślenie"}
 {"k": "350dda03510e1770", "pl": "Korekta poz. 86: Kruszenie Skał · Potęga"}
 {"k": "350eb7397865eb5e", "pl": "Obszar dozwolony w kotle"}
@@ -2601,6 +2654,7 @@
 {"k": "35132866f24a2ea8", "pl": "Stary Flisak - plac ćwiczeń"}
 {"k": "35138bd478c3278c", "pl": "Opowieść wymyślona przez samych oficerów, z uwagami i poprawkami co najmniej pięciu różnych rąk."}
 {"k": "35142642383ce303", "pl": "Kwiaty w potrawie: z białych kwiatów śliwy i wody z drobnym sandałowcem zarabia się ciasto, rozwałkowuje, wycina pięciopłatkowe kwiaty śliwy i gotuje w rosole z kury. Rzadkie cienie kładą się ukosem; patrzysz na kwiat śliwy i wyglądasz wiosny."}
+{"k": "35143056e4a1c8d4", "pl": "Przycisk — cztery znaki"}
 {"k": "3514679bfb502d9c", "pl": "Maść Przemiany Kwiatów i Lica, sporządzona przez Brzydką Niang z Morza Kwiatów według starej księgi z Lecznicy Życia. Potrafi na nowo ukształtować ciało i kości twarzy. Nie wiadomo, czemu nigdy jej nie użyto."}
 {"k": "35163fb0c4e3a8a7", "pl": "Spadek kosztu uniku"}
 {"k": "35165c65f9687ec2", "pl": "Taktyki Jianghu yanfei65"}
@@ -2617,7 +2671,9 @@
 {"k": "351ea3e25294ae12", "pl": "Otchłań Ukrytego Smoka - obszar oglądania smoka"}
 {"k": "351f057596573b9c", "pl": "Jedwabna Nić: Ulewa, st. 86 · Zwykła"}
 {"k": "351f0aa9303a3696", "pl": "Po otwarciu otrzymasz: Skrzynia przepustki bojowej ×1, Niezłe Ptasie Pióro ×4."}
+{"k": "351f3d2bdee7a8a7", "pl": "Zdobądź w domu pośrednictwa licencję pracodawcy, by wynajmować domowników"}
 {"k": "35203d56c198d834", "pl": "Jakiś wystrojony elegant, pachniał pięknie…"}
+{"k": "352086c45f1ef01a", "pl": "Osiągnięto limit tygodniowy"}
 {"k": "3520aae412fd6972", "pl": "Spichlerz: obrona wieży"}
 {"k": "352128c12389da83", "pl": "Przyjdzie tu, żeby się z tobą spotkać?"}
 {"k": "352198cab9acf99b", "pl": "Pstrokaty odręczny odpis, skarb młodego Fu Era z Qinghe."}
@@ -2649,6 +2705,7 @@
 {"k": "352b5e9528d6bb88", "pl": "Element zestawu: Nefrytowy Czerpak, st. 16 · Zwykła"}
 {"k": "352e8a0d0239fc5a", "pl": "Karwasze Zastygłej Rzeki, st. 105"}
 {"k": "352e9b13c99c5c3e", "pl": "Dno Wieży Wina - poziom 2 (kręte schody 2)"}
+{"k": "352ec8678ef41900", "pl": "Nakład wyczerpany"}
 {"k": "352ede5cb87be831", "pl": "Zapytaj Qingxuana o Nocnego Błyska"}
 {"k": "352f6ad05d98418e", "pl": "Wielkoludzie, nie wydaje ci się, że ten wzór na wazonie jest jakiś dziwny?"}
 {"k": "352f9e35619673b7", "pl": "Osiem mis z Qinghe"}
@@ -2758,9 +2815,11 @@
 {"k": "355de1beaf927adb", "pl": "Zbierz pierwszy materiał na pięciobarwne nici"}
 {"k": "355eb0ba17f45ee9", "pl": "Nieznany z pochodzenia człowiek jianghu, którego nie lękają się trujące wyziewy bagien. Z całych sił bije w bęben przed Pagodą Grzechów, by obudzić zamkniętego w wieży generała."}
 {"k": "355f0edb6f7d32fa", "pl": "Po scenie 2 czekaj do nocy"}
+{"k": "355f8d85fa455c36", "pl": "Początek nieskończonych możliwości — oto taniec uliczny!"}
 {"k": "35600d4eaa189353", "pl": "Urzędnicy cywilni z Zhao Pu na czele podejrzewają, że zamachowiec, który tamtej nocy napadł Zhao Pu, wywodzi się z wojska, a ukrywają go generałowie z Urzędu Rekomendacji."}
 {"k": "35601c53c586e7b3", "pl": "Xie Yuanting"}
 {"k": "35602684008a3ee9", "pl": "Ja, stary, tak zgłodniałem, że ręce i nogi mam bez sił, wnętrzności skurczone, nawet kości mi zmiękły! Teraz już tylko pełzam po ziemi, wstać nie dam rady!"}
+{"k": "35602c71def11c71", "pl": "4×"}
 {"k": "3560a98800aecad1", "pl": "Jiang Tangtang"}
 {"k": "35617cae4a4c0946", "pl": "Nic takiego… khe, khe… to wrodzona przypadłość, wyniesiona z łona matki, nie zaraża… khe, khe…"}
 {"k": "35620f132046ab45", "pl": "Okład na stłuczenia, który Zhou Fei zawsze trzyma w domu."}
@@ -2819,6 +2878,7 @@
 {"k": "3579aec5f791f1d5", "pl": "Nagolenniki Pełnego Pucharu, st. 51"}
 {"k": "3579b42094bb59d4", "pl": "Receptura: Sztuczna skała"}
 {"k": "357b7893ae7c1f6b", "pl": "Ogłoszenie z Hangzhou 3 - dzielnica uchodźców"}
+{"k": "357bf4142b98728c", "pl": "Wczytywanie…/wczytywanie…"}
 {"k": "357d8d7c82a51e7b", "pl": "Wspólny toast z kotem"}
 {"k": "357e33c9b18b59e9", "pl": "Xue Tiehe"}
 {"k": "357ebbb19a49bfb3", "pl": "Możecie być spokojni, zabiję wszystkich Kitanów. Tylko muszę od was coś pożyczyć."}
@@ -2848,6 +2908,7 @@
 {"k": "358d58fa7da7c32b", "pl": "Meng Shangyi"}
 {"k": "358ededad0ef7263", "pl": "Oddajesz tabliczkę Tang Bao, ale on nie chce zdradzić, czyja to tabliczka."}
 {"k": "358f344cfd8d26e3", "pl": "Nocą udaj się na aleję Południowej Bramy"}
+{"k": "358fb9df12d67ced", "pl": "Wiatr rześki, niebo wysokie, a żałosny krzyk gibonów budzi brzeg; czyste wysepki, biały piasek — wstrzymują lot krążących mew"}
 {"k": "358fc05af5e5b8a5", "pl": "Efekt gracza: Puch Boga Gromów, 3 stosów"}
 {"k": "35903742cadfd2a6", "pl": "Gospodyni domu uciech"}
 {"k": "3591cf4cb7240b78", "pl": "Żelazna włócznia"}
@@ -2870,6 +2931,7 @@
 {"k": "359963c464e8b78e", "pl": "Dowiedz się prawdy"}
 {"k": "359a55a1c00781fb", "pl": "W #a66829północnym bambusowym gaju#E mieszka dziewczynka Rongrong, która ciągle powtarza, że jest tu ukryta “Tajna księga bohatera”."}
 {"k": "359c77e526664b70", "pl": "Trzeba zabrać wszystkie moje skarby! Nie idę w jianghu po to, żeby się umartwiać."}
+{"k": "359d83e4a4bd69ba", "pl": "Wczytywanie…"}
 {"k": "359d982bc03949aa", "pl": "[Podpatrywanie] Trzy Skazy Piekieł - obszar oświetlenia"}
 {"k": "359fcb09eea3654e", "pl": "Prażone orzeszki dla Tuo"}
 {"k": "35a059a771158ef8", "pl": "Cheng Gu"}
@@ -2878,6 +2940,7 @@
 {"k": "35a15f92fd299d8c", "pl": "Zielony Potok: Pieśń Wędrowna"}
 {"k": "35a18c9ea95de8d2", "pl": "Kuźnia Miecza: Yelu Abuli, próba"}
 {"k": "35a1ef5b27ddb635", "pl": "Szron i śnieg bielą świat bez końca, lód skuwa wody jezior."}
+{"k": "35a26563c8dcfb24", "pl": "Awansuj 60"}
 {"k": "35a34cd46e252266", "pl": "Wejdź do jaskini"}
 {"k": "35a3b2d040386034", "pl": "Jia Baoyu"}
 {"k": "35a3ba7a1fcd375e", "pl": "Drzemiący Śpiący Taoista - taranowanie z dystansu"}
@@ -2900,6 +2963,7 @@
 {"k": "35a9734283315f01", "pl": "Osmantus lubi walczyć.\n\nBył kiedyś najsłabszym szczeniakiem w miocie. Ale pilnował jedzenia, nie przepuścił niczego, co dało się przełknąć, a tym bardziej żadnego rodzeństwa, które śmiało podejść po jego kęs. Dzięki tej zaciekłości, która nie liczyła się z życiem, jako jedyny z całego miotu przeżył.\n\nAle sama zadziorność i zaciekłość nie wystarczą przeciw śnieżycy.\nPewnego dnia w środku zimy leżał jak martwy przy progu górskiej świątyni. Aż podniosły go delikatnie dłonie niewiele cieplejsze od padającego śniegu.\n\nGdy znów się ocknął, usłyszał stuk, stuk. Poszedł za odgłosem drewnianej ryby, a stukanie nagle ucichło.\n“Bracie, kto by pomyślał, że ten szczeniak po odrobinie gorącej zupy z jarzyn dojdzie do siebie, myślałem już, że…”\nMały nowicjusz, uradowany, podszedł do niego.\nPies wygiął grzbiet i zawarczał ostrzegawczo.\n“Nie ruszaj go, ten pies poniewierał się po świecie i dostał niejedną ranę, nie wolno go tak po prostu dotykać”. Drugi, spokojny głos powstrzymał nowicjusza.\n\nPiesek kilka razy próbował wymknąć się z góry, ale ilekroć ostrożnie przestępował próg, tamci dwaj w samą porę przynosili miskę gorącej zupy z jarzyn i stawiali ją z daleka na schodach.\nNiepostrzeżenie minęło ponad pół roku.\n\nMały nowicjusz wciąż obmyślał dla niego jakieś groźne imię, ale ubiegł go stały pielgrzym.\nPielgrzym ze śmiechem powiedział, że ilekroć wchodzi na górę, ten żółty piesek w milczeniu prowadzi go przodem, nie szczeka i nie ujada, taki “małomówny”, że świetnie pasuje do tego cichego dziedzińca pełnego osmantusów.\n“Niech się nazywa Osmantus!”\n\nByła późna jesień i kwiaty osmantusa sypały się w lesie na grzbiet Osmantusa. Otrząsnął sierść, nieco strapiony tymi płatkami, które pachniały tak mocno, że aż kręciło w nosie.\nNiebiańska woń osmantusa, białe obłoki piętrzą się warstwami.\nOsmantus kichnął potężnie, położył się na nagrzanej słońcem kamiennej płycie i w półśnie przypomniał sobie, że chyba już bardzo, bardzo dawno się nie bił."}
 {"k": "35aa1c77a55879e4", "pl": "Uczeń Przystani Słowa. Przed laty ktoś z jego szkoły zdradził i uciekł. Gdy Feng Jisheng dowiedział się, że w Qinghe są ślady, przybył, by go odszukać."}
 {"k": "35aa71a8066b5620", "pl": "Dym Wojenny"}
+{"k": "35ab22f38edcd2fd", "pl": "Styl mody"}
 {"k": "35ac15f96ada1b50", "pl": "Stryjeczny brat Xie Yuanting, burmistrza Miasteczka Łaski, główny zarządca składu zboża Cheng'en na Targu Pszenicznej Woni."}
 {"k": "35ac2e191bb28d50", "pl": "Groźny cios dolny - zwykły (F1)"}
 {"k": "35aca94ffa31adf4", "pl": "Służy do barwienia włosów “Nieśmiertelny Śmiertelnych” (Czarne Pasma, wersja męska). Użyj w Warsztacie, w zakładce Barwienie."}
@@ -2919,6 +2983,7 @@
 {"k": "35b2aaebad001cd4", "pl": "Grobowiec Han w Qingzhou - wejście, zakaz wspinaczki"}
 {"k": "35b2c13d1c003f81", "pl": "Odejdź od księżyca"}
 {"k": "35b2f1f1317f9edf", "pl": "Drewno wierzby — nadaje się jako materiał."}
+{"k": "35b3b68f7c5bf46a", "pl": "Łódź towarowa"}
 {"k": "35b438ab564e2f4f", "pl": "Lampa Oświetlająca Śnieg"}
 {"k": "35b4c48edde46f41", "pl": "Rozmawiaj z Zhang Sisi"}
 {"k": "35b4db345381532c", "pl": "Kwiatowe liściki to szczególne podarki Posłańców Kwiatów, każdy jest rzadkością."}
@@ -2943,6 +3008,7 @@
 {"k": "35bf2a9da3a5e18f", "pl": "Ding Xiao często ostrzył miecz późną nocą.\nNikt nie wiedział, że ten człowiek, tak biegły w rachubach, tylko w takich chwilach pozwalał płynąć swoim uczuciom.\nZa każdym razem, gdy ostrzył miecz, wracały wspomnienia z dzieciństwa. Sromotna klęska na pograniczu, ojciec i bracia uznani za nieudolnych, którzy zginęli w boju, a on sam wtrącony z ich powodu do więzienia. Myślał wtedy, że nie jest już młodym paniczem z pędzlem w dłoni, więc gdy odzyska wolność, powinien mieć miecz - dobry miecz, który przetnie niesprawiedliwość, przebije krzywdę i będzie dzielniejszy i surowszy niż słabe, bezsilne szable jego ojca i braci.\nLecz przez te wszystkie lata, nienawidząc i ostrząc, im jaśniej lśnił miecz, tym bardziej gubiło się jego serce i nie widział drogi przed sobą…\nW co właściwie ma być wymierzony ten miecz?\nAż przy moście Zhongdu zaczęły się zbierać chmury i poznał pewną odległą prawdę.\nMoże przyszedł czas, by wysunąć go z pochwy i wymierzyć w te dawne sprawy, które trzeba rozliczyć."}
 {"k": "35bf527d7d5645c2", "pl": "Rozmawiaj z Xiao Anem"}
 {"k": "35c0815471f80ea7", "pl": "Pudło zaproszenia Ogrodu Grusz"}
+{"k": "35c086955049999d", "pl": "Tytuł pracy"}
 {"k": "35c0bb9971e61951", "pl": "Jaki piękny widok z Mostu Srok!"}
 {"k": "35c0d11fd479b5cf", "pl": "Podejdź zobaczyć, co porabia Bao Gu"}
 {"k": "35c0f101edfc53a7", "pl": "Pięć razy pogłaszcz kota — a zachorujesz"}
@@ -3035,16 +3101,21 @@
 {"k": "35ed7651b6f91bf0", "pl": "Miłosna sprawa nareszcie się rozstrzyga"}
 {"k": "35edce9bb07f2ce5", "pl": "Naczelnik więzienia"}
 {"k": "35ee07e764581fde", "pl": "Odepchnij łódź żerdzią"}
+{"k": "35ee0a38cb5bf92b", "pl": "Kliknij, by kontynuować 3/5"}
 {"k": "35eeb054d1b70ca4", "pl": "Złotem tkany wzór"}
+{"k": "35eef058e146b76e", "pl": "Opis aktywności."}
 {"k": "35ef69b1fa28ac59", "pl": "Wydarzenie bojowe 627"}
 {"k": "35f039b8ffb91ca2", "pl": "N-no… trudno…"}
+{"k": "35f04b8fdb8e17e8", "pl": "Przód i tył postaci"}
 {"k": "35f05ba8a3fb5ce1", "pl": "Zamiana odbicia ciosu"}
 {"k": "35f09ad6e1652735", "pl": "Larwa cykady"}
 {"k": "35f149de202adb57", "pl": "Yueya chyba nie chce nikomu o tym mówić, ale w rozmowie wspomniał o niejakim #a66829Liang Sa#E, który bywa w pobliżu #a66829Widowiska Ryb i Smoków#E. Może w przebraniu za niego uda się coś wyciągnąć."}
 {"k": "35f198a6016ded84", "pl": "…Tę samą herbatę?"}
 {"k": "35f1d876b33e763f", "pl": "Zdrowie (wiatr)"}
+{"k": "35f2133301dd76ca", "pl": " [Na pewno się uda!] Przegląd jest uzasadniony, lecz reforma rolna to sprawa wagi państwowej — trzeba ją rozważyć z namysłem i działać ostrożnie, z myślą o dalszej perspektywie"}
 {"k": "35f26c609467cdfd", "pl": "Zginął… bo ratował Kitańczyka. Kitańskiego dezertera."}
 {"k": "35f28e0716131e4e", "pl": "Pod owym zdradzieckim uczuciem oboje spierają się zawzięcie, jako mówić o miłości. Wysłuchaj ich słów i powiedz, co tobie w sercu leży"}
+{"k": "35f3c4d8acb16a98", "pl": "Wczytywanie…"}
 {"k": "35f42c5c832a1870", "pl": "Kropla w morzu"}
 {"k": "35f42ce163d638c7", "pl": "Hełm Obrońcy bez Skazy, st. 91"}
 {"k": "35f4b844487ba24f", "pl": "Robisz to dla bezpieczeństwa całego pałacu! Żebym cię więcej nie widział, jak gapisz się bezczynnie!"}
@@ -3083,6 +3154,7 @@
 {"k": "36055242ae85adb1", "pl": "Zhang Chunhua"}
 {"k": "36056cca0196226f", "pl": "Jeleń Dziewięciu Barw 10"}
 {"k": "3606be9698bac856", "pl": "Bracie Li An, a kim są Latające Smoki?"}
+{"k": "36073482da88a725", "pl": "Twój wierzchowiec został zagrabiony"}
 {"k": "3607efa974774dde", "pl": "List od przywódcy gałęzi zaginął, a Chen Jianwei nawet tego nie zauważył. Ma na sobie ważne zadanie podkupienia ludzi Przystani Słowa dla Samotnej Chmury, lecz niewiele sobie z tego robi; pod pozorem wizyty naukowej oddaje się wyłącznie czytaniu ksiąg Przystani Słowa."}
 {"k": "3608ad7de1b4d477", "pl": "Li Yaoyin"}
 {"k": "3608e2e0e6a91685", "pl": "Stop, stop, taka melodia to obraza dla uszu!"}
@@ -3091,6 +3163,7 @@
 {"k": "360975753bd11be1", "pl": "Pomów z Tangyao"}
 {"k": "360a5514f046955b", "pl": "Li Guangren"}
 {"k": "360ab7c857afe973", "pl": "Li Lixin"}
+{"k": "360bc31d9d693358", "pl": "Zielnik"}
 {"k": "360c6b0ec24bcbc6", "pl": "Shun Fengtian"}
 {"k": "360ce18f272c25c7", "pl": "%s, przez #ffd19c%s#E, otrzymuje #baf5baKamień Szachowy ×%s#E"}
 {"k": "360d0ef12b54e586", "pl": "Udaj się nad morze (bez odświeżania)"}
@@ -3106,6 +3179,7 @@
 {"k": "360fdfa569626b28", "pl": "Zbadaj osobliwość"}
 {"k": "360fec2765ccad1f", "pl": "Przesuń kamerę, aby znaleźć dwie jedzące wielbłądy."}
 {"k": "361216791efac108", "pl": "Czegóż to wiosenny wiatr nie może znieść, że z wilgami łamie kilka kwitnących gałązek? Większość kwiatów na świecie nie wytrzymuje wiatru, ale gdy kwiaty skupią się w kępy, potrafią przestraszyć i wiatr. Czyż nie mam racji?"}
+{"k": "361260615404eb90", "pl": "Wczytywanie danych."}
 {"k": "3612a3c25c169b64", "pl": "Wydedukuj, gdzie podział się wysłannik Jiangnanu"}
 {"k": "3612ec2583cb7147", "pl": "Smukły i żylasty mężczyzna o niskim wzroście, który ma niezrozumiałą pewność siebie co do swojej figury i urody, a mówi z charakterystycznym miękkim akcentem Wu z południa."}
 {"k": "361352b6dff60465", "pl": "Pani generał mówiła, że siostra Yingying jest w Tyglu, ale przed Tyglem jest za dużo żołnierzy… więc…"}
@@ -3134,6 +3208,7 @@
 {"k": "36201da2e8dc0ffe", "pl": "Wchodź dalej w Ludzki Targ i wytropiaj ślady Xiaofu."}
 {"k": "3620e0187bf392cc", "pl": "W samym sercu Doliny Bez Serca stoi gromada nieruchomych żywych trupów. Mają chyba poprzywiązywane nici - wyglądają jak kukiełki z jarmarku."}
 {"k": "36214700ce18bcb6", "pl": "Gdy znajdziesz chwilę, zajdź do mojej skromnej chaty na czarkę herbaty."}
+{"k": "3621e4b546603471", "pl": "Seria cięć"}
 {"k": "3622046c69bc3b77", "pl": "To one są duszą Fanlou i Wieży Obłocznego Blasku."}
 {"k": "362206ca64a9d5ae", "pl": "Cesarz Południa i Żebrak Północy"}
 {"k": "3622e758647b43d9", "pl": "Wyślę cię do Żółtych Źródeł!"}
@@ -3141,6 +3216,7 @@
 {"k": "36233bf139616829", "pl": "Biała Wilczyca - Obszar dozwolony"}
 {"k": "36233ce683918ec6", "pl": "Dzika cebula"}
 {"k": "3624599f2eb83bb2", "pl": "Kamień “Złamać”"}
+{"k": "362494fcf9a50a87", "pl": "Współpraca"}
 {"k": "3624ad3427f44d2f", "pl": "On też nie wie, jak wyłączyć mechanizm… Xiaoba mnie kiedyś uczył: przycisk jest dla zmyłki, wystarczy #Iporządnie kopnąć#E!"}
 {"k": "3625a9537b623e06", "pl": "Xiang Xiaoling"}
 {"k": "3625c9b5eed610bf", "pl": "Tancerz Lwa 1"}
@@ -3176,19 +3252,23 @@
 {"k": "3630f5f477d3a4be", "pl": "Nie Pytaj o Powrót"}
 {"k": "3631cb5ee3fa049d", "pl": "(Czemu ta mała zrobiła się nagle taka smutna…) Ee, czy przed chwilą miałaś na głowie ten kapelusz?"}
 {"k": "363327dbc89e22f0", "pl": "Psi druhowie"}
+{"k": "3633c38bc0000c98", "pl": "Kroniki kotów"}
 {"k": "36349b2aa498d637", "pl": "Wybór cech: Rozłupana Góra, st. 100 · Wyborna"}
 {"k": "363553eada5e0d34", "pl": "W czasach Tang i Song lud znał sposób na herbacianą polewkę: liście herbaty gotowano w wodzie, dodając sól, twaróg, pieprz, imbir i inne przyprawy, tak że napój pito niczym zupę z jarzyn."}
 {"k": "3635664ad3ee41c4", "pl": "Ani umrzeć się nie waży, ani żyć.  "}
 {"k": "3635de6d8e79f0d2", "pl": "Posłuchaj tatusia, następnym razem nie wolno ci chodzić pod scenę. Tam pełno ludzi, niebezpiecznie!"}
 {"k": "36368e2b8a4e3c9e", "pl": "Pędzel Pierwszego Uczonego - etap 2, gałąź naziemna"}
 {"k": "3637408fb11b46e2", "pl": "Znów trafiasz na trójkę dzieciaków — no, chyba znów wypadnie bawić się z nimi w chowanego"}
+{"k": "36377e28e4802791", "pl": "Hartowana stal"}
 {"k": "3637eba94242d894", "pl": "Cichy Płacz · wachlarz C2"}
 {"k": "36380dc392f458c9", "pl": "Niespokojne czasy"}
 {"k": "36391a264af7c8f7", "pl": "Ech, razem z Małym Wu przeszukaliśmy ten poziom, ale nic nie znaleźliśmy. A Mały Wu jeszcze nieopatrznie stłukł sobie nogę."}
+{"k": "3639b2c395d2fa09", "pl": "Zwykłe wytwarzanie"}
 {"k": "3639e3420e795b68", "pl": "Dzban z wodą - basen wina"}
 {"k": "363a725563ea6bde", "pl": "Ukryta Góra: przewaga nad pomniejszymi"}
 {"k": "363a9b8896b2ef75", "pl": "Wybadaj obcego śmiałka"}
 {"k": "363acd8e0988560e", "pl": "Naczelniku Niu, taki z was chwat, a psa się boicie?"}
+{"k": "363c425ffab66feb", "pl": "Kurczak w kokosie po hajnańsku"}
 {"k": "363e434324143d2b", "pl": "Popatrz, jako reagują obecni"}
 {"k": "363e76282fc5fd14", "pl": "Skrytobójstwo zakończone"}
 {"k": "3640e6e2d6b02175", "pl": "Święto Qixi - sztuka tajemna dla dwojga"}
