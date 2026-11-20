@@ -2596,3 +2596,9 @@ ruchu · 鸣金→Uderzenie dzwonu · 万相集→Galeria Wszechrzeczy ·
 `--na-sucho` 80/0 za każdym razem. Terminy: 绣金楼→Pawilon Złotego Haftu ·
 销金窟→Złoty Dom · 结义→zaprzysiężeni bracia · 访学→uczony w gościnie ·
 独孤求败→Mistrz bez równego sobie · 开蛊→rozpieczętowanie gu.
+
+**Runda 6, ciąg dalszy: 4 797 z 5 229.** Partie `fc`–`ff` po 80
+(magazyn 133 566 → **133 886**, commit `f26bfbf`). Importy bez odrzuceń.
+Terminy: 岁华→Upływ Lat · 清籁回响→Echo czystego brzmienia · 藏音册→
+Księga ukrytych brzmień · 天泉→Studnia Niebios · 听杏村→Wioska Moreli ·
+琅琊→Langya · 河西→Hexi.
