@@ -1232,6 +1232,7 @@
 {"k": "82494a048a979489", "pl": "Poza Tyglem - obszar bossa Jin Huo"}
 {"k": "824b13ebceb2710e", "pl": "Qi przywódcy: Qing F1"}
 {"k": "824b3e32bcda6388", "pl": "Odwrót z Rozwagą"}
+{"k": "824c351536d7796c", "pl": "Co ci ludzie z Sumpa wyprawiają? Niedawno na ołtarzu wisiał sztandar Tangów, a teraz tańczą jakieś rytualne tańce."}
 {"k": "824c3d0643526830", "pl": "Huk Wstrząsający Niebem"}
 {"k": "824c4879cf3eb571", "pl": "Rozmawiaj z Xiao Hui"}
 {"k": "824e86ab00897619", "pl": "Otoczenie 2 - Most z dachem i ostatnia walka"}
@@ -2856,6 +2857,7 @@
 {"k": "854c5adf89abd2eb", "pl": "Awers karty Zaskakującej Gracji"}
 {"k": "854cc1332e00c451", "pl": "Hegu"}
 {"k": "854cddb8ab6a5191", "pl": "Nagroda Próby Miecza, poz. 13"}
+{"k": "854e4d47bd65dd4f", "pl": "Tak! Nie zwlekaj, biegnij z wiadomością! Rób, co mówię!"}
 {"k": "854eaeaefccbcfbd", "pl": "Mistrz Ma"}
 {"k": "854ebd3d86b90a85", "pl": "Mrok"}
 {"k": "854eeaf41c95059b", "pl": "Przystań Nieśmiertelnych - gęś przy wjeździe do wsi"}
@@ -2914,6 +2916,7 @@
 {"k": "8568708093c682eb", "pl": "Fang Bai"}
 {"k": "8568b2ada31d3ad0", "pl": "Zapisane po rozmowie z obydwoma"}
 {"k": "8568cd35d7388ce4", "pl": "Nie osiągnięto poziomu #R48#E — nie można przeglądać nagród."}
+{"k": "8568f282c852d7f8", "pl": "Postanowiłem… Jutro razem z sąsiadem Kangiem zacznę sadzić sadzonki, przycinać gałęzie i uprawiać winogrona. To chyba też sposób na własne zajęcie!"}
 {"k": "8568f47344fbc6bb", "pl": "Panno… ten egzamin z rachunków to troska o nasze przyszłe potomstwo."}
 {"k": "8569389fb7426fdb", "pl": "Napierśnik Pełnego Pucharu, st. 105"}
 {"k": "856a1a6d20d4d73c", "pl": "Fałszywy Szermierz z Kompasem"}
@@ -4432,6 +4435,7 @@
 {"k": "882293bfdcf29f5b", "pl": "Księgowy Liu"}
 {"k": "8822958833007955", "pl": "Kryje się w tym całe mnóstwo! Łuk zbudowany z pomocą rachunków nie tylko wymaga mniej siły, ale i strzela celniej."}
 {"k": "88229ce311ea6077", "pl": "Mo Youjia"}
+{"k": "8822d8fcddd1a851", "pl": "Czego pan szuka, staruszku?"}
 {"k": "882317f6ea502230", "pl": "Do zgłębiania Drogi Wewnętrznej.\n#HUmiejętność pasywna:#E Żeton Wendety trwa o 5 s dłużej i odnawia 20 pkt Żetonu wdzięczności."}
 {"k": "88233f723eee0cad", "pl": "- Tang, Su E, “Żywot księżniczki Tongchang”"}
 {"k": "8823425ab5df1db1", "pl": "Po użyciu można ulepszyć wierzchowca (Gęś) na wyższy poziom."}
@@ -4632,6 +4636,7 @@
 {"k": "8884ac0b1d4661ff", "pl": "Przeczytaj list"}
 {"k": "88854094c1af5595", "pl": "Starszy panie, jaki dzwon?"}
 {"k": "88858a7a0d6fe465", "pl": "Wy tam, chodźcie no!"}
+{"k": "88862b987e779c4f", "pl": "Starucha mówiła drżącym głosem, że Mutun powrócą. Podobno zna wynik i może wskazać swojemu ludowi drogę!"}
 {"k": "888724d558e5fed8", "pl": "Zniszczony bicz"}
 {"k": "8887310869c48898", "pl": "Niedźwiedź grasujący na pustkowiach, owładnięty obsesją na punkcie jedzenia. Pewien młody bohater z jianghu próbował wyrwać mu strawę z paszczy i przypłacił to życiem."}
 {"k": "8887bd4cbc9e1f72", "pl": "Trzeba to spokojnie rozważyć."}
@@ -5656,11 +5661,13 @@
 {"k": "8a70f745b3d99844", "pl": "Krąg Powrotu Jaskółki, st. 91"}
 {"k": "8a7184977769720f", "pl": "Jajka? Jajka! To ty!"}
 {"k": "8a72277200dbf653", "pl": "Zawieszka Nefrytowego Czerpaka, st. 91"}
+{"k": "8a72a6ea1b9070cd", "pl": "Jak chciałeś… oddaję cześć drzewu królewskiej winorośli, a przez nie tobie."}
 {"k": "8a73227dadc03684", "pl": "Wy chyba nietutejsi?"}
 {"k": "8a735abd5f424a4c", "pl": "Niech zgadnę… chcesz posłuchać opowieści o Targu Duchów?"}
 {"k": "8a7367314797f2fc", "pl": "Pięciokamienny — druga partia"}
 {"k": "8a7414642a9946f5", "pl": "(Tymczasowe) Podejdź do posągu Buddy nr 6"}
 {"k": "8a7512a73d4fc484", "pl": "Polowanie: Jeleń Zhi"}
+{"k": "8a7576e0cac337a8", "pl": "Na drzewie. Ukryłem ją na drzewie…"}
 {"k": "8a75fb2205f408e7", "pl": "“Xiangpu, co piszesz?”\n“O-opowieść… opowieść o bohaterze.”\n“O bohaterze? Pokaż… Czy bohaterowie tak mówią? Widziałaś kiedyś bohatera?”\n“Nie…”\n“To jak możesz pisać o czymś, czego nie widziałaś?”\n\nOpowieść. Czym jest opowieść?\nGdy w dzieciństwie chodziła na targ, siadała na stołku u stóp gawędziarza i słuchała, zasłuchana: “Czyż królowie, książęta, generałowie i kanclerze rodzą się z innego nasienia?” Czy to była opowieść? Gdy, pod pretekstem odbierania brata, kucała pod oknem szkoły i podsłuchała słowa: “Co dziesięć kroków zabija człowieka, na tysiąc li nie zostawia śladu”, czy to była opowieść? “Opowieść o Brodaczu z Wąsami jak Smok” czy “Li Ji zabija węża” z księgarni, które ganiono jako niegodne poważnych ludzi, a które ona ukrywała pod poduszką… Czy takie opowieści o bohaterach to opowieści? Jeśli tak, czy jest w nich ktoś, kim chciałabym zostać? Jak się je pisze? Co muszę zrobić, by napisać taką opowieść?\n\nXiangpu nie wiedziała.\nXiangpu mogła tylko pisać, pisać bez końca.\nW głębi pałacu dzień po dniu zamiatać liście, których nigdy nie da się zamieść do końca, i patrzeć, jak niebo powoli czernieje, to było zbyt gorzkie. Słyszeć od starych służek pałacowych, że dawniej, w czasach zamętu, ktoś wczoraj jeszcze się śmiał, a dziś wynoszono go zawiniętego w słomianą matę, to było zbyt straszne. Patrzeć, jak przełożona podarła na strzępy opowieść, którą z takim trudem napisała, i rzuciła jej w twarz, to było zbyt bolesne.\nPoza znoszeniem tej goryczy, tego strachu, tego bólu, dokąd mogłaby pójść? Wrócić do domu, który sprzedał ją komuś za kilka sznurów miedziaków? Czy pogodzić się z losem i tkwić w głębi pałacu aż do śmierci?\nŚwiat jest tak wielki, czemu więc czuje, że nie ma dokąd pójść?\n\nMogła tylko pisać. Pisać o świecie rzek i jezior, którego nigdy nie widziała, o zemście i wdzięczności, o jakich nie śmiała marzyć nawet we śnie, o bohaterze w czerni, który nigdy nie przyjdzie jej ocalić… Aż napisała Yingying.\nYingying też była służką pałacową, ale w końcu przeskoczyła pałacowy mur i została bohaterką. Skoro Yingying mogła, czemu ja nie mogę?\n…Nawet jeśli dziś nie zdoła napisać dobrej opowieści, jeśli będzie pisać wytrwale, kiedyś jej się uda, prawda? Tak jak Yingying, która w opowieści raz po raz próbowała uciec z pałacu, w końcu znajdzie sposób, czyż nie?\n\n“Ptak Jingwei nosi w dziobie drobne gałązki, by zasypać nimi morze. Jeśli nie zdoła w rok, da sobie dziesięć lat. Jeśli nie zdoła w tym życiu, i tak niczego nie będzie żałować.”\nZostanie “Yingying”."}
 {"k": "8a76063eff75abdb", "pl": "Automat z towarem — region 3"}
 {"k": "8a7609576e23838b", "pl": "Wskaż odpowiedź"}
@@ -8388,6 +8395,7 @@
 {"k": "8fa70e950a821ce3", "pl": "#a66829Przed chatką w Lesie Powracających Latawców#E kręci się nieznajoma staruszka; niepewnie szuka śladów dawnego przyjaciela…"}
 {"k": "8fa7b8cb025dbd22", "pl": "Otwierasz zawiniątko od Pana Rzeki,\na w nim stara, zniszczona maska nuo, którą Er Ma tak cenił\nKrew z maski rozpływa się w wodzie\nDziwna wielka ryba wydaje żałosny jęk\ni powoli krąży wokół maski nuo, stając się “pławą” wskazującą, gdzie jest bestia strzegąca wód"}
 {"k": "8fa7db27b28d7b56", "pl": "Klęska żywiołu nie ma litości, ale ludzie mają serca. Rycerzu, na odbudowę wioska pilnie potrzebuje wielkiej ilości $T(26_540010)!"}
+{"k": "8fa83761c366da5e", "pl": "Żony? Syna?"}
 {"k": "8fa8a9b4bdfab0d6", "pl": "Chang Man'er"}
 {"k": "8fa8c453971e9603", "pl": "Jest wiele rzeczy, które An Ning nie rozumie: dlaczego tak się stało, dlaczego tatuś i mamusia jeszcze nie wrócili, dlaczego grzmot na zewnątrz nie ustaje. Ale przynajmniej towarzyszy mu śpiew siostry, dzięki któremu na krótko widzi we śnie rodziców."}
 {"k": "8fa8f327ff99c59e", "pl": "Skądże."}
