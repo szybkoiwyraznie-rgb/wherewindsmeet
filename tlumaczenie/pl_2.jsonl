@@ -3873,6 +3873,7 @@
 {"k": "26f8d7572af3fb27", "pl": "Treser Koni: szał"}
 {"k": "26f8f708aa0b691c", "pl": "Scena: światło i cień"}
 {"k": "26f92b1e24ff0ca1", "pl": "Pomów z każdym z trzech szermierzy z osobna"}
+{"k": "26f955b0ca356f50", "pl": "Przytrzymaj {}, aby bronić się przed atakami. Użyj {}, aby wykonać unik.\nNaciśnij {} tuż przed trafieniem, aby odbić atak."}
 {"k": "26fa2969ea873d20", "pl": "Zapuszczaj się coraz głębiej"}
 {"k": "26fb088e2963c61e", "pl": "Biblioteka leży wśród gór i wód piękniejszych niż na obrazie. Pewien malarz chce uwiecznić jej urodę na zwoju; podobno można go spotkać w okolicy #a66829Altany Stelli nad Urwiskiem#E…"}
 {"k": "26fb31350b3459b9", "pl": "Czy jianghu, któregoś sam zaznał, jest takie, jako on prawi?"}
@@ -5501,6 +5502,7 @@
 {"k": "29d929e4a158345e", "pl": "Tylko ostrożnie, nie ściągnij jakiegoś dziwadła, bo spłoszysz drania."}
 {"k": "29d954539e90e3fc", "pl": "Witaj w naszym Psim Warsztacie Wylegiwania."}
 {"k": "29da24c490cefb09", "pl": "Babcia Su zawsze nosi przy sobie parę pałeczek, z której strony by nie patrzeć, zupełnie zwyczajnych. Jeśli już coś jest w nich niezwykłego, to tylko to, kto ich używa."}
+{"k": "29dafbcfcafdd547", "pl": "Po skoku, gdy jesteś w powietrzu, naciśnij przycisk wielkiej lekkości na panelu sterowania.\nTo ustawienie zapewnia wygodniejsze zwykłe skoki. #YZalecamy ten sposób#E."}
 {"k": "29dc0138dccf10b5", "pl": "Huniang"}
 {"k": "29dc856991467e4a", "pl": "Taras Księżyca"}
 {"k": "29dfa3734606ab40", "pl": "Stajnia jest tuż przed nami. Ruszajmy."}
@@ -6251,6 +6253,7 @@
 {"k": "2b3d3702c4f439e3", "pl": "Ej ty, ptasi móżdżku! Gadaj, którędy na arenę!"}
 {"k": "2b3e5d5cf71bd3ca", "pl": "Korekta (mechanizm) poz. 100: Kruszenie Skał · Ciężar"}
 {"k": "2b3e7f9bc9b364a4", "pl": "Ostrożny szpieg"}
+{"k": "2b3f1e4cddc5c3ba", "pl": "Użyj {}, aby zaatakować, a {}, aby wykonać technikę bojową.\nBronie mają różne #Htechniki bojowe#E, które mogą zadawać #Hobrażenia, ograniczać ruchy wroga lub leczyć#E."}
 {"k": "2b3f9b1362388b22", "pl": "Po otwarciu losowo otrzymasz jeden element wybranego zestawu wyposażenia st. 31 w jakości niebieskiej lub fioletowej."}
 {"k": "2b3fa15266768f51", "pl": "Trudna księga medyczna"}
 {"k": "2b3fae9d024da9ef", "pl": "Chu Shiyi"}
@@ -8302,6 +8305,7 @@
 {"k": "2f06b39d8c4647ac", "pl": "Dzieło Lin Daorena z czasów Tang, najstarszy zachowany w Chinach traktat o leczeniu urazów kości."}
 {"k": "2f06b94b224d38eb", "pl": "Mieli coś wypchanego za pasem… Może szable? Albo naczynia z olejem? Czyżby chcieli przewrócić ognisty ołtarz podczas święta?"}
 {"k": "2f06c053ec66e8f7", "pl": "He, he, daj mi jeszcze chwilę. Masz tu składniki, spróbuj przy palenisku obok, a jak coś, to pytaj śmiało~"}
+{"k": "2f0731c80c17e18c", "pl": "Ta sztuka działa bez wyposażania. Pozwala swobodnie poruszać się po rzekach i morzach oraz odkrywać podwodny świat."}
 {"k": "2f07964850029ec1", "pl": "Dziobnięcie ostrym dziobem"}
 {"k": "2f087012c486c37e", "pl": "Hexi Spotkanie - Obszar spowolnienia: Kociarz"}
 {"k": "2f08796d00b38551", "pl": "Rzemieślnik Ukrytej Góry"}
