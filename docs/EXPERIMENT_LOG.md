@@ -2602,3 +2602,8 @@ ruchu · 鸣金→Uderzenie dzwonu · 万相集→Galeria Wszechrzeczy ·
 Terminy: 岁华→Upływ Lat · 清籁回响→Echo czystego brzmienia · 藏音册→
 Księga ukrytych brzmień · 天泉→Studnia Niebios · 听杏村→Wioska Moreli ·
 琅琊→Langya · 河西→Hexi.
+
+**Runda 6, ciąg dalszy: 4 957 z 5 229.** Partie `fg`–`fh` po 80
+(magazyn 133 886 → **134 046**, commit `6863c14`). Importy bez odrzuceń.
+Terminy: 鸟鹭→Czapla · 有为村→Wioska Obfitych Plonów · 豫章/洪都→Yuzhang/
+Hongdu (przekład prozy 滕王阁序 — fragment) · 九公子→Dziewiąty Panicz.
