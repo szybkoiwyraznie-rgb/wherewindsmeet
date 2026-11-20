@@ -2662,3 +2662,16 @@ w próbie i imporcie. W sumie Compendium **54/1 524**, magazyn **135 423**.
 głównych grupy 1: 665 kluczy bazowych, brak 0. Nie potwierdzono w grze,
 kiedy każda z tych instrukcji jest odblokowana. Następne partie wyłącznie
 po selekcji według wiarygodnego kontekstu wczesnej gry.
+
+**Wybrane sceny Przystani i wspomnienia (`gp`–`gy`).** Od magazynu
+135 423 przyjęto **599** nowych przekładów, magazyn **136 022**. `gp`:
+25 podstaw Compendium; `gq`: 62 sceny z Ruby i ciocią Han oraz pożaru;
+`gr`: 5 braków wspomnienia; `gs`–`gx`: po 80 scen wspomnień, `gy`: 27.
+Każdą partię przyjęto po próbie na sucho bez odrzuceń. W pierwszej próbie
+`gu` odrzucono 1 wpis z brakującym `$T(5037)`; poprawiono przed importem.
+Sonda po kluczach bazowych scen zadań grup 5292, 5305, 5306, 5308, 5314,
+5316, 5328, 5329, 5330, 5333, 5339, 5355 po `gy`: brak 0 w tych
+powiązaniach; nie obejmuje innych rodzajów tekstów ani nie potwierdza
+momentu dostępności w grze. Compendium 79/1 524. Bez weryfikacji w grze.
+Lokalna kontrola po `gy`: `check_repository.py` OK (592 wpisy indeksu),
+`run_tests.py` **623 testy OK**.

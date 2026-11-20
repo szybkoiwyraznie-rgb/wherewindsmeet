@@ -51,10 +51,21 @@ Dodatkowo `gm` uzupełnia **19** braków scen zadań głównych grupy 1
 a po imporcie 0.
 Następnie `gn` i `go` uzupełniają **46** ręcznie wybranych nazw i instrukcji
 Compendium dotyczących ruchu, celowania, walki i innych podstaw. Sonda:
-**54/1 524** kluczy tabeli; dostępność każdego hasła na samym początku nie
-została sprawdzona w grze. Magazyn **135 423**.
+**54/1 524** kluczy tabeli przed dalszą partią; dostępność każdego hasła na
+samym początku nie została sprawdzona w grze.
 Dalsza praca: indywidualna selekcja wczesnej gry, nie hurtowy import całych
 tabel ani dalsze podążanie za filtrem przestrzeni.
+
+**Kontynuacja po korekcie zakresu:** partie `gp`–`gy` dodały **599**
+przekładów (magazyn **136 022**). `gp`: 25 wybranych instrukcji podstaw;
+sonda Compendium: **79/1 524**, bez potwierdzenia momentu odblokowania.
+`gq`–`gy`: **574** kwestii wybranych scen Przystani i wspomnień o dzieciństwie.
+Według powiązań `zadania_sceny` oraz zwiniętych wariantów sonda 12 grup
+wspomnień 5292, 5305, 5306, 5308, 5314, 5316, 5328, 5329, 5330, 5333,
+5339, 5355 nie wykazała już braków w dostępnych scenach zadań — to nie
+dowodzi kompletności innych tekstów ani dostępności zadań na początku gry.
+Partie importowano po kontroli `--na-sucho`, bez odrzuconych wpisów;
+przekład pozostaje **AI-tymczasowy**, niesprawdzony w grze.
 
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
