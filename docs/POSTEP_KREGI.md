@@ -13,9 +13,9 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | ≤400 m | 1372 | 1372 | 0 | 100% |
 | ≤800 m | 3596 | 3596 | 0 | 100% |
 | ≤1000 m | 4523 | 4523 | 0 | **100%** |
-| ≤1600 m | 5952 | 4740 | 1212 | 79,6% |
-| ≤3200 m | 6832 | 4757 | 2075 | 69,6% |
-| ≤6400 m | 9097 | 4768 | 4329 | 52,4% |
+| ≤1600 m | 5952 | 5340 | 612 | 89,7% |
+| ≤3200 m | 6832 | 5357 | 1475 | 78,4% |
+| ≤6400 m | 9097 | 5368 | 3729 | 59,0% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -49,6 +49,9 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_av` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_av.md` | 200/200, 0 odrzuceń |
 | `barks_start_aw` | 97 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aw.md` | 97/97, 0 odrzuceń |
 | `barks_start_ax` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ax.md` | 200/200, 0 odrzuceń |
+| `barks_start_ay` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ay.md` | 200/200, 0 odrzuceń |
+| `barks_start_az` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_az.md` | 200/200, 0 odrzuceń |
+| `barks_start_ba` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ba.md` | 200/200, 0 odrzuceń |
 
 Razem w pierścieniu ≤1 000 m: **4 330 kwestii** w partiach `aa`–`aw`
 (60 + 170 + 10 × 200 + 8 × 200 + 203 + 97) plus 193 kwestie przetłumaczone
@@ -56,15 +59,15 @@ wcześniej w innych partiach — daje to **4 523 / 4 523 = 100%**.
 
 Pierścienie **≤200 m, ≤400 m, ≤800 m i ≤1 000 m są domknięte w 100%**.
 Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
-(<1 000 m) mają pełny przekład; w pierścieniu ≤1 600 m zostało 1 212.
+(<1 000 m) mają pełny przekład; pierścień ≤1 600 m jest w 89,7% — zostało 612.
 
-Magazyn po partii `ax`: **144 183** przekłady (29,45%). Przekład AI-tymczasowy,
+Magazyn po partii `ba`: **144 783** przekłady (29,58%). Przekład AI-tymczasowy,
 bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)
 → 697 (`as`) → 497 (`at`) → 297 (`au`) → 97 (`av`) → **0** kluczy (`aw`,
 pierścień ≤1 000 m domknięty). Nowa lista `--promien 1600`: 1 412 → **1 212**
-kluczy (`ax`).
+kluczy (`ax` → 1 012 `ay` → 812 `az` → **612** `ba`).
 
 ## Jak kontynuować
 

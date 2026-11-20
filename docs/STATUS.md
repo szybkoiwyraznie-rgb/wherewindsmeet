@@ -32,8 +32,8 @@ w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 
 ≤1 000 m, magazyn **143 983** (29,41%), 0 odrzuceń. **Pierścienie ≤200 m,
 ≤400 m, ≤800 m i ≤1 000 m domknięte w 100%** — cały obowiązkowy promień
 (<400 m) i preferencyjny (<1 000 m) z polecenia właściciela ma przekład;
-kolejny próg ≤1 600 m: 4 740/5 952 (79,6%), zostało 1 212
-(partia `ax`). Magazyn **144 183** (29,45%).
+kolejny próg ≤1 600 m: 5 340/5 952 (89,7%), zostało 612
+(partie `ax`–`ba`). Magazyn **144 783** (29,58%).
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

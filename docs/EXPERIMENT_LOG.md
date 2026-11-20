@@ -3110,3 +3110,14 @@ partia `ax` (200, ≤1 600 m) → magazyn **144 183** (29,45%), w pierścieniu
 i ciastkami „prymusa”, herbaciarnie, port i robotnicy, akademie i egzaminy,
 cech kupiecki przewodniczącego Bai, sprzeczki sąsiedzkie, gwara Wu oddana
 swobodną polszczyzną potoczną.
+
+## 2026-11-20 (8) — pierścień ≤1 600 m: partie `ay`–`ba`
+
+Trzy partie po 200 (≤1 600 m), standardowy obieg, 0 odrzuceń, PL bez CJK.
+Magazyn 144 183 → **144 783** (29,58%). Pierścień ≤1 600 m: 5 340/5 952
+(89,7%), zostało 612; lista robocza 1 212 → 1 012 → 812 → **612**.
+Dalsze progi po tych partiach: ≤3 200 m 5 357/6 832 (78,4%),
+≤6 400 m 5 368/9 097 (59,0%). Treść: święto Smoczych Królów, targ rybny
+i warsztaty latawców, szkoła i egzaminy, urząd powiatu, cech kupiecki
+(przewodniczący Bai), port i pochówek, drobne scenki rodzinne; gwara Wu
+oddana polszczyzną potoczną.
