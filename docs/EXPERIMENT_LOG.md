@@ -3024,36 +3024,38 @@ Srebrnej Igły, szynk Pawilonu Po Deszczu, gazeciarze i wróżbici.
 **Ograniczenie:** odległość od kotwicy to przybliżenie „co gracz zobaczy
 najpierw”, nie kolejność fabuły; przekład AI-tymczasowy, bez testu w grze.
 
-## 2026-11-20 (6) — pierścień 400 m domknięty, 2 030 kwestii w 1 000 m
+## 2026-11-20 (6) — pierścienie 200 i 400 m domknięte, 2 230 kwestii w 1 000 m
 
 **Polecenie:** „kontynuuj tym samym torem z wykorzystaniem całego okna
 kontekstowego”.
 
-**Metoda:** osiem kolejnych partii po 200 kwestii (`ac`–`aj`) w standardowym
+**Metoda:** dziesięć kolejnych partii po 200 kwestii (`ac`–`al`) w standardowym
 obiegu: lista robocza `barks_regiony.py --promien 1000 --slotki` (tylko bez
 przekładu, od najbliższej) → zwrotka `.md` → `import_zwrotki.py --na-sucho`
 → import → przeliczenie listy. Każda partia: 200/200 nowych, 0 odrzuceń,
 skan PL bez CJK.
 
-**Wynik:** magazyn 140 083 → **141 483** przekłady (28,90%). Pierścień:
+**Wynik:** magazyn 140 083 → **141 883** przekłady (28,98%). Pierścień:
 
 | pierścień | razem | przetłumaczone | pozostało | pokrycie |
 |---|---:|---:|---:|---:|
 | ≤200 m | 384 | 384 | 0 | 100% |
 | ≤400 m | 1 372 | 1 372 | 0 | 100% |
-| ≤800 m | 3 596 | 2 013 | 1 583 | 56,0% |
-| ≤1 000 m | 4 523 | 2 023 | 2 500 | 44,7% |
-| ≤1 600 m | 5 952 | 2 040 | 3 912 | 34,3% |
-| ≤3 200 m | 6 832 | 2 057 | 4 775 | 30,1% |
-| ≤6 400 m | 9 097 | 2 068 | 7 029 | 22,7% |
+| ≤800 m | 3 596 | 2 413 | 1 183 | 67,1% |
+| ≤1 000 m | 4 523 | 2 423 | 2 100 | 53,6% |
+| ≤1 600 m | 5 952 | 2 440 | 3 512 | 41,0% |
+| ≤3 200 m | 6 832 | 2 457 | 4 375 | 36,0% |
+| ≤6 400 m | 9 097 | 2 468 | 6 629 | 27,1% |
 
-Lista robocza: 3 300 → **2 500** kluczy. **Cały obowiązkowy promień <400 m
-ma przekład**; 1 000 m jest w niespełna połowie.
+Lista robocza: 4 270 → **2 100** kluczy. **Cały obowiązkowy promień <400 m ma
+przekład**; 1 000 m przekroczyło połowę. W tej sesji przetłumaczono 2 000
+kwestii z pierścienia (10 partii po 200).
 
-**Treść partii:** targ ziołowy i apteki (Srebrna Igła, Dalin, Ziołowa Sala),
-klienci i kupcy wokół Pawilonu Po Deszczu, grajkowie i gazeciarze, straż
-miejska i sąd prefektury, Widmowy Targ (szef Shi, Widmowa Ulica, opowieści
-pana Jaskini Duchów), kostnica i śledztwo, noworoczny targ, zawodnicy cuju,
+**Treść partii:** targ ziołowy i apteki (Srebrna Igła, Dalin, Ziołowa Sala,
+Wioska Słuchającej Moreli), szynk Pawilonu Po Deszczu, grajkowie, gazeciarze
+i wróżbici, straż miejska i sąd prefektury, Widmowy Targ (szef Shi, Widmowa
+Ulica, opowieści pana Jaskini Duchów), kostnica i śledztwo, noworoczny targ,
+zawodnicy cuju, sceny nad jeziorem (pipa, „Kwiaty przy drodze”, Su Xiaoxiao),
 plotki o Sekcie Dziewięciu Nurtów i Beztroskich.
 
 **Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od

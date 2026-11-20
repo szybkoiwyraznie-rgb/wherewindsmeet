@@ -11,11 +11,11 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 |---|---:|---:|---:|---:|
 | ≤200 m | 384 | 384 | 0 | 100% |
 | ≤400 m | 1372 | 1372 | 0 | 100% |
-| ≤800 m | 3596 | 2013 | 1583 | 56,0% |
-| ≤1000 m | 4523 | 2023 | 2500 | 44,7% |
-| ≤1600 m | 5952 | 2040 | 3912 | 34,3% |
-| ≤3200 m | 6832 | 2057 | 4775 | 30,1% |
-| ≤6400 m | 9097 | 2068 | 7029 | 22,7% |
+| ≤800 m | 3596 | 2413 | 1183 | 67,1% |
+| ≤1000 m | 4523 | 2423 | 2100 | 53,6% |
+| ≤1600 m | 5952 | 2440 | 3512 | 41,0% |
+| ≤3200 m | 6832 | 2457 | 4375 | 36,0% |
+| ≤6400 m | 9097 | 2468 | 6629 | 27,1% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -35,16 +35,19 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_ah` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ah.md` | 200/200, 0 odrzuceń |
 | `barks_start_ai` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ai.md` | 200/200, 0 odrzuceń |
 | `barks_start_aj` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aj.md` | 200/200, 0 odrzuceń |
+| `barks_start_ak` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ak.md` | 200/200, 0 odrzuceń |
+| `barks_start_al` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_al.md` | 200/200, 0 odrzuceń |
 
-Razem w pierścieniu ≤1000 m: **2 030 kwestii** (60 + 170 + 200×9).
-Pierścienie **≤200 m i ≤400 m są domknięte w 100%** — cały obowiązkowy
-promień z polecenia właściciela ma przekład.
+Razem w pierścieniu ≤1 000 m: **2 230 kwestii** (60 + 170 + 10 × 200).
+Pierścienie **≤200 m i ≤400 m są domknięte w 100%** — cały obowiązkowy promień
+z polecenia właściciela ma przekład; 1 000 m przekroczyło połowę.
 
-Magazyn po partii `aj`: **141 483** przekłady (28,90%). Przekład AI-tymczasowy,
+Magazyn po partii `al`: **141 883** przekłady (28,98%). Przekład AI-tymczasowy,
 bez testu w grze.
 
-Po każdej partii lista robocza topnieje: 4270 → 3900 (`ac`) → … → 2500 kluczy
-(`aj`), czyli w promieniu 1000 m ubyło 1770 kwestii.
+Po każdej partii lista robocza topnieje: 4 270 → 3 900 (`ac`) → 3 700 (`ad`)
+→ 3 500 (`ae`) → 3 300 (`af`) → 3 100 (`ag`) → 2 900 (`ah`) → 2 700 (`ai`)
+→ 2 500 (`aj`) → 2 300 (`ak`) → **2 100** kluczy (`al`).
 
 ## Jak kontynuować
 
