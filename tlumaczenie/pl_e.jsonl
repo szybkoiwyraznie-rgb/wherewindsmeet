@@ -24,6 +24,7 @@
 {"k": "e0094ca49f119e4a", "pl": "Pogoń za złodziejem"}
 {"k": "e0096ce73f80bda0", "pl": "Porozmawiaj z Sanniang"}
 {"k": "e009856bb7e7a116", "pl": "Kij do Bicia Psów i Dłoń Buddy"}
+{"k": "e009af45766918df", "pl": "Szczurze, szczurze, nie jedz mego prosa... czego nie wolno jeść?"}
 {"k": "e00a11bdaa5ae983", "pl": "Stolarz, który ukrył się tu, by się zdrzemnąć."}
 {"k": "e00a264128bd580c", "pl": "Ugasz ogień"}
 {"k": "e00a6056fe1cae84", "pl": "Diagnoza: meridiany"}
@@ -193,6 +194,7 @@
 {"k": "e0633441e1211b61", "pl": "Deszczowa Noc Wędrowca"}
 {"k": "e063bf37c85c93a9", "pl": "…Jakie miejsce?"}
 {"k": "e06482b20938aa46", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Przechylony Puchar lub Pełny Puchar (st. 56) w jakości niebieskiej lub fioletowej oraz dodatkowo jedne notatki ścieżki Łamanie Bambusa: Czara."}
+{"k": "e064e0226e4e091e", "pl": "Uff... zadania... jak je pisać..."}
 {"k": "e065171891e65c5e", "pl": "Ruszaj w noc i nie zwalniaj kroku"}
 {"k": "e0652edc223a80dc", "pl": "Tablica plotek gildii"}
 {"k": "e066c9640a4886d0", "pl": "NPC rozgrywki - karmienie ryb - tylny ogród 3"}
@@ -733,6 +735,7 @@
 {"k": "e155c80c0b77dd54", "pl": "Właściciel straganu z przekąskami"}
 {"k": "e155efc5ea7f05b8", "pl": "Użycie przez naciśnięcie umiejętności"}
 {"k": "e156b1a41acb56cb", "pl": "wszyscy będą syci i odziani,"}
+{"k": "e156bbe051f56769", "pl": "...nie chce jeść, to niech nie je, po co od razu śpiewać..."}
 {"k": "e156f95d59c02d2c", "pl": "Rozmawiaj z He Hupo"}
 {"k": "e157145c546d2ec3", "pl": "Dodaj cel"}
 {"k": "e1588098fce67eaf", "pl": "Obejdź łódź dokoła"}
@@ -968,6 +971,7 @@
 {"k": "e1bcce655c10060c", "pl": "Luo Jiawen"}
 {"k": "e1bd0f4815ade94e", "pl": "Lodowy twarożek mleczny"}
 {"k": "e1bddc3001c923d0", "pl": "Wypij mocny trunek"}
+{"k": "e1be5dbe528b3cf4", "pl": "Nie strasz sam siebie..."}
 {"k": "e1be88f2114476a9", "pl": "Odkąd dawny przywódca Wang Qing porzucił Studnię Niebios, miejsce przywódcy pozostaje puste; nikt go nie objął. Mówią, że to dlatego, iż przywódczyni sprzed niego, Shen Hanying, wciąż pamięta czasy Wang Qinga i żywi cichą nadzieję, że wróci i znów poprowadzi Studnię Niebios."}
 {"k": "e1be979538705650", "pl": "Prawdziwym skarbem, który zostawił “Płaczek”, jest “zapomnienie”. Zapomnieć ojca i matkę, dawny dom, koszmary ucieczki… Zapomnieć wszystko, co budzi lęk. Kto zapomni wszystko, co straszne, ten niczego się już nie boi."}
 {"k": "e1bf249212cb7896", "pl": "Góra Ukrytego Księżyca 2"}
@@ -2223,6 +2227,7 @@
 {"k": "e3e6f84bb8120822", "pl": "Radosny Wiatr"}
 {"k": "e3e71a546be52e1d", "pl": "Chang Yu"}
 {"k": "e3e76213cf3aea2c", "pl": "Po użyciu odblokowuje w katalogu nut w Zapiskach o rzeczach wszelakich nuty na konghou “Szczęsny Kuropatwa”."}
+{"k": "e3e914fc3663d71e", "pl": "Nie wolno kłaść plamy atramentu na papierze..."}
 {"k": "e3e9965cbf7b8c6a", "pl": "Zongzheng Jingyi"}
 {"k": "e3e9b7814712eb3a", "pl": "Jubileuszowa Gra Planszowa 150"}
 {"k": "e3e9e3a9609d773a", "pl": "Pędzel Zielonych Gór: Dobry (osłabiony)"}
@@ -2266,6 +2271,7 @@
 {"k": "e3f51788369e209d", "pl": "Tang Xinci P1, zestaw 36"}
 {"k": "e3f5237caacec782", "pl": "Deszcz ustaje, wiatr powstaje - taki jest zwykły bieg świata. Gonić wiatr i cień to w końcu szukać na próżno.\nWiatr nie ma środka, a jednak wskazuje przychodzącym i odchodzącym kierunek.\nOd dziś i ja stanę się wiatrem, a imię moje - Bingshen."}
 {"k": "e3f57d334bfb6b95", "pl": "Tong Chongguang"}
+{"k": "e3f61b39a1a1f8ad", "pl": "Wy łobuzy! Codziennie Mai to, Mai tamto, a zapomnieliście, jak on się nazywa — Ye Qingsong?"}
 {"k": "e3f6636c97a58dc9", "pl": "Chen Siniang"}
 {"k": "e3f6ab21f49eb910", "pl": "Utrata qi"}
 {"k": "e3f6d2c42adf4c1d", "pl": "Zwinięte i przewiązane plany. Po tym, jak są wytarte, widać, że właściciel często z nich korzystał.\nZłodziej najwyraźniej nie zdążył ich jeszcze rozwinąć."}
@@ -2938,6 +2944,7 @@
 {"k": "e51de9ef6ca07b14", "pl": "Drewno brzozy — nadaje się jako materiał."}
 {"k": "e51eaba92a0341a8", "pl": "Warownia Burzy Piaskowej 2"}
 {"k": "e51eb530748edbcc", "pl": "Zbadaj zwłoki"}
+{"k": "e51f55654874b3c1", "pl": "A...? To co robić..."}
 {"k": "e51f586e13d1ac48", "pl": "Wczytywanie"}
 {"k": "e51f6e79f140af16", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Rozcięcie Chmur lub Brzęk Uzdy (st. 105) w jakości niebieskiej lub fioletowej, a z pewnym prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YJedwabna Nić: Skrzydła#E."}
 {"k": "e51fa1e51be37897", "pl": "Zasięg: Kraina Złota - Spotkanie Wyzwolenie"}
@@ -3448,6 +3455,7 @@
 {"k": "e60fc7228af66eea", "pl": "Co… co z tobą?! Żyjesz?"}
 {"k": "e6102534ad915f11", "pl": "Skryty Dźwięk: Rozbity Nefryt Kunshan 1"}
 {"k": "e6105470a58ad553", "pl": "Bliźniacze ostrza Wiernego Serca · Powrót Jaskółki"}
+{"k": "e6106a9d8a5ceb3d", "pl": "Pachnące i kleiste —"}
 {"k": "e61073898563c0fe", "pl": "Ja miałabym uciekać? Na pewno ci się przywidziało!"}
 {"k": "e61084f65bb7c63c", "pl": "19. dzień szóstego miesiąca"}
 {"k": "e610f3af850fd30f", "pl": "Lipiec"}
@@ -4066,6 +4074,7 @@
 {"k": "e71b113dc4e00eb9", "pl": "Właśnie. Chłopiec w błękitnej szacie przeczytał go i długo milczał… W końcu tylko głęboko westchnął."}
 {"k": "e71bbeeea9471ff6", "pl": "Gwałtowny ogień"}
 {"k": "e71c9af2e511e77d", "pl": "Powiedzcie mi, proszę, skąd to się bierze?"}
+{"k": "e71cf3be7b01e3b2", "pl": "Księżyc dziś w pełni, sosna z zeszłego roku... chłodniej, odpocznijmy wszyscy..."}
 {"k": "e71eb106275815f4", "pl": "Słyszałem, że młody pan zaczął się douczać, żeby mieć o czym rozmawiać z panienką Shen!"}
 {"k": "e71ed63384258bff", "pl": "Tylko obraz"}
 {"k": "e71ee2b4431182d5", "pl": "Gu Pytanie w Ruchomym Piasku"}
@@ -4655,6 +4664,7 @@
 {"k": "e828c16b08ed98fb", "pl": "Dawaj szybko klucz na piętro, muszę pilnie znaleźć ciotkę Han."}
 {"k": "e828f2e83cac2b16", "pl": "Spadek atrybutów żołnierzy Khitanów"}
 {"k": "e829db76b9543922", "pl": "Dobry gust, bracie; tylko dwie żetony atramentowe i twoje."}
+{"k": "e82a448c1cf56db7", "pl": "Dziś polecam „Resztki śniegu nad Jeziorem Zachodnim”, pełne elegancji!"}
 {"k": "e82a7d6d9f4166ee", "pl": "Gdzie on jest?!"}
 {"k": "e82b5fe4628049aa", "pl": "Boski Kunszt: Woda"}
 {"k": "e82c2486abd3c4ef", "pl": "Guan Cha"}
@@ -4704,6 +4714,7 @@
 {"k": "e83fac0a8e5e6124", "pl": "Wielkie wydarzenie — niebiański zwój — efekty rzeki, poziom 02"}
 {"k": "e840ee94be4020bd", "pl": "Czuła siostrzyczka - natarcie 1"}
 {"k": "e84188169081698f", "pl": "Do wymiany: Bezimienna Włócznia."}
+{"k": "e8420eb7227cff73", "pl": "Codziennie nie ma porządnej roboty; może pójdę służyć nowemu naczelnikowi."}
 {"k": "e8427b84aea4316f", "pl": "Wysłużony mieszek"}
 {"k": "e842fc6b6ca4605a", "pl": "Ukryta Ścieżka - Qinchuan - Wioska Wyłamanej Bramy"}
 {"k": "e8436fdaf8d15365", "pl": "Nieźle się ruszasz. Teraz się rozdzielamy."}
@@ -4770,6 +4781,7 @@
 {"k": "e85db5b27c358f51", "pl": "Haftowany mieszek"}
 {"k": "e85df8594868136b", "pl": "Element zestawu: Nefrytowy Czerpak, st. 110 · Zwykła"}
 {"k": "e85e2208ce4fabaf", "pl": "Barwinek"}
+{"k": "e85e5ddbe8c75e0e", "pl": "Złamany most się nie łamie, Samotna Góra nie jest samotna; co widzisz, nie musi być prawdą, co słyszysz, też nie... Znakomicie, znakomicie..."}
 {"k": "e85edc40ff0dac1e", "pl": "Ojej!"}
 {"k": "e85ee6eaa1244c6f", "pl": "Ciężki Upadek - Szkatuła skarbów - Podnóże Góry Nefrytowego Źródła - Bao Wenxu"}
 {"k": "e85f06f0c0ef82b7", "pl": "Zatrucie Broni: Najwyższy"}
@@ -4993,6 +5005,7 @@
 {"k": "e8bf5fe1d9338bc2", "pl": "Plan: surowce st. 6-7 → piaskarnia"}
 {"k": "e8c04b3c8ea56915", "pl": "Dawniej żołnierz załogi Luancheng; nieświadomy niczego, został ogłuszony przez brata i wyniesiony z miasta. Dopiero się ocknął i wrzeszczy, że chce wracać."}
 {"k": "e8c0d183671f9c25", "pl": "Wieloosobowo: Ye Wanshan - poz. 61"}
+{"k": "e8c1d8da821b509a", "pl": "Naprawdę słyszałem, dziwny dźwięk, na pewno nie od wiatru!"}
 {"k": "e8c27aecbf664c2e", "pl": "Jesteś za daleko od strażnika i złodziejaszek wyrywa się z więzów i ucieka.\nTen na pewno nie odpuści, można wrócić i sprawdzić za godzinę."}
 {"k": "e8c33a2fb1d0b861", "pl": "To też wiesz? Skąd znasz tyle opowieści o Panu Orle?"}
 {"k": "e8c370ebeb7ce38c", "pl": "Tajemnicza postać pierwsza"}
@@ -7368,6 +7381,7 @@
 {"k": "ecc2b4a6bee5ecad", "pl": "Zwój z pięknością"}
 {"k": "ecc4a849e9bbf140", "pl": "Ludzkie szczenię nie rozumie wielu rzeczy, ale umie warzyć dobre wino i to Kotu z Blizną się podoba.\nLudzkie szczenię ma dobre wino, ale nie daje go kotu i tego Kot z Blizną nie znosi.\nŻadna zdobycz, na którą zasadzi się Kot z Blizną, mu nie umyka, ale winiarnia była naprawdę pilnie strzeżona. Kot z Blizną próbował raz po raz, aż nagle droga stanęła otworem, a ludzkie szczenię, co całymi dniami się uśmiechało, spochmurniało.\nKot z Blizną dostał wino, ale wcale nie było mu z tym dobrze."}
 {"k": "ecc4e4d8a84f248e", "pl": "#dec5b7Wierni po grób"}
+{"k": "ecc55ac9496ebabf", "pl": "Młodzieńcze, nie pchaj się na oślep."}
 {"k": "ecc563abbd51b4c0", "pl": "Prawdziwego Kaifengu nie zobaczysz samymi oczami."}
 {"k": "ecc668b5670b4bc8", "pl": "Pijany Miecz - powstanie po upadku"}
 {"k": "ecc68f8d441af022", "pl": "Tamtego dnia jego przenikliwy świst spłoszył ptaki w lesie, a gdy zabrzmiał znienacka, aż zadzwoniło ci w uszach.\nPotem ochrypł i nigdy już nie wydał tak donośnego dźwięku, a i do ciebie jego głos już niemal nie docierał.\nZdawało się, że się zepsuł, a każda naprawa zawodziła. Lecz oto spoczywa cicho na twej dłoni i znów potrafi zagrać."}
@@ -7494,6 +7508,7 @@
 {"k": "ecf79d4c1f07a123", "pl": "Tss, ot nowy dom, co w tym takiego."}
 {"k": "ecf7a8ad31ff2386", "pl": "Błazen Bohater - dostrojenie atrybutów"}
 {"k": "ecf7d7957c5c5f08", "pl": "Nakłoń ofiarę, by się wycofała"}
+{"k": "ecf7ef20d2998034", "pl": "Przypuszczam, że brat Zhang też nie śpi; może pójdę go zaprosić do towarzystwa!"}
 {"k": "ecf90d4754298a4d", "pl": "szabla heng: Umiejętność bojowa"}
 {"k": "ecf93fad5ad6ae86", "pl": "Zarabiać brudne pieniądze, ach, co za wstyd."}
 {"k": "ecf9503d9ebd8082", "pl": "Ależ to krzykliwe…"}
@@ -8012,6 +8027,7 @@
 {"k": "ede0c701cd000b94", "pl": "Wędzona żaba"}
 {"k": "ede1afc679925d9a", "pl": "Nowy element budowy fachów 799"}
 {"k": "ede243eff8f8432f", "pl": "Haha, mój Haha, gdzieżeś się podział?"}
+{"k": "ede3756364566db9", "pl": "Chrap... ważne miejsce... nie wolno..."}
 {"k": "ede3a3c03318e765", "pl": "Jak się czujesz?"}
 {"k": "ede3b81bf21130fe", "pl": "Winogrona?"}
 {"k": "ede3f0298a0b19ea", "pl": "Ling Li"}
@@ -8138,6 +8154,7 @@
 {"k": "ee1a0811a5f48175", "pl": "Zbuduj fundament"}
 {"k": "ee1ac3d3d47954f5", "pl": "Du Cheng i drugi"}
 {"k": "ee1b0935c0a16eef", "pl": "Dobrze. A doświadczenie, bracie Feng…?"}
+{"k": "ee1b606d39bc5903", "pl": "Jezioro Zachodnie, jezioro... na dnie jest smok!"}
 {"k": "ee1bb96313c5ef51", "pl": "Więc… pożegnajmy się tutaj."}
 {"k": "ee1c0473f3f44796", "pl": "#a66829Z groty na wschodzie Góry Ukrytego Księżyca#E dobiegają żałosne jęki…"}
 {"k": "ee1c3113a9ca1b69", "pl": "Stałe błądzenie w kółko po zadaniu 2"}
@@ -8276,6 +8293,7 @@
 {"k": "ee5849a3e52f962b", "pl": "Obszar quizu uczonych dla wielu graczy"}
 {"k": "ee5940b5339198e3", "pl": "Z Niebytu Byt"}
 {"k": "ee59e3522768aba6", "pl": "Taoista wprowadzający pielgrzymów w Pałacu Taiyi."}
+{"k": "ee5b38dc6f83e4c7", "pl": "Młody panie, droga, którą przeszedłeś, to nie żadna ciężka droga."}
 {"k": "ee5b4bbd858acb1d", "pl": "Dziwy w Jaskini"}
 {"k": "ee5bd34075460a5b", "pl": "Pan Rzeki jest wspaniały! Nie dość, że zna sztuki walki i przegonił Kitanów, to jeszcze zna się na leczeniu i uleczył mnóstwo, mnóstwo ludzi!"}
 {"k": "ee5cd4b6ea887206", "pl": "Ulotna wiosna: brąz · Nefryt"}
@@ -8371,6 +8389,7 @@
 {"k": "ee862c363905f67c", "pl": "Po użyciu otrzymasz czasową Sławę bohatera “Nieugięte Ostrze”."}
 {"k": "ee8634da1511a153", "pl": "Wszechwiedzący - Żałoba po burzy - obszar nawiedzony"}
 {"k": "ee879e0b5e1d6053", "pl": "Miau Miau - Niewidoczna Góra - Bumerang - Szablon 1"}
+{"k": "ee87efba9487efbe", "pl": "Głośno wyrażać buntownicze słowa bez prawdziwego zamiaru — to „mowa bezpodstawna”."}
 {"k": "ee8826870f7b24fd", "pl": "Kochać się i nie móc być razem, a w końcu na zawsze rozdzieleni przez śmierć - jak to może być dobre zakończenie!"}
 {"k": "ee88437ca7377014", "pl": "Miasteczko Łaski - obszar muzyki 2"}
 {"k": "ee8855f7eca7b77a", "pl": "Preludium Skupienia: -10%"}
@@ -8819,6 +8838,7 @@
 {"k": "ef499d4c77798226", "pl": "Wódz! To wódz!"}
 {"k": "ef4a416c1ccc9148", "pl": "Precyzyjna część, której Mały Huya tak długo szukał i nie mógł znaleźć. Zdaje się, że to serce czegoś, co z niej złożono."}
 {"k": "ef4ae56ac374de5a", "pl": "Podziel się rozmyślaniami z Su Mowenem"}
+{"k": "ef4ae7e352d38a2e", "pl": "Przepraszam, przepuśćcie, nie zasłaniajcie światła."}
 {"k": "ef4be918d2a3e45e", "pl": "Obejrzyj leżącego na ziemi Ziarnka Szczura"}
 {"k": "ef4c241a5e1557c2", "pl": "Cięcie Doczesności"}
 {"k": "ef4c25cdc252f937", "pl": "Obiecane Światło"}
