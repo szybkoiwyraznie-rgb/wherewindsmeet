@@ -369,7 +369,7 @@
 — 74.
    klucz: a94db89341240397
    EN: You think $T(5037) is stupid enough to fall for that again?
-   PL: Masz $T(5037) za idiotę? Myślisz, że drugi raz damy się nabrać?
+   PL: Masz $T(5037) za idiotę? Myślisz, że drugi raz da się nabrać?
 
 — 75.
    klucz: afc515151263bc71
