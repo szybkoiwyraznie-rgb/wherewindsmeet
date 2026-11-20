@@ -2711,3 +2711,11 @@ Fanlou i Upojny Cień w `ho`/`hp` oraz nazwy miejsc w `hj`; poprawiono
 kwestię z tokenem w `hk`. Skan `ha`–`hq`: 1 170 linii PL bez CJK i bez
 nie-NFC. `check_repository.py` OK (610 wpisów indeksu), 623 testy OK;
 brak weryfikacji przekładu w grze.
+
+**Wieści informatorów (`hr`):** 57 nowych przekładów wybranych scen grup
+5183–5187, po suchym i właściwym imporcie 0 odrzuceń; magazyn 137 311,
+489 544 miejsc (28,05%). Sonda dostępnych bazowych kluczy scen tych grup
+nie wskazuje braków; nie obejmuje pozostałych tekstów zadań. Po imporcie
+ujednolicono w sześciu kwestiach nazwy miejsc i Studni Niebios, również
+po kontroli suchej. Skan 57 wierszy PL bez CJK i nie-NFC. Kontrola
+repozytorium OK (611 wpisów), 623 testy OK, bez weryfikacji w grze.

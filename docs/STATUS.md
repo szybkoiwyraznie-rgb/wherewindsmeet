@@ -95,6 +95,12 @@ Pozostałe dostępne w sondzie klucze tych grup nie wykazują braków.
 Sonda dotyczy tylko powiązanych scen, nie wszystkich tekstów zadań.
 623 testy i kontrola repozytorium OK po `hq`; brak testu w grze.
 
+**Partia `hr`:** 57 dodatkowych kwestii informatorów z grup 5183–5187,
+magazyn **137 311** przekładów, **489 544** miejsca (28,05%). W ich
+powiązanych scenach sonda bazowych kluczy nie wykazała braków; nie jest to
+dowód kompletności zadań. Po imporcie poprawiono nazewnictwo miejsc i
+szkoły. Kontrola repozytorium i **623 testy OK**, bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.
