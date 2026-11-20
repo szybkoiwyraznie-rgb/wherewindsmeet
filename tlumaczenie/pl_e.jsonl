@@ -782,6 +782,7 @@
 {"k": "e18e9cf1dd4d5335", "pl": "Zapisane po oddaniu karty zaręczynowej Pi Qiaoyun"}
 {"k": "e18f19dacdb16014", "pl": "Wypłyń na powierzchnię #YŁodzią głębinowych fal#E i oddaj znalezione rzeczy Zhao Baoshanowi"}
 {"k": "e18f1f61d92e7297", "pl": "Rozmawiaj z Shen Yu"}
+{"k": "e18f2d00abdabb84", "pl": "Jeśli nie skończy przepisywać, nie dostaniesz z Błogiej Samotni ani kropli wina!"}
 {"k": "e18f7549b13dead2", "pl": "Posłuchaj, co jeszcze ma do powiedzenia Jin Zhongyuan"}
 {"k": "e18fcdeaa9ab5afa", "pl": "Przebranie: trzecia straż"}
 {"k": "e19000ac000350df", "pl": "Karwasze Białych Obłoków"}
@@ -1876,6 +1877,7 @@
 {"k": "e3a6a4567ead13a4", "pl": "Zabawna z ciebie istota."}
 {"k": "e3a6c8b41a83340b", "pl": "Pan Gór Szumi Lasem"}
 {"k": "e3a6f6de4f099146", "pl": "Klęska żywiołu jest bezlitosna, aliści ludzkie serce nie — mości rycerzu, dotkniętej wsi potrzeba teraz trzech $T(26_207009)."}
+{"k": "e3a7256302ad9a62", "pl": "Wujek Jiang nauczył mnie tylu ciosów, że zwykli złodziejaszkowie nie mają ze mną szans."}
 {"k": "e3a83e8d358f7cac", "pl": "Gwardia cesarska na służbie, proszę się oddalić."}
 {"k": "e3a88f6feaae9e5b", "pl": "Ciemna noc, gęsta mgła, cienie pląsają w gaju. O upiorach prawią gawędy — cóż po ludzkim atramencie? Za lasem pewien gawędziarz sam do siebie mówi — snadź warto posłuchać jego opowieści."}
 {"k": "e3a8b3b823edad60", "pl": "Jeszcze nie widzieliśmy Zongzi — a już mamy tyle skarbów — to, co w środku — na pewno jest niedoścignionym skarbem.\n"}
@@ -2556,6 +2558,7 @@
 {"k": "e4ea216b37f3915a", "pl": "Wzmocnienie ataku"}
 {"k": "e4ea49e81958b19f", "pl": "Znacznik przełomu bohatera: Szpony Orła 2 - przełamanie obrony, zakaz wytrwałości"}
 {"k": "e4ea73eaf1dd90eb", "pl": "Kupon rabatowy: obniża cenę strojów ze Szybkiego Wiatru o 200 Pereł Echa za każdy kupon.\nUżywany automatycznie po odebraniu."}
+{"k": "e4ec1e9d24fcd709", "pl": "Wujku Jiang, skoro jestem taki bystry, to może… nauczysz mnie jednak tego niezwyciężonego ciosu?"}
 {"k": "e4ec46eb41d965db", "pl": "Udaj się do Gospody Bez Zazdrości"}
 {"k": "e4ec588592a77b80", "pl": "Z wielkim trudem — wreszcie mam wieści o Twoim bracie — ostatnio jest w Liangzhou.\nJeśli chcesz go zobaczyć — wymieńcie go za Waszą rodzinną „legendarną winną”.\n To wino ma być podarowane wielkim w Uhu — nie próbuj mnie oszukać — gdy wino będzie gotowe — przyjdę pierwszy i sprawdzę towar.\n"}
 {"k": "e4ec68f616bfd936", "pl": "Przymiarka kreatora: mężczyzna 12"}
@@ -3250,6 +3253,7 @@
 {"k": "e641a6300d9674ff", "pl": "Prowadź patrol dalej sam"}
 {"k": "e642847f6a9e5acb", "pl": "Ascetyczny mnich 68"}
 {"k": "e6428ec8185afb67", "pl": "A'hong"}
+{"k": "e642ab2f4a662a7a", "pl": "…Nauczysz mnie jeszcze sztuki miecza?"}
 {"k": "e642e19ec3f67256", "pl": "(urywanie, jeden po drugim) Panie prefekcie. Panie."}
 {"k": "e643240e77e6e611", "pl": "Każdej nocy po północy mała cudowna lekarka z Chaty Ziarnka Gorczycy, #a66829Su Huaiwei#E, wymyka się przed wszystkimi i w #a66829ustronnym miejscu za domem#E ćwiczy oddech przy księżycu. Zapytana o powód, wykręca się…"}
 {"k": "e643b0a2abfbab3b", "pl": "Ren Gao"}
@@ -3406,6 +3410,7 @@
 {"k": "e68a15d1f08e606e", "pl": "Lud gromadzi się wokół Misy Skarbów i gwarzy bez ustanku — obmyśl, jako ich skłonić, by ją kupili."}
 {"k": "e68a2f1a2e628653", "pl": "Quiz uczonych dla wielu graczy"}
 {"k": "e68a57579677d6a5", "pl": "Geografia: Gardziel Rwącego Nurtu"}
+{"k": "e68b8453ac2ab4b7", "pl": "To przez was obu, ciągle się o nią szarpaliście! Gdzie moja piłka do cuju?"}
 {"k": "e68ba32b9645a814", "pl": "most Zhongdu - Zamiana egzekucji 1"}
 {"k": "e68bdcfccef2158a", "pl": "Su Panqing"}
 {"k": "e68cbc620d7ce5e6", "pl": "Pomoc i dostatek dla ludu"}
@@ -3920,6 +3925,7 @@
 {"k": "e78725f47b645413", "pl": "Pozycja gracza"}
 {"k": "e787933f9a4510ce", "pl": "Chwyt z dystansu - 6"}
 {"k": "e787b878ccb1d2a8", "pl": "Zmierz się z Gongsun Dengiem"}
+{"k": "e787c6994594e16d", "pl": "Schodzisz z drzewa."}
 {"k": "e7886d1b6311bd4f", "pl": "Poza: Lekki cios pięścią"}
 {"k": "e7888032235d6f87", "pl": "Scenka - zgubione dziecko, śledzenie obszaru"}
 {"k": "e788dab145f1f6c3", "pl": "Szał! Szał! Szał! Wódz Szału, pogromca bogów i świątyń, może go użyć raz na 30 minut: tworzy kadź stu szałów pełną wina Cała Rzeka Czerwona, która stoi przez 10 minut. Wino w kadzi pochodzi z darów uczniów sekty Wzburzonych Fal. Pij je razem z nimi, aż do upojenia!"}
@@ -4974,6 +4980,7 @@
 {"k": "e977bbce516468e6", "pl": "“Pozostałe Dzieła Han Wei: I”"}
 {"k": "e9782184852002e7", "pl": "Samsara"}
 {"k": "e9788b4910629a7c", "pl": "Wywar herbaciany schłodzony lodem, orzeźwiający w upał; najlepiej pić go w pełni lata."}
+{"k": "e9798ed13c9fa388", "pl": "Piłka… już do nas nie wróci."}
 {"k": "e979a82a863ba233", "pl": "Przypływ niesie białą wstęgę w tańcu, lecące fale gonią nefrytowe przestworza."}
 {"k": "e97a6495b0f012e0", "pl": "Rozmawiaj z czeladnikiem"}
 {"k": "e97bece3e9d2c0aa", "pl": "Woreczek z lekiem"}
