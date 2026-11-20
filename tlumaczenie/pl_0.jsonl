@@ -1072,6 +1072,7 @@
 {"k": "01d47af35e633acc", "pl": "Mieszkaniec Ruin Szpitala"}
 {"k": "01d48fd455b69f5b", "pl": "Starszy! Tego naiwniaka to wyście przysłali! A pieniążki świeżutkie! Niech starszy oceni, tym razem nic nie spaprałem, co?"}
 {"k": "01d531e3f7924680", "pl": "Mistrz Sali Roztropnej Jasności"}
+{"k": "01d5b97b6ec17617", "pl": "Co oni tam robią? Ale dziwne!"}
 {"k": "01d5de635a78bb15", "pl": "Osobliwa potrawa wymyślona przez ciotkę Li: stary imbir i pieprz miele się na proszek, gotuje z kobylim mlekiem, a potem przetapia. Śmiałkowie, którzy lubią ostre smaki, mogą spróbować."}
 {"k": "01d667ff93a8056d", "pl": "Losowo: szansa na trafienie krytyczne przy wydobyciu rudy lub przy łowach rośnie o 10% na 20 min.\n\nNaraz może działać tylko jeden efekt “Potrawy”."}
 {"k": "01d6fc447d81e0e8", "pl": "Odtwórz echo snu"}
@@ -1866,6 +1867,7 @@
 {"k": "033cf0243fe13912", "pl": "A ile ty masz lat, co ty możesz wiedzieć o świecie? Powiem ci po prawdzie: zioła w mojej nalewce to najlepszy towar, wydarty z Mglistego Lasu!"}
 {"k": "033de1f9c38fbea2", "pl": "Tryb automatyczny — dotknij dowolnego miejsca, by go wyłączyć"}
 {"k": "033e89b6efcb4654", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Płukany Kwiat lub Gruszkowy Śnieg (st. 100) w jakości niebieskiej lub fioletowej, a z niskim prawdopodobieństwem także dodatkowy złoty element wyposażenia. Polecany dla ścieżki #YJedwabna Nić: Ulewa#E."}
+{"k": "033e91e02e5a814f", "pl": "Tu teren równy, może być."}
 {"k": "034033c48e615246", "pl": "Sześć Sztuk - Muzyka 4 - Wioska Szczypioru"}
 {"k": "0340dc70c0c5ff4e", "pl": "Zobacz skraj wsi na Tarasie Króla Szczypioru"}
 {"k": "03413ef3bd336801", "pl": "Wypadają najwyżej złote elementy zestawów Rozcięcie Chmur i Brzęk Uzdy, st. 135.\n(Nagolenniki nie wypadają.)"}
@@ -2241,6 +2243,7 @@
 {"k": "03de68ff478415a1", "pl": "Pióra wiary"}
 {"k": "03debd847bed6884", "pl": "Już raz cię pokonałem. Nikogo nie ocalisz."}
 {"k": "03decb5e9479bc08", "pl": "Do końca sezonu: 30 dni"}
+{"k": "03df27bb5594ce36", "pl": "Polowanie. Oczyszcza umysł."}
 {"k": "03df338c39e382fc", "pl": "Co się dzieje z konstruktorami Qiongqi przez ostatnie lata? Czemu nagle oszaleli i wysadzili drogi?"}
 {"k": "03df6f6c8ec6d1f0", "pl": "Robotnik, który właśnie dowiózł materiały budowlane i odpoczywa tu w cieniu, czekając na kolejny kurs."}
 {"k": "03df7557692628a1", "pl": "Zwykły elitarny wróg wg poziomu świata"}
@@ -4164,6 +4167,7 @@
 {"k": "071ef666e2fe05d0", "pl": "Marionetka: postawa wyjściowa"}
 {"k": "071f167a23c289bd", "pl": "Dar ukończenia Nowego Skrzydła"}
 {"k": "071f23a47d625590", "pl": "Wiedźma."}
+{"k": "071f33d83f8acb4d", "pl": "A pająki? Nóżki się je."}
 {"k": "071f540b0774418f", "pl": "Test typu pustego"}
 {"k": "0720a48daa04d792", "pl": "Pięknie, prześlicznie — gdy pan Wschodniej Bramy to zobaczy, nie oderwie oczu!"}
 {"k": "0720c644ce8abe96", "pl": "Straż: Ruiny Latających Niebian (szansa)"}
@@ -4411,6 +4415,7 @@
 {"k": "0788f7fcec0a4e4f", "pl": "Kręta Ścieżka - Świątynia Xiangguo - 1"}
 {"k": "0789d5bd77731e96", "pl": "Hai Wuliang"}
 {"k": "078a40ffb5868d55", "pl": "Poszukaj mechanizmu"}
+{"k": "078a42da7c0d5a22", "pl": "Wszyscyśmy z ciała i kości, zawrzyjmy dobrą znajomość!"}
 {"k": "078b3b0d144fa6d1", "pl": "Bez wymówek"}
 {"k": "078b5f8a8bd88de8", "pl": "Odłamek steli"}
 {"k": "078b9e24646e772d", "pl": "Hexi, boss Przełęczy Dasan - plac ćwiczeń"}
@@ -4489,6 +4494,7 @@
 {"k": "07b0c70122a42a0e", "pl": "Dwanaście lat wdzięczności i urazy - wyjście gracza, mały"}
 {"k": "07b0f8132df1dc92", "pl": "Oczyść wszystkie obozy kitajskiej konnicy 3"}
 {"k": "07b158a174d74c04", "pl": "Panny ciągną mnie na wino, a ja po każdym kielichu się słaniam. Postanowiłem pić pięć dzbanów dziennie, żeby się zahartować! Smoczy Panie, dobrze robię?"}
+{"k": "07b1aa021f1f7efb", "pl": "Czemu mnie zatrzymujesz? Przed nami przeprawa Tysiąclecia."}
 {"k": "07b1bdfd37f1108b", "pl": "Wejdź do podziemnego skarbca"}
 {"k": "07b247408bfece2a", "pl": "Mowa urzędowa Kaifengu na poziomie swobodnej rozmowy!"}
 {"k": "07b2d3216c2f6a4d", "pl": "Mieszkaniec Mrocznej Doliny; choć młody, jest bardzo rozsądny."}
@@ -5194,10 +5200,12 @@
 {"k": "08f207103f10662e", "pl": "Kości Gór w Objęciach"}
 {"k": "08f3abce1a55aee4", "pl": "Czy tak trudno pogodzić zwaśnionych na targowisku?"}
 {"k": "08f40c04ff5247bf", "pl": "Tan Shengyi"}
+{"k": "08f435693db22f45", "pl": "Co, co, może znaleźli notatki jakiegoś mistrza? A może kompletny mechanizm!!"}
 {"k": "08f46a52479e3e7f", "pl": "Pod studnią panują egipskie ciemności. Może najpierw zapalić pochodnię?"}
 {"k": "08f4915e0885525f", "pl": "Ano właśnie. W Qinghe każdy dom znam od środka! Na dziesięć li dookoła każdy wie, kto to młody gospodarz!"}
 {"k": "08f4caa6db3fc1fe", "pl": "Niezwykły kwiat hodowany przez Li Zhenzhen — rośnie wyłącznie na dnie Księżycowego Jeziora; sam dotyk może na chwilę oślepić.\nCzy to właśnie jego naprawdę szuka Bogini Księżyca?\nLi Zhenzhen bardzo ten kwiat miłuje — i nie bez powodu: czuje, że kwiat jest do niej podobny.\nTeż wyrasta w ciemnym zakątku, do którego nikt nie zagląda, i przez całe życie nie ujrzy światła.\nNie ma żalu o to, że jest niewidoma — żałuje tylko, że dawniej nie mogła zaopiekować się sobą — tą samotną, małą dziewczynką — tak czule, jak opiekuje się tym kwiatem.\n\n"}
 {"k": "08f4ffe71827c41d", "pl": "Aha, już wiem! To ty jesteś $N! Brat bohater ciągle o tobie gada!"}
+{"k": "08f5d229b9bd0a4c", "pl": "Tu naprawdę pięknie; nie bez powodu mówią, że na tej skale gnieździły się boskie ptaki..."}
 {"k": "08f5e4f3afd18289", "pl": "Uczeń Wzgórza Moistów, którego dręczy zagadka “Księżyc w wodzie”, zadana przed laty przez starszego Żurawia; często próbuje wyłowić księżyc ze Stawu Yaoguang w Skale Śpiącej Gwiazdy."}
 {"k": "08f63d5962e3f741", "pl": "Osobliwość Qingzhou - Bęben Karpia Koi - Miasteczko Źródlane 1"}
 {"k": "08f65ff393284ac4", "pl": "Dwanaście Studni - Wschodnia studnia 5"}
@@ -8884,6 +8892,7 @@
 {"k": "0f5a2688611e0fc5", "pl": "To odwiedzaj ojca często, słyszysz?"}
 {"k": "0f5a3c144d4cd25a", "pl": "Te kropliste ciasteczka są znakomite! Pycha!"}
 {"k": "0f5b1f629cd39fa0", "pl": "Smaczek z bratem Zhao"}
+{"k": "0f5b9d56bb0afda8", "pl": "W nocy ciemnej w ogóle nie widać, gdzie jest Kraina Brzoskwiniowego Źródła!"}
 {"k": "0f5c15146c202da5", "pl": "Człowiek jianghu, szczodry i swobodny, ani chwili nie usiedzi w miejscu."}
 {"k": "0f5d3b8458d0d90a", "pl": "Żółty Dzwon znów zabrzmiał;przywódca dziczy na nowo płonie żądzą walki"}
 {"k": "0f5d998646280e67", "pl": "Wędrowny mnich, miłosierny, z sercem pochylonym nad wszystkim, co żyje."}
