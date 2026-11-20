@@ -102,7 +102,7 @@ Przykłady braków: „Towers Connect Facilities” (`塔架连接设施`),
 „Winter Treasure Chest” (`冬日宝箱`), „Hundred Delicacies - Operation
 Instructions” (`珍馐百味·经营说明`).
 
-Stan 151/1 524 sprzed tej sesji wzrósł do 330 dzięki partii opisów szkół
+Stan 251/1 524 sprzed tej sesji wzrósł do 330 dzięki partii opisów szkół
 sztuk walki (`zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`, 79 wpisów;
 opis w `docs/EXPERIMENT_LOG.md`). Te 79 wpisów to opisy, nie nazwy — są
 **poza literalnym zakresem** (5) i można je wycofać jednym poleceniem, jeśli
