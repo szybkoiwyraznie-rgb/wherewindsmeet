@@ -3191,3 +3191,13 @@ i inskrypcji, robotnicy i rzemieślnicy.
 Po domknięciu ≤6 400 m zostaje 1 586 kwestii w odległości 6 400–11 085 m
 oraz ok. 686 bez pozycji w świecie — „całość” wymaga jeszcze osobnej decyzji
 o tych dwóch zbiorach.
+
+## 2026-11-20 (13) — magazyn przekracza 30% (partie `bm`–`bn`)
+
+Dwie partie po 150 w pierścieniu ≤6 400 m: magazyn 146 558 → **146 858**,
+czyli **30,00%** wszystkich miejsc w grze. Pierścień ≤6 400 m: 7 443/9 097
+(81,8%), zostało 1 654; lista robocza 1 954 → 1 804 → **1 654**. 0 odrzuceń,
+`PL:` bez CJK. Treść: Miasto Mo i Droga Gór Atramentu w drugiej warstwie
+(zegar wodny, łodzie chmurowe, tor w chmurach, „Jedne Drzwi”, Ciemna Dolina),
+spór „otwarcie gór / zamknięcie gór”, cytaty z Mistrza Mo, uczniowskie
+żarty o przepisywaniu zadań.
