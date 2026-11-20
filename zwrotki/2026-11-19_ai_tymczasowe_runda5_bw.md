@@ -9,7 +9,7 @@
 — 2.
    klucz: b820160ff0cfda25
    EN: Go find the fainted Qing Qingqing
-   PL: Pospiesz do omdlałej Qing Qingqing
+   PL: Pospiesz do omdlałego Qing Qingqinga
 
 — 3.
    klucz: b821321cd06dd62e
