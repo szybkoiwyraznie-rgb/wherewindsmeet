@@ -9,13 +9,13 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 
 | pierścień | kwestii razem | przetłumaczone | pozostało | pokrycie |
 |---|---:|---:|---:|---:|
-| ≤200 m | 384 | 236 | 148 | 61.5% |
-| ≤400 m | 1372 | 263 | 1109 | 19.2% |
-| ≤800 m | 3596 | 413 | 3183 | 11.5% |
-| ≤1000 m | 4523 | 423 | 4100 | 9.4% |
-| ≤1600 m | 5952 | 440 | 5512 | 7.4% |
-| ≤3200 m | 6832 | 457 | 6375 | 6.7% |
-| ≤6400 m | 9097 | 468 | 8629 | 5.1% |
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1372 | 1063 | 309 | 77.5% |
+| ≤800 m | 3596 | 1213 | 2383 | 33.7% |
+| ≤1000 m | 4523 | 1223 | 3300 | 27.0% |
+| ≤1600 m | 5952 | 1240 | 4712 | 20.8% |
+| ≤3200 m | 6832 | 1257 | 5575 | 18.4% |
+| ≤6400 m | 9097 | 1268 | 7829 | 13.9% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -27,9 +27,19 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 |---|---:|---|---|---|
 | `barks_start_aa` | 60 | ≤200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aa.md` | 60/60, 0 odrzuceń |
 | `barks_start_ab` | 170 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ab.md` | 170/170, 0 odrzuceń |
+| `barks_start_ac` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ac.md` | 200/200, 0 odrzuceń |
+| `barks_start_ad` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ad.md` | 200/200, 0 odrzuceń |
+| `barks_start_ae` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ae.md` | 200/200, 0 odrzuceń |
+| `barks_start_af` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_af.md` | 200/200, 0 odrzuceń |
 
-Magazyn po partii `ab`: **139 883** przekłady (28,57%). Przekład AI-tymczasowy,
+Razem w pierścieniu ≤1000 m: **1030 kwestii** (60 + 170 + 200×4).
+Pierścień ≤200 m jest **domknięty w 100%**, ≤400 m w 77,5%.
+
+Magazyn po partii `af`: **140 683** przekłady (28,74%). Przekład AI-tymczasowy,
 bez testu w grze.
+
+Po każdej partii lista robocza topnieje: 4270 → 3900 (`ac`) → 3700 (`ad`)
+→ 3500 (`ae`) → **3300** kluczy (`af`).
 
 ## Jak kontynuować
 

@@ -2987,3 +2987,39 @@ Do pierścieni wchodzą też wcześniejsze przekłady AI (stąd 423 przy 230 now
 **Narzędzie:** `barks_regiony.py` dostał `--wszystkie` (licz też gotowe
 przekłady), żeby dało się liczyć postęp bez zapisywania stanu w pliku.
 **Kontrole:** `run_tests.py`, `check_repository.py`.
+
+## 2026-11-20 (5) — pierścienie: domknięcie 200 m i 1 030 kwestii w 1 000 m
+
+**Polecenie właściciela:** „kontynuuj do wyczerpania kontekstu” — tempo około
+1 000 kwestii na sesję, bez pytania o wybór pierścienia.
+
+**Metoda:** po każdej partii przeliczana jest lista robocza
+(`barks_regiony.py --promien 1000 --slotki dist/region_1000.txt`), która zawiera
+wyłącznie kwestie bez przekładu, posortowane od najbliższej. Cztery partie po
+200 kwestii (`ac`, `ad`, `ae`, `af`) przeszły standardowy obieg: zwrotka `.md`
+→ `import_zwrotki.py --na-sucho` (200/200, 0 odrzuceń) → import do magazynu.
+Skan PL bez CJK w każdej partii.
+
+**Wynik:** magazyn 140 083 → **140 683** przekłady (28,74%). Pierścień:
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 063 | 309 | 77,5% |
+| ≤800 m | 3 596 | 1 213 | 2 383 | 33,7% |
+| ≤1 000 m | 4 523 | 1 223 | 3 300 | 27,0% |
+| ≤1 600 m | 5 952 | 1 240 | 4 712 | 20,8% |
+| ≤3 200 m | 6 832 | 1 257 | 5 575 | 18,4% |
+| ≤6 400 m | 9 097 | 1 268 | 7 829 | 13,9% |
+
+Lista robocza: 4 270 → 3 900 (`ac`) → 3 700 (`ad`) → 3 500 (`ae`) →
+**3 300** kluczy (`af`). Pierścień ≤200 m jest domknięty w 100% — wszystkie
+odzywki z bezpośredniego otoczenia startu mają przekład AI-tymczasowy.
+
+**Treść partii:** rynek i stragany, odzywki grajków i żebraków, straż przy
+Jaskini Beztroskich i Zaułku Zapomnianych, noworoczny taniec lwów, kupcy koni
+z Xiazhou, handlarze z Widmowego Targu, klienci Pawiego Pawilonu, apteka
+Srebrnej Igły, szynk Pawilonu Po Deszczu, gazeciarze i wróżbici.
+
+**Ograniczenie:** odległość od kotwicy to przybliżenie „co gracz zobaczy
+najpierw”, nie kolejność fabuły; przekład AI-tymczasowy, bez testu w grze.
