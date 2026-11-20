@@ -3277,11 +3277,18 @@ Powód osobnego wpisu: pierwsza próba wydania trafiła do `dist/` pod nazwą
 mógł jej znaleźć. Wydania instalowalne zawsze nazywać `WWM_Spolszczenie_PL_v*.zip`
 i po zbudowaniu wgrywać na Dysk (krok „build” nie obejmuje uploadu).
 
-## 2026-11-20 (17) — Czytanka v19 na Dysku
+## 2026-11-20 (17) — ⚠ BŁĄD: „Czytanka v19” z niewłaściwego generatora (wycofana)
 
-`WWM_Czytanka_PL_v19.zip`, 6 597 845 B, SHA-256
-`fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
-zestaw `przetlumaczone`, płeć `oba` (jak v18). Zawartość:
+**Błąd sesji.** Wydałem paczkę jako `WWM_Czytanka_PL_v19.zip` na podstawie
+nieaktualnej pamięci („ostatnia to v18”), a faktycznie ostatnia czytanka
+właściciela to **v22** i buduje ją `tools/czytanka_czysta.py`, nie
+`tools/buduj_czytanki.py`. Plik z Dysku przeniesiono do kosza
+(id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`, do przywrócenia z kosza).
+Poprawna kontynuacja: wpis (18), `czytanka_v23.zip`.
+
+Dane techniczne wycofanego pliku: `WWM_Czytanka_PL_v19.zip`, 6 597 845 B,
+SHA-256 `fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
+zestaw `przetlumaczone`, płeć `oba`. Zawartość:
 
 | plik | bajtów | przetłumaczone / wszystkich |
 |---|---:|---:|
@@ -3292,3 +3299,23 @@ zestaw `przetlumaczone`, płeć `oba` (jak v18). Zawartość:
 
 Budowa: `buduj_czytanki.py --indeks index --magazyn tlumaczenie --wersja 19`.
 Wgrana na Dysk (id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`), obok łatki v0.6.0.
+
+## 2026-11-20 (18) — Czytanka v23 (właściwy generator) na Dysku
+
+Poprawka po wpisie (17). Wydanie **`czytanka_v23.zip`** z
+`tools/czytanka_czysta.py` (13 plików: `01` w 8 częściach, `02` w 4
+częściach, `README.md`; numeracja i nazwy plików części jak w v22).
+
+- rozmiar: 9 091 949 B, SHA-256
+  `c434325307213d4517b443b66bdc7a0e25bfad7e458e2e11e8303ffe1d3d0eb2`;
+- na Dysku jako `czytanka_v23.zip` (id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`)
+  — nazwa bez przedrostka `WWM_`, jak v21/v22;
+- liczniki z budowy: **75 328** jednostek, **30 986** kwestii PL,
+  **112 057** reszta (v21: 91 441 — wzrost o 20 616 po domknięciu grupy
+  barks do 12 000 m i kwestii bez pozycji), zbiory 1020, pamiątki 120,
+  POI 2949 (368 z dialogiem), 0 pominiętych.
+
+Podział `02` zmienił się z 3 na **4 części** (sekcje przestały mieścić się
+w limicie). Wniosek na przyszłość: numer czytanki ustalać z Dysku
+(`name contains 'czytanka'`) i z `docs/WERSJE_CZYTANKI.md`, a nie z pamięci
+sesji; budować wyłącznie `tools/czytanka_czysta.py`.

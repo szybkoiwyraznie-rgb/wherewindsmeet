@@ -49,10 +49,14 @@ właściciela (folder pakietów, id `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`):
 https://drive.google.com/file/d/1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu/view
 Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
 (styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
-Obok leży **Czytanka v19** (`WWM_Czytanka_PL_v19.zip`, 6 597 845 B,
-SHA-256 `fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
-id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`): epizody 75 127/167 500,
-kontekst scen 58 464/97 686, dodatkowe 127 975/455 592.
+Obok leży **Czytanka v23** (`czytanka_v23.zip`, 9 091 949 B, SHA-256
+`c434325307213d4517b443b66bdc7a0e25bfad7e458e2e11e8303ffe1d3d0eb2`,
+id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`) — `tools/czytanka_czysta.py`,
+`01` w 8 częściach, `02` w 4 częściach: 75 328 jednostek, 30 986 kwestii PL.
+**Ostatnia czytanka przed nią to v22** (`czytanka_v22.zip`, id
+`1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`). Czytanki NIE buduje się
+`buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
+numer wersji ustalać z tego pliku, nie z pamięci sesji.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
