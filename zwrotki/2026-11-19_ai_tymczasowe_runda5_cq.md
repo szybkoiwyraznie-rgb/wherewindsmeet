@@ -169,7 +169,7 @@
 — 34.
    klucz: ebd45ddb47c86019
    EN: Go to Bustling Abode
-   PL: Udaj się do Gwarny Przybytek
+   PL: Udaj się do Gwarnego Przybytku
 
 — 35.
    klucz: ebdd9f91f8e939d8
