@@ -10,12 +10,12 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | pierścień | kwestii razem | przetłumaczone | pozostało | pokrycie |
 |---|---:|---:|---:|---:|
 | ≤200 m | 384 | 384 | 0 | 100% |
-| ≤400 m | 1372 | 1063 | 309 | 77.5% |
-| ≤800 m | 3596 | 1213 | 2383 | 33.7% |
-| ≤1000 m | 4523 | 1223 | 3300 | 27.0% |
-| ≤1600 m | 5952 | 1240 | 4712 | 20.8% |
-| ≤3200 m | 6832 | 1257 | 5575 | 18.4% |
-| ≤6400 m | 9097 | 1268 | 7829 | 13.9% |
+| ≤400 m | 1372 | 1372 | 0 | 100% |
+| ≤800 m | 3596 | 2013 | 1583 | 56,0% |
+| ≤1000 m | 4523 | 2023 | 2500 | 44,7% |
+| ≤1600 m | 5952 | 2040 | 3912 | 34,3% |
+| ≤3200 m | 6832 | 2057 | 4775 | 30,1% |
+| ≤6400 m | 9097 | 2068 | 7029 | 22,7% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -26,20 +26,25 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | partia | kwestii | zakres | plik zwrotki | import |
 |---|---:|---|---|---|
 | `barks_start_aa` | 60 | ≤200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aa.md` | 60/60, 0 odrzuceń |
-| `barks_start_ab` | 170 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ab.md` | 170/170, 0 odrzuceń |
-| `barks_start_ac` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ac.md` | 200/200, 0 odrzuceń |
-| `barks_start_ad` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ad.md` | 200/200, 0 odrzuceń |
-| `barks_start_ae` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ae.md` | 200/200, 0 odrzuceń |
-| `barks_start_af` | 200 | ≤1000 m (kolejność odległości) | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_af.md` | 200/200, 0 odrzuceń |
+| `barks_start_ab` | 170 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ab.md` | 170/170, 0 odrzuceń |
+| `barks_start_ac` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ac.md` | 200/200, 0 odrzuceń |
+| `barks_start_ad` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ad.md` | 200/200, 0 odrzuceń |
+| `barks_start_ae` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ae.md` | 200/200, 0 odrzuceń |
+| `barks_start_af` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_af.md` | 200/200, 0 odrzuceń |
+| `barks_start_ag` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ag.md` | 200/200, 0 odrzuceń |
+| `barks_start_ah` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ah.md` | 200/200, 0 odrzuceń |
+| `barks_start_ai` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ai.md` | 200/200, 0 odrzuceń |
+| `barks_start_aj` | 200 | ≤1000 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aj.md` | 200/200, 0 odrzuceń |
 
-Razem w pierścieniu ≤1000 m: **1030 kwestii** (60 + 170 + 200×4).
-Pierścień ≤200 m jest **domknięty w 100%**, ≤400 m w 77,5%.
+Razem w pierścieniu ≤1000 m: **2 030 kwestii** (60 + 170 + 200×9).
+Pierścienie **≤200 m i ≤400 m są domknięte w 100%** — cały obowiązkowy
+promień z polecenia właściciela ma przekład.
 
-Magazyn po partii `af`: **140 683** przekłady (28,74%). Przekład AI-tymczasowy,
+Magazyn po partii `aj`: **141 483** przekłady (28,90%). Przekład AI-tymczasowy,
 bez testu w grze.
 
-Po każdej partii lista robocza topnieje: 4270 → 3900 (`ac`) → 3700 (`ad`)
-→ 3500 (`ae`) → **3300** kluczy (`af`).
+Po każdej partii lista robocza topnieje: 4270 → 3900 (`ac`) → … → 2500 kluczy
+(`aj`), czyli w promieniu 1000 m ubyło 1770 kwestii.
 
 ## Jak kontynuować
 

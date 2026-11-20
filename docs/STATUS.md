@@ -27,9 +27,10 @@ zbudować łatkę `v0.6.0` z magazynu, potem domknąć nazwy Compendium (486)
 i wybrane sceny pierwszej prowincji. Geograficznie da się te kwestie zawęzić: **10 683 z 11 369** mają pozycję
 w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 384,
 ≤400 m — 1 372, ≤800 m — 3 596, ≤1 000 m — 4 523, ≤1 600 m — 5 952. Partie:
-60 najbliższych (`barks_start_aa`), 170 kolejnych (`ab`) i cztery partie po 200
-(`ac`–`af`) — razem **1 030 kwestii** z pierścienia ≤1 000 m, magazyn **140 683**
-(28,74%), 0 odrzuceń. Pierścień ≤200 m domknięty w 100%, ≤400 m w 77,5%.
+60 najbliższych (`barks_start_aa`), 170 kolejnych (`ab`) i dziewięć partii po 200
+(`ac`–`aj`) — razem **2 030 kwestii** z pierścienia ≤1 000 m, magazyn **141 483**
+(28,90%), 0 odrzuceń. **Pierścienie ≤200 m i ≤400 m są domknięte w 100%**
+(obowiązkowy promień z polecenia właściciela), ≤1 000 m w 44,7%.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
