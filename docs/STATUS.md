@@ -41,8 +41,14 @@ a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
 **cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
 — w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
 Magazyn **151 045** (**30,85%**). Z magazynu zbudowano gotową łatkę
-`dist/WWM_Latka_PL_v0.6.0.zip` (151 389 kluczy, 12,6 MB) — podmienia teksty
-w grze (`one_click_patch.py --tylko-magazyn --wydanie v0.6.0`); nie testowana w grze.
+**`WWM_Spolszczenie_PL_v0.6.0.zip`** (12 583 642 B, 151 389 kluczy:
+151 045 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
+odłożonych; SHA-256 `5ae03530fa9cf1178ee7016715a8fb844f254becd724b45b052deee09146c2ee`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.6.0`. Wgrana na Dysk
+właściciela (folder pakietów, id `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`):
+https://drive.google.com/file/d/1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu/view
+Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
+(styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

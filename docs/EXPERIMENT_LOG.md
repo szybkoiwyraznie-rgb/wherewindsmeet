@@ -3260,3 +3260,19 @@ narzędzie nie liczy). Lista robocza: `dist/region_bez_pozycji.txt`.
 
 Poza zakresem pozostają: teksty bez relacji do `spaces.*`, sceny zadań
 i kity ambientowe (te ostatnie były robione wcześniej osobnymi partiami).
+
+## 2026-11-20 (16) — łatka v0.6.0 na Dysku
+
+Wydanie **`WWM_Spolszczenie_PL_v0.6.0.zip`**: 12 583 642 B, SHA-256
+`5ae03530fa9cf1178ee7016715a8fb844f254becd724b45b052deee09146c2ee`,
+151 389 kluczy w planie (151 045 przekładów + 670 bliźniaków `__grey`;
+326 wariantów płci, 770 kolizji odłożonych, 141 052 wpisy `en_jednoznaczne`).
+Zbudowana `one_click_patch.py --tylko-magazyn --wydanie v0.6.0`, 12 plików
+w ZIP (patcher standalone + `plan_latki.json`, zero binarek gry).
+Wgrana na Dysk do folderu pakietów (`1-4nTF4G5ZbwjuHMNsQ6_fxFuhcyXNI9k`),
+id pliku `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`.
+
+Powód osobnego wpisu: pierwsza próba wydania trafiła do `dist/` pod nazwą
+`WWM_Latka_PL_v0.6.0.zip` i **nie została wgrana na Dysk** — właściciel nie
+mógł jej znaleźć. Wydania instalowalne zawsze nazywać `WWM_Spolszczenie_PL_v*.zip`
+i po zbudowaniu wgrywać na Dysk (krok „build” nie obejmuje uploadu).
