@@ -2629,3 +2629,9 @@ Każdy import z próbą `--na-sucho`: 80 nowych, 0 odrzuconych. Początkowy
 wpis STATUS o 560/1 815 był błędny — sześć partii to 480, brak 1 335.
 Uzupełniono korekty językowe `ge` i `gf`; to nadal przekład AI-tymczasowy,
 bez weryfikacji w grze. Kolejny krok: partia `gg`.
+
+**Runda 7, ciąg dalszy: 960 z 1 815.** Partie `gg`–`gl`, każda po
+80 (magazyn 134 878 → **135 358**). Przed każdym importem próba
+`--na-sucho`: 80 nowych, 0 odrzuconych; importy również bez odrzuceń.
+Postęp według odłożonej listy bazowej: **855** kluczy pozostaje. Przekład
+AI-tymczasowy; brak weryfikacji w grze. Następny krok: partia `gm`.

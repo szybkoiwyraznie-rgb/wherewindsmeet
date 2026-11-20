@@ -40,7 +40,7 @@ tabele całomapowe dopiero na żądanie.
 Lista kluczy jest reprodukowalna: `tools/lista_rundy7.py` (kolejność:
 zadanie → scena → kwestia; identyfikatory wariantów płci zwijane do klucza
 bazowego przez `indeks.warianty`). Razem **1 815** kluczy; zrobione
-**480** (partie `ga`–`gf`, magazyn **134 878**). Zostało 1 335.
+**960** (partie `ga`–`gl`, magazyn **135 358**). Zostało 855.
 Konwencja nazw obowiązująca w dialogach: 墨门 → „Szkoła Moistów”,
 墨山道 → „Szkoła Mo”/„Szkoła Moistów”, 巨子 → „Wielki Mistrz” (żeńsko
 „Wielka Mistrzyni”), 长老 → „starszy”/„starsza”, 兼爱 → „powszechna
