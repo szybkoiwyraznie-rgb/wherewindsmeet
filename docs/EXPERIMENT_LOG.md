@@ -3339,3 +3339,32 @@ w środku `README.md` + `sceny.zip` (20 216 236 B) + `cutsceny.zip`
   „Pakiet «czysty»”;
 - pierwsza próba tej sesji (bez filtra) dała 46 744 645 B ze wpisami AI
   w środku — odrzucona, nie wgrana.
+
+## 2026-11-20 (20) — pakiet „tylko AI” do weryfikacji (v6-AI) na Dysku
+
+`paczka_ai_weryfikacja_v6.zip`: 6 114 134 B, SHA-256
+`b2ee61521f100adda3f57846d5249575c7471ffe1d48a219ae374a654389e0d5`,
+na Dysku (id `1Hg07p-PChOjOOsZ83ne-yb0K5tzpPz0R`). Zawiera **wyłącznie**
+36 577 miejsc `PL:` wypełnionych szkicem AI (zero przekładów tłumacza):
+
+| część | elementów | wpisów `PL:` (AI) |
+|---|---:|---:|
+| `sceny.zip` | 27 471 | 15 347 |
+| `cutsceny.zip` | 1 241 | 917 |
+| `widoki.zip` | 20 495 | 20 313 |
+
+Budowa: magazyn przycięty do 36 932 kluczy z `zwrotki/*ai_tymczasowe*.md`
+(382 pliki) → `buduj_paczke.py --tylko-sloty dist/ai_slots.txt
+--tlumaczenie /tmp/mag_ai --wypelnij-pl --bez-zip`, potem własny `README.md`
+i złożenie ZIP-a w układzie jak pakiet pełny. Kontrola: 36 577 linii `PL:`,
+**0 pustych**, 12 z znakami chińskimi (glify cytowane w treści: 莒, 官, 武德司,
+乌皮, 合先生 + placeholdery `{数量}`, `[对方姓名]`).
+
+Rozkład rund AI: `barks_start` 11 392, `runda5` 6 137, `runda6` 5 229,
+`runda4` 2 466, `runda2` 1 211, `runda7` 979, `runda3` 620, `wspomnienia` 507,
+`hexi` 424, `compendium` 322, `runda1` 310, resztę drobne partie.
+
+Ustalenie jakościowe do decyzji właściciela: wczesne rundy (encyklopedia, księgi)
+mają kalki i wtrącenia angielskie („DO PANIE OF QINGHE…", „Heroes Assembly",
+„Lone Cloud") — nadają się do przepisania, nie do poprawiania; partie
+`barks_start` są jednolite terminologicznie (późniejsze, z `pl_nazwy_hasel`).

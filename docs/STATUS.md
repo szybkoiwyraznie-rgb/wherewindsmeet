@@ -64,6 +64,10 @@ Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
 Dla tłumacza leży **pakiet v6** (`paczka_dla_tlumacza_wwm_v6.zip`,
 45 432 646 B, id `1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`): 423 507 miejsc PL,
 114 067 przekładów tłumacza, **bez tymczasowych wpisów AI**.
+Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v6.zip`,
+6 114 134 B, id `1Hg07p-PChOjOOsZ83ne-yb0K5tzpPz0R`): 36 577 miejsc `PL:`
+wypełnionych wyłącznie szkicem AI (36 932 klucze z 382 plików
+`ai_tymczasowe`), do weryfikacji/przepisania przez tłumacza.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

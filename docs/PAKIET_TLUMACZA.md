@@ -472,3 +472,22 @@ python3 tools/buduj_paczke.py --indeks index --wyj dist --wersja 6 \
 
 Efekt: 36 932 klucze AI odfiltrowane, w pakiecie **114 067** przekładów
 tłumacza (v5: 114 053 + późniejsze zwrotki tłumacza).
+
+## Pakiet „tylko AI” do weryfikacji (v6-AI)
+
+Odmiana pakietu dla tłumacza: **wyłącznie** wpisy tymczasowe AI, żeby dało się
+je przejrzeć/przepisać bez przewijania 77 tys. przekładów tłumacza.
+
+```bash
+# 1. magazyn tylko z kluczami AI (analogicznie jak filtr „czysty”, odwrotnie)
+# 2. lista slotów: dist/ai_slots.txt (36 932 klucze)
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_ai --wersja 1 \
+    --data 2026-11-20 --tlumaczenie /tmp/mag_ai --tylko-sloty dist/ai_slots.txt \
+    --wypelnij-pl --bez-zip
+# 3. własny README + złożenie ZIP-a (README.md + sceny.zip + cutsceny.zip + widoki.zip)
+```
+
+Wydanie: `paczka_ai_weryfikacja_v6.zip` (6 114 134 B, 36 577 miejsc `PL:`).
+Uwaga: README z `--tylko-sloty` opisuje „pakiet uzupełniający po aktualizacji”
+— dla tego wydania trzeba je **zastąpić własnym**, inaczej tłumacz dostanie
+instrukcję „do wpisania: 0 linii”.
