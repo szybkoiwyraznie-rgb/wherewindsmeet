@@ -2719,3 +2719,12 @@ nie wskazuje braków; nie obejmuje pozostałych tekstów zadań. Po imporcie
 ujednolicono w sześciu kwestiach nazwy miejsc i Studni Niebios, również
 po kontroli suchej. Skan 57 wierszy PL bez CJK i nie-NFC. Kontrola
 repozytorium OK (611 wpisów), 623 testy OK, bez weryfikacji w grze.
+
+**Wieści, list i pojedynek (`hs`):** 36 nowych kluczy, magazyn 137 347
+przekładów i 489 544 miejsca (28,06%). Po pierwszej próbie na sucho
+odrzucono jeden wpis (`894f347d941f8e2f`) z brakującymi tokenami podwójnego
+backslasha. Po poprawieniu trzy tokeny zachowano; ponowna próba i import
+bez odrzuceń. Sonda dostępnych bazowych kluczy scen grup 5173, 5188, 5189,
+5192 i 5278: 0 braków, bez stwierdzenia kompletności wszystkich tekstów
+tych zadań. Skan 36 linii PL bez CJK i nie-NFC; `check_repository.py` OK
+(612 wpisów), 623 testy OK. Brak testu w grze.
