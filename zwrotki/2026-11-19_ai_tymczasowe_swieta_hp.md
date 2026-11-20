@@ -144,7 +144,7 @@
 — 29.
    klucz: f70feb9c194c1510
    EN: Oh, and don't forget the Spring Parade in Qinghe or the Spring Festival's Eve fireworks over at Revelry Hall! You won't want to miss a thing!
-   PL: Oprócz tego są jeszcze wiosenny pochód w Qinghe i sylwestrowe fajerwerki nad Pawilonem Rozkoszy. Niczego nie można przegapić!
+   PL: Oprócz tego są jeszcze wiosenny pochód w Qinghe i sylwestrowe fajerwerki nad Fanlou. Niczego nie można przegapić!
 
 — 30.
    klucz: ccd62724df8ce21a
@@ -174,7 +174,7 @@
 — 35.
    klucz: 7e7f37492b029335
    EN: Someone told me Revelry Hall is having a fireworks show. I came for the excitement.
-   PL: Słyszałem, że ostatnio w Pawilonie Rozkoszy odbywa się pokaz fajerwerków. Przyszedłem się rozerwać.
+   PL: Słyszałem, że ostatnio w Fanlou odbywa się pokaz fajerwerków. Przyszedłem się rozerwać.
 
 — 36.
    klucz: 2a726e68cc58477c
@@ -184,7 +184,7 @@
 — 37.
    klucz: bb8fa85d5d42202b
    EN: The Velvet Shade's Fireworks Show is in full swing these days. From the Spring Festival's Eve to the 5th Day in Zhengyue, come by at night.
-   PL: W Aksamitnym Cieniu rzeczywiście odbywa się pokaz fajerwerków. Przyjdź nocą, od sylwestra do piątego dnia pierwszego miesiąca.
+   PL: W Upojnym Cieniu rzeczywiście odbywa się pokaz fajerwerków. Przyjdź nocą, od sylwestra do piątego dnia pierwszego miesiąca.
 
 — 38.
    klucz: 53aa075ea15993d1
@@ -204,7 +204,7 @@
 — 41.
    klucz: 289daa46197fb1a2
    EN: Then there was this huge crash, and a big man came running out, but the beauty vanished. People are saying someone broke into Velvet Shade and kidnapped the pipa beauty. It's caused quite a stir.
-   PL: Rozległ się wielki huk i wybiegł jakiś wielkolud, a piękność zniknęła. Ludzie mówią, że ktoś włamał się do Aksamitnego Cienia i ją porwał. Wszyscy o tym rozmawiają.
+   PL: Rozległ się wielki huk i wybiegł jakiś wielkolud, a piękność zniknęła. Ludzie mówią, że ktoś włamał się do Upojnego Cienia i ją porwał. Wszyscy o tym rozmawiają.
 
 — 42.
    klucz: 2e0cd0b1e4e7c81d
@@ -234,7 +234,7 @@
 — 47.
    klucz: e8becee583b0fb53
    EN: You again? On the first day, you asked if I was from Revelry Hall... Did you do something there?
-   PL: Znowu ty. Pierwszego dnia pytałeś, czy jestem z Pawilonu Rozkoszy. Czy coś tam zrobiłeś?
+   PL: Znowu ty. Pierwszego dnia pytałeś, czy jestem z Fanlou. Czy coś tam zrobiłeś?
 
 — 48.
    klucz: e0936edc04712a3d
@@ -284,7 +284,7 @@
 — 57.
    klucz: bdd686df321f34aa
    EN: I'm He Wanchun! I only went to Revelry Hall to bring some festive cheer... nothing more!
-   PL: Nazywam się He Wanchun! Poszedłem do Pawilonu Rozkoszy, żeby wnieść trochę świątecznej radości. Niczego więcej nie zrobiłem!
+   PL: Nazywam się He Wanchun! Poszedłem do Fanlou, żeby wnieść trochę świątecznej radości. Niczego więcej nie zrobiłem!
 
 — 58.
    klucz: 6d7b819259879309

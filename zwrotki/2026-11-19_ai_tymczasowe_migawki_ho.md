@@ -289,7 +289,7 @@
 — 58.
    klucz: 1e6d34c870ad221f
    EN: The storybooks say Kaifeng's Revelry Hall is, like, super fun! They have beautiful music and dancing, and the grandest Heroes Assembly in all the jianghu!
-   PL: W książkach piszą, że Pawilon Rozkoszy w Kaifengu jest wspaniały! Są tam piękne tańce i pieśni oraz największe w jianghu zgromadzenie bohaterów!
+   PL: W książkach piszą, że Fanlou w Kaifengu jest wspaniały! Są tam piękne tańce i pieśni oraz największe w jianghu zgromadzenie bohaterów!
 
 — 59.
    klucz: 97211e7da1e91db1
