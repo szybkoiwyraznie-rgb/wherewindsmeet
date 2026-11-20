@@ -3175,3 +3175,19 @@ i wątek „kwiatów Buddy”, wioska Fuma i konie, targ Qingzhou i Sala
 Atramentu, sekta Kuchennego Noża, bandyci ukryci w jaskiniach, cytaty
 z klasyków i inskrypcji. **Pierścienie do 3 200 m — cały obszar wczesnej
 gry w promieniu dobrego kwadransa marszu — mają pełny przekład.**
+
+## 2026-11-20 (12) — pierścień ≤6 400 m: partie `bk`–`bl`
+
+Dwie partie po 150 (najdalszy pierścień), 0 odrzuceń, `PL:` bez CJK.
+Magazyn 146 258 → **146 558** (29,94%); ≤6 400 m: 7 143/9 097 (78,5%),
+zostało 1 954. Lista robocza 2 254 → 2 104 → **1 954**.
+
+Treść: „otwarcie gór” i przystań ludu za górami (kult Bogini, sny
+o Krainie Brzoskwiniowego Źródła), Miasto Mo i Droga Gór Atramentu
+(mechanika, zegar wodny, „Gazeta Miasta Mo”), cytaty z Mistrza Mo
+i inskrypcji, robotnicy i rzemieślnicy.
+
+**Uwaga o skali:** pierścienie obejmują 10 683 z 11 369 kwestii grupy.
+Po domknięciu ≤6 400 m zostaje 1 586 kwestii w odległości 6 400–11 085 m
+oraz ok. 686 bez pozycji w świecie — „całość” wymaga jeszcze osobnej decyzji
+o tych dwóch zbiorach.

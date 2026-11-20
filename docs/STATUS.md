@@ -34,8 +34,8 @@ w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 
 (<400 m) i preferencyjny (<1 000 m) z polecenia właściciela ma przekład;
 pierścień ≤1 600 m domknięty w 100% (5 952/5 952, partie `ax`–`bd`),
 pierścień ≤3 200 m domknięty w 100% (6 832/6 832, partie `be`–`bj`);
-zostaje najdalszy próg ≤6 400 m: 6 843/9 097 (75,2%), zostało 2 254.
-Magazyn **146 258** (29,88%).
+zostaje najdalszy próg ≤6 400 m: 7 143/9 097 (78,5%), zostało 1 954
+(partie `bk`–`bl`). Magazyn **146 558** (29,94%).
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

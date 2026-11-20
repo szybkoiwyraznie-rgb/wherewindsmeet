@@ -15,7 +15,7 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | ≤1000 m | 4523 | 4523 | 0 | **100%** |
 | ≤1600 m | 5952 | 5952 | 0 | **100%** |
 | ≤3200 m | 6832 | 6832 | 0 | **100%** |
-| ≤6400 m | 9097 | 6843 | 2254 | 75,2% |
+| ≤6400 m | 9097 | 7143 | 1954 | 78,5% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -61,6 +61,8 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_bh` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bh.md` | 150/150, 0 odrzuceń |
 | `barks_start_bi` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bi.md` | 150/150, 0 odrzuceń |
 | `barks_start_bj` | 113 | ≤3200 m — **domknięcie** | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bj.md` | 113/113, 0 odrzuceń |
+| `barks_start_bk` | 150 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bk.md` | 150/150, 0 odrzuceń |
+| `barks_start_bl` | 150 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bl.md` | 150/150, 0 odrzuceń |
 
 Razem w pierścieniu ≤1 000 m: **4 330 kwestii** w partiach `aa`–`aw`
 (60 + 170 + 10 × 200 + 8 × 200 + 203 + 97) plus 193 kwestie przetłumaczone
@@ -70,9 +72,9 @@ Pierścienie **≤200 m, ≤400 m, ≤800 m i ≤1 000 m są domknięte w 100%**
 Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
 (<1 000 m) oraz ≥ piersień ≤1 600 m (5 952/5 952) mają pełny przekład.
 Pierścień **≤3 200 m domknięty w 100%** (6 832/6 832). Zostaje najdalszy
-próg ≤6 400 m: 6 843/9 097 (75,2%), zostało 2 254 — poza wczesną grą.
+próg ≤6 400 m: 7 143/9 097 (78,5%), zostało 1 954.
 
-Magazyn po partii `bj`: **146 258** przekładów (29,88%). Przekład AI-tymczasowy,
+Magazyn po partii `bl`: **146 558** przekładów (29,94%). Przekład AI-tymczasowy,
 bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)
@@ -100,3 +102,7 @@ poprzednia, bez ręcznego śledzenia numerów.
 - Odległość od startu to przybliżenie „co gracz zobaczy najpierw”, nie kolejność fabuły.
 - Część kwestii występuje w kilku scenach; do pierścienia trafia najbliższe wystąpienie.
 - 709 kwestii bez pozycji wymaga innego klucza (np. `trap`, `entity`) albo danych z bazy gry.
+- Pierścienie pokrywają 10 683 z 11 369 kwestii grupy: po domknięciu ≤6 400 m
+  zostaje jeszcze **1 586 kwestii dalszych niż 6 400 m** (do 11 085 m) oraz
+  ok. **686 bez pozycji** — to nie „koniec całości”, tylko koniec geografii
+  wokół startu gry.
