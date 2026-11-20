@@ -48,9 +48,11 @@ zaimportowanych przekładów; są AI-tymczasowe, nie zostały sprawdzone w grze.
 Dodatkowo `gm` uzupełnia **19** braków scen zadań głównych grupy 1
 (pierwszy rozdział); sonda po powiązaniach `zadania_sceny` zwróciła
 665 kluczy bazowych tej grupy, z których przed importem brakowało 19.
-Magazyn **135 377**. Dalsza praca: indywidualna selekcja wczesnej gry
-(np. nazwy i instrukcje Compendium dotyczące podstaw), nie hurtowy import
-całych tabel ani dalsze podążanie za filtrem przestrzeni.
+Następnie `gn` uzupełnia **25** ręcznie wybranych nazw i instrukcji
+Compendium dotyczących podstaw ruchu, celowania i walki (dostępność każdego
+hasła na samym początku nie została sprawdzona w grze). Magazyn **135 402**.
+Dalsza praca: indywidualna selekcja wczesnej gry, nie hurtowy import całych
+tabel ani dalsze podążanie za filtrem przestrzeni.
 
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →

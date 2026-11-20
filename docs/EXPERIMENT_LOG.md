@@ -2647,3 +2647,10 @@ Osobna sonda po scenach zadań głównych grupy 1: 665 różnych kluczy
 bazowych, 19 braków przed importem. Partia `gm`: +19, 0 odrzuconych;
 magazyn **135 377**. Lokalnie `run_tests.py`: **623 testy OK** po `gl`;
 `check_repository.py`: OK (580 wpisów indeksu) po `gm`. Bez testu w grze.
+
+**Compendium, podstawy (`gn`).** Ręcznie wybrano 25 nazw i instrukcji
+ruchu, celowania i walki z `guider_tujian_data`; próba na sucho i import:
+25 nowych, 0 odrzuconych, magazyn **135 402**. Nie jest to import całej
+tabeli; nie potwierdzono w grze momentu udostępnienia każdego hasła.
+Po tej partii: `run_tests.py` **623 testy OK**, `check_repository.py` OK
+(581 wpisów indeksu). Przekład AI-tymczasowy.
