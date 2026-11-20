@@ -2813,3 +2813,11 @@ bazowych kluczy i 0 braków, bez gwarancji pokrycia całej ćwiartki fabuły.
 nie należy przypisywać całej tabeli wczesnemu Compendium. Import i próba
 sucha bez odrzuceń, skan 38 pozycji OK, 623 testy i kontrola repozytorium
 OK (642 wpisy). Przekład AI-tymczasowy, bez testu w grze.
+
+**Compendium — właściwy zakres (`ix`–`iz`):** 44 + 28 + 27 = 99 nowych
+przekładów podstaw towarzyszy, leczenia, walki i eksploracji. Po imporcie
+`guider_tujian_data` 216/1 524, 1 308 braków (wg głównego źródła kluczy);
+bez potwierdzenia momentu odblokowania poszczególnych haseł w grze. Próby
+suche, importy i poprawki bez odrzuceń; skan 99 bez CJK, nie-NFC i miękkich
+dywizów, liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
+repozytorium OK (645 wpisów). Przekład AI-tymczasowy, bez testu w grze.

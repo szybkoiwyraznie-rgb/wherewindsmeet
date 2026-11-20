@@ -3,6 +3,16 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
+**Najnowsze — Compendium `ix`–`iz` (2026-11-19):** 99 nowych
+przekładów (44 + 28 + 27), przede wszystkim podstawy walki, eksploracji,
+towarzyszy i leczenia. `guider_tujian_data`: **216/1 524**, **1 308 braków**
+(po głównym źródle klucza); nie zakładać, że wszystkie pozostałe hasła są
+widoczne na początku. Moment odblokowania wybranych pozycji nie został
+zweryfikowany w grze. Importy po próbach suchych bez odrzuceń; skan 99
+pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów wierszy zgodna
+ze źródłem. **623 testy OK**, kontrola repozytorium OK (645 wpisów).
+Przekład AI-tymczasowy, bez testu w grze.
+
 **Sprostowanie zakresu i stan (2026-11-19):** właściciel wskazał, że
 wcześniej zaproponowano sceny wczesnego wątku głównego oraz 1 516 braków
 `guider_tujian_data`, a nie tłumaczenie całej gry. Odpowiedź odnosząca się
