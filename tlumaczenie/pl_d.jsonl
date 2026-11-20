@@ -8192,6 +8192,7 @@
 {"k": "df65a812ed51b309", "pl": "Jedno cięcie jianghu III"}
 {"k": "df65a92f0d00517a", "pl": "Ot tak, na wszelki wypadek."}
 {"k": "df6626e756b736b6", "pl": "Renzhong huang"}
+{"k": "df6678e9ca15d4a1", "pl": "Siła wewnętrzna"}
 {"k": "df66dc5e10ba77aa", "pl": "Kołnierz zakładany"}
 {"k": "df68adc14a91b274", "pl": "Podróże poza górami, część III"}
 {"k": "df68d5724b09000c", "pl": "Góra, wzór i koraliki (L)"}
@@ -8252,6 +8253,7 @@
 {"k": "df8893e7f7ccf9c8", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Powrót Jaskółki lub Zastygła Rzeka (st. 31) w jakości niebieskiej lub fioletowej. Polecany dla ścieżki #YŁamanie Bambusa: Wiatr#E."}
 {"k": "df88ae66a081fe97", "pl": "Skoro o to pytasz… pewnie Święto Kwiatów jeszcze przed tobą, co?"}
 {"k": "df88d2c645bb33e8", "pl": "Cao Guangli"}
+{"k": "df897da6e02ecd30", "pl": "9"}
 {"k": "df89a75dbcaea052", "pl": "Ukryci mistrzowie"}
 {"k": "df89ba5b31777cb2", "pl": "890 r. "}
 {"k": "df89f0d146aa1424", "pl": "%s przenosi się do pozycji towarzysza z #YCyclone Spin#E"}
@@ -8271,7 +8273,9 @@
 {"k": "df91d61b76fb6628", "pl": "Gapie"}
 {"k": "df9294f4d7b99038", "pl": "Obszar walki z elitą na dolnym poziomie"}
 {"k": "df92e7a0832cf525", "pl": "Parasol z papieru olejowanego, wytworny i misterny, lekki, a zarazem mocny.\nNa czaszy namalowano rozkwitłe kwiaty czerwonej śliwy, a w ukrytym miejscu rączki wyryto drobne znaki: “Warsztat Parasoli Dziewięciu Nurtów”."}
+{"k": "df930711c7d823df", "pl": "Ostatnio widziany w"}
 {"k": "df94e1c3222160e5", "pl": "Nie wiadomo czemu, na jego widok w uszach cicho brzmi: “Kto to rozumie, rodzinko…”"}
+{"k": "df94ebf025293f84", "pl": "Zasoby cząsteczek dzielą się na dwie kategorie i osiem rodzajów. Zmiana wartości noffset w splendorze pozwala łączyć różne efekty cząsteczkowe"}
 {"k": "df960dbcd0d6380a", "pl": "Trzynasty Wielki Opiekun"}
 {"k": "df9617f2f99df85a", "pl": "Moc Kwiatu"}
 {"k": "df9660699c9fdea0", "pl": "Słabość Jedwabnej Nici odsłonięta"}
@@ -8289,9 +8293,11 @@
 {"k": "df9a37c4581ef02d", "pl": "Odbierz od wszystkich losy"}
 {"k": "df9b3d90393bc037", "pl": "Yan Mei"}
 {"k": "df9c5d674235dd6a", "pl": "Kupiec Li"}
+{"k": "df9d5cbb40da0d30", "pl": "Wypłać"}
 {"k": "df9d6f9d5083d78b", "pl": "Błogosławieństwa w Progu"}
 {"k": "df9da52e950687a8", "pl": "Ukryta Góra - przestrzeń rewanżu z Qianye"}
 {"k": "df9db879f1c4ff00", "pl": "Pływak robi się z całej, zdjętej w jednym kawałku koźlej skóry: nadmuchuje się ją do pełna, mocno zawiązuje otwory i przywiązuje pod pachami - tak można przeprawić się przez rzekę."}
+{"k": "df9dba72a367d9ab", "pl": "Zaznacz czerwone okręgi na mapie"}
 {"k": "df9e59e632f182ed", "pl": "Test Kaifeng: prefektura Kaifengu"}
 {"k": "df9e604af3092ab0", "pl": "Bezimienna tabliczka pamięci"}
 {"k": "df9ee4dc9be5ac80", "pl": "Imiona obok siebie"}
@@ -8331,6 +8337,7 @@
 {"k": "dfae1353b9dc3b5a", "pl": "Po użyciu otrzymasz Sławę bohatera “Wspólna Chwila w Jianghu”."}
 {"k": "dfb016fd8ebb0ffe", "pl": "Przebranie za wykładowcę sutr"}
 {"k": "dfb054a0aec65cc4", "pl": "Oddaj pracę"}
+{"k": "dfb0dc1931754d0f", "pl": "Odświeżane codziennie"}
 {"k": "dfb1465227c40a54", "pl": "Taniec Ognistej Ryby-Smoka"}
 {"k": "dfb1737a95a01a67", "pl": "Wybrano cel wyzwania"}
 {"k": "dfb1993af37056cf", "pl": "to mnie by serce bolało, moje skarby."}
@@ -8417,6 +8424,7 @@
 {"k": "dfd7a1204e67e5bf", "pl": "861 r. "}
 {"k": "dfd7d44de8c75911", "pl": "Guo Song"}
 {"k": "dfd8295cd683d452", "pl": "Śmierdzący dzban z rybą"}
+{"k": "dfd8619e09c3aaf4", "pl": "CCS został porzucony."}
 {"k": "dfd86eb10744dd8b", "pl": "Tuż za rzeką"}
 {"k": "dfd8e31544cecc94", "pl": "Po wypiciu wina zapadasz we wspomnienie…\n\nOjciec trzyma złotą czarkę, gotów podać wino.\nJeśli wino będzie dobre, może w nagrodę dostać złotą czarkę.\n\nWchodzi możny pan, w złym humorze. Widzi podane wino, nie pije, tylko roztrzaskuje je, wyładowując złość\nOjciec ze strachu upuszcza tacę\nMożny pan uspokaja się: Paskudne. Zabić.\n\nOjca wywlekają i zabijają, krew plami złotą czarkę na ziemi.\nPrzejście do złotej czarki leżącej na ziemi w rzeczywistości.\n\n"}
 {"k": "dfd96505f50163f2", "pl": "Hm…? Ktoś tu przekopywał ziemię? Ostatnim razem tak nie było."}
@@ -8459,11 +8467,13 @@
 {"k": "dfedd16102cb0637", "pl": "Tabliczka Urzędnika"}
 {"k": "dfeea35f859a0592", "pl": "Lu Changle"}
 {"k": "dfeecc1ce53b6c54", "pl": "Wojownik z jianghu"}
+{"k": "dfeee7f031c5fdea", "pl": "Życiowe doświadczenie"}
 {"k": "dfef6e3ff60cdfa0", "pl": "a jeszcze inni rabują…"}
 {"k": "dff00bc6878616da", "pl": "Gao Miaomiao"}
 {"k": "dff194e2b49010d1", "pl": "Parasol - Ochrona Guanyuan"}
 {"k": "dff1f411d8206a30", "pl": "Wang Zi"}
 {"k": "dff26090808f02a1", "pl": "Receptura: Stojak 2"}
+{"k": "dff2cac1df61a71e", "pl": "Poziom gospodarstwa"}
 {"k": "dff315218aa76444", "pl": "Szybujące Ostrze"}
 {"k": "dff363b7126c5c88", "pl": "Dziesięć dni przypływów"}
 {"k": "dff36bf308109703", "pl": "Księżyc Przesuwa Cienie Kwiatów"}
