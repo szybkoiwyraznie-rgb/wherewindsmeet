@@ -352,6 +352,7 @@
 {"k": "b0a779f473e3b68e", "pl": "Spróbuj otworzyć skrzynię Ćwierkaniem"}
 {"k": "b0a7826c7fa05b95", "pl": "Kopacz ziemi"}
 {"k": "b0a786a858394761", "pl": "Uwięzienie"}
+{"k": "b0a83e58a336bd0a", "pl": "Ojej! Muszę już iść! Szczęśliwego Nowego Roku, niech wszystko ci się uda! A ty zwiedź jeszcze ogród!"}
 {"k": "b0a8593cc7f17b4d", "pl": "Ekran nagród prób: Hexi"}
 {"k": "b0a85f737a2070f0", "pl": "Podpowiedź o oswajaniu"}
 {"k": "b0a8dcd0e620dfc8", "pl": "Umiejętność jazdy"}
@@ -775,6 +776,7 @@
 {"k": "b165c689667f0be9", "pl": "Jasne. Legendarny zabójca od sprawy w stacji Czystego Wiatru."}
 {"k": "b165d532819c2029", "pl": "Pierścień jue Błękitnych Obłoków"}
 {"k": "b165dbd3dae2906d", "pl": "[Ukryte] Ukryta Góra, Podziemia Boskiego Rzemiosła 05 — NPC — punkt 1"}
+{"k": "b165f3ca7bd69f21", "pl": "Robienie lalek do teatru cieni wymaga precyzji. Nie dałbym rady."}
 {"k": "b16606253aa25142", "pl": "Makijaż: Wołanie Jelenia w Poszukiwaniu Wiosny"}
 {"k": "b166630e3edb0f02", "pl": "Ech, i co, leczyliście się tam? Broń Boże! Ceny mają zbójeckie, żywcem skórę zdzierają!"}
 {"k": "b166a8c4ed17fd8e", "pl": "Miau Miau - Parkour na czas - Miasto Moistów"}
@@ -2253,6 +2255,7 @@
 {"k": "b433596bb4ebcd6b", "pl": "Złodzieja widziałem"}
 {"k": "b433673372d945a6", "pl": "Cai Caigu"}
 {"k": "b4336a3457a32a13", "pl": "Xiaofu poszła ratować brata Zhao; tyś tymczasem bezpieczny — przysiądź i pogwarz ze staruszką sprzedawczynią żółwi."}
+{"k": "b4336dcd921bd88b", "pl": "Wszelkiej pomyślności! Wędrowcze, chcesz zobaczyć łódź błogosławieństw?"}
 {"k": "b434214df7bb1bf0", "pl": "Woreczek na zioła"}
 {"k": "b434c1593d8cbd14", "pl": "Sytuacja jest straszna - cóż złego w szukaniu odrobiny pociechy?"}
 {"k": "b434c2b937259753", "pl": "Udaj się do pana Tuo"}
@@ -4731,6 +4734,7 @@
 {"k": "b8f23eef749cda0d", "pl": "Warownia 6 do warowni 3"}
 {"k": "b8f35e3dde110f38", "pl": "Ach… wodzu?! Ratujesz nas!"}
 {"k": "b8f368be8f8aa858", "pl": "Zapisy otwarte"}
+{"k": "b8f4b4f6692deee5", "pl": "Może mogę pomóc."}
 {"k": "b8f5778451100bc1", "pl": "Rozmawiaj ze staruszkiem"}
 {"k": "b8f604c5545f0d44", "pl": "Zatrzymują cię żołnierze straży urzędowej"}
 {"k": "b8f6bafe4c54a6f0", "pl": "Wzburzone Fale kochają wino nad życie, sami pijacy - nic z nich nie będzie. Posłałem Smoczemu Panu dzban Całej Rzeki Czerwonej, niech się Pan rozchmurzy."}
@@ -6139,6 +6143,7 @@
 {"k": "bb8ea2f98848481b", "pl": "Element zestawu: Płukany Kwiat, st. 91"}
 {"k": "bb8f335eaec7fa5b", "pl": "Jinshan"}
 {"k": "bb8f6c7145ccb820", "pl": "Kasza z tuszu szachowego, w której płynie światło mądrości. Nie wiadomo, jakie działanie przyniesie po zjedzeniu…"}
+{"k": "bb8fa85d5d42202b", "pl": "W Aksamitnym Cieniu rzeczywiście odbywa się pokaz fajerwerków. Przyjdź nocą, od sylwestra do piątego dnia pierwszego miesiąca."}
 {"k": "bb902dc56b2050e6", "pl": "List od Feng Ruzhi"}
 {"k": "bb90dddbbf2d4ae2", "pl": "Klan kotów"}
 {"k": "bb9126ed9991aae2", "pl": "Wspólne HP głowy i ręki"}
@@ -7376,6 +7381,7 @@
 {"k": "bdd55d220b888310", "pl": "Treser Koni"}
 {"k": "bdd5a12f6015bbf7", "pl": "Złożona Łamigłówka - Góra Ukrytego Księżyca - 2"}
 {"k": "bdd626b78b1cf2ac", "pl": "Cai Zhi pochodzi z Syczuanu i uczy swoich uczniów, lecz oni mówią, że jej nie rozumieją, bo ma akcent; ona jednak uważa, że jej mandaryński jest wzorowy."}
+{"k": "bdd686df321f34aa", "pl": "Nazywam się He Wanchun! Poszedłem do Pawilonu Rozkoszy, żeby wnieść trochę świątecznej radości. Niczego więcej nie zrobiłem!"}
 {"k": "bdd856e0f188983a", "pl": "Nefrytowy kielich"}
 {"k": "bdd8a7d38ad35d48", "pl": "8. dzień trzeciego miesiąca"}
 {"k": "bdd916c4269e81f6", "pl": "Twój wzrok mi przeszkadza."}
@@ -8514,6 +8520,7 @@
 {"k": "bfd8715592e3d099", "pl": "Żelazny miecz"}
 {"k": "bfd884d354daf942", "pl": "Moistowski patyczek rachunkowy"}
 {"k": "bfd8a862d011aec1", "pl": "“Nie wiem, skąd dobiega flet z trzciny, całą noc wędrowcy w wojsku tęsknią za domem.” Uschnięte pnącza, stare drzewa, połamane mury i ruiny, tylko trzcinowy dźwięk płynie. Dawny blask nie zostawił śladu, a pod podartym sztandarem leży nie wiadomo ilu wiernych."}
+{"k": "bfd95b179f20786b", "pl": "Zrobię z nich części łodzi, a ty własnoręcznie złożysz tutaj swoją łódź błogosławieństw!"}
 {"k": "bfd9664f0ce6df82", "pl": "Kawałek ciemnoczerwonego mięsa.\nLeżało tak długo, że jego rybia woń dawno zatęchła."}
 {"k": "bfd98bdfb6eca554", "pl": "Ozdobna lotka"}
 {"k": "bfd99c5ce571d559", "pl": "A jak ich znaleźć?"}
@@ -8575,6 +8582,7 @@
 {"k": "bff3804cc8ba2cde", "pl": "Spytaj Luo, czy to zrozumiał"}
 {"k": "bff38496c9bccf11", "pl": "Powiedz mi, dlaczego panna Qingge musiała umrzeć? "}
 {"k": "bff39f0d89b41dec", "pl": "Zestaw: Nieczuły na Chłód, poz. 100"}
+{"k": "bff4398d591825ec", "pl": "Co? Miałem na myśli, że możesz sam…"}
 {"k": "bff4af268fe4e409", "pl": "Herbaciarnia"}
 {"k": "bff51f761fac0aa3", "pl": "Ofiara dla Jelenia Nieśmiertelnego 3 (rozmowa z przechodniem)"}
 {"k": "bff674a7c900b6b9", "pl": "Zhao Ling"}
