@@ -134,6 +134,16 @@ import bez odrzuceń. Skan 583 pozycji: bez CJK i nie-NFC, liczba podziałów
 wierszy zgodna ze źródłem. **623 testy OK**, kontrola repozytorium OK
 (626 wpisów indeksu). Przekład pozostaje AI-tymczasowy, bez testu w grze.
 
+**Kontynuacja `ih`–`ik`:** 304 kolejne przekłady: Chudy Arhat i łatana
+szata (grupa 5240, 152) oraz trupa Dziurawej Kieszeni (5241, 152).
+Magazyn **138 664** przekłady, **489 544** miejsca (28,33%). Sonda scen
+tych grup: odpowiednio 170 i 163 klucze bazowe, bez braków. Nie oznacza to
+pełnego przekładu pozostałych tekstów zadań. Poprawiono też rodzaj Qingqinga
+we wcześniejszej wskazówce. Suche i właściwe importy bez odrzuceń; skan
+304 pozycji bez CJK i nie-NFC, podziały wierszy zgodne ze źródłem.
+**623 testy OK**, kontrola repozytorium OK (630 wpisów indeksu); przekład
+AI-tymczasowy, bez testu w grze.
+
 Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
 „Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
 „Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.

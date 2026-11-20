@@ -2757,3 +2757,13 @@ kompletności pozostałych tekstów zadań. Skan 583 pozycji bez CJK i nie-NFC,
 liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
 repozytorium OK (626 wpisów indeksu); przekład AI-tymczasowy, bez testu
 w grze.
+
+**Chudy Arhat i trupa (`ih`–`ik`):** 75 + 77 + 80 + 72 = 304 nowe
+przekłady, magazyn 138 664, 489 544 miejsc (28,33%). Partie i poprawki
+zaimportowano po kontrolach suchych, bez odrzuceń. Skorygowano też rodzaj
+Qingqinga we wcześniejszej wskazówce `b820160ff0cfda25`. Sonda dostępnych
+scen grup 5240 i 5241: odpowiednio 170 i 163 bazowe klucze, 0 braków;
+pozostałych tekstów zadań nie badano. Skan 304 linii bez CJK, nie-NFC
+i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem.
+623 testy i kontrola repozytorium OK (630 wpisów); AI-tymczasowe, bez
+testu w grze.
