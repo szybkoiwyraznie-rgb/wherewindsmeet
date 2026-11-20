@@ -2775,3 +2775,11 @@ i 5248: odpowiednio 116 i 98 kluczy, 0 braków. To nie jest sonda całych
 zadań. Skan 202 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
 podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
 (632 wpisy); przekład AI-tymczasowy, bez testu w grze.
+
+**Podarunek i zlecenia (`in`–`ip`):** 5 + 50 + 55 = 110 nowych
+przekładów, magazyn 138 976, 489 544 miejsc (28,39%). Suche i właściwe
+importy oraz poprawki bez odrzuceń. Sonda dostępnych scen grup 5246, 5017,
+5018, 5118, 5125–5129: 132 przypisania bazowych kluczy do grup i 0 braków,
+bez badania pozostałych tekstów zadań. Skan 110 pozycji bez CJK, nie-NFC
+i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem. 623 testy
+i kontrola repozytorium OK (635 wpisów); AI-tymczasowe, bez testu w grze.
