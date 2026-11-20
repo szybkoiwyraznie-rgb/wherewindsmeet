@@ -2583,3 +2583,10 @@ Poprawka przed importem: `6f5a345` — sztuczne łamanie w środku słowa
 (无名 „Bez\nimienny”, 限定 „Limito\nwany”) scalone do „Bez imienia”
 i „Limitowany”. Terminy: 牙行→dom pośrednictwa · 风华录→kolekcja
 wyglądów · 聚义厅→Sala Braterstwa · 段位→ranga · 侠客行→Wędrówka Rycerza.
+
+**Runda 6, ciąg dalszy: 4 157 z 5 229.** Partie `eu`–`ex` po 80
+(magazyn 132 926 → **133 246**, commit `dad78ea`). Importy bez odrzuceń.
+Poprawka przed importem: `b1aae67` — CJK w PL (`Nasze眼`) zamienione na
+„Nasze oczy rozsiane…”. Terminy: 投壶→rzut do dzbana · 轻功→lekkość
+ruchu · 鸣金→Uderzenie dzwonu · 万相集→Galeria Wszechrzeczy ·
+令名→tytuły sławy · 牙行→dom pośrednictwa · 庄园入梦→sen w posiadłości.
