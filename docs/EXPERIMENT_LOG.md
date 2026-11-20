@@ -2558,8 +2558,7 @@ Uwaga terminologiczna: 侠客风云录 → Kroniki wędrownych rycerzy,
 `--na-sucho` 80 nowych / 0 odrzuconych. Jedna poprawka przed importem:
 `733b1a7fb4437dfc` — „rozpoczne” → **„rozpocznie”**.
 
-Terminy: 东主→gospodarz (gildii) · 应律之人→Członiek harmonii (traktowany
-opisowo „kto słucha wiatru”) · 天泉→Studnia Niebios · 繁花居→Dom Bujnego
+Terminy: 东主→gospodarz (gildii) · 应律之人→ten, kto słucha wiatru · 天泉→Studnia Niebios · 繁花居→Dom Bujnego
 Kwiecia · 红销铺→Kramy Szkarłatnego Jedwabiu · 夹钟→Jiazhong ·
 摸金→Grobowiec Fortuny · 稷下→Akademia Jixia · 侠境→Kraina Bohaterów ·
 五禽戏→ćwiczenia pięciu zwierząt · 稷下要闻→Wieści z Akademii Jixia.
