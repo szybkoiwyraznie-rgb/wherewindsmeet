@@ -2541,3 +2541,14 @@ Nowe terminy do glosariusza: 渡尘墟→Ruiny Pyłu · 精元→esencja życia 
 偃师→konstruktor · 毒障→miazmaty · 化怨→rozproszenie nienawiści ·
 四海行→Wędrówka po Czterech Morzach · 追魂引→Goniec Dusz ·
 天工→Boskie Rzemiosło · 万相→Galeria Wszechrzeczy · 悬壶→uzdrowiciel.
+
+**Runda 6, ciąg dalszy: 2 237 z 5 229.** Partie `dv`–`ea` po 80
+(magazyn 130 926 → **131 406**, commit `555086d`). Wszystkie importy
+bez odrzuceń, `--na-sucho` 80 nowych / 0 odrzuconych za każdym razem.
+Jedna poprawka przed importem: `57ec946e84bf8753` (救援) — „Odpór”
+zmienione na **„Ratunek”** (pomyłka z terminem odpór/odparcie).
+
+Uwaga terminologiczna: 侠客风云录 → Kroniki wędrownych rycerzy,
+九流 → Dziewięć Nurtów, 营生 → fach, 百业 → fachy (spójność),
+四海行 → Wędrówka po Czterech Morzach, 天工 → Boskie Rzemiosło,
+终律 → Ostateczna harmonia, 无间天相 → Bezkształtne Przebranie.
