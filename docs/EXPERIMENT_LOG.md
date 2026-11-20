@@ -2654,3 +2654,11 @@ ruchu, celowania i walki z `guider_tujian_data`; próba na sucho i import:
 tabeli; nie potwierdzono w grze momentu udostępnienia każdego hasła.
 Po tej partii: `run_tests.py` **623 testy OK**, `check_repository.py` OK
 (581 wpisów indeksu). Przekład AI-tymczasowy.
+
+**Compendium, wybór ogólnych instrukcji (`go`).** 21 wpisów o ruchu,
+celowaniu, świadkach, leczeniu i przebraniach: 21 nowych, 0 odrzuconych
+w próbie i imporcie. W sumie Compendium **54/1 524**, magazyn **135 423**.
+`check_repository.py` OK (582 wpisy indeksu). Powtórzona sonda scen zadań
+głównych grupy 1: 665 kluczy bazowych, brak 0. Nie potwierdzono w grze,
+kiedy każda z tych instrukcji jest odblokowana. Następne partie wyłącznie
+po selekcji według wiarygodnego kontekstu wczesnej gry.

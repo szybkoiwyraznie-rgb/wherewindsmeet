@@ -22,7 +22,7 @@ Pomiar na `index/`: 6 kategorii właściciela i ich pokrycie —
 `story_describe_str`) — próbki „Dusty Sword Tassel” gotowe;
 (4) elementy opisów `ccs_text_msg` **5 282/5 282** (runda 6) i
 `programmer_text_msg` 11/4 139 (próbka „Traces of the Past” gotowa);
-(5) nazwy Compendium `guider_tujian_data` **8/1 524 — realny brak**;
+(5) Compendium `guider_tujian_data`: przed wybranymi partiami **8/1 524**;
 (6) sceny pierwszej prowincji — dialogi sceniczne (`w=None`, poza tabelami).
 Realna skala „1/4 fabuły”: **wątek główny** (`zadania.typ==1`, 3 443 zadań)
 w 燕南 = 3 892 klucze, brak **2 053**; pierwsze 25% wątku głównego
@@ -47,10 +47,12 @@ zaimportowanych przekładów; są AI-tymczasowe, nie zostały sprawdzone w grze.
 
 Dodatkowo `gm` uzupełnia **19** braków scen zadań głównych grupy 1
 (pierwszy rozdział); sonda po powiązaniach `zadania_sceny` zwróciła
-665 kluczy bazowych tej grupy, z których przed importem brakowało 19.
-Następnie `gn` uzupełnia **25** ręcznie wybranych nazw i instrukcji
-Compendium dotyczących podstaw ruchu, celowania i walki (dostępność każdego
-hasła na samym początku nie została sprawdzona w grze). Magazyn **135 402**.
+665 kluczy bazowych tej grupy, z których przed importem brakowało 19,
+a po imporcie 0.
+Następnie `gn` i `go` uzupełniają **46** ręcznie wybranych nazw i instrukcji
+Compendium dotyczących ruchu, celowania, walki i innych podstaw. Sonda:
+**54/1 524** kluczy tabeli; dostępność każdego hasła na samym początku nie
+została sprawdzona w grze. Magazyn **135 423**.
 Dalsza praca: indywidualna selekcja wczesnej gry, nie hurtowy import całych
 tabel ani dalsze podążanie za filtrem przestrzeni.
 
