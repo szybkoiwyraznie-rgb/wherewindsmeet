@@ -324,7 +324,7 @@
 — 65.
    klucz: 9d3d4d3f856d74f0
    EN: Inform the squad leader of Night Vigil's ending
-   PL: Donieś dziesiętnikowi, jako zakończył się nocny obchód
+   PL: Powiedz dowódcy oddziału, co spotkało Nocną Wartę
 
 — 66.
    klucz: 9d41b9da946b7da8

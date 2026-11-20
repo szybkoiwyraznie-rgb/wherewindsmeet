@@ -149,7 +149,7 @@
 — 30.
    klucz: 6f83cf41adc7ac33
    EN: Night Vigil belonged to General Zhang Huaishen?
-   PL: Nocna Warta należał do generała Zhanga Huaishena?!
+   PL: Rumak Nocna Warta należał do generała Zhanga Huaishena?!
 
 — 31.
    klucz: a35db3778dc171e6
@@ -184,7 +184,7 @@
 — 37.
    klucz: 3060ec7161cbd5d4
    EN: I've examined the body. This has nothing to do with you. But can you guess why the horse attacked?
-   PL: Obejrzałem ciało. Ta sprawa nie ma z tobą związku… Czy potrafisz jednak zgadnąć, dlaczego Nocna Warta go zaatakował?
+   PL: Obejrzałem ciało. Ta sprawa nie ma z tobą związku… Czy potrafisz jednak zgadnąć, dlaczego ten rumak go zaatakował?
 
 — 38.
    klucz: eff27510f46df002
@@ -209,7 +209,7 @@
 — 42.
    klucz: 33a633ba1ad8b657
    EN: Really? Then Night Vigil's a hero! Can he be spared now?
-   PL: Naprawdę?! Nocna Warta dokonał wielkiego czynu! Czy można go teraz oszczędzić?
+   PL: Naprawdę?! Rumak zwany Nocną Wartą dokonał wielkiego czynu! Czy można go teraz oszczędzić?
 
 — 43.
    klucz: 3565863ef3c286f1
