@@ -14,8 +14,8 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | ≤800 m | 3596 | 3596 | 0 | 100% |
 | ≤1000 m | 4523 | 4523 | 0 | **100%** |
 | ≤1600 m | 5952 | 5952 | 0 | **100%** |
-| ≤3200 m | 6832 | 5969 | 863 | 87,4% |
-| ≤6400 m | 9097 | 5980 | 3117 | 65,7% |
+| ≤3200 m | 6832 | 6119 | 713 | 89,6% |
+| ≤6400 m | 9097 | 6130 | 2967 | 67,4% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -55,6 +55,7 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_bb` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bb.md` | 200/200, 0 odrzuceń |
 | `barks_start_bc` | 200 | ≤1600 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bc.md` | 200/200, 0 odrzuceń |
 | `barks_start_bd` | 212 | ≤1600 m — **domknięcie** | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bd.md` | 212/212, 0 odrzuceń |
+| `barks_start_be` | 150 | ≤3200 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_be.md` | 150/150, 0 odrzuceń |
 
 Razem w pierścieniu ≤1 000 m: **4 330 kwestii** w partiach `aa`–`aw`
 (60 + 170 + 10 × 200 + 8 × 200 + 203 + 97) plus 193 kwestie przetłumaczone
@@ -63,9 +64,9 @@ wcześniej w innych partiach — daje to **4 523 / 4 523 = 100%**.
 Pierścienie **≤200 m, ≤400 m, ≤800 m i ≤1 000 m są domknięte w 100%**.
 Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
 (<1 000 m) oraz ≥ piersień ≤1 600 m (5 952/5 952) mają pełny przekład.
-Następny próg ≤3 200 m: 5 969/6 832 (87,4%), zostało 863.
+Następny próg ≤3 200 m: 6 119/6 832 (89,6%), zostało 713.
 
-Magazyn po partii `bd`: **145 395** przekładów (29,70%). Przekład AI-tymczasowy,
+Magazyn po partii `be`: **145 545** przekładów (29,73%). Przekład AI-tymczasowy,
 bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)

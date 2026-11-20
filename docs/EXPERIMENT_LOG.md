@@ -3143,3 +3143,12 @@ Treść: rezydencja Chenów i domowe plotki, studenci i akademie, Targ
 Kwiatowych Łodzi z żetonami, świątynie (Sala Wojenna, Pięciu Smoczych
 Królów), port i warsztaty szkutnicze, wioska i klęska chorób, pieśni
 robocze (rytmiczne „hopsa” zamiast chińskich wypełniaczy), kołysanki.
+
+## 2026-11-20 (10) — wejście w pierścień ≤3 200 m (partia `be`)
+
+Lista `--promien 3200` dała 863 kluczy; partia `be` (150) → magazyn
+**145 545** (29,73%), w ≤3 200 m 6 119/6 832 (89,6%), zostało 713.
+0 odrzuceń, `PL:` bez CJK. Treść: wioska nad rzeką (spichlerz, grobla,
+nocna warta), pan Rzeki i „dobre czasy”, oddziały najemne czekające
+na rozkazy pana Wei, ćwiczenia wojskowe, wiejskie plotki o rzezi
+w Beztroskiej Przystani, kołysanki i pieśni robocze.
