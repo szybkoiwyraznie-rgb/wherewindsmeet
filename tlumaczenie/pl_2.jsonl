@@ -323,6 +323,7 @@
 {"k": "20912960e93b7629", "pl": "Dziś masz szczęście!"}
 {"k": "209176a01ec5f485", "pl": "Bębenek z szarfami Śnieżnego Śladu"}
 {"k": "20928daa378670ab", "pl": "Wyceluj w wybrane miejsce i użyj #Ypolecenia#E, a towarzysz natychmiast tam pobiegnie. Przy niektórych celach może też wykonać inną czynność."}
+{"k": "20932a8c1f9dbed0", "pl": "Trzeba znaleźć wyższe miejsce i jeszcze zbadać nośność łańcucha..."}
 {"k": "20934ecb4f523a74", "pl": "Gdy uładzisz oddech i myśli, spostrzegasz, że do tajnej komnaty wszedł człowiek bez twarzy — idź poznać jego zamiary."}
 {"k": "209442643cc27a06", "pl": "Jin Lizi"}
 {"k": "2094802781468e96", "pl": "Otwórz sakiewkę Yuan Buyu"}
@@ -1546,6 +1547,7 @@
 {"k": "22a0f96ba6b9c5b1", "pl": "Gwiezdny Deszcz nad Morzem Chmur - Kierunek spadającej gwiazdy 1"}
 {"k": "22a13a7f1bf61e35", "pl": "Shen Yilun"}
 {"k": "22a1b7ca0524d630", "pl": "Tajemnicza ruda, można używać jako materiału."}
+{"k": "22a1d775a0129c08", "pl": "Jestem!"}
 {"k": "22a1e73e8fa36dcd", "pl": "Skrzynia wyboru: Mglista Wierzba, st. 105"}
 {"k": "22a25a3da634da70", "pl": "Zarządca przyjmujący pielgrzymów w Pałacu Taiyi"}
 {"k": "22a2b3e9d818af5b", "pl": "Miaonian zawsze wolała słuchać, jak dzieci czytają, niż w skupieniu odmawiać sutry. Może lepiej nadawałaby się na nauczycielkę?"}
@@ -1859,6 +1861,7 @@
 {"k": "231f4aad340d6838", "pl": "Lista uprawnionych"}
 {"k": "231f61e0e8ddcc5c", "pl": "Mam… do niego sprawę."}
 {"k": "231f8645fb1ca589", "pl": "Idź za Yi Dao z powrotem do Niebiańskiej Przystani"}
+{"k": "231f8b2216dd05d0", "pl": "Człowiek szlachetny w działaniu musi pomnażać korzyści światu i usuwać jego szkody — to jest jego zadanie."}
 {"k": "231fb4722b27d311", "pl": "Od cukru wszystkie zęby ci wypadną!"}
 {"k": "2320516c494b65bd", "pl": "Tancerka z Pawilonu Pierzastych Szat"}
 {"k": "2320edec7fc95391", "pl": "Skrytobójstwo: utrata 30% HP"}
@@ -1921,6 +1924,7 @@
 {"k": "233d3af3f8f8099e", "pl": "Zbir Xu - wyklucie - atak w skurczach"}
 {"k": "233d4dd5466fa4b8", "pl": "Drewno 12"}
 {"k": "233d893161de2cbc", "pl": "Kroki po Złotych Lotosach"}
+{"k": "233d91ae87e4a0e2", "pl": "Pan nie lustrem się mierzy, lecz ludźmi. Lustro pokazuje twarz, ludzie — pomyślność i klęskę."}
 {"k": "233da0fa1a9b75e7", "pl": "Wróć do Ding Pu"}
 {"k": "233da931b5ad8da8", "pl": "Wiosną wszystko budzi się do życia i zwierzęta znów hasają — z czego Tang Yiduo ma jeno ból głowy.\n#Y(Tylko wiosną)#E"}
 {"k": "233dd72ed914314b", "pl": "Kompas dla świata"}
@@ -2261,6 +2265,7 @@
 {"k": "23d00b4e5102e868", "pl": "Zapisane po oddaniu drewnianego serca dzwonu Wen Mingqianowi"}
 {"k": "23d0f242ae608c22", "pl": "Tak. "}
 {"k": "23d13e7cd5f916a9", "pl": "Krąg Wstrząsu Niebios, st. 81"}
+{"k": "23d1461be62e7912", "pl": "Parę dni temu po dużym deszczu spłynęło tyle gratów..."}
 {"k": "23d16412da2cde4a", "pl": "Właścicielka sklepu z owocami na Targu Pszenicznej Woni, ma parkę rezolutnych, uroczych dzieciaków."}
 {"k": "23d1953ca837e8cf", "pl": "Wybór cech: Lotny Sokół, st. 110 · Wyborna"}
 {"k": "23d2728c5e1ba6cb", "pl": "Liu Ruyi"}
@@ -3327,6 +3332,7 @@
 {"k": "25b725d66421593e", "pl": "Poufny pilny list"}
 {"k": "25b8144809d4afa1", "pl": "Ten spichlerz… jest pusty?"}
 {"k": "25b8a49a4c1ae742", "pl": "Biało-nefrytowy pojemnik na pędzle"}
+{"k": "25b8bc050d914cfc", "pl": "Hm? Czemu ton jakiś nie taki?"}
 {"k": "25b934d540f0fa8e", "pl": "Świta wysłannika Shu"}
 {"k": "25b9576f8bca72e4", "pl": "Pudło przyspieszenia V"}
 {"k": "25b9d343a2c8b485", "pl": "Strzelanie - wyjście"}
@@ -5018,6 +5024,7 @@
 {"k": "289bb95f7213e588", "pl": "Po użyciu poznasz recepturę: Łóżko 1."}
 {"k": "289bf5ed25fbfbab", "pl": "Wu Lixiang"}
 {"k": "289c057960af70e8", "pl": "Hahaha… Ach, to! Spójrz."}
+{"k": "289d4522152f4481", "pl": "*kaszle*... *kaszle*..."}
 {"k": "289daa46197fb1a2", "pl": "Rozległ się wielki huk i wybiegł jakiś wielkolud, a piękność zniknęła. Ludzie mówią, że ktoś włamał się do Upojnego Cienia i ją porwał. Wszyscy o tym rozmawiają."}
 {"k": "289e0a91d20c5510", "pl": "Drewno wiązu"}
 {"k": "289e9cf637e8988a", "pl": "Wierny"}
@@ -6088,6 +6095,7 @@
 {"k": "2a5f33c0f358dfec", "pl": "W dniu naszego rozstania generał Murong powiedziała, że wyzbyła się już swojej obsesji i chce odszukać prawdziwą drogę."}
 {"k": "2a5f7087ca20d0a0", "pl": "A ja, spadkobierca Wangów w trzydziestym ósmym pokoleniu, byłem bogaty, przystojny i sławny. Marzyły o mnie setki milionów dziewcząt z jianghu!"}
 {"k": "2a5fb11ccc43df78", "pl": "Proszę jednego z bohaterów, by sprawdził, czy ten skarb jest prawdziwy. Kto z szanownych gości zechce spróbować?"}
+{"k": "2a60ba36c6308eb2", "pl": "Ty? Idź się umyj i prześpij!"}
 {"k": "2a6102766b4219de", "pl": "Naprawdę bywa takie szczęście…"}
 {"k": "2a62e53814102c41", "pl": "Racje ze Spichlerza Garnizonu"}
 {"k": "2a633bbc8af78e10", "pl": "Duszona dynia zimowa"}
@@ -6410,6 +6418,7 @@
 {"k": "2aed183d512d509c", "pl": "To przecież „Czerwone po całej rzece”! Wypij łyk, od jednego łyka się upije?"}
 {"k": "2aed8a4f1d97dd58", "pl": "Mała łamigłówka - Południowy Brzeg Hutuo Dzban nasłuchujący ziemię 2"}
 {"k": "2aee5acfa2436f37", "pl": "Mo Jin chyba szuka listu polecającego; możliwe, że brygadzista Shi nosi go przy sobie."}
+{"k": "2aee637ab8dcdcc8", "pl": "Xiao Bai, tak wcześnie, dokąd?"}
 {"k": "2aee6645720477ad", "pl": "Hehe, mówisz o grze, czy o decyzji o otwarciu gór?"}
 {"k": "2aeeac36bcfa5af7", "pl": "Kamień “Ziemia”"}
 {"k": "2aef6a893f8173f8", "pl": "Bo Gantang"}
@@ -7148,6 +7157,7 @@
 {"k": "2c36a3c35449dc95", "pl": "Na przedzie czai się wróg, lepiej wrócić we mgłę i szukać innej drogi."}
 {"k": "2c36fb3b8d3cd835", "pl": "Płyta ośmiokątna"}
 {"k": "2c3734e23a511d73", "pl": "Kotek: Wacik"}
+{"k": "2c3735f12ed65395", "pl": "Trochę się boję..."}
 {"k": "2c373a60d120d3ba", "pl": "Zadanie “Kradzież Sztuki: Słuszne Zdobycie”"}
 {"k": "2c3764f9616d9c27", "pl": "Z poczty “Dar Powitania Lata od He Jina”"}
 {"k": "2c382048f0d36cde", "pl": "Shi Liquan"}
@@ -7241,6 +7251,7 @@
 {"k": "2c687c38c21ac3e8", "pl": "List do Starszej Siostry Peng"}
 {"k": "2c68bf3b5d0f1c07", "pl": "Postaw #Ykadź do hartowania#E"}
 {"k": "2c68e919cf809bac", "pl": "Gdy Przystań Słowa po raz pierwszy tu przybyła, zbadała ziemię i ukształtowanie terenu. Wszyscy uważali tę ziemię za nieużytek; tylko uczniowie Przystani Słowa dostrzegli w niej ukryte możliwości. Jej wadą była wilgoć i twarda gleba, ale tę można z czasem naprawić ludzką pracą i umiejętnościami rolniczymi. Zaletą zaś było położenie i dostęp do wody; to prawdziwy dar niebios, którego nie da się zastąpić."}
+{"k": "2c6a0e789759eb8f", "pl": "Ledwo, ledwo, te skarby są całe."}
 {"k": "2c6a234edfc3fad7", "pl": "Rozmawiaj z Tongyu"}
 {"k": "2c6a77527ba42abc", "pl": "Hexi - obszar 3 poziomu - Wąwóz przed Przełęczą"}
 {"k": "2c6aa55df6dc651c", "pl": "Na początku wszyscy kręcili się jak w kołowrotku. A teraz proszę popatrzeć: jak ryby na łodzi."}
@@ -7300,6 +7311,7 @@
 {"k": "2c7f5dabd57b20d9", "pl": "Natknij się na rzemieślników Qiongqi"}
 {"k": "2c7fbaf12b1e322d", "pl": "Zmniejszone otrzymywane obrażenia"}
 {"k": "2c7fc89f613d4463", "pl": "Dodatek do stroju “Szczyty Penglai”"}
+{"k": "2c8071d7ff03f89e", "pl": "Przechyl głowę trochę w moją stronę... tak, jeszcze trochę do góry... hm, właśnie tam."}
 {"k": "2c807fdd49834a58", "pl": "Niewysłany list"}
 {"k": "2c80d41970b230eb", "pl": "Kaligrafia Ouyang Xuna; pędzel silny i sprężysty, budowa znaków ścisła. Słynny wzór pisma półkursywnego z czasów Tang; późniejsi adepci kaligrafii prześcigali się w jego kopiowaniu."}
 {"k": "2c80e2ab75ffd308", "pl": "Zapytaj o “krużganek powitalny w Fanlou”"}
@@ -8944,6 +8956,7 @@
 {"k": "2f6199a64c9b5234", "pl": "Nie do podważenia"}
 {"k": "2f624297228c6bad", "pl": "Pani, na dzisiejsze granie na cytrze zostały jeszcze dwie godziny."}
 {"k": "2f6290c9bdcdf155", "pl": "Lodowy Świetlik: Księżyc"}
+{"k": "2f62fb0072e72961", "pl": "Zhao San, twoja paczka!"}
 {"k": "2f63366bbe5f38a4", "pl": "Za murami pałacu"}
 {"k": "2f634fd3c99a9556", "pl": "Nagrody sekty"}
 {"k": "2f6421ca1df2cea7", "pl": "Elita Warowni Buddy"}
@@ -9214,6 +9227,7 @@
 {"k": "2fe6d125f0ff3413", "pl": "Konfucjański uczony na naukach w Bibliotece, który wciąż przesiaduje w Sali Dysput i sporo studiował sztukę elokwencji, lecz z pewnych względów może tylko przyglądać się z boku, nie uczestnicząc."}
 {"k": "2fe6eed445fdcf56", "pl": "Metoda Wewnętrzna: Szabla Westchnienia"}
 {"k": "2fe73221d8b63dd8", "pl": "Efekt zjedzenia: zwiększa maks. PŻ o #Y15800#E pkt na #Y30#E min (ponowne użycie odświeża czas).\n\nNaraz może działać tylko jeden efekt “Pożywienia krzepiącego”. Nie działa w trybie prób i nie zwiększa biegłości wojownika."}
+{"k": "2fe743c333cc5553", "pl": "Dziś przyjmuje mój mistrz, boję się, że mnie zapyta."}
 {"k": "2fe7699ea4e93bc6", "pl": "Chyba czegoś przede mną nie ukrywasz?"}
 {"k": "2fe798597807c291", "pl": "Przy drodze na Brzegu Płukanych Kamieni w Qinghe kucharz Zhu Bawan pokłócił się z pewnym gościem; snać żaden nie przekona drugiego. Aż cię korci, by spytać, o co poszło."}
 {"k": "2fe80178820f8d56", "pl": "czemu tylko na zjeździe bohaterów w Upojnym Cieniu możemy usłyszeć choć parę jego prawdziwych wierszy"}
