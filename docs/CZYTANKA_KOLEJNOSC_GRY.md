@@ -1,5 +1,11 @@
 # Czytanka WWM: trzy warstwy i kolejność z gry
 
+> **⚠ PRZESTARZAŁE (obsolete) — dokument opisuje narzędzia wycofane.**
+> Czytankę dla właściciela buduje wyłącznie `tools/czytanka_czysta.py`
+> ([CZYTANKA_DO_CZYTANIA.md](CZYTANKA_DO_CZYTANIA.md)); rejestr wycofanych
+> skryptów: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md).
+> Poniższy tekst zostaje jako opis historyczny/audytowy.
+
 Pakiet buduje `tools/zbuduj_czytanke_pelna.py`. Składa on **trzy rodzaje treści**,
 tak jak ustalono w projekcie, i dokłada do nich warstwę chronologiczną:
 

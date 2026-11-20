@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Generator polskich czytanek `.md` i archiwum `WWM_CZYTANKI_PL.zip` dla Where Winds Meet.
+"""⚠ PRZESTARZAŁE (OBSOLETE) — NIE UŻYWAĆ do budowy czytanek.
+
+Czytankę dla właściciela (`czytanka_v*.zip`, pliki `01 - …` / `02 - …` + README)
+buduje wyłącznie `tools/czytanka_czysta.py`. Ten skrypt zostaje w repozytorium
+jako narzędzie audytowe (zestaw techniczny: epizody / kontekst / reszta) —
+służy do weryfikacji danych, a nie do wydań. Rejestr: `docs/NARZEDZIA_PRZESTARZALE.md`,
+lista dla testu: `tools/przestarzale.txt`. Uruchomienie z linii poleceń wypisuje
+ostrzeżenie na stderr.
+
+Generator polskich czytanek `.md` i archiwum `WWM_CZYTANKI_PL.zip` dla Where Winds Meet.
 
 Trzyplikowy zestaw czytelniczy dopasowany do korpusu Where Winds Meet:
 - `README.md` — metryczka edycji, pokrycie tłumaczeń oraz spis ponumerowanych epizodów,
@@ -32,6 +41,8 @@ Przykłady:
         --wyj-katalog dist/czytanki_podglad
 """
 
+
+
 from __future__ import annotations
 
 import argparse
@@ -48,6 +59,10 @@ import sys
 import textwrap
 import zipfile
 
+_OSTRZEZENIE_OBSOLETE = (
+    "UWAGA: narzędzie PRZESTARZAŁE (obsolete) — nie służy do budowy czytanek dla właściciela.\n"
+    "Wydania czytanek buduje tools/czytanka_czysta.py; szczegóły: docs/NARZEDZIA_PRZESTARZALE.md."
+)
 try:
     from tools import buduj_paczke as bp
     from tools import import_zwrotki
@@ -3662,4 +3677,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    print(_OSTRZEZENIE_OBSOLETE, file=sys.stderr)
     raise SystemExit(main())

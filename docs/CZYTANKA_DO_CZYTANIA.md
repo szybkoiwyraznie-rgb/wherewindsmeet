@@ -269,5 +269,7 @@ prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
 
 `tools/zbuduj_czytanke_pelna.py` (trzy warstwy: chronologia, fabuła, kontekst)
 i `tools/buduj_czytanke_gry.py` (sceny w tabelach z chińskim i angielskim)
-zostają jako narzędzia robocze do weryfikacji i audytu — ale **nie są czytanką
-dla właściciela**. Czytanka to dwa pliki treści (01 i 02) plus README.
+są **PRZESTARZAŁE (obsolete)** i zostają wyłącznie jako narzędzia audytowe —
+**nie są czytanką dla właściciela i nie buduje się nimi wydań `czytanka_v*.zip`**.
+Pełny rejestr (wraz z `buduj_czytanki.py` i `powiazania_czytanek.py`, banerami
+w kodzie i ostrzeżeniem na stderr): [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md). Czytanka to dwa pliki treści (01 i 02) plus README.

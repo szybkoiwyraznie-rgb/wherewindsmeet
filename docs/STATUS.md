@@ -57,6 +57,10 @@ id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`) — `tools/czytanka_czysta.py`,
 `1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`). Czytanki NIE buduje się
 `buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
 numer wersji ustalać z tego pliku, nie z pamięci sesji.
+Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
+`buduj_czytanke_gry.py`, `powiazania_czytanek.py`) są oznaczone jako **PRZESTARZAŁE**
+— rejestr: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md), lista maszynowa
+`tools/przestarzale.txt`, pilnuje `tests/test_narzedzia_przestarzale.py`.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

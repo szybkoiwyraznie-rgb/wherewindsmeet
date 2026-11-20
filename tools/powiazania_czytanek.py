@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Indeks powiązań kontekstowych dla czytanek WWM (`index/` + tabele `widoki/`).
+"""⚠ PRZESTARZAŁE (OBSOLETE) — NIE UŻYWAĆ do budowy czytanek.
+
+Czytankę dla właściciela (`czytanka_v*.zip`, pliki `01 - …` / `02 - …` + README)
+buduje wyłącznie `tools/czytanka_czysta.py`. Ten skrypt zostaje w repozytorium
+jako narzędzie audytowe (zestaw techniczny: epizody / kontekst / reszta) —
+służy do weryfikacji danych, a nie do wydań. Rejestr: `docs/NARZEDZIA_PRZESTARZALE.md`,
+lista dla testu: `tools/przestarzale.txt`. Uruchomienie z linii poleceń wypisuje
+ostrzeżenie na stderr.
+
+Indeks powiązań kontekstowych dla czytanek WWM (`index/` + tabele `widoki/`).
 
 Moduł wydobywa bezpośrednie i tekstowe powiązania pomiędzy numerowanymi
 epizodami/scenami czytanki a resztą korpusu gry w `index/`:
