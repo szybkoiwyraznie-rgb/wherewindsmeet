@@ -583,6 +583,34 @@ niej 100 z 101 cutscen wyszło z „Scen bez przypisanej mapy” do swoich krain
    tekstów i trafia do rejestru błędów w `index/manifest.json`.
 9. Licencja własnego kodu i przekładu — nie wybrana, brak `LICENSE`.
 
+## AKTUALNY ZAKRES TŁUMACZENIA (tymczasowe, AI) — 2026-11-20
+
+Właściciel wskazał 6 kategorii tekstów, które wciąż są nieprzetłumaczone
+po instalacji najnowszego spolszczenia (łatka v4 / v0.4.0) i które mają
+zostać przetłumaczone tymczasowo (AI) jako kolejne partie:
+
+| # | Kategoria | Źródło w `index/` | Przykład nieprzetłumaczonego |
+|---|-----------|-------------------|------------------------------|
+| 1 | Hinty w questach | `tasks.task_target_str` | „Search inside for clues” |
+| 2 | Listy (pisma) | `tasks_envelop_data` | „From Wei, to Jiang Wulang” |
+| 3 | Przedmioty fabularne w terenie | `text_msg` + `manual_items` (`story_describe_str`) | „Dusty Sword Tassel” |
+| 4 | Elementy opisów przedmiotów | `ccs_text_msg` + `programmer_text_msg` | „Traces of the Past” |
+| 5 | Nazwy w Compendium | `guider_tujian_data` (opisy już OK) | „Lattice Door” |
+| 6 | Pojedyncze sceny w pierwszej prowincji | dialogi sceniczne (`w=None`, poza tabelami) | cytat o Uncle Jiang |
+
+Stan częściowy z STATUS.md (przed tą partią):
+- (1) hinty zadań: 8 936/8 936 = 100%
+- (2) listy: 1 063/1 063 = 100%
+- (3) przedmioty fabularne: 4 011/4 013 (`story_describe_str`)
+- (4) opisy przedmiotów: `ccs_text_msg` 5 282/5 282 (runda 6), `programmer_text_msg` 11/4 139
+- (5) Compendium `guider_tujian_data`: 251/1 524 (po partii `ja`), 1 273 braki
+- (6) sceny pierwszej prowincji: do wyselekcjonowania
+
+Wszystkie nowe przekłady w tym zakresie są **AI-tymczasowe** i **nieprzetestowane
+w grze** — wymagają późniejszej weryfikacji przez właściciela w kliencie.
+Tłumaczenie odbywa się obiegiem: selekcja kluczy z `index/` → pakiet/tymczasowe
+przekłady → `tools/import_zwrotki.py` → commit `tlumaczenie/` → nowa łatka.
+
 ## Następny krok
 
 **ROADMAPA WYKONANA (2026-11-18, wpis 10 w EXPERIMENT_LOG): chronologia
