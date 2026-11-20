@@ -15,7 +15,8 @@ Kotwica: pierwszy kit scen prologu — **X -1330,09, Z -109,59** (okolica startu
 | ≤1000 m | 4523 | 4523 | 0 | **100%** |
 | ≤1600 m | 5952 | 5952 | 0 | **100%** |
 | ≤3200 m | 6832 | 6832 | 0 | **100%** |
-| ≤6400 m | 9097 | 7443 | 1654 | 81,8% |
+| ≤6400 m | 9097 | 9097 | **0** | **100%** |
+| ≤12000 m (dalszy próg) | 10940 | 9116 | 1824 | 83,3% |
 
 „Razem” obejmuje 10 940 kwestii z pozycją (w tym już przetłumaczone);
 709 kwestii z tej grupy nie ma pozycji w indeksie (brak `spawn_kit_dict`
@@ -65,6 +66,13 @@ lub kitu) — do przejrzenia później, poza pierścieniami.
 | `barks_start_bl` | 150 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bl.md` | 150/150, 0 odrzuceń |
 | `barks_start_bm` | 150 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bm.md` | 150/150, 0 odrzuceń |
 | `barks_start_bn` | 150 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bn.md` | 150/150, 0 odrzuceń |
+| `barks_start_bo` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bo.md` | 250/250, 0 odrzuceń |
+| `barks_start_bp` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bp.md` | 250/250, 0 odrzuceń |
+| `barks_start_bq` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bq.md` | 250/250, 0 odrzuceń |
+| `barks_start_br` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_br.md` | 250/250, 0 odrzuceń |
+| `barks_start_bs` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bs.md` | 250/250, 0 odrzuceń |
+| `barks_start_bt` | 250 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bt.md` | 250/250, 0 odrzuceń |
+| `barks_start_bu` | 154 | ≤6400 m | `zwrotki/2026-11-20_ai_tymczasowe_barks_start_bu.md` | 154/154, 0 odrzuceń |
 
 Razem w pierścieniu ≤1 000 m: **4 330 kwestii** w partiach `aa`–`aw`
 (60 + 170 + 10 × 200 + 8 × 200 + 203 + 97) plus 193 kwestie przetłumaczone
@@ -74,9 +82,11 @@ Pierścienie **≤200 m, ≤400 m, ≤800 m i ≤1 000 m są domknięte w 100%**
 Obowiązkowy promień z polecenia właściciela (<400 m) oraz preferencyjny
 (<1 000 m) oraz ≥ piersień ≤1 600 m (5 952/5 952) mają pełny przekład.
 Pierścień **≤3 200 m domknięty w 100%** (6 832/6 832). Zostaje najdalszy
-próg ≤6 400 m: 7 443/9 097 (81,8%), zostało 1 654.
+próg ≤6 400 m: **9 097/9 097 (100%)** — domknięty partiami `bk`–`bu`.
 
-Magazyn po partii `bn`: **146 858** przekładów (**30,00%**). Przekład AI-tymczasowy,
+Magazyn po partii `bu`: **148 512** przekładów (**30,34%**).
+Kolejny próg do zrobienia: 6 400–12 000 m — **1 824** kwestie
+(`dist/region_12000.txt`); poza tym ~429 kwestii bez pozycji lub dalej niż 12 km. Przekład AI-tymczasowy,
 bez testu w grze.
 
 Po każdej partii lista robocza topnieje: 4 270 → (…) → 1 097 (`aq`) → 897 (`ar`)

@@ -3201,3 +3201,29 @@ czyli **30,00%** wszystkich miejsc w grze. Pierścień ≤6 400 m: 7 443/9 097
 (zegar wodny, łodzie chmurowe, tor w chmurach, „Jedne Drzwi”, Ciemna Dolina),
 spór „otwarcie gór / zamknięcie gór”, cytaty z Mistrza Mo, uczniowskie
 żarty o przepisywaniu zadań.
+
+## 2026-11-20 (14) — pierścień ≤6 400 m domknięty w 100%
+
+Partie `bo`–`bu` (7 partii, 1 654 kwestie) w jednym podejściu, paczki po 250
+i finałowa 154. Magazyn 146 858 → **148 512** (30,34%). Wszystkie pierścienie
+od 200 do 6 400 m mają **0 pozycji do zrobienia**:
+
+| promień | razem | przetłumaczone | zostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 |
+| ≤400 m | 1 372 | 1 372 | 0 |
+| ≤800 m | 3 596 | 3 596 | 0 |
+| ≤1 000 m | 4 523 | 4 523 | 0 |
+| ≤1 600 m | 5 952 | 5 952 | 0 |
+| ≤3 200 m | 6 832 | 6 832 | 0 |
+| ≤6 400 m | 9 097 | 9 097 | 0 |
+| ≤12 000 m | 10 940 | 9 116 | 1 824 |
+
+Uwaga metodyczna: przy `klucze_w_promieniu` punkty muszą być **słownikiem**
+(`dict(wsz) | dict(nie)`), nie zbiorem — `set` daje `AttributeError`.
+Jeden raz w partii `br` wkradł się CJK do linii `PL:` (imię 公孙大娘) →
+poprawione i zreimportowane osobnym commitem. Poza tym 0 odrzuceń, wszystkie
+`PL:` czyste.
+
+Następny zakres: 1 824 kwestie w pierścieniu 6 400–12 000 m
+(`dist/region_12000.txt`) + ~429 kwestii bez pozycji w świecie.
