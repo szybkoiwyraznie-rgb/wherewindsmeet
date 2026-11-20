@@ -451,6 +451,7 @@
 {"k": "d0dd5705076fb6cc", "pl": "Ascetyczny mnich 32"}
 {"k": "d0dd6d4bed2eacc7", "pl": "Wędrowiec - halabarda - seria z wybiciem w powietrze"}
 {"k": "d0de2b8ddb721e34", "pl": "Ramię (P) i materiał"}
+{"k": "d0df1f6f4099a840", "pl": "Seria odbić"}
 {"k": "d0df2e6ff7ddd63d", "pl": "List pierwszy"}
 {"k": "d0e03d994bb85855", "pl": "Mingniang"}
 {"k": "d0e08868441a9feb", "pl": "2 - Skrzynia Ażurowa - Dzielnica Urzędów - Południowy Skarbiec Urzędu Wewnętrznego"}
@@ -1491,6 +1492,7 @@
 {"k": "d2cffa39f8a6a232", "pl": "Mysz polna"}
 {"k": "d2d01e92467af184", "pl": "Rozmawiaj z ciocią Chunhuą"}
 {"k": "d2d041a4f7aff45c", "pl": "Ściąga egzaminacyjna I"}
+{"k": "d2d1518bceac37c3", "pl": "Choroby dzielą się na cztery rodzaje: choroby umysłu, narządów, meridianów oraz mięśni i kości."}
 {"k": "d2d16d1abc5938b5", "pl": "Krąg Szybkiego Wichru, st. 56"}
 {"k": "d2d2e4d58cdc3355", "pl": "Wielkolud! Ojej! Shou, ty gapo, uciekaj!"}
 {"k": "d2d409d34a0e9f6f", "pl": "Urodziny panienki, a przedstawienie jeszcze się nie skończyło…"}
@@ -3747,6 +3749,7 @@
 {"k": "d710779c14002da0", "pl": "Odbicie Nieba i Chmur w Przypływie"}
 {"k": "d71185bc515cc4b7", "pl": "Wejdź do podziemnej komnaty sterowni"}
 {"k": "d71210781e5b4e52", "pl": "Groźba śmierci"}
+{"k": "d7121a3037911cbf", "pl": "Naciśnij {1} tuż przed trafieniem zwykłym atakiem przeciwnika, aby wykonać #Yodbicie#E i zmniejszyć jego qi."}
 {"k": "d71265c1fe8a02f3", "pl": "Wskazówka: Diadem Bogini Luo"}
 {"k": "d7134d642eaaf72f", "pl": "Duże drewniane koło wodne"}
 {"k": "d71393c1628940dd", "pl": "Sługa rodu Zheng"}
@@ -6275,6 +6278,7 @@
 {"k": "dbabdf0428fb3f61", "pl": "Brzęk Stali: Cień - stały 2"}
 {"k": "dbac79a496bda857", "pl": "Niefortunnie wpadłszy w paszczę lwa, odkrywasz, że w niej kryje się osobny świat. Skoroś tu trafił, ruszaj naprzód."}
 {"k": "dbacd86714307e50", "pl": "Suchy placek"}
+{"k": "dbace80122ca3f91", "pl": "Tuż przed trafieniem przez przeciwnika można zużyć wnikliwość, aby automatycznie wykonać #Yodbicie#E. Gdy wnikliwości jest za mało, odbicie nie nastąpi."}
 {"k": "dbad0387b35b27e6", "pl": "Przychodzę w imieniu rzemieślników Kaifengu."}
 {"k": "dbaded23b03ded34", "pl": "Wang Laifu"}
 {"k": "dbae60656cf9c307", "pl": "To kwiatowe łodzie Posłańców Kwiatów!"}

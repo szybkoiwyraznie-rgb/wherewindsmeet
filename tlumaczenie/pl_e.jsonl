@@ -1319,6 +1319,7 @@
 {"k": "e2a22dd07ddbb828", "pl": "A jeśli się dowiem, to grzecznie wrócisz do domu na kolację?"}
 {"k": "e2a30cfca330b21f", "pl": "Hełm Zmierzchu"}
 {"k": "e2a34a7b5cb39f9a", "pl": "Czyż pan nie powtarza, że my, ludzie z jianghu, to tylko awanturnicy z gościńca?"}
+{"k": "e2a358c8422ac9f9", "pl": "Rodzaje chorób"}
 {"k": "e2a366ae5038fe70", "pl": "Li Liaowu"}
 {"k": "e2a4328681de6b27", "pl": "Udaj się nad brzeg rzeki"}
 {"k": "e2a46f2a5f974a49", "pl": "Babcia Wang jest już w latach i pamięć raz jej dopisuje, raz nie. Ale wciąż dobrze pamięta umowę z ukochanym sprzed pięćdziesięciu lat: o północy mieli się spotkać pod starym drzewem nad rzeką."}
@@ -2949,6 +2950,7 @@
 {"k": "e5a2bae1f33647e0", "pl": "Pożegnanie księżniczki Taihe jadącej do ludów zachodnich"}
 {"k": "e5a3178977b2ce43", "pl": "Kwiatek pospolity pod okapami i na kamiennych murach. Można go użyć jako leku.\n\nCzłek wraca do domu, jaskółka do gniazda - któż to śpiewa pieśń rodzinnych stron nad wonnym brzegiem?\nTo najpospolitszy dziki kwiat krainy Yanyun; podobno jaskółki najchętniej budują z niego gniazda.\nWędrowcy z dala od domu często zabierają go w drogę, toteż i on rozsiał się po całym świecie."}
 {"k": "e5a33f15a89a5ca6", "pl": "Kopanie Wolantu - Podwładny 3"}
+{"k": "e5a3583996e74ab7", "pl": "Umiejętność działa bez wyposażania.\nW powietrzu naciśnij {1}, aby szybko opaść na ziemię.\nFala uderzeniowa przy lądowaniu ma znaczną moc."}
 {"k": "e5a3c7acc9ff855b", "pl": "Pieśń wioseł na Luoshui"}
 {"k": "e5a3f0287f81b8ec", "pl": "Syk poz. 3"}
 {"k": "e5a43ed595ad43a4", "pl": "Diabelski młyn"}
@@ -3090,6 +3092,7 @@
 {"k": "e5effb61c6c01c36", "pl": "Dodatek do stroju “Welon Lotosu”"}
 {"k": "e5f06547e0faa8cb", "pl": "Szał"}
 {"k": "e5f0b30ce6d78d20", "pl": "Xiaoba"}
+{"k": "e5f1047b19c1e376", "pl": "W razie choroby wybierz #Ykonsultację lekarską#E, aby poznać dostępne metody leczenia."}
 {"k": "e5f123382da800f9", "pl": "Sznury stroju"}
 {"k": "e5f1396e0ea9b573", "pl": "Sprawdź, co jest nie tak"}
 {"k": "e5f15a96ef78ff58", "pl": "Lustro ochronne na piersi z misternie wyrzeźbionymi ośmioma skarbami buddyzmu. Twórca włożył w nie gorącą nadzieję, że bliska mu osoba wróci cała i zdrowa."}
@@ -3606,6 +3609,7 @@
 {"k": "e6e3b4d029583474", "pl": "Warownia 4 osłona centrum"}
 {"k": "e6e4a9c7293ea4da", "pl": "Jaki masz towar?"}
 {"k": "e6e4f65c68fac1ef", "pl": "Zapisane po oddaniu długiego fletu Guo Jiazhengowi"}
+{"k": "e6e61bff252c585e", "pl": "Stan niezłomności"}
 {"k": "e6e62a60ac887477", "pl": "Hi hi hi, ha ha ha, Jiang Yan."}
 {"k": "e6e6c19edf993ffb", "pl": "Baijie blokuje HP i odzyskuje"}
 {"k": "e6e6d060e73e9c21", "pl": "Po otwarciu losowo otrzymasz jeden element zestawu Lotny Sokół lub Wzlot Orła (st. 16) w jakości niebieskiej lub fioletowej oraz dodatkowo jedne notatki ścieżki Brzęk Stali: Cień."}
