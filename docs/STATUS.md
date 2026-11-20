@@ -61,6 +61,9 @@ Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
 `buduj_czytanke_gry.py`, `powiazania_czytanek.py`) są oznaczone jako **PRZESTARZAŁE**
 — rejestr: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md), lista maszynowa
 `tools/przestarzale.txt`, pilnuje `tests/test_narzedzia_przestarzale.py`.
+Dla tłumacza leży **pakiet v6** (`paczka_dla_tlumacza_wwm_v6.zip`,
+45 432 646 B, id `1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`): 423 507 miejsc PL,
+114 067 przekładów tłumacza, **bez tymczasowych wpisów AI**.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

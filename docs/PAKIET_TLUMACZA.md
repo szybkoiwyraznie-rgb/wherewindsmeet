@@ -439,3 +439,36 @@ Sprawdzone na prawdziwych danych aktualizacji:
 | tabele `__grey` to druga wersja tej samej tabeli | **hipoteza** z nazwy; ich teksty są w pakiecie |
 | mała łatka (`latka_testowa.py` UI + prolog) przyjmowana przez grę, polskie znaki się wyświetlają | **fakt — potwierdzone w uruchomionej grze Steam (Windows)** |
 | pełna łatka fabularna (`WWM_Spolszczenie_PL_v0.4.0.zip`, zwrotka `WWM_PL2.zip`, `86 282` przekłady) w oknie gry | **fakt — przetestowana w grze 2026-11-17: działa, przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela) |
+
+## Pakiet „czysty” — bez tymczasowych wpisów AI (od v6)
+
+Magazyn zawiera dwa rodzaje przekładów: **tłumacza** (zwrotki `.zip`/`.md`,
+autorytatywne) i **tymczasowe AI** (pliki `zwrotki/*ai_tymczasowe*.md`,
+importowane tym samym obiegiem). Pakiet dla tłumacza pokazuje dotychczasowe
+przekłady po `PL:`, więc wpisy AI nie mogą do niego trafić — inaczej tłumacz
+zobaczyłby cudzy tekst jako własny.
+
+Obieg budowy pakietu czystego (użyty dla v6, 2026-11-20):
+
+```bash
+python3 - <<'EOF'
+import json
+from pathlib import Path
+ai=set()
+for p in Path('zwrotki').glob('*ai_tymczasowe*.md'):
+    for l in p.read_text(encoding='utf-8').splitlines():
+        s=l.strip()
+        if s.startswith('klucz:'):
+            ai.add(s.split(':',1)[1].strip())
+out_dir=Path('/tmp/mag_bez_ai'); out_dir.mkdir(exist_ok=True)
+for p in sorted(Path('tlumaczenie').glob('*.jsonl')):
+    keep=[l for l in p.read_text(encoding='utf-8').splitlines()
+          if l.strip() and json.loads(l).get('k','').lstrip('@') not in ai]
+    (out_dir/p.name).write_text(("\n".join(keep)+"\n") if keep else "", encoding='utf-8')
+EOF
+python3 tools/buduj_paczke.py --indeks index --wyj dist --wersja 6 \
+    --data 2026-11-20 --tlumaczenie /tmp/mag_bez_ai --wypelnij-pl
+```
+
+Efekt: 36 932 klucze AI odfiltrowane, w pakiecie **114 067** przekładów
+tłumacza (v5: 114 053 + późniejsze zwrotki tłumacza).

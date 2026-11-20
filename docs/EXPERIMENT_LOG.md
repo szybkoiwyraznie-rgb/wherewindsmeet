@@ -3319,3 +3319,23 @@ Podział `02` zmienił się z 3 na **4 części** (sekcje przestały mieścić s
 w limicie). Wniosek na przyszłość: numer czytanki ustalać z Dysku
 (`name contains 'czytanka'`) i z `docs/WERSJE_CZYTANKI.md`, a nie z pamięci
 sesji; budować wyłącznie `tools/czytanka_czysta.py`.
+
+## 2026-11-20 (19) — pakiet dla tłumacza v6 (czysty, bez AI) na Dysku
+
+`paczka_dla_tlumacza_wwm_v6.zip`: 45 432 646 B, SHA-256
+`894caac1276119f38243d15435f1240af0695c433d1024ac2756643859dfe283`,
+w środku `README.md` + `sceny.zip` (20 216 236 B) + `cutsceny.zip`
+(1 479 419 B) + `widoki.zip` (23 722 250 B). Na Dysku (id
+`1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`), obok v5 (archiwum zostaje).
+
+- **423 507 miejsc PL**, z tego **114 067** przekładów tłumacza wpisanych po
+  `PL:` (v5: 422 248 / 114 053) — 140 240 linii do wpisania w scenach,
+  8 396 w cutscenach;
+- kontrola zgodności: 0 powtórzonych, 0 nieznanych, 0 brakujących,
+  `zgodne: true`;
+- **czystość:** magazyn filtruje się po kluczach z `zwrotki/*ai_tymczasowe*.md`
+  (36 932 klucze AI) — pakiet nie pokazuje tymczasowych przekładów AI jako
+  pracy tłumacza. Obieg: [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md), sekcja
+  „Pakiet «czysty»”;
+- pierwsza próba tej sesji (bez filtra) dała 46 744 645 B ze wpisami AI
+  w środku — odrzucona, nie wgrana.
