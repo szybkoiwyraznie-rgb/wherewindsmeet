@@ -15,6 +15,28 @@ Następny krok: wybór kolejnej tabeli do tłumaczenia (kandydaci wg braków:
 4 128/4 139). Testy odświeżone po zamknięciu rundy: `run_tests.py`
 **623 OK**, `check_repository.py` OK (566 wpisów indeksu).
 
+**Zakres wg potrzeb właściciela (2026-11-19)** — właściciel potrzebuje
+tylko wczesnej gry („max 1/4 zaawansowania fabuły”), nie całych tabel.
+Pomiar na `index/`: 6 kategorii właściciela i ich pokrycie —
+(1) hinty zadań `tasks.task_target_str` **8 936/8 936 = 100%**;
+(2) listy `tasks_envelop_data` **1 063/1 063 = 100%**;
+(3) przedmioty fabularne `text_msg` + `manual_items` (4 011/4 013,
+`story_describe_str`) — próbki „Dusty Sword Tassel” gotowe;
+(4) elementy opisów `ccs_text_msg` **5 282/5 282** (runda 6) i
+`programmer_text_msg` 11/4 139 (próbka „Traces of the Past” gotowa);
+(5) nazwy Compendium `guider_tujian_data` **8/1 524 — realny brak**;
+(6) sceny pierwszej prowincji — dialogi sceniczne (`w=None`, poza tabelami).
+Realna skala „1/4 fabuły”: **wątek główny** (`zadania.typ==1`, 3 443 zadań)
+w 燕南 = 3 892 klucze, brak **2 053**; pierwsze 25% wątku głównego
+(860 zadań) = 2 836 kluczy, brak **2 096** (z tego 1 966 to dialogi scen).
+Czyli **~2 100 kwestii**, nie 163 000. `text_msg` (103 975) i
+`debate_guider_dialog_data` (60 512) to tabele całej mapy świata — we
+wczesnej grze brakuje z nich odpowiednio **265** i **30 899** kluczy,
+ale gros debat dotyczy późnych regionów, więc nie ma sensu tłumaczyć
+ich z góry. Wniosek: runda 7 = sceny wątku głównego 燕南
+(2 053 klucze, ~26 partii po 80) + `guider_tujian_data` (1 516);
+tabele całomapowe dopiero na żądanie.
+
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
 `02 - sztuki walki, walka, zadania, świat i miejsca, historie zasłyszane, … — część 3 z 3.md`
