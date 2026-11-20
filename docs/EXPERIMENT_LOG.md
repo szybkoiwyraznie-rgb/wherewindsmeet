@@ -2903,11 +2903,13 @@ w `tools/audyt_zakresu.py` (slot `e` z wariantem `@`, mapy 1/501/701).
 | flaga głosu ambientowego (`vo_amb*`, `pet_cat_vo*`, `func_audio_placeholder`) | 8 788 |
 | wybory gracza wśród braków | 0 |
 
-Podział bez powtórzeń: kity ambientowe 3 719, sceny zadań 7 680, sceny bez
-powiązania z zadaniem lub kitem 23 460. Ambientowy podzbiór odpowiada
-szacunkowi właściciela („około 3000”); pozostałe to również pojedyncze
-odzywki, ale w scenach powiązanych z zadaniami albo bez żadnego powiązania
-w danych klienta.
+Podział bez powtórzeń (pierwszeństwo: kit, wyzwalacz `spaces.*`, zadanie):
+kity ambientowe **4 893**, wyzwalacze w świecie **11 369**, sceny zadań
+**6 198**, bez powiązania **11 436**. Do grupy wyzwalaczy należy przykład
+właściciela — scena `1026070` ma relację `spaces.s501.trap#6600990`, więc jej
+jednolinijkowa kwestia odpala się przy obiekcie w świecie. Podział liczy
+`tools/audyt_zakresu.py` (`sceny.grupy` w JSON-ie), testy w
+`tests/test_audyt_zakresu.py`.
 
 **Przyczyna błędu w raporcie z rana:** tabela dzieliła sceny na „zadaniowe”
 i „ambientowe” po polu relacji `r`, które ma większość scen — przez to

@@ -23,11 +23,11 @@ poleceniem.
   brakujące kwestie mają medianę **19 znaków**, 82% ma ≤30 znaków, a tylko
   140 ma ≥60; `8 103` scen to scenki złożone z **jednego** zdania, a `8 788`
   kluczy ma flagę głosu ambientowego (`vo_amb*`, `pet_cat_vo*`). To odzywki
-  i banter NPC. Ambientowy podzbiór to `3 719` kluczy — blisko „około 3000”
-  właściciela; reszta leży w scenach zadań (`7 680`) i w scenach bez
-  powiązania (`23 460`). Przykład właściciela (scena `1026070`, „Looks like
-  Uncle Jiang won't be tasting new wine this year…”) **nadal nie ma
-  przekładu**.
+  i banter NPC. Podział: kity ambientowe `4 893`, wyzwalacze w świecie
+  (`spaces.*`) `11 369`, sceny zadań `6 198`, sceny bez powiązania `11 436`.
+  Przykład właściciela (scena `1026070`, „Looks like Uncle Jiang won't be
+  tasting new wine this year…”) **nadal nie ma przekładu** i należy do grupy
+  wyzwalanej ze świata, nie do kitów.
 - **Uwaga praktyczna:** zainstalowana łatka (`v0.5.0`, zbudowana ze zwrotki
   tłumacza `WWN_PL_v4`) zawiera `112 405` przekładów i **nie obejmuje**
   tymczasowych partii AI. W magazynie jest ich teraz `139 653` (28,53% miejsc
@@ -131,14 +131,20 @@ właściciel sobie tego nie życzy.
 | brakujące kwestie będące wyborami gracza | 0 |
 
 Podział według najsilniejszego powiązania sceny (pierwszeństwo: kit
-ambientowy, potem zadanie):
+ambientowy, potem wyzwalacz w świecie, potem zadanie; klucz liczony raz):
 
-| grupa | brakujące klucze |
-|---|---:|
-| sceny w kitach ambientowych (`index/mpk/sceny_ambient_kity.jsonl`) | 3 719 |
-| sceny powiązane z zadaniami (`index/zadania_sceny.jsonl`) | 7 680 |
-| sceny bez powiązania z zadaniem ani kitą | 23 460 |
-| **razem (bez powtórzeń)** | **33 896** |
+| grupa | brakujące klucze | mediana | ≤30 znaków | ≥60 znaków |
+|---|---:|---:|---:|---:|
+| sceny w kitach ambientowych (`index/mpk/sceny_ambient_kity.jsonl`) | 4 893 | 19 | 3 948 | 18 |
+| sceny wyzwalane w świecie (`r` → `spaces.*`, np. pułapki, POI) | 11 369 | 17 | 10 300 | 5 |
+| sceny powiązane z zadaniami (`index/zadania_sceny.jsonl`) | 6 198 | 20 | 4 759 | 40 |
+| sceny bez powiązania z zadaniem, kitem ani `spaces.*` | 11 436 | 21 | 8 824 | 77 |
+| **razem** | **33 896** | 19 | 27 831 | 140 |
+
+Przykład właściciela (scena `1026070`) trafia do grupy **wyzwalanej
+ze świata**: `r` wskazuje `spaces.s501.trap#6600990`, czyli jednolinijkowa
+odzywka odpalana obecnością gracza przy obiekcie w przestrzeni — nie scena
+fabularna i nie kit ambientowy.
 
 Wcześniejsza tabela (30 943 „zadaniowych” / 2 953 „ambientowych”) dzieliła
 sceny inaczej: sceną zadaniową była każda z relacjami `r`, więc do jednego
@@ -146,10 +152,11 @@ worka trafiały także odzywki ambientowe. Nowy podział pokazuje, że **trzon
 brakującego materiału to pojedyncze, krótkie odzywki**: 8 103 scenki mają
 dokładnie jedną brakującą kwestię, a mediana 19 znaków odpowiada barksom typu
 „He's awake!”, „I'd like that.”, nie dialogom fabularnym. Właścicielskie
-„około 3000” odpowiada podzbiorowi ambientowemu (3 719); pełna pula krótkich
-kwestii jest większa, bo w danych klienta nie ma znacznika oddzielającego
-odżywkę przypisaną do zdarzenia od swobodnej paplaniny NPC — a 23 460 kluczy
-leży w scenach bez żadnego powiązania z zadaniem lub kitem.
+„około 3000” odpowiada najbliżej podzbiorowi kitów ambientowych (4 893);
+pełna pula krótkich kwestii jest większa, bo w danych klienta nie ma
+znacznika oddzielającego odżywkę przypisaną do zdarzenia od swobodnej
+paplaniny NPC — 11 369 kluczy odpala się z wyzwalaczy `spaces.*`, a 11 436
+leży w scenach bez żadnego z tych powiązań.
 
 Przykład właściciela: scena `1026070`, mapy `[501, 701]`, `ui_type` 23,
 projekt `对话-zhouyizhou`, jedna kwestia:
@@ -199,6 +206,10 @@ ambientowe sterowane drzewami zachowań serwera nie mają kitu w danych klienta
 - Sceny: unikalne klucze elementów `e` scen, których pole `m` zawiera mapę
   pierwszej krainy z `index/prowincje.json` (燕南: 1, 501, 701). Warianty płci
   (`@id`) traktowane jako osobny slot, zgodnie z magazynem.
+- Podział brakujących kwestii scen (`--json` → `sceny.grupy`) liczy
+  `tools/audyt_zakresu.py`; kolejność pierwszeństwa: kit ambientowy
+  (`sceny_ambient_kity.jsonl`), wyzwalacz `spaces.*` w polu `r`, zadanie
+  (`zadania_sceny.jsonl`), reszta „bez powiązania”.
 - „AI” = klucz występuje w pliku `zwrotki/*.md` z niepustym `PL:`. To nie jest
   dowód, że tekst pochodzi z modelu — pliki zwrotek są jedynym śladem partii
   tymczasowych w repozytorium.

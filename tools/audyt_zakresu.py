@@ -21,7 +21,9 @@ Kategorie odpowiadają liście właściciela (STATUS.md, sekcja „Zakres wg pot
 
 Dla każdej kategorii raport podaje: liczbę unikalnych kluczy, ile pochodzi
 z przekładu tłumacza, ile dodano tymczasowo (klucz występuje w `zwrotki/*.md`
-z niepustym `PL:`), pokrycie i braki. Klucz tekstu jest wspólny dla wszystkich
+z niepustym `PL:`), pokrycie i braki. Brakujące kwestie scen dzieli dodatkowo
+według powiązania sceny: kit ambientowy (`index/mpk/sceny_ambient_kity.jsonl`),
+wyzwalacz `spaces.*` w polu `r`, zadanie (`index/zadania_sceny.jsonl`), reszta. Klucz tekstu jest wspólny dla wszystkich
 miejsc w grze, więc kategoria liczy **teksty**, nie wystąpienia.
 
 Ograniczenia: przypisanie mapy do sceny nie dowodzi, kiedy gracz ją zobaczy;
@@ -33,6 +35,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import sys
 from pathlib import Path
 from typing import Iterable
@@ -51,6 +54,9 @@ except ImportError:  # uruchomienie jako skrypt
 
 BLOK_PRZEDMIOTOW = (1800000, 1810000)
 NAZWY_COMPENDIUM = ("manual_name", "talk_title[]", "button_name[]", "manual_goto_text", "bubble_text")
+
+GRUPY_SCEN = ("ambient (kity)", "wyzwalane ze świata", "zadaniowe", "bez powiązania")
+_KOLEJNOSC_GRUP = {nazwa: numer for numer, nazwa in enumerate(GRUPY_SCEN)}
 
 KATEGORIE = (
     ("1 hinty zadań", "`tasks.task_target_str`"),
@@ -97,6 +103,59 @@ def mapy_krainy(index_dir, kraina: str | None = None) -> tuple[str, set[int]]:
     return wpis.get("kraina", ""), set(wpis.get("mapy") or ())
 
 
+def podzial_scen(ix, magazyn, mapy: set[int], *, kity=frozenset(), zadania_sceny=None) -> dict:
+    """Podział brakujących kwestii scen na grupy według najsilniejszego powiązania sceny.
+
+    Pierwszeństwo: kit ambientowy (`sceny_ambient_kity.jsonl`), wyzwalacz
+    w świecie (`r` wskazujące `spaces.*`), zadanie (`zadania_sceny.jsonl`).
+    Klucz liczony raz, w najsilniejszej grupie, w której występuje.
+    """
+    zadania = zadania_sceny or {}
+    przypisanie: dict[str, str] = {}
+    for scena in ix.sceny.values():
+        if not (set(scena.get("m") or ()) & mapy):
+            continue
+        klucze = []
+        for element in scena.get("e", ()):
+            slot = element[4] if len(element) > 4 and element[3] else element[2]
+            klucz = slot[1:] if slot.startswith("@") else slot
+            if klucz in ix.teksty and not magazyn.przeklad(klucz):
+                klucze.append(klucz)
+        if not klucze:
+            continue
+        swiat = any(
+            "spaces." in str(rel[1])
+            for rel in (scena.get("r") or ())
+            if isinstance(rel, list) and len(rel) > 1
+        )
+        numer = scena.get("d")
+        if numer in kity:
+            grupa = "ambient (kity)"
+        elif swiat:
+            grupa = "wyzwalane ze świata"
+        elif numer in zadania:
+            grupa = "zadaniowe"
+        else:
+            grupa = "bez powiązania"
+        for klucz in klucze:
+            if klucz not in przypisanie or _KOLEJNOSC_GRUP[grupa] < _KOLEJNOSC_GRUP[przypisanie[klucz]]:
+                przypisanie[klucz] = grupa
+
+    wynik = []
+    for grupa in GRUPY_SCEN:
+        dlugosci = [len(ix.teksty[klucz].zrodlo) for klucz, gdzie in przypisanie.items() if gdzie == grupa]
+        wynik.append(
+            {
+                "grupa": grupa,
+                "klucze": len(dlugosci),
+                "mediana": statistics.median(dlugosci) if dlugosci else 0,
+                "do_30": sum(1 for dlugosc in dlugosci if dlugosc <= 30),
+                "od_60": sum(1 for dlugosc in dlugosci if dlugosc >= 60),
+            }
+        )
+    return {"grupy": wynik, "razem": len(przypisanie)}
+
+
 def _kategoria_tekstu(zrodlo) -> str | None:
     tabela, pole, wiersz = zrodlo
     if tabela == "tasks" and pole == "task_target_str":
@@ -114,7 +173,15 @@ def _kategoria_tekstu(zrodlo) -> str | None:
     return None
 
 
-def audyt(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, mapy: set[int], ai: set[str] = frozenset()) -> dict:
+def audyt(
+    ix: indeks_mod.Indeks,
+    magazyn: magazyn_mod.Magazyn,
+    *,
+    mapy: set[int],
+    ai: set[str] = frozenset(),
+    kity=frozenset(),
+    zadania_sceny=None,
+) -> dict:
     """Zestawienie pokrycia sześciu kategorii zakresu tymczasowego."""
     wedlug: dict[str, set[str]] = {nazwa: set() for nazwa, _opis in KATEGORIE}
     for klucz, tekst in ix.teksty.items():
@@ -168,13 +235,45 @@ def audyt(ix: indeks_mod.Indeks, magazyn: magazyn_mod.Magazyn, *, mapy: set[int]
             round(100 * grupa["przetlumaczone"] / grupa["razem"], 1) if grupa["razem"] else 0.0
         )
 
+    sceny_podzial = podzial_scen(ix, magazyn, mapy, kity=kity, zadania_sceny=zadania_sceny) if mapy else {"grupy": [], "razem": 0}
+
     return {
         "format": "wwm-audyt-zakresu-v1",
         "kategorie": wynik,
+        "sceny": sceny_podzial,
         "compendium": compendium,
         "mapy_scen": sorted(mapy),
         "lacznie_ai": len(ai),
     }
+
+
+def _wczytaj_grupy_scen(katalog) -> tuple[set[int], dict]:
+    """Zbiór scen z kitów ambientowych i mapa scena -> zadania (puste, gdy brak plików)."""
+    kity: set[int] = set()
+    zadania: dict[int, set[int]] = {}
+    try:
+        for wiersz in _wiersze_jsonl(Path(katalog) / "mpk" / "sceny_ambient_kity.jsonl"):
+            if isinstance(wiersz.get("scena"), int):
+                kity.add(wiersz["scena"])
+    except (OSError, ValueError):
+        pass
+    try:
+        for wiersz in _wiersze_jsonl(Path(katalog) / "zadania_sceny.jsonl"):
+            numer = wiersz.get("zadanie")
+            for zdarzenie in wiersz.get("zdarzenia") or ():
+                if isinstance(zdarzenie, (list, tuple)) and zdarzenie[0] == "scena" and numer is not None:
+                    zadania.setdefault(zdarzenie[1], set()).add(numer)
+    except (OSError, ValueError):
+        pass
+    return kity, zadania
+
+
+def _wiersze_jsonl(sciezka: Path):
+    """Wiersze JSONL; brak pliku kończy iterację bez błędu tylko przez OSError."""
+    with sciezka.open(encoding="utf-8") as uchwyt:
+        for linia in uchwyt:
+            if linia.strip():
+                yield json.loads(linia)
 
 
 def main(argv=None) -> int:
@@ -193,7 +292,8 @@ def main(argv=None) -> int:
         katalog = Path(arguments.zwrotki)
         zwrotki = sorted(katalog.glob("*.md")) if katalog.is_dir() else []
         ai = klucze_ai(zwrotki)
-        raport = audyt(ix, magazyn, mapy=mapy, ai=ai)
+        kity, zadania_sceny = _wczytaj_grupy_scen(arguments.indeks)
+        raport = audyt(ix, magazyn, mapy=mapy, ai=ai, kity=kity, zadania_sceny=zadania_sceny)
     except (AudytError, indeks_mod.IndeksError, magazyn_mod.MagazynError, OSError) as error:
         print(json.dumps({"ok": False, "powod": str(error)}, ensure_ascii=False))
         return 1
@@ -209,6 +309,15 @@ def main(argv=None) -> int:
     for row in raport["kategorie"]:
         pokrycie = f"{row['przetlumaczone']}/{row['razem']} ({row['procent']}%)"
         print(f"{row['kategoria']:30s} {row['razem']:7d} {row['tlumacz']:8d} {row['ai']:7d} {pokrycie:>18s}")
+    sceny = raport.get("sceny") or {}
+    if sceny.get("grupy"):
+        print()
+        print(f"Brakujące kwestie scen według powiązania (razem {sceny['razem']}):")
+        for row in sceny["grupy"]:
+            print(
+                f"  {row['grupa']:22s} {row['klucze']:6d} kluczy, "
+                f"mediana {row['mediana']:>4} znaków, ≤30: {row['do_30']}, ≥60: {row['od_60']}"
+            )
     comp = raport["compendium"]
     print()
     print(

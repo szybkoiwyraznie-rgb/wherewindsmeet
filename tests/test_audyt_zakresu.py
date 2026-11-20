@@ -88,6 +88,40 @@ class AudytTests(unittest.TestCase):
         sceny = next(row for row in raport["kategorie"] if row["kategoria"].startswith("6 "))
         self.assertEqual((sceny["razem"], sceny["przetlumaczone"], sceny["braki"]), (2, 1, 1))
 
+    def test_podzial_scen_wg_powiazania(self):
+        ix = indeks.Indeks(Path("index"), {"format": indeks.FORMAT})
+        ix.teksty = {
+            K("kit"): indeks.Tekst("kit", None, 1, None, False),
+            K("swiat"): indeks.Tekst("swiat", None, 1, None, False),
+            K("zadanie"): indeks.Tekst("zadanie", None, 1, None, False),
+            K("samo"): indeks.Tekst("samo", None, 1, None, False),
+        }
+        ix.sceny = {
+            1: {"d": 1, "m": [701], "e": [["k", 0, K("kit")]]},
+            2: {"d": 2, "m": [701], "e": [["k", 0, K("swiat")]], "r": [[523, "spaces.s501.trap#1"]]},
+            3: {"d": 3, "m": [701], "e": [["k", 0, K("zadanie")]]},
+            4: {"d": 4, "m": [701], "e": [["k", 0, K("samo")]]},
+            5: {"d": 5, "m": [999], "e": [["k", 0, K("inna")]]},
+        }
+        ix.teksty[K("inna")] = indeks.Tekst("inna", None, 1, None, False)
+        podzial = audyt_zakresu.podzial_scen(
+            ix, tlumaczenie.Magazyn(), {701}, kity={1}, zadania_sceny={3: {10}}
+        )
+        grupy = {row["grupa"]: row["klucze"] for row in podzial["grupy"]}
+        self.assertEqual(grupy["ambient (kity)"], 1)
+        self.assertEqual(grupy["wyzwalane ze świata"], 1)
+        self.assertEqual(grupy["zadaniowe"], 1)
+        self.assertEqual(grupy["bez powiązania"], 1)
+        self.assertEqual(podzial["razem"], 4)
+
+    def test_podzial_scen_pomija_przetlumaczone(self):
+        ix = indeks.Indeks(Path("index"), {"format": indeks.FORMAT})
+        ix.teksty = {K("kit"): indeks.Tekst("kit", None, 1, None, False)}
+        ix.sceny = {1: {"d": 1, "m": [701], "e": [["k", 0, K("kit")]]}}
+        mag = tlumaczenie.Magazyn()
+        mag.po_kluczu[K("kit")] = "gotowe"
+        self.assertEqual(audyt_zakresu.podzial_scen(ix, mag, {701}, kity={1})["razem"], 0)
+
     def test_compendium_dzieli_nazwy_i_opisy(self):
         raport = audyt_zakresu.audyt(indeks_testowy(), magazyn_testowy(), mapy={701})
         comp = raport["compendium"]
