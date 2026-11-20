@@ -11,9 +11,13 @@ miejsc w grze). Kategorie właściciela: (1) hinty zadań **8 936/8 936 =
 100%**, (2) listy **1 063/1 063 = 100%**, (3) przedmioty fabularne
 **4 979/4 981** (2 cytaty klasyczne), (4) opisy przedmiotów `ccs_text_msg`
 **5 282/5 282**, (5) Compendium **330/1 524** — brakuje **486 nazw**
-(141 nazw działów, 334 tytuły haseł, 9 przycisków, 2 pozostałe), (6) sceny
-pierwszej prowincji (燕南) tylko **8 559/42 455 = 20,2%**; brakuje **33 896**
-unikalnych kwestii, w tym przykład właściciela ze sceny `1026070`.
+(141 nazw działów, 334 tytuły haseł, 9 przycisków, 2 pozostałe), (6) kwestie
+w scenach pierwszej prowincji (燕南) **8 559/42 455 = 20,2%**; brakuje
+**33 896** kluczy, w tym przykład właściciela ze sceny `1026070`. To prawie
+wyłącznie **jednolinijkowe odzywki NPC** (mediana 19 znaków, 82% ≤30 znaków,
+8 103 scenki jednoelementowe, 8 788 kluczy z flagą `vo_amb*`), a nie dialog
+fabularny; ambientowy podzbiór to **3 719** kluczy, sceny zadań 7 680,
+sceny bez powiązania 23 460.
 `programmer_text_msg` (4 128 braków) to etykiety UI, nie opisy przedmiotów —
 poza zakresem. **Zainstalowana łatka `v0.5.0` (112 405 przekładów) nie zawiera
 partii tymczasowych** — bez nowej łatki z bieżącego magazynu właściciel nadal

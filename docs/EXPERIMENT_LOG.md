@@ -2883,3 +2883,40 @@ Compendium: 330/1 524 (21,7%).
 **Kontrole:** `run_tests.py` **628 testów OK** (w tym 5 nowych testów audytu); `check_repository.py` OK
 (646 wpisów indeksu). Przekład AI-tymczasowy, bez testu w grze. Następny
 krok: łatka `v0.6.0` z bieżącego magazynu, potem nazwy Compendium.
+
+## 2026-11-20 (2) — sprostowanie: brakujące kwestie 燕南 to odzywki, nie sceny fabularne
+
+**Uwaga właściciela:** „nie chodzi o sceny fabularne tylko o jednozdaniowe
+banter quotes, których jest około 3000”. **Metoda:** pomiar na `index/`
+(Patch 2.4) i magazynie z 2026-11-20, ta sama definicja klucza scen co
+w `tools/audyt_zakresu.py` (slot `e` z wariantem `@`, mapy 1/501/701).
+
+**Wynik — brakujące 33 896 kluczy to krótkie napisy:**
+
+| cecha | wartość |
+|---|---:|
+| unikalne brakujące klucze / wystąpienia | 33 896 / 36 743 |
+| sceny z brakującą kwestią | 15 118 (z 17 453 scen z tekstem) |
+| scenki dokładnie jednokwestiowe | 8 103 |
+| mediana / średnia długość | 19 / 20,8 znaku |
+| ≤30 znaków / ≥60 znaków | 27 831 / 140 |
+| flaga głosu ambientowego (`vo_amb*`, `pet_cat_vo*`, `func_audio_placeholder`) | 8 788 |
+| wybory gracza wśród braków | 0 |
+
+Podział bez powtórzeń: kity ambientowe 3 719, sceny zadań 7 680, sceny bez
+powiązania z zadaniem lub kitem 23 460. Ambientowy podzbiór odpowiada
+szacunkowi właściciela („około 3000”); pozostałe to również pojedyncze
+odzywki, ale w scenach powiązanych z zadaniami albo bez żadnego powiązania
+w danych klienta.
+
+**Przyczyna błędu w raporcie z rana:** tabela dzieliła sceny na „zadaniowe”
+i „ambientowe” po polu relacji `r`, które ma większość scen — przez to
+2 953 odzywki ambientowe stopiły się z 30 943 kwestiami scen zadań i powstał
+obraz „niedokończonego dialogu fabularnego”. Poprawiono opis w
+[AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md) (sekcja (6) i podsumowanie) oraz
+w `docs/STATUS.md`. Liczby pokrycia (42 455 / 8 559 / 33 896) się nie
+zmieniły — zmieniła się ich interpretacja.
+
+**Ograniczenie:** w danych klienta nie ma znacznika oddzielającego odżywkę
+związaną z zadaniem od swobodnego banteru NPC; przypisanie mapy ani kitu nie
+dowodzi, kiedy gracz daną kwestię usłyszy.
