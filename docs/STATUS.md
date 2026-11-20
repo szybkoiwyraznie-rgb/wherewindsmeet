@@ -1,7 +1,28 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-20**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+**Audyt zakresu tymczasowego AI (2026-11-20)** — pełne zestawienie:
+[AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md), narzędzie `tools/audyt_zakresu.py`.
+Wszystkie **25 696** unikalnych kluczy z 328 plików zwrotek AI jest
+w magazynie (0 brakujących wpisów; magazyn **139 653** przekłady, 28,53%
+miejsc w grze). Kategorie właściciela: (1) hinty zadań **8 936/8 936 =
+100%**, (2) listy **1 063/1 063 = 100%**, (3) przedmioty fabularne
+**4 979/4 981** (2 cytaty klasyczne), (4) opisy przedmiotów `ccs_text_msg`
+**5 282/5 282**, (5) Compendium **330/1 524** — brakuje **486 nazw**
+(141 nazw działów, 334 tytuły haseł, 9 przycisków, 2 pozostałe), (6) sceny
+pierwszej prowincji (燕南) tylko **8 559/42 455 = 20,2%**; brakuje **33 896**
+unikalnych kwestii, w tym przykład właściciela ze sceny `1026070`.
+`programmer_text_msg` (4 128 braków) to etykiety UI, nie opisy przedmiotów —
+poza zakresem. **Zainstalowana łatka `v0.5.0` (112 405 przekładów) nie zawiera
+partii tymczasowych** — bez nowej łatki z bieżącego magazynu właściciel nadal
+widzi po angielsku treści, które już są przetłumaczone. Następny krok:
+zbudować łatkę `v0.6.0` z magazynu, potem domknąć nazwy Compendium (486)
+i wybrane sceny pierwszej prowincji. W tej sesji doszło 79 opisów szkół sztuk
+walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
+`zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`). **628 testów** i kontrola
+repozytorium OK (w tym 5 nowych testów `tools/audyt_zakresu.py`); przekład AI-tymczasowy, bez testu w grze.
 
 **Najnowsze — Compendium `ja` (2026-11-19):** 35 kolejnych instrukcji
 podróżowania, koni, sztuk osobliwych i odbić; `guider_tujian_data` ma teraz

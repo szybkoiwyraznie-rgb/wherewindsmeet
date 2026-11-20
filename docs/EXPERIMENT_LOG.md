@@ -2828,3 +2828,58 @@ według głównego źródła klucza. Próba sucha i import bez odrzuceń; skan 1
 nowych pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów wierszy
 zgodna ze źródłem. 623 testy i kontrola repozytorium OK (646 wpisów).
 Moment odblokowania w grze niezweryfikowany; przekład AI-tymczasowy.
+
+## 2026-11-20 — audyt tymczasowego zakresu AI + Compendium `ka` (szkoły sztuk walki)
+
+**Pytanie właściciela:** czy tymczasowy zakres z 2026-11-19 został zrobiony
+i czego brakuje. **Wejście:** `index/` (Patch 2.4), magazyn `tlumaczenie/`
+(139 574 przekłady przed tą sesją), 328 plików `zwrotki/*.md` z partiami
+tymczasowymi. **Metoda:** nowe narzędzie `tools/audyt_zakresu.py` (tylko
+odczyt; kategoria = główne źródło klucza, klucz liczony raz; sceny = unikalne
+elementy `e` scen, których `m` zawiera mapę pierwszej krainy z
+`index/prowincje.json`; „AI” = klucz z niepustym `PL:` w `zwrotki/*.md`).
+Testy narzędzia: `tests/test_audyt_zakresu.py` (5 przypadków, dane syntetyczne).
+
+**Wynik audytu** (szczegóły i ograniczenia: [AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md)):
+
+| kategoria | razem | tłumacz | AI | pokrycie | braki |
+|---|---:|---:|---:|---:|---:|
+| hinty zadań | 8 936 | 979 | 7 957 | 100,0% | 0 |
+| listy | 1 063 | 40 | 1 023 | 100,0% | 0 |
+| przedmioty fabularne | 4 981 | 3 997 | 982 | 100,0% | 2 |
+| opisy przedmiotów (`ccs` + `programmer`) | 9 421 | 44 | 5 249 | 56,2% | 4 128 |
+| Compendium | 1 524 | 87 | 243 | 21,7% | 1 194 |
+| sceny 燕南 | 42 455 | 7 944 | 615 | 20,2% | 33 896 |
+
+- **Integracja kompletna:** 25 696 unikalnych kluczy AI, wszystkie w magazynie,
+  0 brakujących wpisów. Rozkład: `tasks` 12 020, `ccs_text_msg` 5 238, sceny
+  4 514 (w 燕南 tylko 615; 3 120 bez mapy, 1 371 inne prowincje), `text_msg`
+  1 303, `tasks_envelop_data` 1 023, debaty 452, Compendium 243, reszta 903.
+- **Kategorie (1)–(3) domknięte**, (4) domknięta przez całą tabelę
+  `ccs_text_msg`; `programmer_text_msg` to etykiety UI (4 128 braków) i nie
+  należy do opisu przedmiotów.
+- **Braki zakresu:** 486 nazw Compendium (141 `manual_name`, 334
+  `talk_title[]`, 9 `button_name[]`, 1 `manual_goto_text`, 1 `bubble_text`),
+  2 cytaty w `manual_items`, oraz **33 896** unikalnych kwestii scen 燕南
+  (30 943 w scenach powiązanych z zadaniami, 2 953 ambientowych). Przykład
+  właściciela (scena `1026070`, u=23, „Looks like Uncle Jiang…”) bez przekładu.
+- **Przyczyna angielskich napisów w grze:** łatka `v0.5.0` (2026-11-18,
+  112 405 przekładów ze zwrotki tłumacza `WWN_PL_v4`) powstała **przed**
+  partiami AI; magazyn ma dziś 139 653 przekłady. Przykłady właściciela
+  „Search inside for clues”, „From Wei, to Jiang Wulang”, „Dusty Sword Tassel”,
+  „Traces of the Past”, „Lattice Door” są już w magazynie.
+
+**Partia `ka` — Compendium, rozdział 91xx (opis, poza literalnym zakresem
+nazw):** 79 nowych przekładów (14 szkół sztuk walki, drogi wewnętrzne, opisy
+podstaw i zaawansowanych technik; pominięto 4 wpisy testowe `测试…` i treść
+„文案待补充”). Plik `zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`.
+Przed importem skrypt sprawdził zgodność tokenów `#Y/#J/#E` i liczbę podziałów
+wierszy; skan 79 pozycji bez CJK, nie-NFC i miękkich dywizów. Import:
+79 miejsc, 79 nowych, 0 odrzuconych; magazyn 139 574 → **139 653** (28,53%).
+Nazwy własne i terminy zgodne z magazynem (np. „Płomienna Bicz”, „Upojenie:
+Głęboki Rausz”, „Łamanie Bambusa: Wiatr”, „Wola Niebios”). Po partii
+Compendium: 330/1 524 (21,7%).
+
+**Kontrole:** `run_tests.py` **628 testów OK** (w tym 5 nowych testów audytu); `check_repository.py` OK
+(646 wpisów indeksu). Przekład AI-tymczasowy, bez testu w grze. Następny
+krok: łatka `v0.6.0` z bieżącego magazynu, potem nazwy Compendium.
