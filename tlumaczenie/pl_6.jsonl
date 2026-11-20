@@ -98,6 +98,7 @@
 {"k": "60307b3bd5219601", "pl": "Tu są talizmany…"}
 {"k": "6031dc453a207287", "pl": "Po użyciu poznasz recepturę: Zaśnieżony kamienny posąg."}
 {"k": "6032423123625f2b", "pl": "Po otwarciu otrzymasz złoty element zestawu Mglista Wierzba lub Nieznający Chłodu na wskazanym miejscu i możesz wybrać jego początkową cechę: #Yzawsze fioletową, o stałej wartości#E. Polecany dla ścieżki #YJedwabna Nić: Nefryt#E."}
+{"k": "60325c12b9ba8848", "pl": "Będę tuż obok. Jeśli nie będziesz wiedziała, co powiedzieć, patrz na moje znaki."}
 {"k": "6033469497314baa", "pl": "Cień Strażnika Mutun"}
 {"k": "60334e3b2b7bffe6", "pl": "Ślizg i skok"}
 {"k": "6033b3eeeeb2d99d", "pl": "„Tysiąc żagli, jedna łódź”"}
@@ -1049,6 +1050,7 @@
 {"k": "6210482ca3a918c4", "pl": "Pawilon Leżącej Tęczy: futryna dwuskrzydłowa"}
 {"k": "62114e0425804f1b", "pl": "Zasięgnij wieści o liściach drzewa nieśmiertelności"}
 {"k": "6211c3d9df151b4a", "pl": "Ach, tylko nie wolno się naprawdę roześmiać, bo pani znów mi potrąci z zapłaty."}
+{"k": "621270e8ea9ed642", "pl": "(wstrzymuje oddech ze zdumienia, widząc tłum młodych uczniów) …"}
 {"k": "62133834155e0cbb", "pl": "Z tym paniczem zawsze ciężko się dogadać. Ile razy chodziłem do jego dworu po pieniądze za ciastka, tyle razy całowałem klamkę… A dziś co, poszedł sobie ot tak?"}
 {"k": "621359b31606788c", "pl": "Trup?"}
 {"k": "621436cd3f0d56c9", "pl": "Puste zadanie oczekiwania"}
@@ -1802,6 +1804,7 @@
 {"k": "63966390adbea313", "pl": "Udaj się na Targ Pszenicznej Woni wskazany w liście i szukaj „bez skazy”."}
 {"k": "6396a064d2a5bc85", "pl": "Rano wstaję, dziś znowu pracowity dzień. Xiaoba, do roboty nad mechanizmami!\n\nNadzorca Shi wczoraj w nocy męczył się przy liczeniu towaru; trzeba mu zrobić siedmiobarwną latarnię, żeby w nocy liczył towar z większym zapałem, a w wolnej chwili mógł potańczyć w siedmiobarwnej poświacie i rozruszać kości.\n\nStary nadzorca ostatnio ciągle komenderuje wszystkimi przy robocie, aż wszystkim uszy zmęczyły się na amen! Trzeba mu zrobić skrzyneczkę, która łapie głos: wtedy będzie mógł się nagadać do woli, a nikt nie usłyszy, co mówi.\n\nZi Yuan ciągle mówi, że chce wyjść z gór i się rozejrzeć; mechanicznego ptaka do przenoszenia ludzi trzeba jeszcze przerobić… Przelecieć nad Urwiskiem Westchnień się nie da, ale można wzbudzić trąbę powietrzną i wywiać Zi Yuan na zewnątrz; oby do tego czasu nie przybyło Zi Yuan za dużo wzrostu.\n\nSiostra Cai Yin lubi pić, ale zawsze się martwi, że jak wypije za dużo, to pomyli się w rachunkach; trzeba zrobić mechanizm przeciw senności na tysiąc dni: ilekroć siostra Cai Yin zamroczy się przy rachunkach, wyleje się jej na głowę dzban Tysiąca Dni Snu; tak będzie mogła i pić, i liczyć, tylko księgi rachunkowe trzeba wymienić na wodoodporne.\n\n…\n\nTyle jest do zrobienia, Mroczna Dolina naprawdę nie da sobie rady bez Xiaoby!"}
 {"k": "6396afa98b250d88", "pl": "Geografia: Wieża Tianyi"}
+{"k": "6396df03a4b80317", "pl": "Wędrowcze, wędrowcze! Młodsi bracia i siostry wszyscy się na nią rzucili!"}
 {"k": "6396e4d42f1fcdcf", "pl": "Qi Qiuyi bardzo lubi stare lalki z teatru cieni Shang Chuliu, a Shang Chuliu zamierza wymienić je na nowe. Że wszystkie stare “postacie” pójdą w odstawkę, bardzo go zasmuciło."}
 {"k": "63970fa1f4e95c8f", "pl": "- Tang, Zhou Fang, “Damy dworu z wachlarzami”, zbiory Muzeum Pałacowego"}
 {"k": "6397c79153424799", "pl": "Wypytaj Xiaohe, co się stało"}
@@ -1861,6 +1864,7 @@
 {"k": "63ae65bdc588cbb9", "pl": "“Dzwonek Złych Duchów” to w istocie “dzwonek przywołujący śmierć”. Każde jego zadzwonienie oznacza śmierć poprzedniego pionka i wejście do gry następnego. Pionki te, jeden po drugim, własną śmiercią budowały groźną sławę Zhu Youshenga i ratowały przyszłość ludzi z Dziewięciu Nurtów."}
 {"k": "63aeeefea378577c", "pl": "Ćśś! Ciszej."}
 {"k": "63af1c2dd17c633f", "pl": "Podejdź w pobliże Pawilonu Widoku Fal"}
+{"k": "63afb00de290b214", "pl": "Siostro, Wielka Mistrzyni, ja też chcę…"}
 {"k": "63b27a7bf96e377c", "pl": "Miau Miau - Naprawa zbiornika 2"}
 {"k": "63b2daecd6c956ec", "pl": "Ostatnia bułka na parze, jaką zostawiła matka Meng Dalanga przed śmiercią. Po szczególnej obróbce jest twarda jak kamień i już się nie zepsuje."}
 {"k": "63b301c99a2958e8", "pl": "Ile razy mam powtarzać, chorobę trzeba leczyć! Zresztą w Aptece Dobroczynnej leki zawsze są tanie!"}
@@ -3689,6 +3693,7 @@
 {"k": "671ab4c178f57103", "pl": "Słuchacz opowieści"}
 {"k": "671ac2e24d69dd9b", "pl": "Zapisane po rozmowie z Deng Xin"}
 {"k": "671af3920862b951", "pl": "Rzut oka na Nefrytową Górę"}
+{"k": "671b3ce5daf3b234", "pl": "Ach… tak też można…"}
 {"k": "671b76c4dcef7a95", "pl": "Krok Przed Innymi"}
 {"k": "671c0f51b1a80d54", "pl": "Zbadaj dokładnie wnętrze izby"}
 {"k": "671c96d8a83f64d9", "pl": "Starzec Jing nie chce uwierzyć, że Kruk nie żyje. Prosi cię o zebranie tegorocznych trzech porcji nektaru złotego kwiatu; tym razem chce sam zanieść miód panu Krukowi."}
@@ -8327,6 +8332,7 @@
 {"k": "6ff450c24f323866", "pl": "Dziki ogień pożera step i spala wszelkie zło."}
 {"k": "6ff4e1cf94cfb4b8", "pl": "Bęben Owacji"}
 {"k": "6ff56859cb9844a2", "pl": "Miau-miau - zbieranie błędnych ogników - pod wodospadem Szczytu Blasku Buddy"}
+{"k": "6ff5876de271c248", "pl": "Młody uczeń A"}
 {"k": "6ff5ae274c644d1b", "pl": "Lekkie upojenie"}
 {"k": "6ff721dc0acfd839", "pl": "Rezonans"}
 {"k": "6ff73a630e33a96b", "pl": "Bo Zhou"}
