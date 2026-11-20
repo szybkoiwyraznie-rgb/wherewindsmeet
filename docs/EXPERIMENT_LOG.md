@@ -2635,3 +2635,15 @@ bez weryfikacji w grze. Kolejny krok: partia `gg`.
 `--na-sucho`: 80 nowych, 0 odrzuconych; importy również bez odrzuceń.
 Postęp według odłożonej listy bazowej: **855** kluczy pozostaje. Przekład
 AI-tymczasowy; brak weryfikacji w grze. Następny krok: partia `gm`.
+
+**Korekta selekcji rundy 7.** Filtr przestrzeni zadania użyty do
+`tools/lista_rundy7.py` nie zapewnia, że powiązana scena leży na początku
+gry lub w pierwszej prowincji. Przykład: zadanie `1901402`, grupa 8,
+przestrzeń 501, scena `34300001` — rozmowa w Jiangnan. Ostatnie partie
+dotyczyły również Ukrytej Góry (grupa 7). Historyczna lista: 960/1 815,
+pozostałych 855 nie traktować jako zaakceptowanego wczesnego zakresu.
+
+Osobna sonda po scenach zadań głównych grupy 1: 665 różnych kluczy
+bazowych, 19 braków przed importem. Partia `gm`: +19, 0 odrzuconych;
+magazyn **135 377**. Lokalnie `run_tests.py`: **623 testy OK** po `gl`;
+`check_repository.py`: OK (580 wpisów indeksu) po `gm`. Bez testu w grze.

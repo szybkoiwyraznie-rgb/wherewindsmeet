@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Lista kluczy rundy 7: dialogi scen wątku głównego (主章) w prowincji 燕南.
+"""Historyczna lista rundy 7: sceny zadań głównych z przestrzeniami 1, 501, 701.
+
+UWAGA: przestrzeń przypisana do zadania nie dowodzi położenia ani wczesnego
+czasu akcji sceny; wynik obejmuje późniejsze rozdziały i lokacje. Nie używać
+bez osobnej selekcji do określania zakresu wczesnej gry.
 
 Kolejność: numer zadania rosnąco, potem kolejność scen w `zadania_sceny`,
 potem kolejność kwestii w scenie. Klucze już przetłumaczone są pomijane.
@@ -78,6 +82,7 @@ def main(argv=None):
     parser.add_argument("--pelne", action="store_true", help="dopisz tekst ZH i EN")
     parser.add_argument("--wszystkie", action="store_true", help="także już przetłumaczone")
     args = parser.parse_args(argv)
+    print("UWAGA: historyczny filtr przestrzeni nie gwarantuje wczesnej gry ani prowincji sceny.", file=sys.stderr)
     indeks = indeks_mod.wczytaj("index", sceny=True)
     magazyn = tlumaczenie.wczytaj("tlumaczenie", warianty="index/warianty.jsonl")
     for klucz in kolejnosc(indeks):

@@ -31,21 +31,30 @@ Czyli **~2 100 kwestii**, nie 163 000. `text_msg` (103 975) i
 `debate_guider_dialog_data` (60 512) to tabele całej mapy świata — we
 wczesnej grze brakuje z nich odpowiednio **265** i **30 899** kluczy,
 ale gros debat dotyczy późnych regionów, więc nie ma sensu tłumaczyć
-ich z góry. Wniosek: runda 7 = sceny wątku głównego 燕南
-(po deduplikacji wariantów 1 815 kluczy, ~23 partie po 80); następny
-kandydat: `guider_tujian_data` (1 516);
-tabele całomapowe dopiero na żądanie.
+ich z góry. Wstępny plan: wyselekcjonować sceny wczesnej gry oraz nazwy Compendium.
+Uwaga: pierwotny filtr przestrzeni zadań jest niewystarczający — szczegóły
+i korekta poniżej. Tabele całomapowe dopiero na żądanie.
 
-**Runda 7 w toku (2026-11-19):** dialogi sceniczne wątku głównego 燕南.
-Lista kluczy jest reprodukowalna: `tools/lista_rundy7.py` (kolejność:
-zadanie → scena → kwestia; identyfikatory wariantów płci zwijane do klucza
-bazowego przez `indeks.warianty`). Razem **1 815** kluczy; zrobione
-**960** (partie `ga`–`gl`, magazyn **135 358**). Zostało 855.
-Konwencja nazw obowiązująca w dialogach: 墨门 → „Szkoła Moistów”,
-墨山道 → „Szkoła Mo”/„Szkoła Moistów”, 巨子 → „Wielki Mistrz” (żeńsko
-„Wielka Mistrzyni”), 长老 → „starszy”/„starsza”, 兼爱 → „powszechna
-miłość”, 飞天城 → „Latające Miasto”, 金乌窠 → „Gniazdo Złotego Kruka”,
-司南剑客 → „Szermierz z Kompasem”, 孤云 → „Samotna Chmura”.
+**Runda 7 — korekta zakresu (2026-11-19):** historyczny filtr
+`tools/lista_rundy7.py` wybiera zadania główne o przestrzeni 1, 501 lub 701,
+ale **to nie dowodzi miejsca ani czasu akcji sceny**. M.in. zadanie 1901402
+(grupa 8) ma przestrzeń 501, a scena 34300001 rozgrywa się w Jiangnan;
+partie `ga`–`gl` objęły także wątek Ukrytej Góry w grupie 7. Dlatego
+nie należy utożsamiać wyniku z samym początkiem gry w pierwszej prowincji.
+Historyczna lista miała 1 815 braków, z czego zaimportowano 960, ale dalsze
+855 **nie są automatycznie zatwierdzonym zakresem**. Nie usuwano wcześniej
+zaimportowanych przekładów; są AI-tymczasowe, nie zostały sprawdzone w grze.
+
+Dodatkowo `gm` uzupełnia **19** braków scen zadań głównych grupy 1
+(pierwszy rozdział); sonda po powiązaniach `zadania_sceny` zwróciła
+665 kluczy bazowych tej grupy, z których przed importem brakowało 19.
+Magazyn **135 377**. Dalsza praca: indywidualna selekcja wczesnej gry
+(np. nazwy i instrukcje Compendium dotyczące podstaw), nie hurtowy import
+całych tabel ani dalsze podążanie za filtrem przestrzeni.
+
+Konwencje dotychczasowych dialogów: 墨门 → „Szkoła Moistów”, 墨山道 →
+„Szkoła Mo”, 巨子 → „Wielki Mistrz” / „Wielka Mistrzyni”, 飞天城 →
+„Latające Miasto”, 司南剑客 → „Szermierz z Kompasem”.
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,
