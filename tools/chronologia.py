@@ -34,7 +34,7 @@ Zasady kolejności (te same, co w ustaleniach):
    nie mają numeru dialogu,
 5. cutsceny bez grupy zadań stoją na końcu, w kolejności własnych numerów
    (sekcja „Cutsceny bez grupy zadań”) — nie udajemy, że znamy ich miejsce,
-6. napisy przerywników (pula `text_msg`) trafiają do 01, nie do 03: te, których
+6. napisy przerywników (pula `text_msg`) trafiają do 01, nie do 02: te, których
    scenę da się rozpoznać po nazwie nagrania albo po sprawdzonej kotwicy, stoją
    **w swojej cutscenie** (pole `kn`, przed streszczeniem), a pozostałe — w sekcji
    „Napisy przerywników”, w kolejności wierszy z pliku gry.

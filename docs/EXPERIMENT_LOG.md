@@ -2192,3 +2192,639 @@ z danych: „Whispers of the Tempest" należy w grze do grupy 1, nie 2.
 Testy: **614 OK** (przebudowane `tests/test_kolejnosc_zadan.py`:
 nagłówek rozdziału pierwszego, >500 nazwanych łańcuchów, fallback
 tylko dla grup bez nazwy, wciąganie luźnych nazw pod nagłówek).
+
+## 2026-11-19 (17) — uwagi właściciela do Czytanki; czytanka v21
+
+Owner notes after reading v20. Three changes, all in `tools/czytanka_czysta.py`:
+
+1. **Nazwa pliku reszty: `03_reszta` → `02_reszta`** (`02` przejęty po
+   zlikwidowanym `02_kontekst_scen_i_cutscen.md`); wszystkie odwołania
+   (docstring, README generatora, `docs/CZYTANKA_DO_CZYTANIA.md`,
+   `docs/STATUS.md`, testy) przeniesione; `03_reszta*.md` już nie powstaje.
+2. **Tytuł części nazywa jej zawartość** (`_etykieta_sekcji`, `_opis_czesci`,
+   `_zapisz_czesci`): lista etykiet `# ` sekcji w kolejności występowania,
+   po przecinkach, maks. 5 (potem `…`); krótkie nazwy z `_KROTKIE_SEKCJE`
+   (np. `Zadania i wątki` → `zadania`, `Encyklopedia…` → `kompendium`,
+   `Pamiątki — przedmioty z historią` → `pamiątki`), a kraina `# 清河 —
+   Qinghe - ostatnia iluzja…` bierze człon po ` — ` i ucina dopisek po
+   pierwszym `, `, ` - ` lub ` (` → `Qinghe`. Tytuł części np.
+   `# Where Winds Meet — 01 - Yannan, Qinghe, Hexi, Ukryta Góra — część 5 z 8`,
+   `# Where Winds Meet — 02 - przedmioty — część 2 z 3`;
+   pojedynczy, niecięty plik zostaje pod zwykłym tytułem. `README.md` w paczce
+   wylicza krótką listę sekcji każdej części (wiersze tabeli).
+3. **Dwie uwagi formatowania:** karta pamiątki ma tytuł, legendę i treść
+   w kolejnych liniach bez pustych wierszy (`**Jiang Wulang — Stara włócznia**`
+   / `U Przystani Niebios · 1` / treść — prośba właściciela, przykład 1:1);
+   wiersz `Interakcja: <POI>` stoi tuż nad `## Scena …` bez pustej linii
+   (prośba właściciela, przykład 1:1), a `_czesci` przy cięciu na części
+   przenosi wiersz `Interakcja: …` na początek nowej części razem ze sceną
+   (inaczej mógł zostać sam na końcu części).
+
+Budowa `out/czytanka_v21`: 01 → 8 części, 02 → 3 części + README;
+75 328 jednostek, 30 986 kwestii PL, 160 897 z gwiazdką, reszta **91 441**
+(v19: 91 095; +346 to nowe klucze `pl_nazwy_hasel.jsonl` z wpisu 16 —
+wpis 16 podawał „liczniki bez zmian", ale licznik `reszta` liczy klucze
+magazynu, więc przesunął się o pełną dopisaną porcję), zbiory 1020,
+pamiątki 120, POI 2945 (w tym 369 z numerem sceny).
+
+Testy: **623 OK** (nowe: `TestTytulyCzesci` (5), `TestInterakcjaWstep` (2),
+`PamiatkiTests.test_tytul_legenda_i_tresc_w_kolejnych_liniach`;
+`test_dwa_pliki_tresci_bez_kontekstu` i glob `02_reszta*.md` w
+`test_chronologia.py` pilnują nowej nazwy).
+
+Paczka `dist/WWM_Czytanka_PL_v21.zip` (8 435 805 B, SHA-256
+`b528e98b600a6c8d9fe60e9304644685369301cde240c697999f83af76db0fe8`) na
+Dysku (folder „Where Winds Meet", `czytanka_v21.zip`,
+id `1wMFzfRAqr964kL-p8o8k_OSV3s_2brDz`). Weryfikacja po budowie: wszystkie
+59 wierszy `Interakcja:` stoją bezpośrednio nad `## Scena …` (skan całego
+01), wszystkie 120 kart pamiątek bez pustych wierszy między tytułem,
+legendą i treścią (skan sekcji `# Pamiątki` we wszystkich trzech częściach 02).
+
+## 2026-11-19 (18) — nazwy plików części; czytanka v22
+
+Właściciel po pobieraniu v21: „pliki dalej mają stare tytuły" — okazało
+się, że chodziło o **nazwy plików** części, nie o nagłówki w środku
+(nagłówki naprawiła v21, ale pliki nazywały się wciąż `01_sceny_i_cutsceny_01.md …
+_08.md` / `02_reszta_01.md … _03.md`). Żądanie: nazwy mają mówić, co jest
+w środku (przykłady właściciela: „02 - zadania, kompendium, pozostałe",
+„01 - prowincja X").
+
+Zmiana (`tools/czytanka_czysta.py`): **nazwa pliku części = tytuł części
+(bez przedrostka `Where Winds Meet — `) + `.md`** — np. `01 - prolog,
+Yannan — część 1 z 8.md`, `02 - sztuki walki, walka, zadania, świat i
+miejsca, historie zasłyszane, … — część 3 z 3.md`. `_nazwa_pliku_czesci`
+podmienia znaki niedozwolone w nazwach (`\/:*?"<>|` i znaki kontrolne) na
+`-` i ucina kropki/spacje na końcu (Windows). Gdy część nie ma sekcji
+(brak listy etykiet) — nazwa zostaje stara (`baza_NN.md`). Pojedynczy,
+niecięty plik bez zmian (`02_reszta.md`). Treść plików — co do bajta —
+taka sama jak v21 (zweryfikowane `cmp` na wszystkich 11 plikach treści
+out/czytanka_v22 vs out/czytanka_v21). `README.md` w paczce nadal wylicza
+wszystkie części z krótką listą sekcji; w repo testy sklejające części
+sortują po `część N` (nazwy są opisowe, więc alfabetyczny porządek
+nie działa).
+
+Uwaga: w Eksplorerze alfabetyczny porządek części nie pokrywa się z
+kolejnością czytania — kolejność liczbowa jest w nazwie („część N z M")
+i w README. Paczka **czytanka_v22.zip** na Dysku (id
+`1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`, 8 436 785 B, SHA-256
+`0eaf4790be1fc3594b7b5e5b554c9549d79c4fe5b4854a6cf69886a679625840`).
+v21 na Dysku zostaje jako archiwum; v20 również (nie usuwano nic bez zgody
+właściciela).
+
+Testy: **623 OK** (rozszerzony `TestTytulyCzesci.test_zapisz_czesci_nadaje_tytul_z_zawartoscia`:
+nazwy zaczynają się od `01 - `, zawierają `część` i kończą `.md`, bez
+znaków zakazanych w ścieżce; `test_chronologia.py` skleja części po numerze
+z „część N”, nie alfabetycznie).
+
+## 2026-11-19 (19) — przekład AI-tymczasowy, runda 1 (310 wpisów); pakiet tłumacza v5
+
+Właściciel zgłosił nieprzetłumaczone fragmenty widoczne podczas gry i
+zlecił ich **tymczasowy przekład przez agenta AI** — do czasu dostarczenia
+zwrotki przez Tłumacza, która te wpisy nadpisze (wyższy priorytet zwrotki;
+zwykły import, raport `zmienione`). Decyzja właściciela dotyczy wyłącznie
+tymczasowego użycia w ramach tej sesji; zwrotka AI jest jawnie oznaczona
+(`zwrotki/2026-11-19_ai_tymczasowe_runda1.md`), a w Git trafia zapis, że
+autorem rundy 1 jest agent AI, nie człowiek.
+
+Ustalenia graniczne (2026-11-19):
+- **nie tłumaczymy poczty systemowej** (`emails_data`, „Dear Wanderer…”) — tylko listy fabularne z zadań;
+- kategoria (6) „pojedyncze sceny w pierwszej prowincji” to wg właściciela
+  **luźne gadki gracza/NPC** (sceny rozmów tła), nie zwykłe kwestie scen;
+- „Lattice Door” (格子门, `building_exchange_group_config.content`) — nazwa
+  drzwi w opisie w chacie (opis historyczny był już po polsku);
+- ścieżka: **pakiet tłumacza v5** (`--wypelnij-pl`, 422 248 miejsc PL,
+  114 053 wypełnione) → agent wypełnia wybrane kategorie → import zwykłym
+  `tools/import_zwrotki.py` → po zakończeniu rund **łatka v0.6.0**.
+  Paczka na Dysku jako **paczka_dla_tlumacza_wwm_v5.zip**
+  (id `1bQHWtz-Y9x2Bfl58Ppe2jDchIB5OsgUx`, 45 348 474 B, SHA-256
+  `b736123d1d3e1a25f868ee015babcf69c0c0d59449cf4ac1306e43ac62295aa4`);
+  czysta — bez AI-wypełnień;
+
+Runda 1 (2026-11-19): **310 wpisów** — `building_exchange_group_config`
+(90 nazw elementów budowlanych 家园, m.in. wiersz 1026 格子门),
+`manual_broad_type` (35 kategorii Kompendium 博物), `manual_consts` (4),
+`manual_entry_groups_data` (6), `manual_items` (16 gatunków drewna),
+`manual_main_type` (27 tytułów i opisów tonów), `manual_monster_data` (13),
+`manual_photo_level` (5 ocen zgadywania, kody kolorów zachowane),
+`manual_poetry_reward` (10 tytułów), `manual_reply_data` (57 nazw narzędzi
+i umiejętności z tierami), `manual_subtype_index` (45 podtypów),
++ 2× „Traces of the Past” (往事追溯 w `ccs_text_msg`, 往事·待追溯 w
+`programmer_text_msg`). Import: 310 nowych, 0 odrzuconych, tokeny zgodnie.
+Magazyn po rundzie 1: **114 423** (było 114 113).
+
+Uwaga odkryta przy budowie paczki v5: klucz `格子门`/`Lattice Door`
+(`eae347b6f13d5626`, „Drzwi kratowe”) **jest już w magazynie** — gra pokazuje
+go po angielsku najpewniej dlatego, że sterta właściciela jest starsza niż
+łatka v0.5.0 / wpis `pl_nazwy_hasel` z 2026-11-18; po imporcie rundy 1
+iść w łatkę v0.6.0.
+
+Pozostałe rundy (zaplanowane): runda 2 — `text_msg` wiersze 180000–180450
+(przedmioty fabularne z terenu, „Dusty Sword Tassel”; ~811 wpisów);
+runda 3 — `tasks_envelop_data` (listy fabularne, 1 020 wpisów, długie
+teksty); runda 4 — `tasks.task_desc_str` + `task_name` (opisy zadań);
+runda 5 — `tasks.task_target_str` (hinty w questach; 7 948, podzielone na
+partie tematyczne); runda 6 — `ccs_text_msg` (4 952; komunikaty interfejsu);
+runda 7 — reszta `text_msg` (50 504 bez PL — partie po częstotliwości);
+runda 8 — luźne gadki z początku gry (lokalizacja do ustalenia po skanie).
+Każda runda: ekstrakcja pustych `PL:` z paczki v5 (nowy
+`tools/wyciag_z_paczki.py`), przekład AI, import, commit, push.
+Łatka v0.6.0 dopiero po zamknięciu rund (albo w punkcie przejściowym — do
+decyzji właściciela).
+
+## 2026-11-19 (20) — przekład AI-tymczasowy, runda 2 (text_msg 180xxx; 1 211 wpisów); łatka na koniec
+
+Właściciel przesądził: **łatka v0.6.0 dopiero po domknięciu wszystkich
+rund** — zadanie obejmuje wszystkie kategorie z jego listy, realizowane
+w kilku turach. Runda 2: **wszystkie 1 211** bez-PL kluczy z preferowanego
+źródła `text_msg · content`, wierszy 180xxx (komunikaty UI, minigry
+i wydarzenia — m.in. Jianghu Tactics, Anniversary Flying Chess, Howlion's
+Trial, Taotao Fashion, ustawienia grafiki) + nieliczne opisy fabularne
+(m.in. **灰扑扑的剑穗 / Dusty Sword Tassel**, index 681 w mapie rundy).
+Kategorie z listy właściciela pokrywające się z tym zakresem (2/3):
+- **(3) przedmioty fabularne z terenu** — w danych gry NIE mają osobnej
+  tabeli; warstwa opisu przedmiotów leży w `text_msg` (preferowane źródło
+  z `w[]`), więc objęte tą rundą;
+- opisy ustawień i minigier są skutkiem ubocznym tego worka (udało się
+  wszystko, nie tylko świecko).
+
+Mechaniczne rodziny (`江湖弈chenxinN`, `江湖弈yanfeiN`, `周年庆飞行棋N`,
+64+38+66 etykiet) wygenerowane schematem (`Taktyki Jianghu <id>`,
+„Jubileuszowa Gra Planszowa N”); reszta (~1 040) tłumaczona ręcznie.
+Tokeny zachowane; w `--na-sucho` wyszły 2 wpisy z nadmiarowym `#E`
+(`%s因千里奔袭#baf5ba…` i bliźniak with Linked Hearts — źródło celowo
+NIE zamyka tagu) — poprawione; import: **1 211 nowych, 0 odrzuconych**;
+magazyn **114 423 → 115 634** (23,62%). Ciekawe: w `runda2` znalazły się
+też ~250 komunikatów już-obecnych w paczce (np. zdania typu „宝箱已被开启”).
+
+Uwagi rzeczowe do rundy:
+- dwie partie długich wpisów (Dawny Jialing / 孙愿, Wang Zongze) i wiele
+  wierszy `@T[...]` z datami — skopiowane **1:1**;
+- przy tłumaczeniu nazwy `灰扑扑的剑穗` został zgłoszony (i poprawiony
+  w źródle mapy) jeden błąd słowny („kutas miecza” → „chwost miecza”);
+- testy 623 OK; łatka **nie** budowana (decyzja właściciela — wszystkie
+  rundy najpierw).
+
+Następne rundy (kolejność zachowana): runda 3 — listy fabularne
+`tasks_envelop_data` (1 020; z pominięciem poczty systemowej); runda 4 —
+`tasks.task_desc_str` + `task_name`; runda 5 — `tasks.task_target_str`
+(hinty; 7 947); runda 6 — `ccs_text_msg` (4 952); runda 7 — reszta
+`text_msg` (~50 500, partie); runda 8 — luźne gadki z początku gry.
+Po każdej: `import_zwrotki.py`, commit, push. Łatka v0.6.0 na końcu.
+
+## 2026-11-19 (21) — przekład AI-tymczasowy, runda 3 (listy fabularne) — stan pośredni: 516 z 1 023 wpisów
+
+Właściciel doprecyzował metodę (2026-11-19): **pełna jakość, kontekst, zero skrótów
+i schematów** („Tłumaczysz jako AI z kontekstem i z głową”). Wszystkie listy długo-
+opisowe tłumaczone indywidualnie (ZH z EN gry jako odniesieniem — EN czytany dla
+zrozumienia, wybór po polsku), nie mechanicznie. Mechaniczne wypełnienia
+z rund 1–2 dla `江湖弈chenxinN/yanfeiN/周年庆飞行棋N` pozostają w magazynie
+(są AI-tymczasowe, zostaną nadpisane zwrotką Tłumacza) i zostały opisane jako
+takie; nowej tej praktyki nie rozszerzam.
+
+Runda 3 (w toku): zakres = `tasks_envelop_data` (text/to/from/melody_puzzle_text/
+melody_solved_text), **bez poczty systemowej** `emails_data` (decyzja właściciela).
+
+Stan na koniec tury: **162 z 669 list** + **350 z 350 tytułów/adresów/podpisów**
+(`to`/`from`) + **4 z 4 melodii** = **516 z 1 023** wpisów zaimportowanych
+(0 odrzuconych; tokeny zgodne). Magazyn: **115 634 → 116 150** (23,73%).
+Zwrotka: `zwrotki/2026-11-19_ai_tymczasowe_runda3.md` (rosnąca; reszta w kolejnych
+turach). Łatka v0.6.0 NIE budowana — zgodnie z decyzją właściciela dopiero
+po domknięciu wszystkich rund.
+
+Pozostałe w rundzie 3: 507 list (głównie długie — tematyka przewodzi:
+krąg Qiongqi/Colossus, powódź 黄河, Wansan, listy z 江南, dzieła mocne).
+Następnie: runda 4 (task_desc_str), runda 5 (task_target_str ~7 947),
+runda 6 (ccs_text_msg 4 952), runda 7 (reszta text_msg ~50 500 — decyzja
+właściciela niezbędna co do zakresu), runda 8 (luźne gadki z początku gry).
+
+## 2026-11-19 (21b) — runda 3 (b): +57 wpisów; 573 z 1 023; poprawka tokenu
+
+Kontynuacja rundy 3 (po wpisie 21 — 516/1 023). Doszły **57** nowe wpisy
+(27 list + poprawki); poprawione tłumaczenie `#N…#E` w `沉疴久矣…`
+(`bc06088ff39aa2f2`) — brakująca `#E` po `(于此停笔，未能写完)`, dry-run
+zgłosił `tokeny`, poprawione przed importem. Magazyn: **116 150 → 116 207**.
+Łącznie wpisy zaimportowane z rundy 3: **573 z 1 023** (219/669 list +
+wszystkie 350 to/from + 4 melodie). Pozostało ~450 list (najdłuższe listy
+z wątków fabularnych — m.in. księgi z 黄河 i Wielki Mur). Zasada bez
+zmian: żadnych schematów, każdy tekst indywidualnie.
+
+## 2026-11-19 (21c) — runda 3 (c–d): 635 z 1 023; jeden incydent z sandboxem
+
+Kontynuacja rundy 3. Po wpisie 21b (573/1 023) doszły kolejne porcje:
+**(c) +47** listów (`958cf17`) i **(d) +15** (`6a680ba`) — razem **635 z 1 023**
+(281/669 list + wszystkie 350 to/from + 4 melodie). Magazyn:
+**116 254 → 116 269** (23,75%). Wszystkie wpisy indywidualnie, bez schematów.
+
+Incydent (do odnotowania): sandbox w trakcie tej tury wrócił do stanu
+sprzed sesji — lokalny `HEAD` wskazywał `45b4be3`, a pliki `/tmp/*` z rundy 3
+zniknęły. Mój commit `b369614` (próba (d)) powstał na złej podstawie i push
+został odrzucony (`fetch first`). Naprawa bez utraty pracy: nową zwrotkę
+`zwrotki/2026-11-19_ai_tymczasowe_runda3_c.md` zachowałem, zresetowałem
+gałąź do `origin/arena/0bd156b2-wherewindsmeet` (`958cf17`), przywróciłem
+zwrotkę i zaimportowałem ponownie — import idempotentny: **15 nowych,
+0 zmienionych, 0 odrzuconych**. Stan plików `tlumaczenie/` zgadza się
+z sumą importów (116 269). Wniosek na przyszłość: po każdym `timeout`/restarcie
+sandboxa sprawdzać `git log` i `/tmp` przed dalszą pracą; zwrotki trzymać
+w repo (są wersjonowane), nie tylko w `/tmp`.
+
+Pozostało w rundzie 3: **388 listów**. Potem rundy 4–8.
+
+## 2026-11-19 (21e) — runda 3 (h–t): LISTY UKOŃCZONE, 1 023 z 1 023
+
+W tej turze domknięto całą pulę listów fabularnych (`tasks_envelop_data`).
+Partie: **(h–k) po 20** (`9ed3a31`, `3eb04ae`, `38ab584`, `121ad10`),
+**(l) +20** (`729193d`), **(m) +20 i 1 poprawka** (`5c600f5`),
+**(n) +20** (`03b7b14`), **(o) +8** (`116 537`), **(p) +24** (`a589010`),
+**(q) +24** (`ca8b687`), **(r) +24** (`7db0b41`), **(s) +24** (`184d4f1`),
+**(t) +24** (`0701582`).
+
+Stan: **1 023 z 1 023** wpisów (669 list + 350 to/from + 4 melodie).
+Magazyn **116 585 → 116 657** przekładów. Pokrycie wszystkich unikalnych
+tekstów wyciągu: **117 143 / 487 684 = 24,0%** (`pokrycie_tlumaczenia.py`).
+
+Zakres tej porcji: dzienniki połowu niemowląt i uprawy topoli „huyang”,
+spis fałszerstw obrazów, opowieść o Shi Qi i siostrze, pamiętnik Wang Qinga,
+listy Xi Huai o śmierci mistrzyni Feng Xu, list „Wzburzonych Fal” do Wang Qinga,
+zapiski o uprawie latawców, sennik o zamkniętych w studni, „Podręcznik
+rozpoznawania uczniów Moistów”, pożegnalny list Chena z Luancheng, listy
+Feng Dao do pana Żurawia, zapiski alchemika z ery Yuanfeng, rachunki
+Bractwa Beztroski, przysięga 119 obrońców przełęczy, kacerski list o siedmiu
+lampach, dziennik ukończenia nauki w Akademii Fenglong.
+
+Warsztat: 8 z 16 partii wymagało scalenia rozłamanych linii `PL:`
+(`zlamana_linia`) — za każdym razem łapał to `--na-sucho` przed importem;
+0 odrzuconych w imporcie finalnym każdej partii. Kontrola CJK w liniach `PL:`
+czysta w każdej partii. Uwaga: przy scalaniu fragmentów łatwo zgubić literalne
+`\n` — po (s) trzeba było je wstawić z powrotem (klucz `d43fafe8`).
+
+Sprawdzone po zamknięciu listów: `tools/run_tests.py` **623/623 OK** (exit 0),
+`tools/check_repository.py` OK (339 wpisów indeksu), `git diff --check` czysty.
+
+Następny krok: runda 4 — `task_desc_str` (3 078) + `task_name` (962)
++ `tasks_ending_data` (8).
+
+## 2026-11-19 (21d) — runda 3 (e–g): 755 z 1 023 listów fabularnych
+
+W tej turze doszły trzy partie po 40 listów (`tasks_envelop_data · text`):
+**(e) +40** (`e40efe3`), **(f) +40** (`74107f7`), **(g) +40** (`3ed3485`).
+Runda 3 stoi na **755 z 1 023** (403/669 list + 350 to/from + 4 melodie);
+magazyn **116 389** (23,77%). Wszystkie wpisy indywidualnie z pełnym
+kontekstem ZH+EN; 0 odrzuconych w każdej partii.
+
+Zakres tej porcji: listy o marionetkach, pożegnania z Przystanią Słowa,
+dziennik wyprawy, skarga do Bogini Księżyca, testament Water Lady, listy
+Zhang Yichao i Lu Li, memoriały o podatkach, Niebiański Rachunek Qinga,
+pamiętnik Du Chongwei o Ding Xiao, opowieść o Zou Yizhou i Yang Qianyan,
+noworoczne podarunki Przymierza Północy, dziennik ucznia o „ściąganiu
+należności” od zbójców, traktat o pędzlu Wu Daoxuana.
+
+Sprawdzone po tych partiach: `tools/run_tests.py` **623/623 OK** (exit 0),
+`tools/check_repository.py` OK (327 wpisów indeksu), `git diff --check` czysty.
+
+Uwaga warsztatowa: przy polach `PL:` z wieloma akapitami trzeba po każdej
+takiej linii zostawić pustą linię — inaczej `format_paczki.czytaj_wpisy`
+uznaje następną linię za ciąg dalszy i zwraca `zlamana_linia`. Dwie takie
+sytuacje złapał `--na-sucho` przed importem (partia f); naprawione.
+
+## 2026-11-19 (22a) — runda 4 i 5 UKOŃCZONE; start rundy 6
+
+**Runda 4** (opisy zadań) domknięta wcześniej: 3 536/3 536.
+
+**Runda 5 — cele zadań (`tasks · task_target_str`): 8 199 z 8 199.**
+Partie `ci`–`cx` po 80 (ostatnia 119) plus `cy` dla `tasks_ending_data`
+(**18**, nie 8 — manifest po patchu 2.4 pokazuje więcej wpisów `name`).
+Magazyn 127 832 → **129 169**. Każda partia: sonda glosariusza, heredoc,
+kontrola 80 PL/80 kluczy + skan CJK/cyr/`\u00ad`/NFC, `--na-sucho`
+(80 nowych / 0 odrzuconych), import, commit, push. Odrzucone w każdej
+partii: **0** (jedyny wyjątek: partia `dd`, gdzie trzy klucze były
+wymyślone — usunięte przed importem; oraz `cz` z fizyczną nową linią
+w `PL:`, zamienioną na literalne `\n`).
+
+Naprawy w trakcie rundy 5: „okokonionym” → „kokonowym”; „cesarskiej jady”
+→ „pieczęć cesarską Czterech Mórz”; „Gwarny Przybytek” → odmiana
+„Gwarnego Przybytku”; „Kitów” → „Kitanów” (spójność z resztą magazynu);
+„Zdemaśkuj” → „Zdemaskuj”; „brodatą sakiewkę” → „brokatową sakiewkę”;
+„Jiaa” → „Jia”; rezygnacja z „Księga Miecza Canglang” na rzecz formy
+używanej w partiach r5.
+
+**Runda 6 — `ccs_text_msg` (5 229 braków, nie 4 952): 557 zrobione.**
+To etykiety interfejsu, komunikaty systemowe i opisy aktywności; sporo
+powtórzonych ciągów „数据加载中…” (same chińskie znaki bez `en`) —
+te tłumaczone jako „Wczytywanie danych.” (bez `\n`, bo oryginał bywa
+wielolinijkowy). Partie: `cz`, `da`–`df` po 80 (wyjątek `dd`: 77).
+Konwencje: `N重` → `St. N` (zgodnie z magazynem), `N重镜` → `Zwierciadło:
+St. N`, 长鸣玉 → Nefryt Echa, 不羡仙 → Gospoda Bez Zazdrości, 止戈 → arena,
+话术 → dar wymowy, 悬壶 → leczenie zawieszone, 燕云十六声/Where Winds Meet
+zostaje po angielsku.
+
+Następny krok: dalsze partie `ccs_text_msg` do 5 229, potem `text_msg`
+(~99 357 braków — największa tabela) i na końcu tabele luźne.
+
+**Runda 6, ciąg dalszy: 1 757 z 5 229.** Partie `df`–`du` po 80 (magazyn
+129 646 → **130 926**, commit `6a8751d`). Wszystkie importy bez odrzuceń;
+dwie partie wymagały poprawek zapowiadanych „na sucho”:
+- `dj`: dopisana linia `tokeny: …` pod `PL:` została uznana za ciąg dalszy
+  tekstu (`zlamana_linia`) — **nie wolno dopisywać linii `tokeny:`**
+  w plikach zwrotek; usunięte, potem 80/80 czysto;
+- `dn`: PL zawierało powtórzone chińskie 分 (zachowane z oryginału) —
+  zamienione na `— [imię zwycięzcy]`.
+
+Pary EN↔PL czytane po każdej partii; poprawki: „Bogactwo”→„chwała”
+(`4f074b5901d10bc5`: „Wielkie Fale”), „Terminator” (uczeń-rzemieślnik),
+„Pastwisko” (牧场), „Otręby”, „Pukanie”, „Zaliczka” (折抵), „Galeria
+Wszechrzeczy w Liangzhou” (凉州万相), „Gospoda Bez Zazdrości” zamiast
+nowego wariantu dla 不羡仙客栈.
+
+Nowe terminy do glosariusza: 渡尘墟→Ruiny Pyłu · 精元→esencja życia ·
+牙行→dom pośrednictwa · 鹊仙桥→Most Srok · 醉花阴→Upojny Cień ·
+乞巧节→Święto Błagania Zręczności · 东君→Władca Wiosny ·
+偃师→konstruktor · 毒障→miazmaty · 化怨→rozproszenie nienawiści ·
+四海行→Wędrówka po Czterech Morzach · 追魂引→Goniec Dusz ·
+天工→Boskie Rzemiosło · 万相→Galeria Wszechrzeczy · 悬壶→uzdrowiciel.
+
+**Runda 6, ciąg dalszy: 2 237 z 5 229.** Partie `dv`–`ea` po 80
+(magazyn 130 926 → **131 406**, commit `555086d`). Wszystkie importy
+bez odrzuceń, `--na-sucho` 80 nowych / 0 odrzuconych za każdym razem.
+Jedna poprawka przed importem: `57ec946e84bf8753` (救援) — „Odpór”
+zmienione na **„Ratunek”** (pomyłka z terminem odpór/odparcie).
+
+Uwaga terminologiczna: 侠客风云录 → Kroniki wędrownych rycerzy,
+九流 → Dziewięć Nurtów, 营生 → fach, 百业 → fachy (spójność),
+四海行 → Wędrówka po Czterech Morzach, 天工 → Boskie Rzemiosło,
+终律 → Ostateczna harmonia, 无间天相 → Bezkształtne Przebranie.
+
+**Runda 6, ciąg dalszy: 2 637 z 5 229.** Partie `eb`–`ef` po 80
+(magazyn 131 406 → **131 806**, commit `8b2d863`). Importy bez odrzuceń,
+`--na-sucho` 80 nowych / 0 odrzuconych. Jedna poprawka przed importem:
+`733b1a7fb4437dfc` — „rozpoczne” → **„rozpocznie”**.
+
+Terminy: 东主→gospodarz (gildii) · 应律之人→ten, kto słucha wiatru · 天泉→Studnia Niebios · 繁花居→Dom Bujnego
+Kwiecia · 红销铺→Kramy Szkarłatnego Jedwabiu · 夹钟→Jiazhong ·
+摸金→Grobowiec Fortuny · 稷下→Akademia Jixia · 侠境→Kraina Bohaterów ·
+五禽戏→ćwiczenia pięciu zwierząt · 稷下要闻→Wieści z Akademii Jixia.
+
+**Runda 6, ciąg dalszy: 3 277 z 5 229.** Partie `eg`–`em` po 80
+(magazyn 131 806 → **132 366**, commit `3c64018`). Importy bez odrzuceń,
+`--na-sucho` 80 nowych / 0 odrzuconych za każdym razem. Uwaga: po
+awarii sandboxa lokalny wskaźnik cofnął się do bazy `45b4be3` i push
+został odrzucony — stan odtworzono z `origin` (m.in. partia `eg`
+z pliku tymczasowego), magazyn scalony z remote bez utraty wpisów.
+Poprawki przed importem: brak literówek; ujednolicono 烟柳 → Mglista
+Wierzba, 南烛 → Południowa Świeca, 千金楼 → Pawilon Tysiąca Sztuk Złota.
+
+Terminy: 悬壶→Uzdrowiciel · 牙行→dom pośrednictwa · 心法/内功→droga
+wewnętrzna/siła wewnętrzna · 帮派→gildia · 堂主→przełożony Sali ·
+聚义厅→Sala Braterstwa · 精元→esencja życia · 百业等级→poziom fachu ·
+江湖→jianghu · 大相国寺→Wielka Świątynia Cesarska · 藏经阁→Pawilon Sutr.
+
+**Runda 6, ciąg dalszy: 3 837 z 5 229.** Partie `en`–`et` po 80
+(magazyn 132 366 → **132 926**, commit `71721c2`). Importy bez odrzuceń.
+Poprawka przed importem: `6f5a345` — sztuczne łamanie w środku słowa
+(无名 „Bez\nimienny”, 限定 „Limito\nwany”) scalone do „Bez imienia”
+i „Limitowany”. Terminy: 牙行→dom pośrednictwa · 风华录→kolekcja
+wyglądów · 聚义厅→Sala Braterstwa · 段位→ranga · 侠客行→Wędrówka Rycerza.
+
+**Runda 6, ciąg dalszy: 4 157 z 5 229.** Partie `eu`–`ex` po 80
+(magazyn 132 926 → **133 246**, commit `dad78ea`). Importy bez odrzuceń.
+Poprawka przed importem: `b1aae67` — CJK w PL (`Nasze眼`) zamienione na
+„Nasze oczy rozsiane…”. Terminy: 投壶→rzut do dzbana · 轻功→lekkość
+ruchu · 鸣金→Uderzenie dzwonu · 万相集→Galeria Wszechrzeczy ·
+令名→tytuły sławy · 牙行→dom pośrednictwa · 庄园入梦→sen w posiadłości.
+
+**Runda 6, ciąg dalszy: 4 477 z 5 229.** Partie `ey`–`fb` po 80
+(magazyn 133 246 → **133 566**, commit `3626343`). Importy bez odrzuceń,
+`--na-sucho` 80/0 za każdym razem. Terminy: 绣金楼→Pawilon Złotego Haftu ·
+销金窟→Złoty Dom · 结义→zaprzysiężeni bracia · 访学→uczony w gościnie ·
+独孤求败→Mistrz bez równego sobie · 开蛊→rozpieczętowanie gu.
+
+**Runda 6, ciąg dalszy: 4 797 z 5 229.** Partie `fc`–`ff` po 80
+(magazyn 133 566 → **133 886**, commit `f26bfbf`). Importy bez odrzuceń.
+Terminy: 岁华→Upływ Lat · 清籁回响→Echo czystego brzmienia · 藏音册→
+Księga ukrytych brzmień · 天泉→Studnia Niebios · 听杏村→Wioska Moreli ·
+琅琊→Langya · 河西→Hexi.
+
+**Runda 6, ciąg dalszy: 4 957 z 5 229.** Partie `fg`–`fh` po 80
+(magazyn 133 886 → **134 046**, commit `6863c14`). Importy bez odrzuceń.
+Terminy: 鸟鹭→Czapla · 有为村→Wioska Obfitych Plonów · 豫章/洪都→Yuzhang/
+Hongdu (przekład prozy 滕王阁序 — fragment) · 九公子→Dziewiąty Panicz.
+
+**Runda 6 — UKOŃCZONA: 5 282 z 5 282.** Partie `fi`–`fm`
+(magazyn 134 046 → **134 398**, commity `f598c5d`, `084e928`, `854c284`,
+`9e71092`, `f259028`). Importy bez odrzuceń, `--na-sucho` 80/0 (ostatnia
+partia `fm` 32/0). Sonda domykająca: `ccs_text_msg` **5 282/5 282,
+brak 0**. Rzeczywista liczba tekstów tej tabeli (5 282) jest o 53 wyższa
+od pierwotnego szacunku 5 229 — licznik rundy rozjechał się wcześniej
+(po `ex` 1 072 vs sonda 1 152; po `fb` 752 vs 912); rozstrzyga zawsze
+`len(ccs)`, nie suma partii. Terminy z domknięcia: 悬赏发布→Wystawianie
+nagród za głowy · 焚草→Wypal trawę · 话术卡→Karta perswazji ·
+泛泛之交→„ledwie znajomi” (EN „Respected” błędne, tłumaczone z ZH) ·
+王家村·崇德坊→Wioska Wang · Zaułek Cnoty · 柴府→Posiadłość Chai ·
+酒葫芦·不破→Tykwa wina · Niezniszczalna.
+
+
+**Runda 7, początek: 480 z 1 815.** Partie `ga`–`gf` po 80
+(magazyn 134 398 → **134 878**). Kolejność: `tools/lista_rundy7.py`,
+sceny zadań głównych w 燕南, klucze wariantów sprowadzone do bazowych.
+Każdy import z próbą `--na-sucho`: 80 nowych, 0 odrzuconych. Początkowy
+wpis STATUS o 560/1 815 był błędny — sześć partii to 480, brak 1 335.
+Uzupełniono korekty językowe `ge` i `gf`; to nadal przekład AI-tymczasowy,
+bez weryfikacji w grze. Kolejny krok: partia `gg`.
+
+**Runda 7, ciąg dalszy: 960 z 1 815.** Partie `gg`–`gl`, każda po
+80 (magazyn 134 878 → **135 358**). Przed każdym importem próba
+`--na-sucho`: 80 nowych, 0 odrzuconych; importy również bez odrzuceń.
+Postęp według odłożonej listy bazowej: **855** kluczy pozostaje. Przekład
+AI-tymczasowy; brak weryfikacji w grze. Następny krok: partia `gm`.
+
+**Korekta selekcji rundy 7.** Filtr przestrzeni zadania użyty do
+`tools/lista_rundy7.py` nie zapewnia, że powiązana scena leży na początku
+gry lub w pierwszej prowincji. Przykład: zadanie `1901402`, grupa 8,
+przestrzeń 501, scena `34300001` — rozmowa w Jiangnan. Ostatnie partie
+dotyczyły również Ukrytej Góry (grupa 7). Historyczna lista: 960/1 815,
+pozostałych 855 nie traktować jako zaakceptowanego wczesnego zakresu.
+
+Osobna sonda po scenach zadań głównych grupy 1: 665 różnych kluczy
+bazowych, 19 braków przed importem. Partia `gm`: +19, 0 odrzuconych;
+magazyn **135 377**. Lokalnie `run_tests.py`: **623 testy OK** po `gl`;
+`check_repository.py`: OK (580 wpisów indeksu) po `gm`. Bez testu w grze.
+
+**Compendium, podstawy (`gn`).** Ręcznie wybrano 25 nazw i instrukcji
+ruchu, celowania i walki z `guider_tujian_data`; próba na sucho i import:
+25 nowych, 0 odrzuconych, magazyn **135 402**. Nie jest to import całej
+tabeli; nie potwierdzono w grze momentu udostępnienia każdego hasła.
+Po tej partii: `run_tests.py` **623 testy OK**, `check_repository.py` OK
+(581 wpisów indeksu). Przekład AI-tymczasowy.
+
+**Compendium, wybór ogólnych instrukcji (`go`).** 21 wpisów o ruchu,
+celowaniu, świadkach, leczeniu i przebraniach: 21 nowych, 0 odrzuconych
+w próbie i imporcie. W sumie Compendium **54/1 524**, magazyn **135 423**.
+`check_repository.py` OK (582 wpisy indeksu). Powtórzona sonda scen zadań
+głównych grupy 1: 665 kluczy bazowych, brak 0. Nie potwierdzono w grze,
+kiedy każda z tych instrukcji jest odblokowana. Następne partie wyłącznie
+po selekcji według wiarygodnego kontekstu wczesnej gry.
+
+**Wybrane sceny Przystani i wspomnienia (`gp`–`gy`).** Od magazynu
+135 423 przyjęto **599** nowych przekładów, magazyn **136 022**. `gp`:
+25 podstaw Compendium; `gq`: 62 sceny z Ruby i ciocią Han oraz pożaru;
+`gr`: 5 braków wspomnienia; `gs`–`gx`: po 80 scen wspomnień, `gy`: 27.
+Każdą partię przyjęto po próbie na sucho bez odrzuceń. W pierwszej próbie
+`gu` odrzucono 1 wpis z brakującym `$T(5037)`; poprawiono przed importem.
+Sonda po kluczach bazowych scen zadań grup 5292, 5305, 5306, 5308, 5314,
+5316, 5328, 5329, 5330, 5333, 5339, 5355 po `gy`: brak 0 w tych
+powiązaniach; nie obejmuje innych rodzajów tekstów ani nie potwierdza
+momentu dostępności w grze. Compendium 79/1 524. Bez weryfikacji w grze.
+Lokalna kontrola po `gy`: `check_repository.py` OK (592 wpisy indeksu),
+`run_tests.py` **623 testy OK**.
+
+**Dziecięce spotkania i odbudowa gospody (`gz`):** 62 nowe przekłady
+scen z grup 5254–5259 i 5296, suchy i właściwy import bez odrzuceń;
+magazyn 136 084 przekłady, 489 544 miejsca (27,80%). Sonda bazowych
+kluczy scen zadań dla grup 5254–5260 i 5296: po przypisaniu do grup
+odpowiednio 11, 10, 4, 9, 8, 10, 2 i 13 kluczy, 0 braków w każdej.
+Sonda grupy 5306: 121 kluczy, 0 braków po `gy`. Kontrola repozytorium OK
+(593 wpisy indeksu), 623 testy OK po `gz`. To nie jest test w grze.
+
+**Wybrane historie (`ha`–`hh`):** odpowiednio 64, 46, 79, 70, 66, 73,
+68 i 77 nowych kluczy scen (razem 543), magazyn 136 627 przekładów i
+489 544 miejsca (27,91%). Sceny grup 5250, 5252, 5253, 5261–5276, 5293,
+5294, 5327, 5336–5338 wybierano indywidualnie; niektóre dotyczą późniejszego
+Liangzhou. Po imporcie sonda dostępnych powiązań scen z zadaniami wykazała
+609 przypisań kluczy bazowych do grup, 0 braków. Nie obejmuje innych tekstów
+ani momentu odblokowania. Kontrole suche i importy bez odrzuceń. W `hd`
+poprawiono zwrot do żółwia; w `hh` trzy sformułowania oraz wcześniej
+błędną wskazówkę zadania `9d3d4d3f856d74f0` o koniu Nocna Warta.
+Skan 543 linii PL: 0 CJK, 0 nie-NFC. `check_repository.py` OK (601 wpisów
+indeksu), 623 testy OK; przekład niesprawdzony w grze.
+
+**Dalsze sceny (`hi`–`hq`):** 61, 53, 86, 97, 82, 36, 75, 75, 62
+nowe przekłady — łącznie 627; z `ha`–`hh` razem 1 170. Magazyn 137 254
+przekłady, 489 544 miejsc (28,04%). Wybrano zadania grup 5159, 5163,
+5165, 5167, 5169, 5171, 5174, 5175, 5177–5179, 5181, 5194–5196, 5202,
+5207, 5210, 5211, 5216–5219, 5222, 5224, 5225, 5228, 5230, 5232–5234,
+5236, 5237, 5245, 5247, 5249; część to późniejsze historie, nie deklaracja
+wczesnej lokalizacji. Sonda kluczy bazowych scen z powiązań tych grup po
+`hq`: 716 przypisań do grup, 2 braki — `36a9e7f1c95b82ff` (spacja)
+i `e270aeb347f21655` (`??`, EN „Channels”). Pozostawiono je bez przekładu
+z powodu niejasnego źródła; sonda nie obejmuje pozostałych tekstów. Suchy
+i właściwy import każdej partii: 0 odrzuconych. Po imporcie ujednolicono
+Fanlou i Upojny Cień w `ho`/`hp` oraz nazwy miejsc w `hj`; poprawiono
+kwestię z tokenem w `hk`. Skan `ha`–`hq`: 1 170 linii PL bez CJK i bez
+nie-NFC. `check_repository.py` OK (610 wpisów indeksu), 623 testy OK;
+brak weryfikacji przekładu w grze.
+
+**Wieści informatorów (`hr`):** 57 nowych przekładów wybranych scen grup
+5183–5187, po suchym i właściwym imporcie 0 odrzuceń; magazyn 137 311,
+489 544 miejsc (28,05%). Sonda dostępnych bazowych kluczy scen tych grup
+nie wskazuje braków; nie obejmuje pozostałych tekstów zadań. Po imporcie
+ujednolicono w sześciu kwestiach nazwy miejsc i Studni Niebios, również
+po kontroli suchej. Skan 57 wierszy PL bez CJK i nie-NFC. Kontrola
+repozytorium OK (611 wpisów), 623 testy OK, bez weryfikacji w grze.
+
+**Wieści, list i pojedynek (`hs`):** 36 nowych kluczy, magazyn 137 347
+przekładów i 489 544 miejsca (28,06%). Po pierwszej próbie na sucho
+odrzucono jeden wpis (`894f347d941f8e2f`) z brakującymi tokenami podwójnego
+backslasha. Po poprawieniu trzy tokeny zachowano; ponowna próba i import
+bez odrzuceń. Sonda dostępnych bazowych kluczy scen grup 5173, 5188, 5189,
+5192 i 5278: 0 braków, bez stwierdzenia kompletności wszystkich tekstów
+tych zadań. Skan 36 linii PL bez CJK i nie-NFC; `check_repository.py` OK
+(612 wpisów), 623 testy OK. Brak testu w grze.
+
+**Pielgrzym, twierdza, Kraina Złota i źródło (`ht`–`hy`):**
+84 + 43 + 80 + 66 + 67 + 50 = 390 nowych przekładów. Magazyn 137 737,
+489 544 miejsc (28,14%). Każdą partię zaimportowano po próbie suchej,
+bez odrzuceń; poprawki `hw` i `hy` również zweryfikowano przed importem.
+Sonda scen grup 5191, 5199, 5206 i 5100: odpowiednio 88, 46, 152 i 129
+różnych kluczy bazowych, 0 braków. Sonda nie obejmuje pozostałych tekstów
+ani nie dowodzi kompletności zadań. 390 przekładów po imporcie: bez CJK
+i nie-NFC, liczba fizycznych podziałów wierszy zgodna ze źródłem.
+`check_repository.py` OK (616 wpisów), 623 testy OK; poprawki po testach
+dotyczyły tylko dwóch kwestii. Przekładu nie sprawdzano w grze.
+
+**Poselstwo (`hz`):** 40 nowych kluczy z grupy 5208; magazyn 137 777,
+489 544 miejsc (28,14%). Suchy i właściwy import bez odrzuceń, 40 linii
+bez CJK i nie-NFC, liczba podziałów wierszy zgodna ze źródłem. Po imporcie
+sonda wskazuje jeszcze 584 brakujące bazowe klucze powiązanych scen tej
+grupy, bez oceny innych tekstów zadania. Kontrola repozytorium OK; 623 testy
+przeprowadzono przed tą partią. Przekład AI-tymczasowy, bez testu w grze.
+
+**Poselstwo i Hexi (`ia`–`ig`):** 81 + 78 + 81 + 75 + 81 + 82 + 105
+= 583 nowych przekładów, magazyn 138 360, 489 544 miejsc (28,26%). Suchy
+i właściwy import każdej partii bez odrzuceń; poprawiono również nazwę
+Rozdzieracza Świtu po sprawdzeniu istniejącego przekładu. Sonda grupy 5208
+obejmuje 720 różnych bazowych kluczy dostępnych scen; pozostał jeden brak
+`36a9e7f1c95b82ff` (źródło to spacja), celowo pominięty. Nie oznacza to
+kompletności pozostałych tekstów zadań. Skan 583 pozycji bez CJK i nie-NFC,
+liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
+repozytorium OK (626 wpisów indeksu); przekład AI-tymczasowy, bez testu
+w grze.
+
+**Chudy Arhat i trupa (`ih`–`ik`):** 75 + 77 + 80 + 72 = 304 nowe
+przekłady, magazyn 138 664, 489 544 miejsc (28,33%). Partie i poprawki
+zaimportowano po kontrolach suchych, bez odrzuceń. Skorygowano też rodzaj
+Qingqinga we wcześniejszej wskazówce `b820160ff0cfda25`. Sonda dostępnych
+scen grup 5240 i 5241: odpowiednio 170 i 163 bazowe klucze, 0 braków;
+pozostałych tekstów zadań nie badano. Skan 304 linii bez CJK, nie-NFC
+i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem.
+623 testy i kontrola repozytorium OK (630 wpisów); AI-tymczasowe, bez
+testu w grze.
+
+**Ostrze i papryczki (`il`–`im`):** 110 + 92 nowe przekłady, magazyn
+138 866, 489 544 miejsc (28,37%). Suche i właściwe importy oraz późniejsze
+poprawki bez odrzuceń. Sonda bazowych kluczy dostępnych scen grup 5242
+i 5248: odpowiednio 116 i 98 kluczy, 0 braków. To nie jest sonda całych
+zadań. Skan 202 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(632 wpisy); przekład AI-tymczasowy, bez testu w grze.
+
+**Podarunek i zlecenia (`in`–`ip`):** 5 + 50 + 55 = 110 nowych
+przekładów, magazyn 138 976, 489 544 miejsc (28,39%). Suche i właściwe
+importy oraz poprawki bez odrzuceń. Sonda dostępnych scen grup 5246, 5017,
+5018, 5118, 5125–5129: 132 przypisania bazowych kluczy do grup i 0 braków,
+bez badania pozostałych tekstów zadań. Skan 110 pozycji bez CJK, nie-NFC
+i miękkich dywizów; liczba podziałów wierszy zgodna ze źródłem. 623 testy
+i kontrola repozytorium OK (635 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Młoty, smok, zabójca i wilk (`iq`–`ir`):** 73 + 71 = 144 nowe
+przekłady; magazyn 139 120, 489 544 miejsc (28,42%). Próby suche, importy
+i poprawki bez odrzuceń. Sonda scen grup 5029, 5025, 5032, 5095: 77, 27,
+24, 26 dostępnych bazowych kluczy, bez braków; nie obejmuje pozostałych
+tekstów zadań. Skan 144 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(637 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Szczurek Pip i Brzydka Niang (`is`–`iv`):** 71 + 72 + 74 + 65 =
+282 nowe przekłady; magazyn 139 402, 489 544 miejsc (28,48%). Próby suche,
+importy i poprawki bez odrzuceń. Sonda scen grup 5015, 5021, 5016: 73, 85
+i 161 dostępnych bazowych kluczy, bez braków; nie obejmuje pozostałych
+tekstów zadań. Skan 282 pozycji bez CJK, nie-NFC i miękkich dywizów, liczba
+podziałów wierszy zgodna ze źródłem. 623 testy i kontrola repozytorium OK
+(641 wpisów); AI-tymczasowe, bez testu w grze.
+
+**Sprostowanie obiecanego zakresu; Compendium `iw`:** wcześniejsze
+przedstawienie 28,48% całej gry jako odpowiedzi o pozostałym zakresie było
+mylące. Plan obejmował wczesny wątek główny i 1 516 ówczesnych braków
+`guider_tujian_data`. Pierwotny filtr przestrzeni zadań nie ustala położenia
+ani czasu scen i pierwotne ~2 053 nie jest pewnym licznikiem pierwszej
+ćwiartki. Obecnie historyczny filtr ma 853 braki, ale zawiera późniejsze
+sceny; w grupie 1 zadań głównych sonda dostępnych powiązanych scen ma 665
+bazowych kluczy i 0 braków, bez gwarancji pokrycia całej ćwiartki fabuły.
+`iw`: +38 haseł; `guider_tujian_data` 117/1 524, 1 407 braków. Osobno
+`building_default_items` 2 143/2 650, 507 braków po głównym źródle kluczy;
+nie należy przypisywać całej tabeli wczesnemu Compendium. Import i próba
+sucha bez odrzuceń, skan 38 pozycji OK, 623 testy i kontrola repozytorium
+OK (642 wpisy). Przekład AI-tymczasowy, bez testu w grze.
+
+**Compendium — właściwy zakres (`ix`–`iz`):** 44 + 28 + 27 = 99 nowych
+przekładów podstaw towarzyszy, leczenia, walki i eksploracji. Po imporcie
+`guider_tujian_data` 216/1 524, 1 308 braków (wg głównego źródła kluczy);
+bez potwierdzenia momentu odblokowania poszczególnych haseł w grze. Próby
+suche, importy i poprawki bez odrzuceń; skan 99 bez CJK, nie-NFC i miękkich
+dywizów, liczba podziałów wierszy zgodna ze źródłem. 623 testy i kontrola
+repozytorium OK (645 wpisów). Przekład AI-tymczasowy, bez testu w grze.
+
+**Compendium, podróż i umiejętności (`ja`):** 35 nowych przekładów,
+łącznie `ix`–`ja` +134. `guider_tujian_data` 251/1 524, 1 273 braki
+według głównego źródła klucza. Próba sucha i import bez odrzuceń; skan 134
+nowych pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów wierszy
+zgodna ze źródłem. 623 testy i kontrola repozytorium OK (646 wpisów).
+Moment odblokowania w grze niezweryfikowany; przekład AI-tymczasowy.

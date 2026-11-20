@@ -59,6 +59,21 @@ class PamiatkiTests(unittest.TestCase):
         self.assertIn("**Jiang Wulang — Stara włócznia**", linie)
         self.assertIn("Historia po polsku", linie)
 
+    def test_tytul_legenda_i_tresc_w_kolejnych_liniach(self):
+        indeks = _Indeks()
+        indeks.teksty["motyw1"] = _Tekst((3, "1"), "燕云十八骑", "At Heaven's Pier")
+        indeks.zrodla = _Indeks.zrodla + [["curio_theme", "history_name", 1168]]
+        with self._katalog([{"id": 35, "przedmiot": 1100010, "wlasciciel": 1,
+                             "pamiec": 741036, "motyw": 1, "kolejnosc": 1,
+                             **WLASCICIEL}]) as katalog:
+            linie = czytanka_czysta._pamiatki(
+                indeks, {"historia1": "Historia po polsku", "nazwa1": "Stara włócznia",
+                         "wlasciciel1": "Jiang Wulang", "motyw1": "U Przystani Niebios"},
+                set(), {}, katalog)
+        i = linie.index("**Jiang Wulang — Stara włócznia**")
+        self.assertEqual(linie[i + 1], "U Przystani Niebios · 1")
+        self.assertEqual(linie[i + 2], "Historia po polsku")
+
     def test_bez_przekladu_gwiazdka_i_wlasciciel_z_ikony(self):
         indeks = _Indeks()
         indeks.teksty.pop("wlasciciel1")  # właściciela nie ma w wyciągu — zostaje ikona

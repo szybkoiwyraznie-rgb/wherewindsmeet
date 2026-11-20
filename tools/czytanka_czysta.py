@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-"""Czytanka WWM do czytania — trzy pliki w układzie ustalonym z właścicielem.
+"""Czytanka WWM do czytania — dwa pliki treści plus README, w układzie ustalonym z właścicielem.
 
 1. `01_sceny_i_cutsceny.md` — sceny **i** cutsceny razem, chronologicznie:
    filmy otwierające, prolog w kolejności sprawdzonej z transkryptem, potem krainy
    w kolejności odwiedzania (sceny w porządku grafu następstw), na końcu pozostałe pule
    napisów przerywników.
-2. `03_reszta.md` — komplet informacji dodatkowych: cała reszta przekładów,
+2. `02_reszta.md` — komplet informacji dodatkowych: cała reszta przekładów,
    której nie ma w 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowana
-   według rodzaju danych. (Plik 02 z kontekstem scen zlikwidowany na życzenie
-   właściciela — wszystko, co pokazywał, trafia do 03.)
+   według rodzaju danych. (Dawny plik 02 z kontekstem scen zlikwidowany na
+   życzenie właściciela — wszystko, co pokazywał, trafia do tego pliku,
+   a numer 02 przejął plik reszty.)
+
+Gdy któryś plik treści nie mieści się w budżecie `_CZESC_BUDZET`, jest cięty
+na części `NN_baza_01.md …`, a tytuł części w środku opisuje jej zawartość
+(np. `02 - przedmioty — część 2 z 3`).
 
 Format kwestii w 01: jedna linia `**Mówca:** tekst` (bez punktora), bez czasów,
 kluczy i tabel; kwestia bez mówcy to goły tekst.
@@ -847,7 +852,7 @@ def _z_gry(ix, klucz: str) -> str:
 
 
 # Karty zbiorów: w jednym wierszu gry leży tytuł i pełny tekst. Wcześniej
-# trafiał do 03 tylko tekst (jako „nazwa — opis” z przypadku), a karty bez
+# trafiał do reszty tylko tekst (jako „nazwa — opis” z przypadku), a karty bez
 # przekładu nie trafiały wcale — dlatego w czytance brakowało pamiątek.
 _ZBIORY = (
     ("region_collect_jianwen_data", "jianwen_title", "jianwen_text",
@@ -892,7 +897,7 @@ def _zbiory(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict) -> list[s
 
 
 # gwiazdka przy tekście bez przekładu: dwa backslashe i gwiazdka,
-# tak jak w pozostałych sekcjach 03
+# tak jak w pozostałych sekcjach pliku 02
 GWIAZDKA = "\\*"
 
 _PAMIATKI_PLIK = "pamiatki.jsonl"
@@ -1053,12 +1058,11 @@ def _pamiatki(ix, pl: dict[str, str], uzyte: set[str], statystyka: dict,
             continue
         widziane.add(tytul)
         uzyte.add(klucz_historii)
+        # Tytuł, legenda i treść stoją w kolejnych liniach — bez pustych wierszy.
         karty.append(f"**{tytul}**")
-        karty.append("")
         legenda = _legenda_pamiatki(ix, pl, mapy["motyw"], wpis)
         if legenda:
             karty.append(legenda)
-            karty.append("")
         karty.extend(_blok_tekstu(zrodlo, bool(historia)))
         karty.append("")
         statystyka["pamiatki"] = statystyka.get("pamiatki", 0) + 1
@@ -1077,7 +1081,7 @@ def _poi_scen(ix, pl: dict[str, str], katalog: str | Path) -> dict[int, str]:
     Powiązanie POI→scena pochodzi z `index/mpk/poi_storyline_sceny.jsonl`
     (skrypt `interact_storyline` POI gra tę scenę — patrz
     `tools/poi_storyline_sceny.py`; benchmark: POI 200046001 „Dragon Pattern
-    Mark” → scena 4700001). Nazwa POI jak w sekcji POI pliku 03: najpierw
+    Mark” → scena 4700001). Nazwa POI jak w sekcji POI pliku 02: najpierw
     polski przekład, bez niego tekst z gry z gwiazdką. POI bez nazwy nie
     podpisujemy — lepszy brak wstępu niż goły numer.
     """
@@ -1229,7 +1233,7 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
             out += [jednostka.sekcja, ""]
             ostatnia_sekcja = jednostka.sekcja
         if jednostka.wstep:
-            out += [jednostka.wstep, ""]
+            out += [jednostka.wstep]   # wiersz „Interakcja: …” tuż nad nagłówkiem, bez pustej linii
         out.append(f"## {jednostka.etykieta}")
         out.extend(linie)
         out.append("")
@@ -1295,7 +1299,7 @@ def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
 
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             krainy: list[dict] | None = None) -> list[str]:
-    """Co nie trafiło do 01 ani 02 — pogrupowane rodzajem: „nazwa — opis”."""
+    """Co nie trafiło do 01 — pogrupowane rodzajem: „nazwa — opis”."""
     sekcje: dict[str, dict[str, list[str]]] = {}
     bez_nazwy: dict[str, list[str]] = {}
     widziane: dict[str, set[tuple[str, str]]] = {}
@@ -1360,7 +1364,7 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
 
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
     tresc, uzyte, _zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
-    pliki_scen = _zapisz_czesci(
+    pliki_scen, opisy_scen = _zapisz_czesci(
         wyj, "01_sceny_i_cutsceny", "Sceny i cutsceny",
         "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
         "pieśni na końcu, bo w grze nie ma ich na początku: "
@@ -1371,20 +1375,82 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     tresc_reszty += _zbiory(ix, pl, uzyte, statystyka)
     tresc_reszty += _pamiatki(ix, pl, uzyte, statystyka, index)
     tresc_reszty += _poi(ix, pl, uzyte, statystyka, index)
-    pliki_reszty = _zapisz_czesci(
-        wyj, "03_reszta", "Reszta",
+    pliki_reszty, opisy_reszty = _zapisz_czesci(
+        wyj, "02_reszta", "Reszta",
         "Komplet informacji dodatkowych: wszystkie przekłady, "
         "których nie ma w pliku 01, pogrupowane rodzajem.",
         tresc_reszty, statystyka)
 
     (wyj / "README.md").write_text(
-        _readme(statystyka, zakres, pliki_scen, pliki_reszty), encoding="utf-8")
+        _readme(statystyka, zakres, pliki_scen, opisy_scen, pliki_reszty, opisy_reszty),
+        encoding="utf-8")
     statystyka["plikow"] += 1
     return statystyka
 
 
 def _naglowek(tytul: str, opis: str) -> str:
     return f"# Where Winds Meet — {tytul}\n\n{opis}\n\n"
+
+
+# Krótkie etykiety sekcji (`# …`) do tytułu części — np. „01 - prolog, Yannan” albo „02 - przedmioty”.
+# Krainy i inne sekcje z formy „# Nazwa — polski odpowiednik” biorą człon po
+# ostatnim myślniku (tam leży polska nazwa).
+_KROTKIE_SEKCJE = {
+    "Prolog": "prolog",
+    "Pieśni": "pieśni",
+    "Sceny bez przypisanej mapy": "sceny bez mapy",
+    "Cutsceny bez grupy zadań": "cutsceny bez grupy",
+    "Napisy przerywników": "napisy przerywników",
+    "Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)": "napisy przerywników",
+    "Zadania i wątki": "zadania",
+    "Encyklopedia, księgi i poszlaki": "kompendium",
+    "Przedmioty, stroje i tytuły": "przedmioty",
+    "Sztuki walki i umiejętności": "sztuki walki",
+    "Walka i przeciwnicy": "walka",
+    "Świat, sekty i miejsca": "świat i miejsca",
+    "Postacie i relacje": "postacie",
+    "Interfejs i komunikaty": "interfejs",
+    "Pozostałe teksty": "pozostałe",
+    "Zbiory i pamiątki — zasłyszane historie": "historie zasłyszane",
+    "Zbiory i pamiątki — karty przeciwników": "karty przeciwników",
+    "Pamiątki — przedmioty z historią": "pamiątki",
+    "Punkty na mapie (POI)": "POI",
+}
+_CIAG_DALSZY = re.compile(r"\s*\(ciąg dalszy\)\s*$")
+
+
+def _etykieta_sekcji(linia: str) -> str:
+    """Krótka etykieta nagłówka `# …` do tytułu części: „# 清河 — Qinghe - ostatnia iluzja” → „Qinghe”."""
+    tekst = linia[1:].strip()
+    tekst = _CIAG_DALSZY.sub("", tekst).strip()
+    krotka = _KROTKIE_SEKCJE.get(tekst)
+    if krotka:
+        return krotka
+    if " — " in tekst:                      # „# 清河 — Qinghe - …” → czas po polsku
+        tekst = tekst.rsplit(" — ", 1)[-1].strip()
+    for separator in (", ", " - ", " ("):     # dopisek po nazwie: utnij przy pierwszym separatorze
+        if separator in tekst:
+            tekst = tekst.split(separator, 1)[0].strip()
+            break
+    if tekst.startswith("Mapa "):            # „Mapa Yannan” → „Yannan”
+        tekst = tekst[len("Mapa "):].strip()
+    return tekst
+
+
+def _opis_czesci(czesc: list[str], maks: int = 5) -> str:
+    """Krótka lista sekcji w części, w kolejności występowania („prolog, Yan Nan, Qinghe”)."""
+    etykiety: list[str] = []
+    for linia in czesc:
+        if not linia.startswith("# "):
+            continue
+        etykieta = _etykieta_sekcji(linia)
+        if etykieta and etykieta not in etykiety:
+            etykiety.append(etykieta)
+    if not etykiety:
+        return ""
+    if len(etykiety) > maks:
+        return ", ".join(etykiety[:maks]) + ", …"
+    return ", ".join(etykiety)
 
 
 # Budżet jednej części pliku treści: pliki po kilkanaście megabajtów są
@@ -1399,16 +1465,18 @@ def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
     Całość w budżecie → jedna część (plik zostaje pod starą nazwą).
     Granice w kolejności chęci: nagłówek (`# `/`## `) zaraz po przekroczeniu
     budżetu; hasło (`**…`) lub linia po pustej, gdy nagłówka długo nie ma
-    (listy w 03); dowolna linia dopiero przy podwójnym zapasie. Gdy cięcie
+    (listy w 02); dowolna linia dopiero przy podwójnym zapasie. Gdy cięcie
     wypada w środku sekcji (`# `), nowa część dostaje powtórzony nagłówek
     sekcji z dopiskiem „(ciąg dalszy)”, żeby było widać, skąd pochodzi tekst.
+    Wiersz „Interakcja: …” nigdy nie zostaje sam na końcu części przed
+    `## Scena …` — przechodzi na początek nowej części razem ze sceną.
     """
     czesci: list[list[str]] = []
     biezaca: list[str] = []
     bajty = 0
     sekcja = ""
     poprzednia = ""
-    # Sekcje list (03) nie mają nagłówków w środku: po przekroczeniu budżetu
+    # Sekcje list (02) nie mają nagłówków w środku: po przekroczeniu budżetu
     # o `zapas` wolno ciąć na haśle (`**…`) albo po pustej linii, a po
     # podwójnym zapasie — na dowolnej linii, żeby część nie rosła bez końca.
     zapas = max(budzet // 10, 1)
@@ -1422,12 +1490,20 @@ def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
             or (bajty > budzet + zapas and luzna)
             or bajty > budzet + 2 * zapas)
         if tnij:
+            # Wiersz „Interakcja: …” należy do sceny pod nim — przy cięciu
+            # na `## ` razem z nią przechodzi na początek nowej części.
+            przesun = ""
+            if poprzednia.startswith("Interakcja: ") and biezaca and biezaca[-1] == poprzednia:
+                przesun = biezaca.pop()
             czesci.append(biezaca)
             biezaca = []
             bajty = 0
             if sekcja and not linia.startswith("# "):
                 biezaca = [sekcja[:2] + sekcja[2:].strip() + " (ciąg dalszy)", ""]
                 bajty = len(biezaca[0].encode("utf-8")) + 2
+            if przesun:
+                biezaca.append(przesun)
+                bajty += len(przesun.encode("utf-8")) + 1
         biezaca.append(linia)
         bajty += len(linia.encode("utf-8")) + 1
         poprzednia = linia
@@ -1436,46 +1512,78 @@ def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
     return czesci
 
 
+# Znaki niedozwolone w nazwach plików (Windows) — zastępujemy myślnikiem;
+# kropki i spacje na końcu nazwy są też niedozwolone w Windows.
+_ZABRONIONE_W_NAZWIE = re.compile(r'[\\/:*?"<>|\x00-\x1f]')
+
+
+def _nazwa_pliku_czesci(tytul_czesci: str) -> str:
+    """Nazwa pliku części = tytuł części (bez „Where Winds Meet — ”), z `.md`."""
+    nazwa = _ZABRONIONE_W_NAZWIE.sub("-", tytul_czesci).strip().rstrip(". ")
+    return nazwa + ".md"
+
+
 def _zapisz_czesci(wyj: Path, baza: str, tytul: str, opis: str,
-                   linie: list[str], statystyka: dict) -> list[str]:
-    """Zapisuje treść w jednej lub kilku częściach i zwraca nazwy plików."""
+                   linie: list[str], statystyka: dict) -> tuple[list[str], list[str]]:
+    """Zapisuje treść w jednej lub kilku częściach.
+
+    Zwraca (nazwy plików, opisy części). Przy podziale tytuł części opisuje
+    jej zawartość (np. `02 - przedmioty — część 2 z 3`), a **nazwa pliku to
+    ten tytuł** (np. `02 - przedmioty — część 2 z 3.md`).
+    Przy jednym pliku zostaje zwykły tytuł bazowy i stara nazwa `baza.md`.
+    """
     czesci = _czesci(linie)
+    numer_baza = baza.split("_", 1)[0]
     nazwy: list[str] = []
+    opisy: list[str] = []
     for numer, czesc in enumerate(czesci, start=1):
         if len(czesci) == 1:
-            nazwa, doklejka = f"{baza}.md", ""
+            nazwa, tytul_czesci, opis_czesci = f"{baza}.md", tytul, ""
         else:
-            nazwa = f"{baza}_{numer:02d}.md"
-            doklejka = f" — część {numer} z {len(czesci)}"
+            opis_czesci = _opis_czesci(czesc)
+            tytul_czesci = f"{numer_baza} - {opis_czesci}" if opis_czesci else tytul
+            tytul_czesci += f" — część {numer} z {len(czesci)}"
+            nazwa = _nazwa_pliku_czesci(tytul_czesci) if opis_czesci else f"{baza}_{numer:02d}.md"
         (wyj / nazwa).write_text(
-            _naglowek(tytul + doklejka, opis) + "\n".join(czesc) + "\n",
+            _naglowek(tytul_czesci, opis) + "\n".join(czesc) + "\n",
             encoding="utf-8")
         statystyka["plikow"] += 1
         nazwy.append(nazwa)
-    return nazwy
+        opisy.append(opis_czesci)
+    return nazwy, opisy
 
 
-def _wiersze_readme(pliki: list[str], opis: str) -> str:
-    """Wiersze tabeli README: jeden plik albo kolejne części z numeracją."""
+def _wiersze_readme(pliki: list[str], opis: str, szczegoly: list[str] | None = None) -> str:
+    """Wiersze tabeli README: jeden plik albo kolejne części z numeracją.
+
+    `szczegoly` to opisy części z `_zapisz_czesci` — każdy wiersz pokazuje,
+    co dana część zawiera.
+    """
     if len(pliki) == 1:
         return f"| `{pliki[0]}` | {opis} |"
     return "\n".join(
-        f"| `{nazwa}` | {opis} — część {numer} z {len(pliki)} |"
+        f"| `{nazwa}` | {(szczegoly or [''] * len(pliki))[numer - 1] or opis}"
+        f" — część {numer} z {len(pliki)} |"
         for numer, nazwa in enumerate(pliki, start=1))
 
 
 def _readme(statystyka: dict, zakres: str,
-            pliki_scen: list[str], pliki_reszty: list[str]) -> str:
+            pliki_scen: list[str], opisy_scen: list[str],
+            pliki_reszty: list[str], opisy_reszty: list[str]) -> str:
     return f"""# Czytanka Where Winds Meet
 
 | plik | zawartość |
 |---|---|
-{_wiersze_readme(pliki_scen, "sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu")}
-{_wiersze_readme(pliki_reszty, "komplet informacji dodatkowych: wszystkie przekłady spoza 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowane rodzajem")}
+{_wiersze_readme(pliki_scen, "sceny i cutsceny razem, chronologicznie: prolog, krainy po kolei, pieśni na końcu", opisy_scen)}
+{_wiersze_readme(pliki_reszty, "komplet informacji dodatkowych: wszystkie przekłady spoza 01 (przedmioty, encyklopedia, kompendium itd.), pogrupowane rodzajem", opisy_reszty)}
 
 Pliki treści cięte są na części po ~2,5 MB (granice tylko na nagłówkach sekcji
 i jednostek; sekcja przecięta w środku zaczyna kolejną część nagłówkiem
 z dopiskiem „(ciąg dalszy)”), bo wielkich plików nie da się wygodnie przeglądać.
+Tytuł i nazwa pliku każdej części nazywają jej zawartość (np. „01 - prolog, Yannan —
+część 1 z 8.md” albo „02 - sztuki walki, walka, zadania, świat i miejsca, historie
+zasłyszane, … — część 3 z 3.md”), a w tabeli wyżej przy każdej części stoi krótka
+lista jej sekcji.
 
 Kwestie w 01: `**Mówca:** tekst`, jedna kwestia na linię, bez punktora, czasów
 i tabel; kwestia bez mówcy to goły tekst.
@@ -1489,7 +1597,7 @@ Statystyka: {statystyka['jednostek']} jednostek, {statystyka['linii']} kwestii,
 {statystyka['reszta']} pozycji w reszcie,
 {statystyka['pominiete']} kwestii bez polskiego pominięto,
 {statystyka['bez_przekladu']} kwestii stoi z gwiazdką, bo przekładu jeszcze nie ma,
-{statystyka.get('zbiory', 0)} kart zbiorów, {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) i {statystyka.get('poi', 0)} punktów na mapie (POI — z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 03.
+{statystyka.get('zbiory', 0)} kart zbiorów, {statystyka.get('pamiatki', 0)} pamiątek (przedmiotów z historią) i {statystyka.get('poi', 0)} punktów na mapie (POI — z tego {statystyka.get('poi_z_dialogiem', 0)} z potwierdzonym numerem sceny) w pliku 02.
 
 Karty kontekstu bez polskiego przekładu mają tekst z gry z gwiazdką — tak samo
 jak kwestie w pliku 01.
