@@ -3,7 +3,7 @@
 Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
-**Najnowsze (przekład AI-tymczasowy, wpisy 19–21d w dzienniku):** runda 3 — **755 z 1 023** wpisów list fabularnych (403/669 list + wszystkie 350 to/from + 4 melodie). Magazyn **116 389** (23,77%). Pozostało 268 listów (partie 4–10); potem rundy 4–8, na końcu łatka v0.6.0.
+**Najnowsze (przekład AI-tymczasowy, wpis 21e w dzienniku):** runda 3 — **LISTY UKOŃCZONE, 1 023 z 1 023** (669 list + wszystkie 350 to/from + 4 melodie). Magazyn **116 657** (24,0% unikalnych tekstów wyciągu). Następny krok: runda 4 — `task_desc_str` (3 078) + `task_name` (962) + `tasks_ending_data` (8); potem rundy 5–8, na końcu łatka v0.6.0. Testy: **623 OK**.
 
 **Poprzednie (czytanka v22, wpis 18 w dzienniku):** części pliku 01 i 02
 mają **opisowe nazwy plików** — `01 - prolog, Yannan — część 1 z 8.md`,

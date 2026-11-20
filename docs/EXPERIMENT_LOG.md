@@ -2429,6 +2429,40 @@ w repo (są wersjonowane), nie tylko w `/tmp`.
 
 Pozostało w rundzie 3: **388 listów**. Potem rundy 4–8.
 
+## 2026-11-19 (21e) — runda 3 (h–t): LISTY UKOŃCZONE, 1 023 z 1 023
+
+W tej turze domknięto całą pulę listów fabularnych (`tasks_envelop_data`).
+Partie: **(h–k) po 20** (`9ed3a31`, `3eb04ae`, `38ab584`, `121ad10`),
+**(l) +20** (`729193d`), **(m) +20 i 1 poprawka** (`5c600f5`),
+**(n) +20** (`03b7b14`), **(o) +8** (`116 537`), **(p) +24** (`a589010`),
+**(q) +24** (`ca8b687`), **(r) +24** (`7db0b41`), **(s) +24** (`184d4f1`),
+**(t) +24** (`0701582`).
+
+Stan: **1 023 z 1 023** wpisów (669 list + 350 to/from + 4 melodie).
+Magazyn **116 585 → 116 657** przekładów. Pokrycie wszystkich unikalnych
+tekstów wyciągu: **117 143 / 487 684 = 24,0%** (`pokrycie_tlumaczenia.py`).
+
+Zakres tej porcji: dzienniki połowu niemowląt i uprawy topoli „huyang”,
+spis fałszerstw obrazów, opowieść o Shi Qi i siostrze, pamiętnik Wang Qinga,
+listy Xi Huai o śmierci mistrzyni Feng Xu, list „Wzburzonych Fal” do Wang Qinga,
+zapiski o uprawie latawców, sennik o zamkniętych w studni, „Podręcznik
+rozpoznawania uczniów Moistów”, pożegnalny list Chena z Luancheng, listy
+Feng Dao do pana Żurawia, zapiski alchemika z ery Yuanfeng, rachunki
+Bractwa Beztroski, przysięga 119 obrońców przełęczy, kacerski list o siedmiu
+lampach, dziennik ukończenia nauki w Akademii Fenglong.
+
+Warsztat: 8 z 16 partii wymagało scalenia rozłamanych linii `PL:`
+(`zlamana_linia`) — za każdym razem łapał to `--na-sucho` przed importem;
+0 odrzuconych w imporcie finalnym każdej partii. Kontrola CJK w liniach `PL:`
+czysta w każdej partii. Uwaga: przy scalaniu fragmentów łatwo zgubić literalne
+`\n` — po (s) trzeba było je wstawić z powrotem (klucz `d43fafe8`).
+
+Sprawdzone po zamknięciu listów: `tools/run_tests.py` **623/623 OK** (exit 0),
+`tools/check_repository.py` OK (339 wpisów indeksu), `git diff --check` czysty.
+
+Następny krok: runda 4 — `task_desc_str` (3 078) + `task_name` (962)
++ `tasks_ending_data` (8).
+
 ## 2026-11-19 (21d) — runda 3 (e–g): 755 z 1 023 listów fabularnych
 
 W tej turze doszły trzy partie po 40 listów (`tasks_envelop_data · text`):
