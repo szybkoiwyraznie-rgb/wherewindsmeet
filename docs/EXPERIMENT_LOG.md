@@ -3423,3 +3423,33 @@ Odświeżony pakiet **`paczka_ai_weryfikacja_v8.zip`** (6 116 837 B, SHA-256
 — 36 577 miejsc `PL:`, w tym 207 listów w nowej wersji. v7 zostaje na Dysku.
 Zostają wczesne rundy `runda1`–`runda3` (encyklopedia, księgi poza listami)
 do przepisania.
+
+## 2026-11-20 (23) — łatka v0.7.0 na Dysku
+
+Wydanie **`WWM_Spolszczenie_PL_v0.7.0.zip`**: 12 592 118 B, SHA-256
+`866ce6f33ee4cda0c0a237069f1961250996b19364783412e660fd073612c704`,
+151 389 kluczy w planie (151 045 przekładów + 670 bliźniaków `__grey`;
+326 wariantów płci, 770 kolizji odłożonych, 141 052 wpisy `en_jednoznaczne`).
+Zbudowana `one_click_patch.py --tylko-magazyn --wydanie v0.7.0
+--wyj-zip dist/WWM_Spolszczenie_PL_v0.7.0.zip`, 12 plików w ZIP
+(patcher standalone + `plan_latki.json`, zero binarek gry).
+Wgrana na Dysk do folderu pakietów (`1-4nTF4G5ZbwjuHMNsQ6_fxFuhcyXNI9k`),
+id pliku `1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`,
+[webViewLink](https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view?usp=drivesdk).
+v0.6.0 zostaje na Dysku. Nie testowana w grze. Różnica względem v0.6.0:
+przepisane listy z wpisu (22), bez nowych kluczy.
+
+## 2026-11-20 (24) — Czytanka v24 na Dysku
+
+Wydanie **`czytanka_v24.zip`** z `tools/czytanka_czysta.py --wyj
+out/czytanka_v24 --wersja 24` (13 plików: `01` w 8 częściach, `02` w 4
+częściach, `README.md`; numeracja i nazwy plików części jak w v23).
+
+- rozmiar: 9 097 184 B, SHA-256
+  `ae4657b602ab0cab0f5f98805138d75379a2adf325071a8c38f7d248e31f7e3d`;
+- na Dysku jako `czytanka_v24.zip` (id `14011iaVLwqZ-VyaDIeGRqB6h9c14Tqmi`)
+  — nazwa bez przedrostka `WWM_`, jak v21–v23;
+- liczniki z budowy: **75 328** jednostek, **50 671** linii, **112 057**
+  reszta, 0 pominiętych, zbiory 1020, pamiątki 120, POI 2949 (368 z dialogiem).
+
+v23 zostaje na Dysku. Treść jak v23 plus poprawione listy z wpisu (22).

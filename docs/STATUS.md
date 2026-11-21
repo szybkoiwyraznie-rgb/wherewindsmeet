@@ -41,20 +41,21 @@ a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
 **cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
 — w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
 Magazyn **151 045** (**30,85%**). Z magazynu zbudowano gotową łatkę
-**`WWM_Spolszczenie_PL_v0.6.0.zip`** (12 583 642 B, 151 389 kluczy:
+**`WWM_Spolszczenie_PL_v0.7.0.zip`** (12 592 118 B, 151 389 kluczy:
 151 045 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
-odłożonych; SHA-256 `5ae03530fa9cf1178ee7016715a8fb844f254becd724b45b052deee09146c2ee`)
-— `one_click_patch.py --tylko-magazyn --wydanie v0.6.0`. Wgrana na Dysk
-właściciela (folder pakietów, id `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`):
-https://drive.google.com/file/d/1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu/view
+odłożonych; SHA-256 `866ce6f33ee4cda0c0a237069f1961250996b19364783412e660fd073612c704`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.7.0`. Wgrana na Dysk
+właściciela (folder pakietów, id `1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`):
+https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view
+v0.6.0 (`1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`) zostaje na Dysku.
 Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
 (styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
-Obok leży **Czytanka v23** (`czytanka_v23.zip`, 9 091 949 B, SHA-256
-`c434325307213d4517b443b66bdc7a0e25bfad7e458e2e11e8303ffe1d3d0eb2`,
-id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`) — `tools/czytanka_czysta.py`,
-`01` w 8 częściach, `02` w 4 częściach: 75 328 jednostek, 30 986 kwestii PL.
-**Ostatnia czytanka przed nią to v22** (`czytanka_v22.zip`, id
-`1G2JMeOWn1_9UsgABo_I5KtBEGHU637nH`). Czytanki NIE buduje się
+Obok leży **Czytanka v24** (`czytanka_v24.zip`, 9 097 184 B, SHA-256
+`ae4657b602ab0cab0f5f98805138d75379a2adf325071a8c38f7d248e31f7e3d`,
+id `14011iaVLwqZ-VyaDIeGRqB6h9c14Tqmi`) — `tools/czytanka_czysta.py`,
+`01` w 8 częściach, `02` w 4 częściach: 75 328 jednostek, 50 671 linii,
+112 057 reszta. **Ostatnia czytanka przed nią to v23** (`czytanka_v23.zip`,
+id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`). Czytanki NIE buduje się
 `buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
 numer wersji ustalać z tego pliku, nie z pamięci sesji.
 Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
