@@ -3368,3 +3368,32 @@ Ustalenie jakościowe do decyzji właściciela: wczesne rundy (encyklopedia, ksi
 mają kalki i wtrącenia angielskie („DO PANIE OF QINGHE…", „Heroes Assembly",
 „Lone Cloud") — nadają się do przepisania, nie do poprawiania; partie
 `barks_start` są jednolite terminologicznie (późniejsze, z `pl_nazwy_hasel`).
+
+## 2026-11-20 (21) — poprawki 36 listów AI (encyklopedia i księgi); pakiet AI v7
+
+Właściciel poprosił o poprawę najgorszych fragmentów przekładu AI w sekcji
+„encyklopedia i księgi". Audyt wykazał, że najsłabsza część to **listy
+i wiadomości** (`tasks_envelop_data`, 1 023 klucze AI), tłumaczone wcześniej
+z wersji angielskiej: wtrącone terminy („Heroes Assembly", „Well of Heaven",
+„Lord Master of Grain", „Lone Cloud", „River Master", „Primordial Essence
+Restorative Pill"), myślniki zamiast składni, niedokończone zdania, urywki
+chińskie („天工", „樱桃煎").
+
+Przepisano **36 listów od źródła chińskiego** (partie `poprawki_listy` 1–36),
+z terminologią z magazynu: Zgromadzenie bohaterów, Niebiańskie Źródło,
+Strażnik równowagi, Samotna chmura, Pan Rzeki, Przełęcz Jadeitowej Bramy,
+„Z samego nieba", Kurhan Ostrzy, Staw Jinming, Spichlerz Wyrównawczy,
+Sala Życia i Śmierci, Wioska Koński Łeb, Ryczące Piaski, Wielkie Liao.
+Nazwy bez odpowiednika w magazynie: banda Czystego Źródła, Sala Szkarłatnego
+Smoka Wodnego, banda Turkusowego Smoka Wodnego, Mglisty Las, Sala Sześciu
+Chorób, wał Huzi.
+
+Import: 36 miejsc `PL`, **0 odrzuconych**; pułapka po drodze — wielolinijkowy
+`PL:` musi stać w jednej linii z `\n` (inaczej `zlamana_linia`). Magazyn bez
+zmian liczbowych: 151 045, skan linii `PL:` bez CJK.
+
+Odświeżony pakiet **`paczka_ai_weryfikacja_v7.zip`** (6 115 213 B, SHA-256
+`160534ccba595d1b6e7e7f046f5acafffd19e58ae8ce07fcebb972c11d2f7513`, Dysk id
+`1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) — 36 577 miejsc `PL:`, w tym 36 listów
+w nowej wersji. Zostaje ~35 kolejnych podejrzanych listów oraz wczesne rundy
+`runda1`–`runda3` (encyklopedia, księgi) do przepisania.
