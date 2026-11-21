@@ -54,10 +54,16 @@ class NarzedziaPrzestarzaleTests(unittest.TestCase):
         for nazwa in ("buduj_czytanki.py", "zbuduj_czytanke_pelna.py", "buduj_czytanke_gry.py"):
             wynik = subprocess.run(
                 [sys.executable, str(KORZEN / "tools" / nazwa), "--help"],
-                capture_output=True, text=True, encoding="utf-8",
-                timeout=120, check=False,
+                capture_output=True, timeout=120, check=False,
             )
-            self.assertIn("PRZESTARZAŁE", wynik.stderr, f"tools/{nazwa}: brak ostrzeżenia na stderr")
+            # Windows pipe + cp1252: Ł/ę idą jako \\uXXXX albo bajty spoza UTF-8.
+            # „obsolete” jest w banerze ASCII i nie zależy od strony kodowej.
+            stderr = (wynik.stderr or b"").decode("utf-8", errors="replace")
+            self.assertIn(
+                "obsolete",
+                stderr.lower(),
+                f"tools/{nazwa}: brak ostrzeżenia na stderr ({stderr[:400]!r})",
+            )
 
 
 if __name__ == "__main__":
