@@ -3453,3 +3453,22 @@ częściach, `README.md`; numeracja i nazwy plików części jak w v23).
   reszta, 0 pominiętych, zbiory 1020, pamiątki 120, POI 2949 (368 z dialogiem).
 
 v23 zostaje na Dysku. Treść jak v23 plus poprawione listy z wpisu (22).
+
+## 2026-11-20 (25) — Czytanka v25: listy z tytułem i treścią, bez formantów
+
+Właściciel: (1) powiązać treść listów z tytułem, (2) wywalić `\\v` i podobne
+formanty z całej czytanki, (3) jeśli się da — wstawić list po scenie, która
+go wywołuje.
+
+`tools/czytanka_czysta.py`: karty `## List: {tytuł}` z `tasks_envelop_data`
+(`to` + `text`, akapity na `\\v`); `_czysty` zdejmuje też `\\v`, `$T(…)`, `$N`.
+Przypisanie do sceny: unikalny fragment tytułu ZH cytowany w dialogu, a przy
+wielu kandydatach krawędź etsb `*shuxin*` (przykład: 魏某白 w 4700002,
+`sxd_xiaowushuxin.etsb` → 4700003). 9 listów przy scenach, reszta w 02
+pod `# Listy`. Testy: `tests/test_czytanka_listy.py`.
+
+Wydanie **`czytanka_v25.zip`**: 9 088 460 B, SHA-256
+`111bdff1081ad328e790d8fd9073a311f9f8f63a79fe67c81919c1a1731fa03b`,
+id `1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM`,
+[webViewLink](https://drive.google.com/file/d/1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 696 reszta. v24 zostaje.

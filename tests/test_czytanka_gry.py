@@ -349,6 +349,7 @@ class TestCzytankaDoCzytania(unittest.TestCase):
 
     def test_czysty_tekst_zdejmuje_kody(self):
         self.assertEqual(self.czytanka._czysty("#a66829Noc#E <Fang|1|#Y> w piwnicy"), "Noc Fang w piwnicy")
+        self.assertEqual(self.czytanka._czysty("A\\vB"), "A B")
 
     def test_kategorie_po_nazwie_tabeli(self):
         self.assertEqual(self.czytanka._kategoria("equip_items"), "Przedmioty, stroje i tytuły")

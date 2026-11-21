@@ -159,6 +159,17 @@ Zasady kolejności:
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem
    wychodziła po angielsku mimo gotowego przekładu.
+12. **listy fabularne** (`tasks_envelop_data`) mają tytuł (`to`) i treść (`text`)
+    w jednej karcie `## List: …`, a `\\v` łamie akapity. Gdy scena cytuje
+    unikalny fragment tytułu (np. «魏某白» w scenie 4700002) i skrypt etsb
+    `*shuxin*` ma krawędź do następnej sceny, karta stoi **między tymi scenami**
+    — list „Z Wei — do Jiang Wulanga” po ostatniej kwestii 4700002, przed
+    4700003. Reszta listów, których miejsca w fabule nie da się jednoznacznie
+    dowieść, stoi w 02 pod `# Listy` (też jako karty, nie osobny tytuł i osobna
+    treść w encyklopedii).
+13. **znaki formatowania gry** (`\\v`, `\\n`, `#Y…#E`, `$T(…)`, `$N`, odnośniki
+    `<Tekst|…>`) znikają z całej czytanki — `_czysty` zdejmuje je przy wczytaniu
+    magazynu; w listach `\\v` zostaje przerwą akapitu.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
