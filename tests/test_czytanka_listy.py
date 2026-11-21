@@ -74,18 +74,20 @@ class TestKartyListow(unittest.TestCase):
         # tytuł i treść nie są osobnymi hasłami
         self.assertNotIn("**Z Wei", tekst)
 
-    def test_list_po_scenie_ktora_cytuje_tytul(self):
+    def test_list_po_scenie_z_grafu_openui(self):
         ix = _Indeks()
         listy = cz._wczytaj_listy(ix)
         katalog = tempfile.TemporaryDirectory()
         mpk = Path(katalog.name, "mpk")
         mpk.mkdir()
-        (mpk / "etsb_storyline.jsonl").write_text(
+        (mpk / "listy_w_grafie.jsonl").write_text(
             json.dumps({
+                "file_id": "3dd2fe816e69782d",
+                "no": 5,
+                "po": 4700002,
+                "przed": 4700003,
                 "sciezka": "Storyline/client/dialogs/hjt/sxd_xiaowushuxin.etsb",
-                "sceny": [4700002, 4700003],
-                "nastepstwa": [["scena", 4700002, "scena", 4700003]],
-            }, ensure_ascii=False) + "\n",
+            }, ensure_ascii=False, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         przy = cz._przypisz_listy_do_scen(ix, listy, katalog.name)
@@ -93,10 +95,23 @@ class TestKartyListow(unittest.TestCase):
         self.assertNotIn(4700003, przy)
         katalog.cleanup()
 
-    def test_niejednoznaczny_bez_shuxin_zostaje_w_02(self):
+    def test_bez_pola_po_zostaje_w_02(self):
         ix = _Indeks()
-        # drugi cytat tego samego unikalnego tokenu, bez krawędzi shuxin
-        ix.sceny[32000218] = {"d": 32000218, "e": [["k", 0, "sc1"]]}
+        listy = cz._wczytaj_listy(ix)
+        katalog = tempfile.TemporaryDirectory()
+        mpk = Path(katalog.name, "mpk")
+        mpk.mkdir()
+        # graf otwiera list, ale bez dialogu poprzedzającego — nie zgadujemy
+        (mpk / "listy_w_grafie.jsonl").write_text(
+            json.dumps({"file_id": "abc", "no": 5}, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        przy = cz._przypisz_listy_do_scen(ix, listy, katalog.name)
+        self.assertEqual(przy, {})
+        katalog.cleanup()
+
+    def test_cytat_tytulu_w_dialogu_nie_wystarcza(self):
+        ix = _Indeks()
         listy = cz._wczytaj_listy(ix)
         przy = cz._przypisz_listy_do_scen(ix, listy, None)
         self.assertEqual(przy, {})

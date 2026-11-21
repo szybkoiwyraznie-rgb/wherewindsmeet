@@ -57,9 +57,7 @@ _ODNOSNIK = re.compile(r"<([^<>|]{1,80})(\|[^<>]*)?>")
 _SPACJE = re.compile(r"\s+")
 _DOLAR_T = re.compile(r"\$T\([^)]*\)")
 _DOLAR_N = re.compile(r"\$N")
-_PUNKT_TYTULU = re.compile(r"[，。、；：\s,.!\-—–\"“”‘’《》『』「」【】（）()]+")
-# Skrypty etsb, które otwierają UI listu między scenami (nazwa pliku).
-_SHUXIN_ETS = re.compile(r"(shuxin|xinjian|open_letter|xiexin|[^a-z]letter)", re.I)
+
 
 # W danych gracza ta sama postać bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
 GRACZ = {nazwa.lower(): "Youxia" for nazwa in (
@@ -1284,85 +1282,41 @@ def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> 
     return linie
 
 
-def _blob_sceny(scena: dict, ix) -> str:
-    kawalki = []
-    for element in scena.get("e") or []:
-        if not isinstance(element, list) or not element or element[0] != "k":
-            continue
-        klucz = element[2] if len(element) > 2 else None
-        if not klucz or klucz not in ix.teksty:
-            continue
-        kawalki.append(ix.teksty[klucz].zrodlo or "")
-    return "\n".join(kawalki)
-
-
-def _nastepstwa_shuxin(index: str | Path | None) -> dict[int, int]:
-    """Scena A → scena B, gdy skrypt etsb listu ma krawędź A→B."""
+def _wczytaj_listy_w_grafie(index: str | Path | None) -> list[dict]:
+    """Wiersze `index/mpk/listy_w_grafie.jsonl` (OpenUI TaskEnvelopWindow → no)."""
     if not index:
-        return {}
-    plik = Path(index) / "mpk" / "etsb_storyline.jsonl"
+        return []
+    plik = Path(index) / "mpk" / "listy_w_grafie.jsonl"
     if not plik.is_file():
-        return {}
-    para: dict[int, int] = {}
+        return []
+    wiersze: list[dict] = []
     for linia in plik.read_text(encoding="utf-8").splitlines():
         if not linia.strip():
             continue
-        wpis = json.loads(linia)
-        sciezka = str(wpis.get("sciezka") or "")
-        if not _SHUXIN_ETS.search(sciezka.split("/")[-1]):
-            continue
-        for krawedz in wpis.get("nastepstwa") or []:
-            if (isinstance(krawedz, list) and len(krawedz) >= 4
-                    and krawedz[0] == "scena" and krawedz[2] == "scena"):
-                try:
-                    para[int(krawedz[1])] = int(krawedz[3])
-                except (TypeError, ValueError):
-                    continue
-    return para
+        wiersze.append(json.loads(linia))
+    return wiersze
 
 
 def _przypisz_listy_do_scen(ix, listy: dict[str, dict],
                             index: str | Path | None = None) -> dict[int, list[str]]:
-    """List po scenie, która cytuje unikalny fragment tytułu — gdy da się to zrobić jednoznacznie.
+    """List po scenie, która w grafie Storyline otwiera `TaskEnvelopWindow`.
 
-    Scena 4700002 cytuje «魏某白» z tytułu listu «月日，魏某白，江无浪足下»; skrypt
-    `sxd_xiaowushuxin.etsb` ma krawędź 4700002 → 4700003, więc list staje między nimi.
-    Przy wielu kandydatach bez krawędzi shuxin list zostaje w 02.
+    Źródło: `index/mpk/listy_w_grafie.jsonl` — węzeł OpenUI z `ui_kwargs.no`
+    stoi na krawędzi `__out__` zaraz po `dialogs_no` (pole `po`). Przykład:
+    `sxd_xiaowushuxin.etsb` gra 4700002, potem list `no=5`, potem 4700003.
+    Bez `po` list zostaje w 02. Nie porównujemy tytułu z kwestią.
     """
-    token_rid: dict[str, set[str]] = {}
-    for rid, wpis in listy.items():
-        klucz = wpis.get("to")
-        if not klucz or klucz not in ix.teksty:
-            continue
-        zh = ix.teksty[klucz].zrodlo or ""
-        for token in _PUNKT_TYTULU.split(zh):
-            if len(token) >= 3:
-                token_rid.setdefault(token, set()).add(rid)
-    unikalne = {token: next(iter(ridy)) for token, ridy in token_rid.items() if len(ridy) == 1}
-
-    sceny_zh = {int(sid): _blob_sceny(scena, ix)
-                for sid, scena in (ix.sceny or {}).items()}
-    kandydaci: dict[str, set[int]] = {}
-    for token, rid in unikalne.items():
-        trafienia = [sid for sid, blob in sceny_zh.items() if token in blob]
-        if trafienia:
-            kandydaci.setdefault(rid, set()).update(trafienia)
-
-    shuxin = _nastepstwa_shuxin(index)
     przy: dict[int, list[str]] = {}
     zajete: set[str] = set()
-    for rid, sceny in kandydaci.items():
-        wybrane = None
-        for sid in sceny:
-            if sid in shuxin:
-                wybrane = sid
-                break
-        if wybrane is None and len(sceny) == 1:
-            wybrane = next(iter(sceny))
-        if wybrane is None or rid in zajete:
+    for wpis in _wczytaj_listy_w_grafie(index):
+        rid = str(wpis.get("no", ""))
+        if not rid or rid not in listy or rid in zajete:
+            continue
+        po = wpis.get("po")
+        if not isinstance(po, int):
             continue
         zajete.add(rid)
-        przy.setdefault(wybrane, []).append(rid)
+        przy.setdefault(po, []).append(rid)
     return przy
 
 

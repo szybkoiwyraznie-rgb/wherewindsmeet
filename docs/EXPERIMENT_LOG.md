@@ -3472,3 +3472,29 @@ Wydanie **`czytanka_v25.zip`**: 9 088 460 B, SHA-256
 id `1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM`,
 [webViewLink](https://drive.google.com/file/d/1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM/view?usp=drivesdk).
 75 278 jednostek, 50 671 linii, 111 696 reszta. v24 zostaje.
+
+## 2026-11-20 (26) — Czytanka v26: list po scenie z grafu OpenUI, nie z cytatu
+
+Właściciel odrzucił heurystykę v25 (porównywanie tytułu ZH z kwestią):
+powiązanie ma być bezwzględne z indeksów/kodu/bazy. Tabela
+`tasks_envelop_data` nie ma `task_id`/`dialog_id` (kolumny: model, `no`,
+text/to/from, bowu, melody). Zadanie 220006 tylko odpalają
+`sxd_xiaowushuxin.etsb`. Id listu jest w grafie Storyline:
+
+`StartEvent → StorylineDialogsPlayNode(4700002) → CommonMakeDictNode
+(key "no", value 5) → OpenUIWithInputNode
+(ui_path=task.task_envelope_window.TaskEnvelopWindow) →
+ListenCloseUIByGuidNode → StorylineDialogsPlayNode(4700003)`.
+
+Parser `tools/listy_w_grafie.py` na zdekodowanych `ezst_*.bin` z v7
+(213 grafów z `TaskEnvelopWindow`) → `index/mpk/listy_w_grafie.jsonl`
+(202 listów z `no`, 21 z polem `po`). `_przypisz_listy_do_scen` czyta
+tylko `po`; bez `po` list zostaje w 02. Testy: `tests/test_listy_w_grafie.py`,
+`tests/test_czytanka_listy.py`.
+
+Wydanie **`czytanka_v26.zip`**: 9 088 350 B, SHA-256
+`52dbda77ebc79a2a96ea8e0e7de27cd902cbd23320db6e5a9397e712ccc375f4`,
+id `1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv`,
+[webViewLink](https://drive.google.com/file/d/1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 687 reszta; 15 listów w 01 (w tym
+Wei po 4700002, przed 4700003), 692 w 02. v25 zostaje.
