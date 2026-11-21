@@ -69,7 +69,11 @@ class TestKartyListow(unittest.TestCase):
         self.assertIn("## List: Z Wei — do Jiang Wulanga", tekst)
         self.assertIn("Odkąd osiadłeś.", tekst)
         self.assertIn("Tian Ying zdobył przedmiot.", tekst)
-        self.assertIn("Odkąd osiadłeś.\n\nTian Ying zdobył przedmiot.", tekst)
+        self.assertIn(
+            "## List: Z Wei — do Jiang Wulanga\nOdkąd osiadłeś.\nTian Ying zdobył przedmiot.",
+            tekst,
+        )
+        self.assertNotIn("\n\n", tekst)
         self.assertNotIn("\\v", tekst)
         # tytuł i treść nie są osobnymi hasłami
         self.assertNotIn("**Z Wei", tekst)

@@ -50,14 +50,15 @@ https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view
 v0.6.0 (`1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`) zostaje na Dysku.
 Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
 (styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
-Obok leży **Czytanka v26** (`czytanka_v26.zip`, 9 088 350 B, SHA-256
-`52dbda77ebc79a2a96ea8e0e7de27cd902cbd23320db6e5a9397e712ccc375f4`,
-id `1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv`) — `tools/czytanka_czysta.py`,
-`01` w 8 częściach, `02` w 4: listy z tytułem i treścią razem, bez `\\v`;
+Obok leży **Czytanka v27** (`czytanka_v27.zip`, 9 088 103 B, SHA-256
+`5a1e0ee94765264a62385d7846172851b734ae220147e6f4a2c87dd29e668276`,
+id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`) — `tools/czytanka_czysta.py`,
+`01` w 8 częściach, `02` w 4: karty listów bez pustych wierszy;
 15 listów przy scenach **z grafu** OpenUI `TaskEnvelopWindow` (w tym
-„Z Wei — do Jiang Wulanga” po 4700002, przed 4700003) — nie z cytatu
-tytułu. **Ostatnia czytanka przed nią to v25** (`czytanka_v25.zip`,
-id `1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM`). Czytanki NIE buduje się
+„Z Wei — do Jiang Wulanga” po 4700002). Treść Wei z jednego pola `text`
+(ZH 4 akapity, EN 3 — EN pomija 《哭孔戡》). **Ostatnia czytanka przed nią
+to v26** (`czytanka_v26.zip`, id `1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv`).
+Czytanki NIE buduje się
 `buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
 numer wersji ustalać z tego pliku, nie z pamięci sesji.
 Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,

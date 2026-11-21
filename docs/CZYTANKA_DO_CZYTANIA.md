@@ -160,7 +160,7 @@ Zasady kolejności:
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem
    wychodziła po angielsku mimo gotowego przekładu.
 12. **listy fabularne** (`tasks_envelop_data`) mają tytuł (`to`) i treść (`text`)
-    w jednej karcie `## List: …`, a `\\v` łamie akapity. Miejsce w 01 wynika
+    w jednej karcie `## List: …`, a `\\v` łamie linię (bez pustego wiersza). Miejsce w 01 wynika
     **z grafu Storyline**, nie z cytatu tytułu w dialogu: węzeł
     `OpenUINode` / `OpenUIWithInputNode` z `TaskEnvelopWindow` dostaje
     `ui_kwargs.no` (identyfikator wiersza `tasks_envelop_data`) i stoi na
@@ -172,7 +172,7 @@ Zasady kolejności:
     tytuł i osobna treść).
 13. **znaki formatowania gry** (`\\v`, `\\n`, `#Y…#E`, `$T(…)`, `$N`, odnośniki
     `<Tekst|…>`) znikają z całej czytanki — `_czysty` zdejmuje je przy wczytaniu
-    magazynu; w listach `\\v` zostaje przerwą akapitu.
+    magazynu; w listach `\\v` zostaje zwykłym łamaniem linii, bez pustego wiersza.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.

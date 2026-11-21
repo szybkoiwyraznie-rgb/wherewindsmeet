@@ -129,7 +129,7 @@ def _czysty(tekst: str) -> str:
 
 
 def _akapity(tekst: str) -> list[str]:
-    """Treść listu: `\\v` / `\\n` to granice akapitów, reszta jak `_czysty`."""
+    """Treść listu: `\\v` / `\\n` łamie linię (bez pustego wiersza), reszta jak `_czysty`."""
     if not tekst:
         return []
     rozbity = (tekst.replace("\\v", "\n").replace("\v", "\n")
@@ -1245,9 +1245,9 @@ def _tytul_listu(wpis: dict, pl: dict[str, str], ix) -> str:
 
 
 def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> list[str]:
-    """Tytuł i treść listu razem, akapity w miejscu `\\v`."""
+    """Tytuł i treść listu razem; `\\v` to nowa linia, bez pustych wierszy."""
     tytul = _tytul_listu(wpis, pl, ix)
-    linie = [f"## List: {tytul}", ""]
+    linie = [f"## List: {tytul}"]
     nadawca_klucz = wpis.get("from")
     if nadawca_klucz:
         nadawca = pl.get(nadawca_klucz) or _czysty(
@@ -1256,7 +1256,6 @@ def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> 
             or "")
         if nadawca and nadawca not in tytul:
             linie.append(nadawca)
-            linie.append("")
     klucz_tresci = wpis.get("text")
     surowy = (surowe.get(klucz_tresci) if klucz_tresci else "") or (
         pl.get(klucz_tresci) if klucz_tresci else "") or ""
@@ -1266,17 +1265,13 @@ def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> 
     akapity = _akapity(surowy)
     if not akapity and klucz_tresci and pl.get(klucz_tresci):
         akapity = [pl[klucz_tresci]]
-    for i, akapit in enumerate(akapity):
-        if i:
-            linie.append("")
-        linie.append(akapit)
+    linie.extend(akapity)
     for extra in ("melody_solved_text", "melody_puzzle_text"):
         klucz = wpis.get(extra)
         if not klucz:
             continue
         extra_txt = pl.get(klucz) or ""
         if extra_txt and extra_txt not in akapity:
-            linie.append("")
             linie.append(extra_txt)
     linie.append("")
     return linie

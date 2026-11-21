@@ -3498,3 +3498,19 @@ id `1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv`,
 [webViewLink](https://drive.google.com/file/d/1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv/view?usp=drivesdk).
 75 278 jednostek, 50 671 linii, 111 687 reszta; 15 listów w 01 (w tym
 Wei po 4700002, przed 4700003), 692 w 02. v25 zostaje.
+
+## 2026-11-20 (27) — Czytanka v27: listy bez pustych wierszy; treść z ZH
+
+Właściciel: (1) podwójne `\\n\\n` pod nagłówkiem listu i między wierszami;
+(2) treść listu Wei inna niż EN z ekranu (akapit o „Opłakując Kong Kana”).
+
+`_karta_listu` nie wstawia pustych linii — `\\v` to jedna nowa linia.
+List `no=5` to **jeden** wiersz `tasks_envelop_data.text` (`w=[4715,"5"]`),
+nie sklejane pola. ZH ma 4 akapity (`\\v`), EN 3: lokalizacja EN pomija
+《哭孔戡》. PL idzie za chińskim (pełniejszy tekst).
+
+Wydanie **`czytanka_v27.zip`**: 9 088 103 B, SHA-256
+`5a1e0ee94765264a62385d7846172851b734ae220147e6f4a2c87dd29e668276`,
+id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`,
+[webViewLink](https://drive.google.com/file/d/1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 687 reszta. v26 zostaje.
