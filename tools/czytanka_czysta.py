@@ -55,6 +55,9 @@ BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
 _ODNOSNIK = re.compile(r"<([^<>|]{1,80})(\|[^<>]*)?>")
 _SPACJE = re.compile(r"\s+")
+_DOLAR_T = re.compile(r"\$T\([^)]*\)")
+_DOLAR_N = re.compile(r"\$N")
+
 
 # W danych gracza ta sama postać bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
 GRACZ = {nazwa.lower(): "Youxia" for nazwa in (
@@ -108,15 +111,31 @@ _NARRACYJNE = {
 
 
 def _czysty(tekst: str) -> str:
-    """Zdejmij kody kolorów i odnośniki rich-text, złóż białe znaki.
+    """Zdejmij kody kolorów, placeholdery i odnośniki rich-text, złóż białe znaki.
 
-    W danych gry łamanie akapitu bywa zapisane dosłownie jako `\\n`, a kwestia
-    ma być jedną linią — zamieniamy to na spację.
+    W danych gry łamanie akapitu bywa zapisane dosłownie jako `\\n` albo `\\v`
+    (także pionowy tabulator). Kwestia w 01 ma być jedną linią — zamieniamy
+    to na spację. `$T(…)` to podstawienie imienia, `$N` — imię gracza.
     """
-    tekst = (tekst or "").replace("\\n", " ").replace("\\r", " ").replace("\\t", " ")
-    tekst = _ODNOSNIK.sub(lambda m: m.group(1), tekst or "")
+    tekst = tekst or ""
+    tekst = (tekst.replace("\\v", " ").replace("\v", " ")
+             .replace("\\n", " ").replace("\\r", " ").replace("\\t", " ")
+             .replace("\\P", " "))
+    tekst = _DOLAR_T.sub("", tekst)
+    tekst = _DOLAR_N.sub("Youxia", tekst)
+    tekst = _ODNOSNIK.sub(lambda m: m.group(1), tekst)
     tekst = _KOLOR.sub("", tekst)
     return _SPACJE.sub(" ", tekst).strip()
+
+
+def _akapity(tekst: str) -> list[str]:
+    """Treść listu: `\\v` / `\\n` łamie linię (bez pustego wiersza), reszta jak `_czysty`."""
+    if not tekst:
+        return []
+    rozbity = (tekst.replace("\\v", "\n").replace("\v", "\n")
+               .replace("\\n", "\n").replace("\\P", "\n"))
+    return [linia for kawałek in rozbity.split("\n")
+            if (linia := _czysty(kawałek))]
 
 
 def _kategoria(tabela: str) -> str:
@@ -127,7 +146,7 @@ def _kategoria(tabela: str) -> str:
     return "Pozostałe teksty"
 
 
-def _magazyn(katalog: Path, index: Path | str = "index") -> dict[str, str]:
+def _magazyn(katalog: Path, index: Path | str = "index", *, czysc: bool = True) -> dict[str, str]:
     """Przekłady po kluczu tekstu, razem z wariantami płci bohatera.
 
     Kwestie zależne od płci gracza mają w grze osobne identyfikatory (`@id`),
@@ -135,10 +154,14 @@ def _magazyn(katalog: Path, index: Path | str = "index") -> dict[str, str]:
     nie da się ich przypisać do klucza tekstu — i wtedy czytanka pokazywała
     angielski tekst mimo gotowego przekładu (np. „This symbol…” w scenie
     4700001). Czytamy wariant bohatera; gdy go nie ma, pierwszy dostępny.
+    `czysc=False` zostawia surowy tekst (akapity `\\v` w listach).
     """
     magazyn = tlumaczenie_mod.wczytaj(katalog, warianty=Path(index) / "warianty.jsonl")
-    return {klucz: _czysty(tekst) for klucz, tekst in magazyn.po_kluczu_pelny().items()
-            if tekst and tekst.strip()}
+    pelny = {klucz: tekst for klucz, tekst in magazyn.po_kluczu_pelny().items()
+             if tekst and tekst.strip()}
+    if not czysc:
+        return pelny
+    return {klucz: _czysty(tekst) for klucz, tekst in pelny.items()}
 
 
 # W danych gry gracz bywa zapisany różnie, także z literówkami (`mian_player`).
@@ -359,6 +382,7 @@ class Jednostka:
     zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
     streszczenie: int = 0                                     # ile linii na początku to streszczenie
     wstep: str = ""                                           # wiersz nad nagłówkiem, np. „Interakcja: …”
+    numer: int | None = None                                  # numer sceny/cutsceny (do listów)
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -797,7 +821,8 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
             jednostki.append(Jednostka(
                 "scena", f"Scena {numer}", sekcja(wiersz["s"]), linie,
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby,
-                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else "")))
+                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else ""),
+                numer=numer))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             kolejnosc = kolejnosc_cutscen.get(numer)
@@ -1178,12 +1203,130 @@ def _linia(mowca: str, tekst: str) -> str:
     return f"**{mowca}:** {tekst}" if mowca else tekst
 
 
+def _kolumny_envelop(ix) -> dict[str, int]:
+    """Kolumna `tasks_envelop_data` → indeks źródła w `ix.zrodla`."""
+    out: dict[str, int] = {}
+    for i, wpis in enumerate(ix.zrodla or []):
+        if isinstance(wpis, (list, tuple)) and wpis and wpis[0] == "tasks_envelop_data":
+            out[str(wpis[1])] = i
+    return out
+
+
+def _wczytaj_listy(ix) -> dict[str, dict]:
+    """Listy fabularne: wiersz `tasks_envelop_data` → klucze kolumn to/from/text."""
+    kolumny = _kolumny_envelop(ix)
+    if not kolumny:
+        return {}
+    indeksy = set(kolumny.values())
+    wiersze: dict[str, dict] = {}
+    for klucz, tekst in ix.teksty.items():
+        w = tekst.w
+        if not w or not isinstance(w[0], int) or w[0] not in indeksy:
+            continue
+        pole = next((nazwa for nazwa, nr in kolumny.items() if nr == w[0]), None)
+        if not pole:
+            continue
+        rid = str(w[1])
+        wpis = wiersze.setdefault(rid, {"id": rid, "klucze": []})
+        wpis[pole] = klucz
+        wpis["klucze"].append(klucz)
+    return wiersze
+
+
+def _tytul_listu(wpis: dict, pl: dict[str, str], ix) -> str:
+    klucz = wpis.get("to")
+    if klucz and pl.get(klucz):
+        return pl[klucz].strip()
+    if klucz and ix is not None:
+        zrodlo = ix.teksty.get(klucz)
+        if zrodlo:
+            return _czysty(zrodlo.en or zrodlo.zrodlo or "") or f"List {wpis['id']}"
+    return f"List {wpis['id']}"
+
+
+def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> list[str]:
+    """Tytuł i treść listu razem; `\\v` to nowa linia, bez pustych wierszy."""
+    tytul = _tytul_listu(wpis, pl, ix)
+    linie = [f"## List: {tytul}"]
+    nadawca_klucz = wpis.get("from")
+    if nadawca_klucz:
+        nadawca = pl.get(nadawca_klucz) or _czysty(
+            (ix.teksty[nadawca_klucz].en if ix and nadawca_klucz in ix.teksty else "")
+            or (ix.teksty[nadawca_klucz].zrodlo if ix and nadawca_klucz in ix.teksty else "")
+            or "")
+        if nadawca and nadawca not in tytul:
+            linie.append(nadawca)
+    klucz_tresci = wpis.get("text")
+    surowy = (surowe.get(klucz_tresci) if klucz_tresci else "") or (
+        pl.get(klucz_tresci) if klucz_tresci else "") or ""
+    if not surowy and klucz_tresci and ix and klucz_tresci in ix.teksty:
+        t = ix.teksty[klucz_tresci]
+        surowy = t.en or t.zrodlo or ""
+    akapity = _akapity(surowy)
+    if not akapity and klucz_tresci and pl.get(klucz_tresci):
+        akapity = [pl[klucz_tresci]]
+    linie.extend(akapity)
+    for extra in ("melody_solved_text", "melody_puzzle_text"):
+        klucz = wpis.get(extra)
+        if not klucz:
+            continue
+        extra_txt = pl.get(klucz) or ""
+        if extra_txt and extra_txt not in akapity:
+            linie.append(extra_txt)
+    linie.append("")
+    return linie
+
+
+def _wczytaj_listy_w_grafie(index: str | Path | None) -> list[dict]:
+    """Wiersze `index/mpk/listy_w_grafie.jsonl` (OpenUI TaskEnvelopWindow → no)."""
+    if not index:
+        return []
+    plik = Path(index) / "mpk" / "listy_w_grafie.jsonl"
+    if not plik.is_file():
+        return []
+    wiersze: list[dict] = []
+    for linia in plik.read_text(encoding="utf-8").splitlines():
+        if not linia.strip():
+            continue
+        wiersze.append(json.loads(linia))
+    return wiersze
+
+
+def _przypisz_listy_do_scen(ix, listy: dict[str, dict],
+                            index: str | Path | None = None) -> dict[int, list[str]]:
+    """List po scenie, która w grafie Storyline otwiera `TaskEnvelopWindow`.
+
+    Źródło: `index/mpk/listy_w_grafie.jsonl` — węzeł OpenUI z `ui_kwargs.no`
+    stoi na krawędzi `__out__` zaraz po `dialogs_no` (pole `po`). Przykład:
+    `sxd_xiaowushuxin.etsb` gra 4700002, potem list `no=5`, potem 4700003.
+    Bez `po` list zostaje w 02. Nie porównujemy tytułu z kwestią.
+    """
+    przy: dict[int, list[str]] = {}
+    zajete: set[str] = set()
+    for wpis in _wczytaj_listy_w_grafie(index):
+        rid = str(wpis.get("no", ""))
+        if not rid or rid not in listy or rid in zajete:
+            continue
+        po = wpis.get("po")
+        if not isinstance(po, int):
+            continue
+        zajete.add(rid)
+        przy.setdefault(po, []).append(rid)
+    return przy
+
+
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
-               statystyka: dict, ix=None) -> tuple[list[str], set[str], set[str]]:
+               statystyka: dict, ix=None,
+               listy: dict[str, dict] | None = None,
+               listy_przy: dict[int, list[str]] | None = None,
+               surowe: dict[str, str] | None = None) -> tuple[list[str], set[str], set[str]]:
     out: list[str] = []
     uzyte: set[str] = set()
     zrobione: set[str] = set()
     ostatnia_sekcja = None
+    listy = listy or {}
+    listy_przy = listy_przy or {}
+    surowe = surowe or {}
     for jednostka in jednostki:
         linie = []
         widziane_linie: set[str] = set()
@@ -1238,6 +1381,13 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         out.extend(linie)
         out.append("")
         zrobione.add(jednostka.etykieta)
+        if jednostka.rodzaj == "scena" and jednostka.numer in listy_przy:
+            for rid in listy_przy[jednostka.numer]:
+                wpis = listy.get(rid)
+                if not wpis:
+                    continue
+                out.extend(_karta_listu(wpis, pl, surowe, ix))
+                uzyte.update(wpis.get("klucze") or [])
     return out, uzyte, zrobione
 
 
@@ -1353,7 +1503,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
 
 def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     ix = indeks_mod.wczytaj(index, teksty=True, sceny=True)
-    pl = _magazyn(Path(magazyn), Path(index))
+    surowe = _magazyn(Path(magazyn), Path(index), czysc=False)
+    pl = {klucz: _czysty(tekst) for klucz, tekst in surowe.items()}
     porzadek = _wczytaj_porzadek(index)
     chronologia = chronologia_mod.wczytaj(index)
     krainy = json.loads((Path(index) / "prowincje.json").read_text(encoding="utf-8"))
@@ -1362,8 +1513,12 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
                   "bez_przekladu": 0}
 
+    listy = _wczytaj_listy(ix)
+    listy_przy = _przypisz_listy_do_scen(ix, listy, index)
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
-    tresc, uzyte, _zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
+    tresc, uzyte, _zrobione = _plik_scen(
+        jednostki, pl, zakres, statystyka, ix,
+        listy=listy, listy_przy=listy_przy, surowe=surowe)
     pliki_scen, opisy_scen = _zapisz_czesci(
         wyj, "01_sceny_i_cutsceny", "Sceny i cutsceny",
         "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
@@ -1371,7 +1526,18 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
         "sceny i cutsceny przemieszane w kolejności występowania.",
         tresc, statystyka)
 
-    tresc_reszty = _reszta(ix, pl, uzyte, statystyka, krainy)
+    # Wszystkie klucze listów wychodzą z „encyklopedii”: albo przy scenie, albo w # Listy.
+    for wpis in listy.values():
+        uzyte.update(wpis.get("klucze") or [])
+    nieprzypisane = [rid for rid in sorted(listy, key=lambda r: _tytul_listu(listy[r], pl, ix).lower())
+                     if rid not in {x for grupa in listy_przy.values() for x in grupa}]
+    tresc_reszty: list[str] = []
+    if nieprzypisane:
+        tresc_reszty += ["# Listy", ""]
+        for rid in nieprzypisane:
+            tresc_reszty += _karta_listu(listy[rid], pl, surowe, ix)
+        statystyka["reszta"] += len(nieprzypisane)
+    tresc_reszty += _reszta(ix, pl, uzyte, statystyka, krainy)
     tresc_reszty += _zbiory(ix, pl, uzyte, statystyka)
     tresc_reszty += _pamiatki(ix, pl, uzyte, statystyka, index)
     tresc_reszty += _poi(ix, pl, uzyte, statystyka, index)
@@ -1404,6 +1570,7 @@ _KROTKIE_SEKCJE = {
     "Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)": "napisy przerywników",
     "Zadania i wątki": "zadania",
     "Encyklopedia, księgi i poszlaki": "kompendium",
+    "Listy": "listy",
     "Przedmioty, stroje i tytuły": "przedmioty",
     "Sztuki walki i umiejętności": "sztuki walki",
     "Walka i przeciwnicy": "walka",

@@ -1,0 +1,7 @@
+# Narzędzia PRZESTARZAŁE (obsolete) — nie używać do budowy czytanek.
+# Aktywny generator: tools/czytanka_czysta.py
+# Lista pilnowana testem tests/test_narzedzia_przestarzale.py.
+buduj_czytanki.py
+zbuduj_czytanke_pelna.py
+buduj_czytanke_gry.py
+powiazania_czytanek.py

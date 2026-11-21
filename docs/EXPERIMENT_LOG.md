@@ -2828,3 +2828,703 @@ według głównego źródła klucza. Próba sucha i import bez odrzuceń; skan 1
 nowych pozycji bez CJK, nie-NFC i miękkich dywizów, liczba podziałów wierszy
 zgodna ze źródłem. 623 testy i kontrola repozytorium OK (646 wpisów).
 Moment odblokowania w grze niezweryfikowany; przekład AI-tymczasowy.
+
+## 2026-11-20 — audyt tymczasowego zakresu AI + Compendium `ka` (szkoły sztuk walki)
+
+**Pytanie właściciela:** czy tymczasowy zakres z 2026-11-19 został zrobiony
+i czego brakuje. **Wejście:** `index/` (Patch 2.4), magazyn `tlumaczenie/`
+(139 574 przekłady przed tą sesją), 328 plików `zwrotki/*.md` z partiami
+tymczasowymi. **Metoda:** nowe narzędzie `tools/audyt_zakresu.py` (tylko
+odczyt; kategoria = główne źródło klucza, klucz liczony raz; sceny = unikalne
+elementy `e` scen, których `m` zawiera mapę pierwszej krainy z
+`index/prowincje.json`; „AI” = klucz z niepustym `PL:` w `zwrotki/*.md`).
+Testy narzędzia: `tests/test_audyt_zakresu.py` (5 przypadków, dane syntetyczne).
+
+**Wynik audytu** (szczegóły i ograniczenia: [AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md)):
+
+| kategoria | razem | tłumacz | AI | pokrycie | braki |
+|---|---:|---:|---:|---:|---:|
+| hinty zadań | 8 936 | 979 | 7 957 | 100,0% | 0 |
+| listy | 1 063 | 40 | 1 023 | 100,0% | 0 |
+| przedmioty fabularne | 4 981 | 3 997 | 982 | 100,0% | 2 |
+| opisy przedmiotów (`ccs` + `programmer`) | 9 421 | 44 | 5 249 | 56,2% | 4 128 |
+| Compendium | 1 524 | 87 | 243 | 21,7% | 1 194 |
+| sceny 燕南 | 42 455 | 7 944 | 615 | 20,2% | 33 896 |
+
+- **Integracja kompletna:** 25 696 unikalnych kluczy AI, wszystkie w magazynie,
+  0 brakujących wpisów. Rozkład: `tasks` 12 020, `ccs_text_msg` 5 238, sceny
+  4 514 (w 燕南 tylko 615; 3 120 bez mapy, 1 371 inne prowincje), `text_msg`
+  1 303, `tasks_envelop_data` 1 023, debaty 452, Compendium 243, reszta 903.
+- **Kategorie (1)–(3) domknięte**, (4) domknięta przez całą tabelę
+  `ccs_text_msg`; `programmer_text_msg` to etykiety UI (4 128 braków) i nie
+  należy do opisu przedmiotów.
+- **Braki zakresu:** 486 nazw Compendium (141 `manual_name`, 334
+  `talk_title[]`, 9 `button_name[]`, 1 `manual_goto_text`, 1 `bubble_text`),
+  2 cytaty w `manual_items`, oraz **33 896** unikalnych kwestii scen 燕南
+  (30 943 w scenach powiązanych z zadaniami, 2 953 ambientowych). Przykład
+  właściciela (scena `1026070`, u=23, „Looks like Uncle Jiang…”) bez przekładu.
+- **Przyczyna angielskich napisów w grze:** łatka `v0.5.0` (2026-11-18,
+  112 405 przekładów ze zwrotki tłumacza `WWN_PL_v4`) powstała **przed**
+  partiami AI; magazyn ma dziś 139 653 przekłady. Przykłady właściciela
+  „Search inside for clues”, „From Wei, to Jiang Wulang”, „Dusty Sword Tassel”,
+  „Traces of the Past”, „Lattice Door” są już w magazynie.
+
+**Partia `ka` — Compendium, rozdział 91xx (opis, poza literalnym zakresem
+nazw):** 79 nowych przekładów (14 szkół sztuk walki, drogi wewnętrzne, opisy
+podstaw i zaawansowanych technik; pominięto 4 wpisy testowe `测试…` i treść
+„文案待补充”). Plik `zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`.
+Przed importem skrypt sprawdził zgodność tokenów `#Y/#J/#E` i liczbę podziałów
+wierszy; skan 79 pozycji bez CJK, nie-NFC i miękkich dywizów. Import:
+79 miejsc, 79 nowych, 0 odrzuconych; magazyn 139 574 → **139 653** (28,53%).
+Nazwy własne i terminy zgodne z magazynem (np. „Płomienna Bicz”, „Upojenie:
+Głęboki Rausz”, „Łamanie Bambusa: Wiatr”, „Wola Niebios”). Po partii
+Compendium: 330/1 524 (21,7%).
+
+**Kontrole:** `run_tests.py` **628 testów OK** (w tym 5 nowych testów audytu); `check_repository.py` OK
+(646 wpisów indeksu). Przekład AI-tymczasowy, bez testu w grze. Następny
+krok: łatka `v0.6.0` z bieżącego magazynu, potem nazwy Compendium.
+
+## 2026-11-20 (2) — sprostowanie: brakujące kwestie 燕南 to odzywki, nie sceny fabularne
+
+**Uwaga właściciela:** „nie chodzi o sceny fabularne tylko o jednozdaniowe
+banter quotes, których jest około 3000”. **Metoda:** pomiar na `index/`
+(Patch 2.4) i magazynie z 2026-11-20, ta sama definicja klucza scen co
+w `tools/audyt_zakresu.py` (slot `e` z wariantem `@`, mapy 1/501/701).
+
+**Wynik — brakujące 33 896 kluczy to krótkie napisy:**
+
+| cecha | wartość |
+|---|---:|
+| unikalne brakujące klucze / wystąpienia | 33 896 / 36 743 |
+| sceny z brakującą kwestią | 15 118 (z 17 453 scen z tekstem) |
+| scenki dokładnie jednokwestiowe | 8 103 |
+| mediana / średnia długość | 19 / 20,8 znaku |
+| ≤30 znaków / ≥60 znaków | 27 831 / 140 |
+| flaga głosu ambientowego (`vo_amb*`, `pet_cat_vo*`, `func_audio_placeholder`) | 8 788 |
+| wybory gracza wśród braków | 0 |
+
+Podział bez powtórzeń (pierwszeństwo: kit, wyzwalacz `spaces.*`, zadanie):
+kity ambientowe **4 893**, wyzwalacze w świecie **11 369**, sceny zadań
+**6 198**, bez powiązania **11 436**. Do grupy wyzwalaczy należy przykład
+właściciela — scena `1026070` ma relację `spaces.s501.trap#6600990`, więc jej
+jednolinijkowa kwestia odpala się przy obiekcie w świecie. Podział liczy
+`tools/audyt_zakresu.py` (`sceny.grupy` w JSON-ie), testy w
+`tests/test_audyt_zakresu.py`.
+
+**Przyczyna błędu w raporcie z rana:** tabela dzieliła sceny na „zadaniowe”
+i „ambientowe” po polu relacji `r`, które ma większość scen — przez to
+2 953 odzywki ambientowe stopiły się z 30 943 kwestiami scen zadań i powstał
+obraz „niedokończonego dialogu fabularnego”. Poprawiono opis w
+[AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md) (sekcja (6) i podsumowanie) oraz
+w `docs/STATUS.md`. Liczby pokrycia (42 455 / 8 559 / 33 896) się nie
+zmieniły — zmieniła się ich interpretacja.
+
+**Ograniczenie:** w danych klienta nie ma znacznika oddzielającego odżywkę
+związaną z zadaniem od swobodnego banteru NPC; przypisanie mapy ani kitu nie
+dowodzi, kiedy gracz daną kwestię usłyszy.
+
+## 2026-11-20 (3) — geografia kwestii wyzwalanych w świecie + partia pilot 60
+
+**Pytanie właściciela:** czy da się zawęzić 11 369 kwestii wyzwalanych
+w świecie, np. geograficznie wokół miejsca, w którym odpala się przykład
+(scena `1026070`, relacja `spaces.s501.trap#6600990`).
+
+**Ustalenia:**
+- Przykład nie ma pozycji (pułapka `trap` nie występuje w indeksie kitów), ale
+  **inne** kwestie z tej grupy mają relację `spaces.*.spawn_kit_dict#<kit>`,
+  a kit ma XYZ w `index/mpk/sceny_ambient_kity.jsonl`.
+- Pokrycie geograficzne: **10 683 z 11 369** kluczy (94%); 709 bez pozycji
+  (brak relacji `spawn_kit_dict` albo kitu w indeksie).
+- Nowe narzędzie `tools/barks_regiony.py`: kotwica domyślna = pierwszy kit
+  scen prologu (X -1330,09, Z -109,59), pierścienie co 200–6 400 m, klastry
+  400 m, `--slotki` zapisuje listę kluczy od najbliższego. Testy:
+  `tests/test_barks_regiony.py` (3 przypadki, dane syntetyczne).
+
+**Pierścienie od startu:** ≤200 m — 378, ≤400 m — 1 339, ≤800 m — 3 413,
+≤1 600 m — 5 742, ≤3 200 m — 6 605, ≤6 400 m — 8 859. Największe klastry:
+X -1200/Z 0 — 800 kluczy (170 m), X -4400/Z -5600 — 766 (6,3 km),
+X -2000/Z 0 — 727.
+
+**Partia `barks_start_aa` (pilot):** 60 najbliższych kwestii z pierścienia
+≤200 m (handlarze, grajkowie, bywalcy zajazdu, pijacy przy stole — jednolinijkowe
+odzywki). Plik `zwrotki/2026-11-20_ai_tymczasowe_barks_start_aa.md`, przekład
+z ZH z pomocą EN. Import: 60 miejsc, 60 nowych, 0 odrzuconych; magazyn
+139 653 → **139 713** (28,54%). Skan PL bez CJK. Pakiet roboczy:
+`dist/paczka_barks_pilot` (`buduj_paczke --tylko-sloty`).
+
+**Kontrole:** `run_tests.py`, `check_repository.py`. Przekład AI-tymczasowy,
+bez testu w grze.
+
+## 2026-11-20 (4) — partia `barks_start_ab` (170 kwestii) i ewidencja pierścieni
+
+**Polecenie właściciela:** „tłumacz pierścieniami; na pewno <400 m, a najchętniej
+<1000 m”. **Metoda:** `tools/barks_regiony.py --promien 1000 --slotki` daje
+wyłącznie nieprzetłumaczone klucze od najbliższej; z tej listy 170 kolejnych
+kwestii (handel, grajkowie, pijacy, noworoczny smok, dzieci, koty, stragany).
+
+**Wynik:** zwrotka `zwrotki/2026-11-20_ai_tymczasowe_barks_start_ab.md`,
+import 170/170, 0 odrzuceń; magazyn 139 713 → **139 883** (28,57%).
+Skan PL bez CJK.
+
+**Ewidencja:** nowy [POSTEP_KREGI.md](POSTEP_KREGI.md) z tabelą pierścieni
+(razem / przetłumaczone / pozostało) liczona narzędziem (`--wszystkie` vs
+domyślnie). Stan po partii `ab`:
+
+| pierścień | razem | przetłumaczone | pozostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 236 | 148 |
+| ≤400 m | 1 372 | 263 | 1 109 |
+| ≤800 m | 3 596 | 413 | 3 183 |
+| ≤1 000 m | 4 523 | 423 | 4 100 |
+| ≤1 600 m | 5 952 | 440 | 5 512 |
+| ≤3 200 m | 6 832 | 457 | 6 375 |
+| ≤6 400 m | 9 097 | 468 | 8 629 |
+
+Do pierścieni wchodzą też wcześniejsze przekłady AI (stąd 423 przy 230 nowych).
+709 kwestii grupy nie ma pozycji — poza pierścieniami, do osobnego klucza
+(`trap`, `entity`) albo danych z bazy gry.
+
+**Narzędzie:** `barks_regiony.py` dostał `--wszystkie` (licz też gotowe
+przekłady), żeby dało się liczyć postęp bez zapisywania stanu w pliku.
+**Kontrole:** `run_tests.py`, `check_repository.py`.
+
+## 2026-11-20 (5) — pierścienie: domknięcie 200 m i 1 030 kwestii w 1 000 m
+
+**Polecenie właściciela:** „kontynuuj do wyczerpania kontekstu” — tempo około
+1 000 kwestii na sesję, bez pytania o wybór pierścienia.
+
+**Metoda:** po każdej partii przeliczana jest lista robocza
+(`barks_regiony.py --promien 1000 --slotki dist/region_1000.txt`), która zawiera
+wyłącznie kwestie bez przekładu, posortowane od najbliższej. Cztery partie po
+200 kwestii (`ac`, `ad`, `ae`, `af`) przeszły standardowy obieg: zwrotka `.md`
+→ `import_zwrotki.py --na-sucho` (200/200, 0 odrzuceń) → import do magazynu.
+Skan PL bez CJK w każdej partii.
+
+**Wynik:** magazyn 140 083 → **140 683** przekłady (28,74%). Pierścień:
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 063 | 309 | 77,5% |
+| ≤800 m | 3 596 | 1 213 | 2 383 | 33,7% |
+| ≤1 000 m | 4 523 | 1 223 | 3 300 | 27,0% |
+| ≤1 600 m | 5 952 | 1 240 | 4 712 | 20,8% |
+| ≤3 200 m | 6 832 | 1 257 | 5 575 | 18,4% |
+| ≤6 400 m | 9 097 | 1 268 | 7 829 | 13,9% |
+
+Lista robocza: 4 270 → 3 900 (`ac`) → 3 700 (`ad`) → 3 500 (`ae`) →
+**3 300** kluczy (`af`). Pierścień ≤200 m jest domknięty w 100% — wszystkie
+odzywki z bezpośredniego otoczenia startu mają przekład AI-tymczasowy.
+
+**Treść partii:** rynek i stragany, odzywki grajków i żebraków, straż przy
+Jaskini Beztroskich i Zaułku Zapomnianych, noworoczny taniec lwów, kupcy koni
+z Xiazhou, handlarze z Widmowego Targu, klienci Pawiego Pawilonu, apteka
+Srebrnej Igły, szynk Pawilonu Po Deszczu, gazeciarze i wróżbici.
+
+**Ograniczenie:** odległość od kotwicy to przybliżenie „co gracz zobaczy
+najpierw”, nie kolejność fabuły; przekład AI-tymczasowy, bez testu w grze.
+
+## 2026-11-20 (6) — pierścienie 200 i 400 m domknięte, 2 230 kwestii w 1 000 m
+
+**Polecenie:** „kontynuuj tym samym torem z wykorzystaniem całego okna
+kontekstowego”.
+
+**Metoda:** dziesięć kolejnych partii po 200 kwestii (`ac`–`al`) w standardowym
+obiegu: lista robocza `barks_regiony.py --promien 1000 --slotki` (tylko bez
+przekładu, od najbliższej) → zwrotka `.md` → `import_zwrotki.py --na-sucho`
+→ import → przeliczenie listy. Każda partia: 200/200 nowych, 0 odrzuceń,
+skan PL bez CJK.
+
+**Wynik:** magazyn 140 083 → **141 883** przekłady (28,98%). Pierścień:
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 2 413 | 1 183 | 67,1% |
+| ≤1 000 m | 4 523 | 2 423 | 2 100 | 53,6% |
+| ≤1 600 m | 5 952 | 2 440 | 3 512 | 41,0% |
+| ≤3 200 m | 6 832 | 2 457 | 4 375 | 36,0% |
+| ≤6 400 m | 9 097 | 2 468 | 6 629 | 27,1% |
+
+Lista robocza: 4 270 → **2 100** kluczy. **Cały obowiązkowy promień <400 m ma
+przekład**; 1 000 m przekroczyło połowę. W tej sesji przetłumaczono 2 000
+kwestii z pierścienia (10 partii po 200).
+
+**Treść partii:** targ ziołowy i apteki (Srebrna Igła, Dalin, Ziołowa Sala,
+Wioska Słuchającej Moreli), szynk Pawilonu Po Deszczu, grajkowie, gazeciarze
+i wróżbici, straż miejska i sąd prefektury, Widmowy Targ (szef Shi, Widmowa
+Ulica, opowieści pana Jaskini Duchów), kostnica i śledztwo, noworoczny targ,
+zawodnicy cuju, sceny nad jeziorem (pipa, „Kwiaty przy drodze”, Su Xiaoxiao),
+plotki o Sekcie Dziewięciu Nurtów i Beztroskich.
+
+**Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od
+kotwicy to przybliżenie „co gracz zobaczy najpierw”.
+
+## 2026-11-20 (7) — domknięcie pierścienia ≤1 000 m (partie `am`–`aw`)
+
+**Cel:** dokończyć preferencyjny promień z polecenia właściciela („najchętniej
+<1 000 m”) po domknięciu obowiązkowego <400 m.
+
+**Metoda bez zmian:** `barks_regiony.py --promien 1000 --slotki` (tylko bez
+przekładu, od najbliższej kwestii) → zwrotka `.md` → `import_zwrotki.py
+--na-sucho` → import → przeliczenie listy. Partie: `am`–`ap` po 200, `aq` 203,
+`ar`–`av` po 200, `aw` 97. Każda: 200/200 (lub 203/203, 97/97) nowych,
+0 odrzuceń, skan linii `PL:` bez CJK.
+
+**Wynik:** magazyn 141 883 → **143 983** przekłady (29,41%). Pierścień:
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | **100%** |
+| ≤1 600 m | 5 952 | 4 540 | 1 412 | 76,3% |
+| ≤3 200 m | 6 832 | 4 557 | 2 275 | 66,7% |
+| ≤6 400 m | 9 097 | 4 568 | 4 529 | 50,2% |
+
+Lista robocza `--promien 1000`: 2 100 → 1 700 (`an`) → 1 500 (`ao`) → 1 300
+(`ap`) → 1 097 (`aq`) → 897 (`ar`) → 697 (`as`) → 497 (`at`) → 297 (`au`)
+→ 97 (`av`) → **0** (`aw`). W tej sesji przetłumaczono 2 247 kwestii
+z pierścienia ≤1 000 m (11 partii).
+
+**Treść partii:** targ i przekupnie (ryby, gruszki, ciastka różane, lampiony,
+latawce, figurki z ciasta), kamieniarze i warsztat szkutniczy, porty
+(przeprawa Linjin, Wansheng, Gracetown), „siedemdziesiąt dwa źródła”, szkoła
+i uczniowie, kaplica przodków i plotki o młodym panu, Sala Zielonego Węża
+vs Sala Krwawej Łuski, urzędnicy i arsenał, świątynie (Pałac Najwyższej
+Jedności), Cytaty z Księgi Pieśni i klasyków w przekładzie swobodnym.
+
+**Uwaga o formacie:** wpis z wielowierszowym `EN:` łamie parser zwrotki
+(`zlamana_linia`) — `EN:`/`PL:` muszą być jednoliniowe; wielowierszowy tekst
+źródłowy sklejać spacjami.
+
+**Ograniczenie:** przekład AI-tymczasowy, bez testu w grze; odległość od
+kotwicy to przybliżenie „co gracz zobaczy najpierw”. Plik pierścieni:
+`dist/postep_kregi.json` (poza Git).
+
+**Ciąg dalszy:** po domknięciu ≤1 000 m lista `--promien 1600` dała 1 412 kluczy;
+partia `ax` (200, ≤1 600 m) → magazyn **144 183** (29,45%), w pierścieniu
+≤1 600 m 4 740/5 952 (79,6%), zostało 1 212. Treść: targ z latawcami
+i ciastkami „prymusa”, herbaciarnie, port i robotnicy, akademie i egzaminy,
+cech kupiecki przewodniczącego Bai, sprzeczki sąsiedzkie, gwara Wu oddana
+swobodną polszczyzną potoczną.
+
+## 2026-11-20 (8) — pierścień ≤1 600 m: partie `ay`–`ba`
+
+Trzy partie po 200 (≤1 600 m), standardowy obieg, 0 odrzuceń, PL bez CJK.
+Magazyn 144 183 → **144 783** (29,58%). Pierścień ≤1 600 m: 5 340/5 952
+(89,7%), zostało 612; lista robocza 1 212 → 1 012 → 812 → **612**.
+Dalsze progi po tych partiach: ≤3 200 m 5 357/6 832 (78,4%),
+≤6 400 m 5 368/9 097 (59,0%). Treść: święto Smoczych Królów, targ rybny
+i warsztaty latawców, szkoła i egzaminy, urząd powiatu, cech kupiecki
+(przewodniczący Bai), port i pochówek, drobne scenki rodzinne; gwara Wu
+oddana polszczyzną potoczną.
+
+## 2026-11-20 (9) — domknięcie pierścienia ≤1 600 m (partie `bb`–`bd`)
+
+Po `ba` zostało 612 kluczy; partie `bb` (200), `bc` (200) i `bd` (212)
+zamknęły pierścień ≤1 600 m w 100% (5 952/5 952). Magazyn 144 783 →
+**145 395** (29,70%). Każda partia: komplet, 0 odrzuceń, `PL:` bez CJK.
+Lista robocza ≤1 600 m: 612 → 412 → 212 → **0**.
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | 100% |
+| ≤1 600 m | 5 952 | 5 952 | 0 | **100%** |
+| ≤3 200 m | 6 832 | 5 969 | 863 | 87,4% |
+| ≤6 400 m | 9 097 | 5 980 | 3 117 | 65,7% |
+
+Treść: rezydencja Chenów i domowe plotki, studenci i akademie, Targ
+Kwiatowych Łodzi z żetonami, świątynie (Sala Wojenna, Pięciu Smoczych
+Królów), port i warsztaty szkutnicze, wioska i klęska chorób, pieśni
+robocze (rytmiczne „hopsa” zamiast chińskich wypełniaczy), kołysanki.
+
+## 2026-11-20 (10) — wejście w pierścień ≤3 200 m (partia `be`)
+
+Lista `--promien 3200` dała 863 kluczy; partia `be` (150) → magazyn
+**145 545** (29,73%), w ≤3 200 m 6 119/6 832 (89,6%), zostało 713.
+0 odrzuceń, `PL:` bez CJK. Treść: wioska nad rzeką (spichlerz, grobla,
+nocna warta), pan Rzeki i „dobre czasy”, oddziały najemne czekające
+na rozkazy pana Wei, ćwiczenia wojskowe, wiejskie plotki o rzezi
+w Beztroskiej Przystani, kołysanki i pieśni robocze.
+
+## 2026-11-20 (11) — domknięcie pierścienia ≤3 200 m (partie `bf`–`bj`)
+
+Sześć partii (150+150+150+150+150+113 = 863 kwestie) domknęło pierścień
+≤3 200 m w 100% (6 832/6 832). Magazyn 145 545 → **146 258** (29,88%).
+0 odrzuceń, `PL:` bez CJK; listy robocze 863 → 713 → 563 → 413 → 263 →
+113 → **0**.
+
+| pierścień | razem | przetłumaczone | pozostało | pokrycie |
+|---|---:|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 | 100% |
+| ≤400 m | 1 372 | 1 372 | 0 | 100% |
+| ≤800 m | 3 596 | 3 596 | 0 | 100% |
+| ≤1 000 m | 4 523 | 4 523 | 0 | 100% |
+| ≤1 600 m | 5 952 | 5 952 | 0 | 100% |
+| ≤3 200 m | 6 832 | 6 832 | 0 | **100%** |
+| ≤6 400 m | 9 097 | 6 843 | 2 254 | 75,2% |
+
+Treść: szlaki górskie i nocleg na szczycie, klasztor Miłosiernego Serca
+i wątek „kwiatów Buddy”, wioska Fuma i konie, targ Qingzhou i Sala
+Atramentu, sekta Kuchennego Noża, bandyci ukryci w jaskiniach, cytaty
+z klasyków i inskrypcji. **Pierścienie do 3 200 m — cały obszar wczesnej
+gry w promieniu dobrego kwadransa marszu — mają pełny przekład.**
+
+## 2026-11-20 (12) — pierścień ≤6 400 m: partie `bk`–`bl`
+
+Dwie partie po 150 (najdalszy pierścień), 0 odrzuceń, `PL:` bez CJK.
+Magazyn 146 258 → **146 558** (29,94%); ≤6 400 m: 7 143/9 097 (78,5%),
+zostało 1 954. Lista robocza 2 254 → 2 104 → **1 954**.
+
+Treść: „otwarcie gór” i przystań ludu za górami (kult Bogini, sny
+o Krainie Brzoskwiniowego Źródła), Miasto Mo i Droga Gór Atramentu
+(mechanika, zegar wodny, „Gazeta Miasta Mo”), cytaty z Mistrza Mo
+i inskrypcji, robotnicy i rzemieślnicy.
+
+**Uwaga o skali:** pierścienie obejmują 10 683 z 11 369 kwestii grupy.
+Po domknięciu ≤6 400 m zostaje 1 586 kwestii w odległości 6 400–11 085 m
+oraz ok. 686 bez pozycji w świecie — „całość” wymaga jeszcze osobnej decyzji
+o tych dwóch zbiorach.
+
+## 2026-11-20 (13) — magazyn przekracza 30% (partie `bm`–`bn`)
+
+Dwie partie po 150 w pierścieniu ≤6 400 m: magazyn 146 558 → **146 858**,
+czyli **30,00%** wszystkich miejsc w grze. Pierścień ≤6 400 m: 7 443/9 097
+(81,8%), zostało 1 654; lista robocza 1 954 → 1 804 → **1 654**. 0 odrzuceń,
+`PL:` bez CJK. Treść: Miasto Mo i Droga Gór Atramentu w drugiej warstwie
+(zegar wodny, łodzie chmurowe, tor w chmurach, „Jedne Drzwi”, Ciemna Dolina),
+spór „otwarcie gór / zamknięcie gór”, cytaty z Mistrza Mo, uczniowskie
+żarty o przepisywaniu zadań.
+
+## 2026-11-20 (14) — pierścień ≤6 400 m domknięty w 100%
+
+Partie `bo`–`bu` (7 partii, 1 654 kwestie) w jednym podejściu, paczki po 250
+i finałowa 154. Magazyn 146 858 → **148 512** (30,34%). Wszystkie pierścienie
+od 200 do 6 400 m mają **0 pozycji do zrobienia**:
+
+| promień | razem | przetłumaczone | zostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 |
+| ≤400 m | 1 372 | 1 372 | 0 |
+| ≤800 m | 3 596 | 3 596 | 0 |
+| ≤1 000 m | 4 523 | 4 523 | 0 |
+| ≤1 600 m | 5 952 | 5 952 | 0 |
+| ≤3 200 m | 6 832 | 6 832 | 0 |
+| ≤6 400 m | 9 097 | 9 097 | 0 |
+| ≤12 000 m | 10 940 | 9 116 | 1 824 |
+
+Uwaga metodyczna: przy `klucze_w_promieniu` punkty muszą być **słownikiem**
+(`dict(wsz) | dict(nie)`), nie zbiorem — `set` daje `AttributeError`.
+Jeden raz w partii `br` wkradł się CJK do linii `PL:` (imię 公孙大娘) →
+poprawione i zreimportowane osobnym commitem. Poza tym 0 odrzuceń, wszystkie
+`PL:` czyste.
+
+Następny zakres: 1 824 kwestie w pierścieniu 6 400–12 000 m
+(`dist/region_12000.txt`) + ~429 kwestii bez pozycji w świecie.
+
+## 2026-11-20 (15) — pierścień ≤12 000 m i cała grupa barks domknięta
+
+Partie `bv`–`cb` (6 × 250 + 324 = **1 824** kwestie) z pierścienia
+6 400–12 000 m, potem partie `cc` (250) i `cd` (459) dla kwestii
+**bez pozycji** w świecie. Magazyn 148 512 → **151 045** (30,85%).
+0 odrzuceń importu, 0 CJK w liniach `PL:`.
+
+| promień | razem | przetłumaczone | zostało |
+|---|---:|---:|---:|
+| ≤200 m | 384 | 384 | 0 |
+| ≤400 m | 1 372 | 1 372 | 0 |
+| ≤800 m | 3 596 | 3 596 | 0 |
+| ≤1 000 m | 4 523 | 4 523 | 0 |
+| ≤1 600 m | 5 952 | 5 952 | 0 |
+| ≤3 200 m | 6 832 | 6 832 | 0 |
+| ≤6 400 m | 9 097 | 9 097 | 0 |
+| ≤12 000 m | 10 940 | 10 940 | 0 |
+
+Grupa kwestii wyzwalanych w świecie (`spaces.*`, poza kitami ambientowymi
+i scenami zadań): **11 713 kluczy, 0 bez przekładu** — 10 940 z pozycją
+i 773 bez pozycji. Po partii `cb` narzędzie zwróciło
+`{"ok": false, "powod": "brak kwestii z pozycją — sprawdź index/ i magazyn"}`,
+co jest oczekiwanym sygnałem wyczerpania listy (nie tworzy pliku).
+
+Uwaga metodyczna: wcześniejsza liczba „~429 bez pozycji” była różnicą
+11 369 − 10 940 na przybliżonym podziale z audytu. Faktyczny zbiór bez
+pozycji to **773** klucze (skrypt odtwarzający logikę `zbiersz()` bez
+filtrowania scen bez relacji `spaces.*` daje zawyżone 12 777 — takich scen
+narzędzie nie liczy). Lista robocza: `dist/region_bez_pozycji.txt`.
+
+Poza zakresem pozostają: teksty bez relacji do `spaces.*`, sceny zadań
+i kity ambientowe (te ostatnie były robione wcześniej osobnymi partiami).
+
+## 2026-11-20 (16) — łatka v0.6.0 na Dysku
+
+Wydanie **`WWM_Spolszczenie_PL_v0.6.0.zip`**: 12 583 642 B, SHA-256
+`5ae03530fa9cf1178ee7016715a8fb844f254becd724b45b052deee09146c2ee`,
+151 389 kluczy w planie (151 045 przekładów + 670 bliźniaków `__grey`;
+326 wariantów płci, 770 kolizji odłożonych, 141 052 wpisy `en_jednoznaczne`).
+Zbudowana `one_click_patch.py --tylko-magazyn --wydanie v0.6.0`, 12 plików
+w ZIP (patcher standalone + `plan_latki.json`, zero binarek gry).
+Wgrana na Dysk do folderu pakietów (`1-4nTF4G5ZbwjuHMNsQ6_fxFuhcyXNI9k`),
+id pliku `1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`.
+
+Powód osobnego wpisu: pierwsza próba wydania trafiła do `dist/` pod nazwą
+`WWM_Latka_PL_v0.6.0.zip` i **nie została wgrana na Dysk** — właściciel nie
+mógł jej znaleźć. Wydania instalowalne zawsze nazywać `WWM_Spolszczenie_PL_v*.zip`
+i po zbudowaniu wgrywać na Dysk (krok „build” nie obejmuje uploadu).
+
+## 2026-11-20 (17) — ⚠ BŁĄD: „Czytanka v19” z niewłaściwego generatora (wycofana)
+
+**Błąd sesji.** Wydałem paczkę jako `WWM_Czytanka_PL_v19.zip` na podstawie
+nieaktualnej pamięci („ostatnia to v18”), a faktycznie ostatnia czytanka
+właściciela to **v22** i buduje ją `tools/czytanka_czysta.py`, nie
+`tools/buduj_czytanki.py`. Plik z Dysku przeniesiono do kosza
+(id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`, do przywrócenia z kosza).
+Poprawna kontynuacja: wpis (18), `czytanka_v23.zip`.
+
+Dane techniczne wycofanego pliku: `WWM_Czytanka_PL_v19.zip`, 6 597 845 B,
+SHA-256 `fea03f9accf5796e2f20800a80190f3bc16f3f7e4baaa18cc4b872b9baaf8a3f`,
+zestaw `przetlumaczone`, płeć `oba`. Zawartość:
+
+| plik | bajtów | przetłumaczone / wszystkich |
+|---|---:|---:|
+| `README.md` | 102 641 | — |
+| `epizody.md` | 8 412 742 | 75 127 / 167 500 |
+| `kontekst_scen.md` | 11 190 836 | 58 464 / 97 686 |
+| `dodatkowe.md` | 20 156 560 | 127 975 / 455 592 |
+
+Budowa: `buduj_czytanki.py --indeks index --magazyn tlumaczenie --wersja 19`.
+Wgrana na Dysk (id `1XR4Y7FHnC5DDpmq5Da9G65anVuUQ0--N`), obok łatki v0.6.0.
+
+## 2026-11-20 (18) — Czytanka v23 (właściwy generator) na Dysku
+
+Poprawka po wpisie (17). Wydanie **`czytanka_v23.zip`** z
+`tools/czytanka_czysta.py` (13 plików: `01` w 8 częściach, `02` w 4
+częściach, `README.md`; numeracja i nazwy plików części jak w v22).
+
+- rozmiar: 9 091 949 B, SHA-256
+  `c434325307213d4517b443b66bdc7a0e25bfad7e458e2e11e8303ffe1d3d0eb2`;
+- na Dysku jako `czytanka_v23.zip` (id `1eeDTP4p1vv86mW1y_sRJXnZhYP2vtT_H`)
+  — nazwa bez przedrostka `WWM_`, jak v21/v22;
+- liczniki z budowy: **75 328** jednostek, **30 986** kwestii PL,
+  **112 057** reszta (v21: 91 441 — wzrost o 20 616 po domknięciu grupy
+  barks do 12 000 m i kwestii bez pozycji), zbiory 1020, pamiątki 120,
+  POI 2949 (368 z dialogiem), 0 pominiętych.
+
+Podział `02` zmienił się z 3 na **4 części** (sekcje przestały mieścić się
+w limicie). Wniosek na przyszłość: numer czytanki ustalać z Dysku
+(`name contains 'czytanka'`) i z `docs/WERSJE_CZYTANKI.md`, a nie z pamięci
+sesji; budować wyłącznie `tools/czytanka_czysta.py`.
+
+## 2026-11-20 (19) — pakiet dla tłumacza v6 (czysty, bez AI) na Dysku
+
+`paczka_dla_tlumacza_wwm_v6.zip`: 45 432 646 B, SHA-256
+`894caac1276119f38243d15435f1240af0695c433d1024ac2756643859dfe283`,
+w środku `README.md` + `sceny.zip` (20 216 236 B) + `cutsceny.zip`
+(1 479 419 B) + `widoki.zip` (23 722 250 B). Na Dysku (id
+`1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`), obok v5 (archiwum zostaje).
+
+- **423 507 miejsc PL**, z tego **114 067** przekładów tłumacza wpisanych po
+  `PL:` (v5: 422 248 / 114 053) — 140 240 linii do wpisania w scenach,
+  8 396 w cutscenach;
+- kontrola zgodności: 0 powtórzonych, 0 nieznanych, 0 brakujących,
+  `zgodne: true`;
+- **czystość:** magazyn filtruje się po kluczach z `zwrotki/*ai_tymczasowe*.md`
+  (36 932 klucze AI) — pakiet nie pokazuje tymczasowych przekładów AI jako
+  pracy tłumacza. Obieg: [PAKIET_TLUMACZA.md](PAKIET_TLUMACZA.md), sekcja
+  „Pakiet «czysty»”;
+- pierwsza próba tej sesji (bez filtra) dała 46 744 645 B ze wpisami AI
+  w środku — odrzucona, nie wgrana.
+
+## 2026-11-20 (20) — pakiet „tylko AI” do weryfikacji (v6-AI) na Dysku
+
+`paczka_ai_weryfikacja_v6.zip`: 6 114 134 B, SHA-256
+`b2ee61521f100adda3f57846d5249575c7471ffe1d48a219ae374a654389e0d5`,
+na Dysku (id `1Hg07p-PChOjOOsZ83ne-yb0K5tzpPz0R`). Zawiera **wyłącznie**
+36 577 miejsc `PL:` wypełnionych szkicem AI (zero przekładów tłumacza):
+
+| część | elementów | wpisów `PL:` (AI) |
+|---|---:|---:|
+| `sceny.zip` | 27 471 | 15 347 |
+| `cutsceny.zip` | 1 241 | 917 |
+| `widoki.zip` | 20 495 | 20 313 |
+
+Budowa: magazyn przycięty do 36 932 kluczy z `zwrotki/*ai_tymczasowe*.md`
+(382 pliki) → `buduj_paczke.py --tylko-sloty dist/ai_slots.txt
+--tlumaczenie /tmp/mag_ai --wypelnij-pl --bez-zip`, potem własny `README.md`
+i złożenie ZIP-a w układzie jak pakiet pełny. Kontrola: 36 577 linii `PL:`,
+**0 pustych**, 12 z znakami chińskimi (glify cytowane w treści: 莒, 官, 武德司,
+乌皮, 合先生 + placeholdery `{数量}`, `[对方姓名]`).
+
+Rozkład rund AI: `barks_start` 11 392, `runda5` 6 137, `runda6` 5 229,
+`runda4` 2 466, `runda2` 1 211, `runda7` 979, `runda3` 620, `wspomnienia` 507,
+`hexi` 424, `compendium` 322, `runda1` 310, resztę drobne partie.
+
+Ustalenie jakościowe do decyzji właściciela: wczesne rundy (encyklopedia, księgi)
+mają kalki i wtrącenia angielskie („DO PANIE OF QINGHE…", „Heroes Assembly",
+„Lone Cloud") — nadają się do przepisania, nie do poprawiania; partie
+`barks_start` są jednolite terminologicznie (późniejsze, z `pl_nazwy_hasel`).
+
+## 2026-11-20 (21) — poprawki 36 listów AI (encyklopedia i księgi); pakiet AI v7
+
+Właściciel poprosił o poprawę najgorszych fragmentów przekładu AI w sekcji
+„encyklopedia i księgi". Audyt wykazał, że najsłabsza część to **listy
+i wiadomości** (`tasks_envelop_data`, 1 023 klucze AI), tłumaczone wcześniej
+z wersji angielskiej: wtrącone terminy („Heroes Assembly", „Well of Heaven",
+„Lord Master of Grain", „Lone Cloud", „River Master", „Primordial Essence
+Restorative Pill"), myślniki zamiast składni, niedokończone zdania, urywki
+chińskie („天工", „樱桃煎").
+
+Przepisano **36 listów od źródła chińskiego** (partie `poprawki_listy` 1–36),
+z terminologią z magazynu: Zgromadzenie bohaterów, Niebiańskie Źródło,
+Strażnik równowagi, Samotna chmura, Pan Rzeki, Przełęcz Jadeitowej Bramy,
+„Z samego nieba", Kurhan Ostrzy, Staw Jinming, Spichlerz Wyrównawczy,
+Sala Życia i Śmierci, Wioska Koński Łeb, Ryczące Piaski, Wielkie Liao.
+Nazwy bez odpowiednika w magazynie: banda Czystego Źródła, Sala Szkarłatnego
+Smoka Wodnego, banda Turkusowego Smoka Wodnego, Mglisty Las, Sala Sześciu
+Chorób, wał Huzi.
+
+Import: 36 miejsc `PL`, **0 odrzuconych**; pułapka po drodze — wielolinijkowy
+`PL:` musi stać w jednej linii z `\n` (inaczej `zlamana_linia`). Magazyn bez
+zmian liczbowych: 151 045, skan linii `PL:` bez CJK.
+
+Odświeżony pakiet **`paczka_ai_weryfikacja_v7.zip`** (6 115 213 B, SHA-256
+`160534ccba595d1b6e7e7f046f5acafffd19e58ae8ce07fcebb972c11d2f7513`, Dysk id
+`1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) — 36 577 miejsc `PL:`, w tym 36 listów
+w nowej wersji. Zostaje ~35 kolejnych podejrzanych listów oraz wczesne rundy
+`runda1`–`runda3` (encyklopedia, księgi) do przepisania.
+
+## 2026-11-20 (22) — pełny przegląd listów AI; pakiet AI v8
+
+Właściciel: sprawdzić **wszystkie** listy (`tasks_envelop_data`) i naprawić
+je w tej turze, nie tylko 35 podejrzanych. Klasyfikacja 1 023 kluczy AI:
+38 ostrych + 185 średnich = 223 do przepisania (reszta uznana za czytelną).
+
+Przepisano od źródła chińskiego **207 listów** (partie `listy_a`–`listy_k`;
+14 z flagowanych zostawiono bez zmian jako wystarczająco dobre). Formanty
+`#Y…#E`, `#N…#E`, `#M…#E`, `\\v`, `【…】` zachowane. Import łącznie 207 miejsc
+`PL`, **0 odrzuconych** po poprawce tokenu `\\v` w `894c358cc3f046af`. Magazyn
+bez zmian liczbowych: 151 045 (30,85%). Skan `PL:` partii b–k: 0 CJK
+(partie a: celowe glify 工, 廿, 官, 莒, 乌皮).
+
+Terminologia z magazynu m.in.: Szalona Fala, Szkoła Dziewięciu Nurtów,
+stacja Wiszącego Źródła, Przełęcz Jadeitowej Bramy, Banda Beztroski,
+Upojny Cień, Ogród Gruszy, Pan Rzeki, góry Fuxi, Targ Duchów, Kult Xuanyuan,
+strażnica Śpiewającego Piasku, Karez, Góra Ukrytego Księżyca.
+
+Odświeżony pakiet **`paczka_ai_weryfikacja_v8.zip`** (6 116 837 B, SHA-256
+`966f2b24f07daffa3a697f717e57a13ab2c87693c856e986b5f504ad5726e6dd`, Dysk id
+`1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`,
+[webViewLink](https://drive.google.com/file/d/1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv/view?usp=drivesdk))
+— 36 577 miejsc `PL:`, w tym 207 listów w nowej wersji. v7 zostaje na Dysku.
+Zostają wczesne rundy `runda1`–`runda3` (encyklopedia, księgi poza listami)
+do przepisania.
+
+## 2026-11-20 (23) — łatka v0.7.0 na Dysku
+
+Wydanie **`WWM_Spolszczenie_PL_v0.7.0.zip`**: 12 592 118 B, SHA-256
+`866ce6f33ee4cda0c0a237069f1961250996b19364783412e660fd073612c704`,
+151 389 kluczy w planie (151 045 przekładów + 670 bliźniaków `__grey`;
+326 wariantów płci, 770 kolizji odłożonych, 141 052 wpisy `en_jednoznaczne`).
+Zbudowana `one_click_patch.py --tylko-magazyn --wydanie v0.7.0
+--wyj-zip dist/WWM_Spolszczenie_PL_v0.7.0.zip`, 12 plików w ZIP
+(patcher standalone + `plan_latki.json`, zero binarek gry).
+Wgrana na Dysk do folderu pakietów (`1-4nTF4G5ZbwjuHMNsQ6_fxFuhcyXNI9k`),
+id pliku `1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`,
+[webViewLink](https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view?usp=drivesdk).
+v0.6.0 zostaje na Dysku. Nie testowana w grze. Różnica względem v0.6.0:
+przepisane listy z wpisu (22), bez nowych kluczy.
+
+## 2026-11-20 (24) — Czytanka v24 na Dysku
+
+Wydanie **`czytanka_v24.zip`** z `tools/czytanka_czysta.py --wyj
+out/czytanka_v24 --wersja 24` (13 plików: `01` w 8 częściach, `02` w 4
+częściach, `README.md`; numeracja i nazwy plików części jak w v23).
+
+- rozmiar: 9 097 184 B, SHA-256
+  `ae4657b602ab0cab0f5f98805138d75379a2adf325071a8c38f7d248e31f7e3d`;
+- na Dysku jako `czytanka_v24.zip` (id `14011iaVLwqZ-VyaDIeGRqB6h9c14Tqmi`)
+  — nazwa bez przedrostka `WWM_`, jak v21–v23;
+- liczniki z budowy: **75 328** jednostek, **50 671** linii, **112 057**
+  reszta, 0 pominiętych, zbiory 1020, pamiątki 120, POI 2949 (368 z dialogiem).
+
+v23 zostaje na Dysku. Treść jak v23 plus poprawione listy z wpisu (22).
+
+## 2026-11-20 (25) — Czytanka v25: listy z tytułem i treścią, bez formantów
+
+Właściciel: (1) powiązać treść listów z tytułem, (2) wywalić `\\v` i podobne
+formanty z całej czytanki, (3) jeśli się da — wstawić list po scenie, która
+go wywołuje.
+
+`tools/czytanka_czysta.py`: karty `## List: {tytuł}` z `tasks_envelop_data`
+(`to` + `text`, akapity na `\\v`); `_czysty` zdejmuje też `\\v`, `$T(…)`, `$N`.
+Przypisanie do sceny: unikalny fragment tytułu ZH cytowany w dialogu, a przy
+wielu kandydatach krawędź etsb `*shuxin*` (przykład: 魏某白 w 4700002,
+`sxd_xiaowushuxin.etsb` → 4700003). 9 listów przy scenach, reszta w 02
+pod `# Listy`. Testy: `tests/test_czytanka_listy.py`.
+
+Wydanie **`czytanka_v25.zip`**: 9 088 460 B, SHA-256
+`111bdff1081ad328e790d8fd9073a311f9f8f63a79fe67c81919c1a1731fa03b`,
+id `1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM`,
+[webViewLink](https://drive.google.com/file/d/1PXrbaSOYqvNxwayRRPHYb-LNBx5qhCdM/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 696 reszta. v24 zostaje.
+
+## 2026-11-20 (26) — Czytanka v26: list po scenie z grafu OpenUI, nie z cytatu
+
+Właściciel odrzucił heurystykę v25 (porównywanie tytułu ZH z kwestią):
+powiązanie ma być bezwzględne z indeksów/kodu/bazy. Tabela
+`tasks_envelop_data` nie ma `task_id`/`dialog_id` (kolumny: model, `no`,
+text/to/from, bowu, melody). Zadanie 220006 tylko odpalają
+`sxd_xiaowushuxin.etsb`. Id listu jest w grafie Storyline:
+
+`StartEvent → StorylineDialogsPlayNode(4700002) → CommonMakeDictNode
+(key "no", value 5) → OpenUIWithInputNode
+(ui_path=task.task_envelope_window.TaskEnvelopWindow) →
+ListenCloseUIByGuidNode → StorylineDialogsPlayNode(4700003)`.
+
+Parser `tools/listy_w_grafie.py` na zdekodowanych `ezst_*.bin` z v7
+(213 grafów z `TaskEnvelopWindow`) → `index/mpk/listy_w_grafie.jsonl`
+(202 listów z `no`, 21 z polem `po`). `_przypisz_listy_do_scen` czyta
+tylko `po`; bez `po` list zostaje w 02. Testy: `tests/test_listy_w_grafie.py`,
+`tests/test_czytanka_listy.py`.
+
+Wydanie **`czytanka_v26.zip`**: 9 088 350 B, SHA-256
+`52dbda77ebc79a2a96ea8e0e7de27cd902cbd23320db6e5a9397e712ccc375f4`,
+id `1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv`,
+[webViewLink](https://drive.google.com/file/d/1rbF2OXrwMFw_qYx-muqTrHAjRzzZO_Lv/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 687 reszta; 15 listów w 01 (w tym
+Wei po 4700002, przed 4700003), 692 w 02. v25 zostaje.
+
+## 2026-11-20 (27) — Czytanka v27: listy bez pustych wierszy; treść z ZH
+
+Właściciel: (1) podwójne `\\n\\n` pod nagłówkiem listu i między wierszami;
+(2) treść listu Wei inna niż EN z ekranu (akapit o „Opłakując Kong Kana”).
+
+`_karta_listu` nie wstawia pustych linii — `\\v` to jedna nowa linia.
+List `no=5` to **jeden** wiersz `tasks_envelop_data.text` (`w=[4715,"5"]`),
+nie sklejane pola. ZH ma 4 akapity (`\\v`), EN 3: lokalizacja EN pomija
+《哭孔戡》. PL idzie za chińskim (pełniejszy tekst).
+
+Wydanie **`czytanka_v27.zip`**: 9 088 103 B, SHA-256
+`5a1e0ee94765264a62385d7846172851b734ae220147e6f4a2c87dd29e668276`,
+id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`,
+[webViewLink](https://drive.google.com/file/d/1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd/view?usp=drivesdk).
+75 278 jednostek, 50 671 linii, 111 687 reszta. v26 zostaje.
+
+## 2026-11-20 (28) — list Wei poprawiony z chińskiego; Czytanka v28
+
+Właściciel: tłumaczymy z chińskiego; jawne błędy AI poprawiać od razu,
+bez pytania. List `no=5` (`681093272e72ce1e`): „chce się” → „chcesz się”;
+凡赠 = dary, nie „przesłane pismo”; 隐 = skryłeś się. Tytuł
+`b17547b6db3c27fa` bez końcowego `\\n` (dawał pustą linię pod nagłówkiem).
+Zwrotka: `zwrotki/2026-11-20_poprawka_list_wei.md` (2 zmienione, 0 odrzuceń).
+
+Wydanie **`czytanka_v28.zip`**: 9 088 109 B, SHA-256
+`18ee382386afa4ca66909fd74c4adce19267e2903d7925be1194af6d8228bdeb`,
+id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`,
+[webViewLink](https://drive.google.com/file/d/1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn/view?usp=drivesdk).
+v27 zostaje.

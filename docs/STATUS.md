@@ -1,7 +1,84 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-20**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+**Audyt zakresu tymczasowego AI (2026-11-20)** — pełne zestawienie:
+[AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md), narzędzie `tools/audyt_zakresu.py`.
+Wszystkie **25 696** unikalnych kluczy z 328 plików zwrotek AI jest
+w magazynie (0 brakujących wpisów; magazyn **139 653** przekłady, 28,53%
+miejsc w grze). Kategorie właściciela: (1) hinty zadań **8 936/8 936 =
+100%**, (2) listy **1 063/1 063 = 100%**, (3) przedmioty fabularne
+**4 979/4 981** (2 cytaty klasyczne), (4) opisy przedmiotów `ccs_text_msg`
+**5 282/5 282**, (5) Compendium **330/1 524** — brakuje **486 nazw**
+(141 nazw działów, 334 tytuły haseł, 9 przycisków, 2 pozostałe), (6) kwestie
+w scenach pierwszej prowincji (燕南) **8 559/42 455 = 20,2%**; brakuje
+**33 896** kluczy, w tym przykład właściciela ze sceny `1026070`. To prawie
+wyłącznie **jednolinijkowe odzywki NPC** (mediana 19 znaków, 82% ≤30 znaków,
+8 103 scenki jednoelementowe, 8 788 kluczy z flagą `vo_amb*`), a nie dialog
+fabularny; podział: kity ambientowe **4 893**, wyzwalacze `spaces.*`
+**11 369** (tam trafia scena `1026070`), sceny zadań **6 198**, bez powiązania
+**11 436**.
+`programmer_text_msg` (4 128 braków) to etykiety UI, nie opisy przedmiotów —
+poza zakresem. **Zainstalowana łatka `v0.5.0` (112 405 przekładów) nie zawiera
+partii tymczasowych** — bez nowej łatki z bieżącego magazynu właściciel nadal
+widzi po angielsku treści, które już są przetłumaczone. Następny krok:
+zbudować łatkę `v0.6.0` z magazynu, potem domknąć nazwy Compendium (486)
+i wybrane sceny pierwszej prowincji. Geograficznie da się te kwestie zawęzić: **10 683 z 11 369** mają pozycję
+w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 384,
+≤400 m — 1 372, ≤800 m — 3 596, ≤1 000 m — 4 523, ≤1 600 m — 5 952. Partie:
+60 najbliższych (`barks_start_aa`), 170 kolejnych (`ab`) i 21 partii po 200
+(`ac`–`aw`, z `aq` 203 i `aw` 97) — razem **4 330 kwestii** z pierścienia
+≤1 000 m, magazyn **143 983** (29,41%), 0 odrzuceń. **Pierścienie ≤200 m,
+≤400 m, ≤800 m i ≤1 000 m domknięte w 100%** — cały obowiązkowy promień
+(<400 m) i preferencyjny (<1 000 m) z polecenia właściciela ma przekład;
+pierścień ≤1 600 m domknięty w 100% (5 952/5 952, partie `ax`–`bd`),
+pierścień ≤3 200 m domknięty w 100% (6 832/6 832, partie `be`–`bj`);
+wszystkie progi do 6 400 m są **domknięte w 100%** (partie `bk`–`bu`).
+Pierścień 6 400–12 000 m domknięty partiami `bv`–`cb` (**1 824/1 824**),
+a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
+`--slotki` zwraca pustkę („brak kwestii z pozycją”). Domknięta jest też
+**cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
+— w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
+Magazyn **151 045** (**30,85%**). Z magazynu zbudowano gotową łatkę
+**`WWM_Spolszczenie_PL_v0.7.0.zip`** (12 592 118 B, 151 389 kluczy:
+151 045 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
+odłożonych; SHA-256 `866ce6f33ee4cda0c0a237069f1961250996b19364783412e660fd073612c704`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.7.0`. Wgrana na Dysk
+właściciela (folder pakietów, id `1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`):
+https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view
+v0.6.0 (`1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`) zostaje na Dysku.
+Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
+(styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
+Obok leży **Czytanka v28** (`czytanka_v28.zip`, 9 088 109 B, SHA-256
+`18ee382386afa4ca66909fd74c4adce19267e2903d7925be1194af6d8228bdeb`,
+id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`) — `tools/czytanka_czysta.py`,
+`01` w 8 częściach, `02` w 4: karty listów bez pustych wierszy;
+15 listów przy scenach **z grafu** OpenUI `TaskEnvelopWindow` (w tym
+„Z Wei — do Jiang Wulanga” po 4700002). Treść Wei z chińskiego (poprawka
+AI: 凡赠 = dary, „chcesz się”). **Ostatnia czytanka przed nią to v27**
+(`czytanka_v27.zip`, id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`).
+Czytanki NIE buduje się
+`buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
+numer wersji ustalać z tego pliku, nie z pamięci sesji.
+Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
+`buduj_czytanke_gry.py`, `powiazania_czytanek.py`) są oznaczone jako **PRZESTARZAŁE**
+— rejestr: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md), lista maszynowa
+`tools/przestarzale.txt`, pilnuje `tests/test_narzedzia_przestarzale.py`.
+Dla tłumacza leży **pakiet v6** (`paczka_dla_tlumacza_wwm_v6.zip`,
+45 432 646 B, id `1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`): 423 507 miejsc PL,
+114 067 przekładów tłumacza, **bez tymczasowych wpisów AI**.
+Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v8.zip`,
+6 116 837 B, id `1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`, pełny przegląd listów:
+207 przepisanych od chińskiego + 36 z v7): 36 577 miejsc `PL:`
+wypełnionych wyłącznie szkicem AI (36 932 klucze z plików
+`ai_tymczasowe`), do weryfikacji/przepisania przez tłumacza.
+v7 (`1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) zostaje na Dysku.
+Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
+W tej sesji doszło też 79 opisów szkół sztuk
+walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
+`zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`). **628 testów** i kontrola
+repozytorium OK (w tym 5 nowych testów `tools/audyt_zakresu.py`); przekład AI-tymczasowy, bez testu w grze.
 
 **Najnowsze — Compendium `ja` (2026-11-19):** 35 kolejnych instrukcji
 podróżowania, koni, sztuk osobliwych i odbić; `guider_tujian_data` ma teraz

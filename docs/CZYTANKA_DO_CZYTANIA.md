@@ -159,6 +159,20 @@ Zasady kolejności:
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem
    wychodziła po angielsku mimo gotowego przekładu.
+12. **listy fabularne** (`tasks_envelop_data`) mają tytuł (`to`) i treść (`text`)
+    w jednej karcie `## List: …`, a `\\v` łamie linię (bez pustego wiersza). Miejsce w 01 wynika
+    **z grafu Storyline**, nie z cytatu tytułu w dialogu: węzeł
+    `OpenUINode` / `OpenUIWithInputNode` z `TaskEnvelopWindow` dostaje
+    `ui_kwargs.no` (identyfikator wiersza `tasks_envelop_data`) i stoi na
+    krawędzi `__out__` zaraz po `dialogs_no`. Indeks:
+    `index/mpk/listy_w_grafie.jsonl` (pole `po` = scena poprzedzająca,
+    `przed` = następna). Przykład: `sxd_xiaowushuxin.etsb` gra 4700002,
+    potem list `no=5` („Z Wei — do Jiang Wulanga”), potem 4700003.
+    List bez `po` w grafie stoi w 02 pod `# Listy` (też jako karty, nie osobny
+    tytuł i osobna treść).
+13. **znaki formatowania gry** (`\\v`, `\\n`, `#Y…#E`, `$T(…)`, `$N`, odnośniki
+    `<Tekst|…>`) znikają z całej czytanki — `_czysty` zdejmuje je przy wczytaniu
+    magazynu; w listach `\\v` zostaje zwykłym łamaniem linii, bez pustego wiersza.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
@@ -269,5 +283,7 @@ prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
 
 `tools/zbuduj_czytanke_pelna.py` (trzy warstwy: chronologia, fabuła, kontekst)
 i `tools/buduj_czytanke_gry.py` (sceny w tabelach z chińskim i angielskim)
-zostają jako narzędzia robocze do weryfikacji i audytu — ale **nie są czytanką
-dla właściciela**. Czytanka to dwa pliki treści (01 i 02) plus README.
+są **PRZESTARZAŁE (obsolete)** i zostają wyłącznie jako narzędzia audytowe —
+**nie są czytanką dla właściciela i nie buduje się nimi wydań `czytanka_v*.zip`**.
+Pełny rejestr (wraz z `buduj_czytanki.py` i `powiazania_czytanek.py`, banerami
+w kodzie i ostrzeżeniem na stderr): [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md). Czytanka to dwa pliki treści (01 i 02) plus README.

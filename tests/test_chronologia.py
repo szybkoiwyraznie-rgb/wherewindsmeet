@@ -286,11 +286,15 @@ class TestCzytankaCzytaChronologie(unittest.TestCase):
         self.assertEqual(self.tekst.count("\n\n\n"), 0)
 
     def test_bez_powtorzonych_kwestii_pod_rzad(self):
-        kwestie: list[str] = []
         kwestie: set[str] = set()
+        karta_listu = False
         for linia in self.tekst.splitlines():
             if linia.startswith("## ") or linia.startswith("# "):
                 kwestie = set()
+                # treść listu bywa celowo powtórzona (np. dwa razy „środek przypalony”)
+                karta_listu = linia.startswith("## List:")
+            elif karta_listu:
+                continue
             elif linia.strip() and not linia.startswith("#"):
                 if linia in kwestie:
                     self.fail(f"powtórzona kwestia w jednostce: {linia[:60]}")
