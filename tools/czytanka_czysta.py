@@ -1236,7 +1236,7 @@ def _wczytaj_listy(ix) -> dict[str, dict]:
 def _tytul_listu(wpis: dict, pl: dict[str, str], ix) -> str:
     klucz = wpis.get("to")
     if klucz and pl.get(klucz):
-        return pl[klucz]
+        return pl[klucz].strip()
     if klucz and ix is not None:
         zrodlo = ix.teksty.get(klucz)
         if zrodlo:

@@ -3514,3 +3514,17 @@ Wydanie **`czytanka_v27.zip`**: 9 088 103 B, SHA-256
 id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`,
 [webViewLink](https://drive.google.com/file/d/1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd/view?usp=drivesdk).
 75 278 jednostek, 50 671 linii, 111 687 reszta. v26 zostaje.
+
+## 2026-11-20 (28) — list Wei poprawiony z chińskiego; Czytanka v28
+
+Właściciel: tłumaczymy z chińskiego; jawne błędy AI poprawiać od razu,
+bez pytania. List `no=5` (`681093272e72ce1e`): „chce się” → „chcesz się”;
+凡赠 = dary, nie „przesłane pismo”; 隐 = skryłeś się. Tytuł
+`b17547b6db3c27fa` bez końcowego `\\n` (dawał pustą linię pod nagłówkiem).
+Zwrotka: `zwrotki/2026-11-20_poprawka_list_wei.md` (2 zmienione, 0 odrzuceń).
+
+Wydanie **`czytanka_v28.zip`**: 9 088 109 B, SHA-256
+`18ee382386afa4ca66909fd74c4adce19267e2903d7925be1194af6d8228bdeb`,
+id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`,
+[webViewLink](https://drive.google.com/file/d/1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn/view?usp=drivesdk).
+v27 zostaje.
