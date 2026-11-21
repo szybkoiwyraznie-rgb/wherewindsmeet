@@ -64,11 +64,12 @@ Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
 Dla tłumacza leży **pakiet v6** (`paczka_dla_tlumacza_wwm_v6.zip`,
 45 432 646 B, id `1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`): 423 507 miejsc PL,
 114 067 przekładów tłumacza, **bez tymczasowych wpisów AI**.
-Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v7.zip`,
-6 115 213 B, id `1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`, wersja z 36 poprawionymi
-listami z sekcji encyklopedia i księgi): 36 577 miejsc `PL:`
-wypełnionych wyłącznie szkicem AI (36 932 klucze z 382 plików
+Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v8.zip`,
+6 116 837 B, id `1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`, pełny przegląd listów:
+207 przepisanych od chińskiego + 36 z v7): 36 577 miejsc `PL:`
+wypełnionych wyłącznie szkicem AI (36 932 klucze z plików
 `ai_tymczasowe`), do weryfikacji/przepisania przez tłumacza.
+v7 (`1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) zostaje na Dysku.
 Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
 W tej sesji doszło też 79 opisów szkół sztuk
 walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik

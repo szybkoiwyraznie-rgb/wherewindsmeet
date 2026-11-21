@@ -3397,3 +3397,29 @@ Odświeżony pakiet **`paczka_ai_weryfikacja_v7.zip`** (6 115 213 B, SHA-256
 `1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) — 36 577 miejsc `PL:`, w tym 36 listów
 w nowej wersji. Zostaje ~35 kolejnych podejrzanych listów oraz wczesne rundy
 `runda1`–`runda3` (encyklopedia, księgi) do przepisania.
+
+## 2026-11-20 (22) — pełny przegląd listów AI; pakiet AI v8
+
+Właściciel: sprawdzić **wszystkie** listy (`tasks_envelop_data`) i naprawić
+je w tej turze, nie tylko 35 podejrzanych. Klasyfikacja 1 023 kluczy AI:
+38 ostrych + 185 średnich = 223 do przepisania (reszta uznana za czytelną).
+
+Przepisano od źródła chińskiego **207 listów** (partie `listy_a`–`listy_k`;
+14 z flagowanych zostawiono bez zmian jako wystarczająco dobre). Formanty
+`#Y…#E`, `#N…#E`, `#M…#E`, `\\v`, `【…】` zachowane. Import łącznie 207 miejsc
+`PL`, **0 odrzuconych** po poprawce tokenu `\\v` w `894c358cc3f046af`. Magazyn
+bez zmian liczbowych: 151 045 (30,85%). Skan `PL:` partii b–k: 0 CJK
+(partie a: celowe glify 工, 廿, 官, 莒, 乌皮).
+
+Terminologia z magazynu m.in.: Szalona Fala, Szkoła Dziewięciu Nurtów,
+stacja Wiszącego Źródła, Przełęcz Jadeitowej Bramy, Banda Beztroski,
+Upojny Cień, Ogród Gruszy, Pan Rzeki, góry Fuxi, Targ Duchów, Kult Xuanyuan,
+strażnica Śpiewającego Piasku, Karez, Góra Ukrytego Księżyca.
+
+Odświeżony pakiet **`paczka_ai_weryfikacja_v8.zip`** (6 116 837 B, SHA-256
+`966f2b24f07daffa3a697f717e57a13ab2c87693c856e986b5f504ad5726e6dd`, Dysk id
+`1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`,
+[webViewLink](https://drive.google.com/file/d/1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv/view?usp=drivesdk))
+— 36 577 miejsc `PL:`, w tym 207 listów w nowej wersji. v7 zostaje na Dysku.
+Zostają wczesne rundy `runda1`–`runda3` (encyklopedia, księgi poza listami)
+do przepisania.
