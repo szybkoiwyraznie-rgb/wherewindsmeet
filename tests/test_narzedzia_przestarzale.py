@@ -54,7 +54,8 @@ class NarzedziaPrzestarzaleTests(unittest.TestCase):
         for nazwa in ("buduj_czytanki.py", "zbuduj_czytanke_pelna.py", "buduj_czytanke_gry.py"):
             wynik = subprocess.run(
                 [sys.executable, str(KORZEN / "tools" / nazwa), "--help"],
-                capture_output=True, text=True, timeout=120, check=False,
+                capture_output=True, text=True, encoding="utf-8",
+                timeout=120, check=False,
             )
             self.assertIn("PRZESTARZAŁE", wynik.stderr, f"tools/{nazwa}: brak ostrzeżenia na stderr")
 
