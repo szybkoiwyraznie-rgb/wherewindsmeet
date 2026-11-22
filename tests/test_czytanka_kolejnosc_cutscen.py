@@ -258,6 +258,20 @@ class TestChronologiaCine(unittest.TestCase):
                 wpis = json.loads(linia)
                 cls.kolejnosc[int(wpis["no"])] = wpis.get("bloki") or []
 
+    def test_30162_kolejnosc_z_gry(self):
+        """Most Ruby: „nie skacz” → Ach! → most → „co teraz” (oś `.cine`)."""
+        bloki = self.kolejnosc.get(30162)
+        self.assertTrue(bloki, "brak cutsceny 30162 w indeksie kolejności")
+        audio = [r.get("a") for r in bloki[0]]
+        self.assertEqual(audio, [
+            "vo_sm_sxdm9_pma_25",
+            "vo_sm_sxdm9_pma_26",
+            "vo_sm_sxdm9_npc_44",
+            "vo_sm_sxdm9_npc_44",
+        ])
+        self.assertEqual(bloki[0][1]["t"], 11.104)
+        self.assertNotIn("w", bloki[0][1])
+
     def test_indeks_odtwarza_zapis_gracza_30161(self):
         """Nowszy blok 30161 w indeksie = pełny ręczny zapis rozgrywki."""
         bloki = self.kolejnosc.get(30161)
@@ -324,6 +338,52 @@ class TestMowcaZAudio(unittest.TestCase):
         from tools import kontekst_cutscen as kc
         self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_17"), "Ruby")
         self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_02"), "Ruby")
+
+
+class TestWykrzyknikDidaskaliow(unittest.TestCase):
+    """Okrzyk `（啊）` z didaskaliów wchodzi na oś czasu; westchnienie nie."""
+
+    def setUp(self):
+        from tools import cutsceny_kolejnosc_kwestii as ck
+        self.ck = ck
+
+    def test_ah_z_nawiasu_nie_westchnienie(self):
+        zh = "（啊）（稍微惊吓的气声）（看见桥断了）（放心下来）"
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow(zh), "啊")
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow("（轻轻叹气）"), "")
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow("（跳桥前气息）+（跳）嘿呀。"), "")
+
+    def test_wstawia_ach_miedzy_kwestie_30162(self):
+        """Kolejność z gry: Ruby → Ach! → most → co teraz."""
+        blok = [
+            {"w": 591186, "k": "ruby", "t": 7.091, "a": "vo_sm_sxdm9_pma_25"},
+            {"w": 591184, "k": "most", "t": 15.266, "a": "vo_sm_sxdm9_npc_44"},
+            {"w": 591185, "k": "co", "t": 15.266, "a": "vo_sm_sxdm9_npc_44"},
+        ]
+        kwestie = [
+            {"t": 2.052, "audio": "vo_sm_sxdm9_npc_43", "zh": "（跳桥前气息）+（跳）嘿呀。"},
+            {"t": 7.091, "audio": "vo_sm_sxdm9_pma_25", "zh": "红线你好好走，别蹦！"},
+            {"t": 11.104, "audio": "vo_sm_sxdm9_pma_26",
+             "zh": "（啊）（稍微惊吓的气声）（看见桥断了）（放心下来）"},
+            {"t": 15.266, "audio": "vo_sm_sxdm9_npc_44",
+             "zh": "（反应过来）啊桥、桥被我压断了。老大你要怎么办？"},
+        ]
+        self.ck.wstaw_wykrzykniki(blok, kwestie, {"啊": "k-ach"})
+        self.assertEqual([r["k"] for r in blok], ["ruby", "k-ach", "most", "co"])
+        self.assertEqual(blok[1]["t"], 11.104)
+        self.assertEqual(blok[1]["a"], "vo_sm_sxdm9_pma_26")
+        self.assertNotIn("w", blok[1])
+
+    def test_mapa_bierze_krotkie_ah_nie_wrzask(self):
+        from collections import namedtuple
+        Tekst = namedtuple("Tekst", "zrodlo")
+        teksty = {
+            "k-wrzask": Tekst("啊————————！"),
+            "0aaa-szara": Tekst("啊      "),
+            "k-ah": Tekst("啊"),
+            "k-ah-wykrz": Tekst("啊！"),
+        }
+        self.assertEqual(self.ck.mapa_wykrzyknikow(teksty), {"啊": "k-ah"})
 
 
 class TestKwestieZapasowe(unittest.TestCase):

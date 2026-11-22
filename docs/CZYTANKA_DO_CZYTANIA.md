@@ -91,11 +91,14 @@ Zasady kolejności:
      albo po prefiksie nagrania (`VO_DOMENY`) trafia do cutsceny tak jak dotąd,
    * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
      w kolejności wierszy, a nie alfabetycznie.
-   * **kolejność kwestii w cutscenie bierze się z numeru wiersza puli `text_msg`**
-     (`index/cutsceny_kontekst.jsonl`, wiersze typu `napis`), a nie z pola `kn`
-     w chronologii — to pole miesza napisy przypisane wprost z tabeli gry i bloki
-     puli, więc kwestie stawały w kolejności losowej (w `## Cutscena 30161`
-     „Jaki człowiek w czerni?” stało przed „Wstawaj! Wstawaj no!”).
+   * **kolejność kwestii w cutscenie** bierze się ze ścieżki audio `.cine`
+     (`index/cutsceny_kolejnosc_kwestii.jsonl`) — to przeplot bloków puli
+     `text_msg` w czasie nagrania. Bez osi `.cine` zostaje numer wiersza puli.
+     Pole `kn` w chronologii miesza napisy z tabeli i bloki puli, więc samo
+     nie rządzi kolejnością (w 30161 „Jaki człowiek w czerni?” stawało przed
+     „Wstawaj!”). Okrzyk trzymany w didaskaliach (`（啊）` w 30162) wchodzi
+     na oś w czasie nagrania — w grze jest to „Ach!” między „nie skacz”
+     a zawaleniem mostu.
    * gdy w plikach gry leżą **dwa zestawy napisów tej samej cutsceny** (np. wiersze
      590153–590179 i 591125–591169 w cutscenie 30161, ta sama scena w dwóch
      wersjach), pierwszy zestaw jest treścią sceny, a pozostałe stoją pod
@@ -104,12 +107,10 @@ Zasady kolejności:
    * **streszczenie sceny** stoi zawsze na początku cutsceny, zaraz pod jej
      nagłówkiem — a po nim **pusta linia przerwy** przed kwestiami dialogu
      (od 2026-11-17; wcześniej kwestie szły od razu po streszczeniu).
-   * **kolejność z ekranu gry** nie jest odtwarzana: pliki gry nie mają osi czasu
-     cutscen (sprawdzone w `tools/cutsceny_z_bazy.py` — osie `.cine` nie są
-     w pakiecie, a `dialog_timelines.*` nie zawierają ani jednego napisu puli).
-     `index/cutsceny_ekran.jsonl` (przepisaną z ekranu kolejność) **usunięto**
-     decyzją właściciela 2026-11-14 — sceną rządzi najnowsza redakcja napisów
-     z danych (patrz `docs/WERSJE_CZYTANKI.md`, v9).
+   * ręczny spis z ekranu (`index/cutsceny_ekran.jsonl`) **usunięto** decyzją
+     właściciela 2026-11-14 — kolejność ma wychodzić z danych. Daje ją oś
+     `.cine` (`tools/cutsceny_kolejnosc_kwestii.py`); `dialog_timelines.*`
+     nadal nie zawierają napisów puli.
 7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
    z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
    `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101

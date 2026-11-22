@@ -3555,3 +3555,25 @@ id `1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm`,
 [webViewLink](https://drive.google.com/file/d/1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm/view?usp=drivesdk).
 75 278 jednostek, 50 752 linii, 112 611 reszta. v28 zostaje.
 Nie budowana `buduj_czytanki.py`.
+
+## 2026-11-20 (30) — cutscena 30162: kolejność z osi `.cine`, „Ach!” i 老大你要怎么办
+
+Właściciel: chronologia dialogu w Czytance ma być taka jak w grze;
+w 30162 brakowało „Ach!”, a ostatnia kwestia w grze zostawała po angielsku
+(„What do we do now?”).
+
+Oś `.cine` (`cutsceny_sciezka_audio.jsonl`) ma cztery nagrania:
+`pma_25` 红线你好好走别蹦 (7.091) → `pma_26` （啊） (11.104) →
+`npc_44` 桥被我压断了 / 老大你要怎么办 (15.266). Algorytm pomijał
+`（啊）` jako didaskalia, więc Czytanka skakała z „nie skacz” na most.
+`wstaw_wykrzykniki` wstawia krótki napis `啊` (klucz `7c2c50fbaf7b2747`,
+„Ach!”) w czasie nagrania; westchnienia bez okrzyku nadal odpadają.
+Indeks: tylko 30162 się zmienił (+1 wiersz). Benchmark 30161 bez zmian.
+
+„What do we do now?” to **ten sam** chiński 老大你要怎么办 co wiersz
+591185, ale inny EN niż „How will you get over here?”. Magazyn miał
+tylko wariant EN (klucz `7d7b9f0a5ef50e8d` → „jak ty teraz przejdziesz?”),
+więc łatka nie ruszała wersji z gry. Dopisany klucz źródła
+`214a27f3cdc43f2a`; oba z chińskiego: „Wodzu, co teraz zrobimy?”.
+Zwrotka `zwrotki/2026-11-20_poprawka_cutscena_30162.md`. Magazyn 152 013.
+Nowej łatki i Czytanki nie składano.
