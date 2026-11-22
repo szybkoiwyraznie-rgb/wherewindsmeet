@@ -3577,3 +3577,33 @@ więc łatka nie ruszała wersji z gry. Dopisany klucz źródła
 `214a27f3cdc43f2a`; oba z chińskiego: „Wodzu, co teraz zrobimy?”.
 Zwrotka `zwrotki/2026-11-20_poprawka_cutscena_30162.md`. Magazyn 152 013.
 Nowej łatki i Czytanki nie składano.
+
+## 2026-11-20 (31) — karty 02, etapy questów, Feng, cutscena 30163
+
+Cztery śledztwa Czytanki, **bez** v0.9.0 / v30.
+
+1. **Karty w 02** nie sklejają pól ` · `. `_karta_hasla`: `**Nazwa**` /
+   akapit / akapit. Kolejność `_KOLUMNA_KOLEJNOSC` + waga 50+id zadania.
+   `manual` przed `item` w `KATEGORIE`. `extra_describe_1` bez lokalizacji
+   odpada. Ochłapy: krótki → długi. Miazmaty: meridiały → zgnilizna →
+   cytat Chao Yuanfanga (`buff_detail` pominięty). Biały Ptak: opis
+   encyklopedii, bez podpowiedzi questa. Miejsce 901 (`04bc7e22e141a8db`)
+   w danych gry wisi na aktywności «Porównanie łucznicze»
+   (`region_reward_data` `c26378213d93f8f7`), nie na haśle 832009 —
+   na karcie kompendium go nie ma. Zwrotka lokalizacji:
+   `zwrotki/2026-11-20_poprawka_lokalizacja_bialy_ptak.md`
+   („Zielne Bezdroża, na północny zachód od Bambusowej Chaty”).
+2. **Łucznictwo** (`705a7351994edc81`): 330002 target/desc → 330003
+   target → 330006 target/desc.
+3. **Feng** `52264b26b7892eda` ma PL, `w=None`. Jest w scenach 1020604
+   i 4700117 (燕南, w chronologii) — wchodzi do 01. `_reszta` bierze też
+   teksty bez `w` i bez `zrodla.json` (fixture'y + Feng, gdyby scena
+   nie weszła).
+4. **30163** (`sq003_qhyt`, pakiet `baicaoye`): brak osi `.cine` i
+   `cutsceny_sciezka_audio`. `sq003_qhyt_mobile` = 30493. Porządek z
+   zapisu gracza, pula 591187–195: Feng, Feng, Ruby, Ruby, Ruby, Ruby,
+   Youxia (`pma_35`), Ruby. `NAPISY_BEZ_CINE` w matcherze; indeks +1
+   wiersz. Mówcy z pola `m` osi.
+
+Magazyn 152 014. Testy: `tests/test_czytanka_hasla.py` + 30163 w
+`test_czytanka_kolejnosc_cutscen.py`. Nowej łatki i Czytanki nie składano.

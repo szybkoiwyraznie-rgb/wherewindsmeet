@@ -35,6 +35,14 @@ części mają wyłącznie opisowe nazwy plików (np. `01 - prolog, Yannan —
 część 1 z 8.md`); stary przyrostek `_NN` (`01_sceny_i_cutsceny_01.md`)
 zniknął. Treści plików — co do bajta — się nie zmieniły.
 
+Karty haseł w 02 są **wielolinijkowe**: `**Nazwa**`, pusta linia, każde
+pole osobno (bez sklejania ` · `). Kolejność kolumn: lokalizacja → krótki
+opis → treść → cytat; etapy questa po numerze zadania (`task_target`
+przed `task_desc` tego samego id). `manual_items` to encyklopedia, nie
+przedmiot. `extra_describe_1` bez `locate_describe` odpada (podpowiedź
+questa, nie treść hasła). Cięcie części 02 jest na tytule karty (`**…**`),
+nie po pustej linii w środku.
+
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 
 Kolejność jest **raz policzona i zapisana w gicie**; czytanka tylko ją czyta.
@@ -98,7 +106,10 @@ Zasady kolejności:
      nie rządzi kolejnością (w 30161 „Jaki człowiek w czerni?” stawało przed
      „Wstawaj!”). Okrzyk trzymany w didaskaliach (`（啊）` w 30162) wchodzi
      na oś w czasie nagrania — w grze jest to „Ach!” między „nie skacz”
-     a zawaleniem mostu.
+     a zawaleniem mostu. Cutscena **30163** nie ma osi `.cine` w wyciągu
+     (w pakiecie jest tylko wariant mobile `sq003_qhyt_mobile` = 30493);
+     porządek i mówców bierze z zapisu gracza (`NAPISY_BEZ_CINE` w
+     `tools/cutsceny_kolejnosc_kwestii.py`, pula 591187–591195).
    * gdy w plikach gry leżą **dwa zestawy napisów tej samej cutsceny** (np. wiersze
      590153–590179 i 591125–591169 w cutscenie 30161, ta sama scena w dwóch
      wersjach), pierwszy zestaw jest treścią sceny, a pozostałe stoją pod

@@ -1,0 +1,115 @@
+"""Karty haseł w 02: wielolinijkowe, kolejność kolumn, bez sklejania ` · `."""
+
+from __future__ import annotations
+
+import unittest
+
+from tools.czytanka_czysta import PoleHasla, _karta_hasla, _kategoria, _waga_pola
+
+
+def pole(tekst, kolumna, wiersz="1", tabela="x"):
+    return PoleHasla(tekst, tabela, kolumna, wiersz, "k")
+
+
+class TestKartaHasla(unittest.TestCase):
+    def test_przedmiot_tytul_potem_akapity(self):
+        linie = _karta_hasla("Ochłapy mięsa", [
+            pole("Mięso drobnych zwierząt.", "story_describe_str"),
+            pole("Soczyste ochłapy mięsa. Zastosowań wiele.", "describe_str"),
+        ])
+        self.assertEqual(linie, [
+            "**Ochłapy mięsa**",
+            "",
+            "Soczyste ochłapy mięsa. Zastosowań wiele.",
+            "",
+            "Mięso drobnych zwierząt.",
+            "",
+        ])
+
+    def test_quest_etapy_po_numerze_zadania(self):
+        linie = _karta_hasla("Łucznictwo", [
+            pole("Feng daruje sztukę.", "task_desc_str", "330006"),
+            pole("Znajdź łucznika.", "task_target_str", "330002"),
+            pole("Wiadomo już, czemu ptaki spadają.", "task_desc_str", "330002"),
+            pole("Potrenuj łucznictwo.", "task_target_str", "330006"),
+            pole("Użyj przedmiotu.", "task_target_str", "330003"),
+        ])
+        self.assertEqual([l for l in linie if l and not l.startswith("**")], [
+            "Znajdź łucznika.",
+            "Wiadomo już, czemu ptaki spadają.",
+            "Użyj przedmiotu.",
+            "Potrenuj łucznictwo.",
+            "Feng daruje sztukę.",
+        ])
+
+    def test_kompendium_pomija_podpowiedz_questa_bez_lokalizacji(self):
+        linie = _karta_hasla("Biały Ptak Strzela do Yi", [
+            pole("Od Ruby wiesz, że w Qinghe…", "describe"),
+            pole("Bezlitosna strzała omal cię nie zraniła.", "extra_describe_1"),
+        ])
+        self.assertIn("Od Ruby wiesz, że w Qinghe…", linie)
+        self.assertNotIn("Bezlitosna strzała omal cię nie zraniła.", linie)
+
+    def test_choroba_definicja_przed_cytatem(self):
+        linie = _karta_hasla("Zarażenie Miazmatami", [
+            pole("- Sui, Chao Yuanfang…", "shiyi_show_word_from"),
+            pole("Zielonotrawiasta zgnilizna…", "shiyi_show_word"),
+            pole("Miazmaty wchodzą w meridiały.", "description"),
+        ])
+        cialo = [l for l in linie if l and not l.startswith("**")]
+        self.assertEqual(cialo, [
+            "Miazmaty wchodzą w meridiały.",
+            "Zielonotrawiasta zgnilizna…",
+            "- Sui, Chao Yuanfang…",
+        ])
+
+    def test_manual_items_to_encyklopedia_nie_przedmiot(self):
+        self.assertEqual(_kategoria("manual_items"),
+                         "Encyklopedia, księgi i poszlaki")
+        self.assertEqual(_kategoria("all_homeland_stuff_items"),
+                         "Przedmioty, stroje i tytuły")
+
+
+class TestWagaPola(unittest.TestCase):
+    def test_target_przed_desc_tego_samego_zadania(self):
+        a = pole("t", "task_target_str", "330002")
+        b = pole("d", "task_desc_str", "330002")
+        self.assertLess(_waga_pola(a), _waga_pola(b))
+
+
+class _Tekst:
+    def __init__(self, wiersz):
+        self.w = wiersz
+        self.zrodlo = ""
+        self.en = ""
+
+
+class _Ix:
+    zrodla: list = []
+    teksty: dict
+
+    def __init__(self, teksty):
+        self.teksty = teksty
+
+    def zrodlo(self, tekst):
+        return None
+
+
+class TestResztaBezZrodla(unittest.TestCase):
+    def test_napis_bez_tabeli_idzie_do_02(self):
+        from tools.czytanka_czysta import _reszta
+
+        ix = _Ix({"k1": _Tekst((1, "1"))})
+        linie = _reszta(ix, {"k1": "Napisy przerywnika."}, set(), {"reszta": 0})
+        self.assertIn("Napisy przerywnika.", linie)
+
+    def test_tekst_bez_w_tez_idzie_do_02(self):
+        from tools.czytanka_czysta import _reszta
+
+        ix = _Ix({"feng": _Tekst(None)})
+        linie = _reszta(ix, {"feng": "Feng mówi."}, set(), {"reszta": 0})
+        self.assertIn("Feng mówi.", linie)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -258,6 +258,18 @@ class TestChronologiaCine(unittest.TestCase):
                 wpis = json.loads(linia)
                 cls.kolejnosc[int(wpis["no"])] = wpis.get("bloki") or []
 
+    def test_30163_napisy_z_ekranu(self):
+        """30163 nie ma osi `.cine`; porządek z zapisu gracza (pula 591187–195)."""
+        bloki = self.kolejnosc.get(30163)
+        self.assertTrue(bloki, "brak cutsceny 30163 w indeksie kolejności")
+        self.assertEqual([r["k"] for r in bloki[0]], [
+            "99aa1305b14cab9d", "686292d5404f99dc", "85c2e3dcfa0beea3",
+            "18b0e586d1f98026", "ef40bf4720988a61", "571634c537f273b9",
+            "614fbe2f5b73ac93", "aa44a6097c51e9dd",
+        ])
+        self.assertEqual(bloki[0][0]["m"], "Feng Jisheng")
+        self.assertEqual(bloki[0][6]["m"], "Youxia")
+
     def test_30162_kolejnosc_z_gry(self):
         """Most Ruby: „nie skacz” → Ach! → most → „co teraz” (oś `.cine`)."""
         bloki = self.kolejnosc.get(30162)
