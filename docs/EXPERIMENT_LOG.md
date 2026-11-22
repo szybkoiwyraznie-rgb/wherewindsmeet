@@ -3625,3 +3625,16 @@ Trzy poprawki po `ae1958e`, **bez** v0.9.0 / Czytanki v30.
    30147, 30188, 30208 (ten sam algorytm, pack 34 ze skanera).
 
 Nowej łatki i Czytanki nie składano.
+
+## 2026-11-20 (33) — łatka v0.9.0 i Czytanka v30 na Dysku
+
+Na życzenie właściciela. Magazyn 152 014.
+
+- **`WWM_Spolszczenie_PL_v0.9.0.zip`** 12 707 909 B, SHA-256
+  `3eb8094756b96c7bcc6ee0f58b996cbaef41a4ff162b72fed70d69a4f1fe941d`,
+  152 358 kluczy (152 014 + 670 bliźniaków). Dysk
+  `1F5UhsXkTzL6AYA3K5v7ZVT6BtOyhLcTl`. v0.8.0 zostaje.
+- **`czytanka_v30.zip`** 9 010 834 B, SHA-256
+  `d595eade6663a7b95b4e65db5234aa15cc13bd1bd82beca093c2f5ec34bf0c5a`.
+  Dysk `1aMpo1ddfJ74bpBwSh6wBtN8Hbxrf92MW`. v29 zostaje.
+  75 278 jednostek, 50 752 linii, 112 908 reszta; `01`×8, `02`×4.
