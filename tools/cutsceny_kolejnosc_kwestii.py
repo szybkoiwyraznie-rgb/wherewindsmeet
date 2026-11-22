@@ -65,23 +65,6 @@ WYKRZYKNIKI = frozenset({
 _RE_DIDASKALIA = re.compile(r"[（(]([^）)]+)[）)]")
 MAKS_ZRODLO_WYKRZYKNIKA = 4   # „啊！” mieści się; „啊————！” nie
 
-# Cutsceny bez osi `.cine` w wyciągu (30163: w pakiecie tylko wariant mobile
-# `sq003_qhyt_mobile` z jedną kwestią). Porządek = zapis gracza z ekranu;
-# klucze i numery wierszy z puli `text_msg` 591187–591195.
-NAPISY_BEZ_CINE = {
-    30163: [
-        {"w": 591189, "k": "99aa1305b14cab9d", "t": 1.0, "m": "Feng Jisheng"},
-        {"w": 591190, "k": "686292d5404f99dc", "t": 2.0, "m": "Feng Jisheng"},
-        {"w": 591188, "k": "85c2e3dcfa0beea3", "t": 3.0, "m": "Ruby"},
-        {"w": 591191, "k": "18b0e586d1f98026", "t": 4.0, "m": "Ruby"},
-        {"w": 591192, "k": "ef40bf4720988a61", "t": 5.0, "m": "Ruby"},
-        {"w": 591193, "k": "571634c537f273b9", "t": 6.0, "m": "Ruby"},
-        {"w": 591195, "k": "614fbe2f5b73ac93", "t": 7.0, "m": "Youxia",
-         "a": "vo_sm_sxdm6_pma_35"},
-        {"w": 591187, "k": "aa44a6097c51e9dd", "t": 8.0, "m": "Ruby"},
-    ],
-}
-
 LUKA_KLASTRA = 25      # maks. przerwa numeracji w klastrze jednoznacznych trafień
 MARGINES_OKNA = 10     # zapas okna wokół klastra
 MIN_KLASTER = 2        # tyle jednoznacznych trafień uwiarygadnia klaster
@@ -462,11 +445,6 @@ def zbuduj(index: str | Path = "index",
                     zapasowych += 1
             if bloki:
                 wynik.append({"no": wpis["no"], "bloki": bloki})
-
-    obecne = {int(r["no"]) % 10**8 for r in wynik}
-    for no, blok in NAPISY_BEZ_CINE.items():
-        if no not in obecne:
-            wynik.append({"no": no, "bloki": [blok]})
 
     cel = Path(wyj)
     cel.parent.mkdir(parents=True, exist_ok=True)

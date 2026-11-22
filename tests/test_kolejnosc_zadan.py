@@ -107,7 +107,7 @@ class SekcjaZadanTests(unittest.TestCase):
 
         linie = czytanka_czysta._sekcja_zadan(opisy, klucze, PustyIndeks(), {}, [])
         tekst = "\n".join(linie)
-        self.assertIn("**Zadanie z planu:** opis", tekst)
+        self.assertIn("**Zadanie z planu**\nopis", tekst)
         self.assertIn("## Pozostałe zadania i wątki", tekst)
         self.assertIn("**Zadanie spoza planu**", tekst)
 

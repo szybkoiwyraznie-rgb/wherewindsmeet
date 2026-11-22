@@ -258,17 +258,19 @@ class TestChronologiaCine(unittest.TestCase):
                 wpis = json.loads(linia)
                 cls.kolejnosc[int(wpis["no"])] = wpis.get("bloki") or []
 
-    def test_30163_napisy_z_ekranu(self):
-        """30163 nie ma osi `.cine`; porządek z zapisu gracza (pula 591187–195)."""
+    def test_30163_kolejnosc_z_ujec(self):
+        """30163: master milczy, oś z ujęć s0010/s0030/s0070 (nie z zapisu gracza)."""
         bloki = self.kolejnosc.get(30163)
         self.assertTrue(bloki, "brak cutsceny 30163 w indeksie kolejności")
         self.assertEqual([r["k"] for r in bloki[0]], [
-            "99aa1305b14cab9d", "686292d5404f99dc", "85c2e3dcfa0beea3",
+            "99aa1305b14cab9d", "686292d5404f99dc",
             "18b0e586d1f98026", "ef40bf4720988a61", "571634c537f273b9",
-            "614fbe2f5b73ac93", "aa44a6097c51e9dd",
+            "c8ae650aef035fe1", "614fbe2f5b73ac93",
+            "aa44a6097c51e9dd",
         ])
-        self.assertEqual(bloki[0][0]["m"], "Feng Jisheng")
-        self.assertEqual(bloki[0][6]["m"], "Youxia")
+        self.assertEqual(bloki[0][0]["a"], "vo_sm_sxdm7_npc_33")
+        self.assertEqual(bloki[0][2]["a"], "vo_sm_sxdm5_npc_39")
+        self.assertEqual(bloki[0][-1]["a"], "vo_sm_sxdm4_npc_03")
 
     def test_30162_kolejnosc_z_gry(self):
         """Most Ruby: „nie skacz” → Ach! → most → „co teraz” (oś `.cine`)."""

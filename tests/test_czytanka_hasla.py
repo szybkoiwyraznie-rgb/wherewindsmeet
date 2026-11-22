@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import unittest
 
-from tools.czytanka_czysta import PoleHasla, _karta_hasla, _kategoria, _waga_pola
+from tools.czytanka_czysta import (
+    PoleHasla, _karta_hasla, _kategoria, _waga_pola, _reszta,
+)
 
 
 def pole(tekst, kolumna, wiersz="1", tabela="x"):
@@ -19,12 +21,10 @@ class TestKartaHasla(unittest.TestCase):
         ])
         self.assertEqual(linie, [
             "**Ochłapy mięsa**",
-            "",
             "Soczyste ochłapy mięsa. Zastosowań wiele.",
-            "",
             "Mięso drobnych zwierząt.",
-            "",
         ])
+        self.assertNotIn("", linie)
 
     def test_quest_etapy_po_numerze_zadania(self):
         linie = _karta_hasla("Łucznictwo", [
@@ -93,6 +93,47 @@ class _Ix:
 
     def zrodlo(self, tekst):
         return None
+
+
+class TestLokalizacjaBowu(unittest.TestCase):
+    """`bowu_no_to_story_no` kładzie backing_area aktu na kartę hasła."""
+
+    def test_832009_dostaje_lokalizacje_901(self):
+        nazwa = _Tekst((2803, "832009"))
+        opis = _Tekst((2804, "832009", "namek"))
+        miejsce = _Tekst((3954, "901", "aktywnosc"))
+        ix = _Ix({
+            "namek": nazwa,
+            "opisk": opis,
+            "04bc7e22e141a8db": miejsce,
+        })
+        ix.mapa = {
+            id(nazwa): ("manual_items", "bowu_name"),
+            id(opis): ("manual_items", "describe"),
+            id(miejsce): ("region_story_act_data", "backing_area"),
+        }
+        ix.zrodlo = lambda t: ix.mapa.get(id(t))  # type: ignore[method-assign]
+        pl = {
+            "namek": "Biały Ptak Strzela do Yi",
+            "opisk": "Od Ruby wiesz, że w Qinghe…",
+            "04bc7e22e141a8db":
+                "Zielne Bezdroża, na północny zachód od Bambusowej Chaty",
+        }
+        linie = _reszta(ix, pl, set(), {"reszta": 0},
+                        bowu_story={"832009": ["901"]})
+        karta = linie[linie.index("**Biały Ptak Strzela do Yi**"):]
+        karta = karta[:karta.index("") if "" in karta else len(karta)]
+        # sekcja kończy się pustą linią — weźmy do następnego #
+        koniec = next((i for i, l in enumerate(karta) if l.startswith("#")), len(karta))
+        karta = [l for l in karta[:koniec] if l]
+        self.assertEqual(karta[0], "**Biały Ptak Strzela do Yi**")
+        self.assertIn(
+            "Zielne Bezdroża, na północny zachód od Bambusowej Chaty", karta)
+        self.assertIn("Od Ruby wiesz, że w Qinghe…", karta)
+        self.assertLess(
+            karta.index("Zielne Bezdroża, na północny zachód od Bambusowej Chaty"),
+            karta.index("Od Ruby wiesz, że w Qinghe…"),
+        )
 
 
 class TestResztaBezZrodla(unittest.TestCase):

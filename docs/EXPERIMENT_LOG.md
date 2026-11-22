@@ -3607,3 +3607,21 @@ Cztery śledztwa Czytanki, **bez** v0.9.0 / v30.
 
 Magazyn 152 014. Testy: `tests/test_czytanka_hasla.py` + 30163 w
 `test_czytanka_kolejnosc_cutscen.py`. Nowej łatki i Czytanki nie składano.
+
+## 2026-11-20 (32) — lokalizacja 832009, ujęcia 30163, bez pustych wierszy
+
+Trzy poprawki po `ae1958e`, **bez** v0.9.0 / Czytanki v30.
+
+1. **Karty 02** bez pustych wierszy (`**Nazwa**` od razu treść).
+2. **Biały Ptak (832009):** twarde mapowanie z Dysku.
+   `bowu_no_to_story_no` 832009 → [901]; `region_story_act_data[901].bowu_no`
+   = 832009, `backing_area` tekst `04bc7e22e141a8db` (百草野·竹林旧居·西北).
+   `_dolacz_lokalizacje_bowu` kładzie to na kartę hasła. Indeks
+   `index/bowu_story.jsonl` (195 haseł).
+3. **30163:** master `.cine` ma tylko muzykę `3100018`; kwestie w dzieciach
+   EZST `s0010` (7150838/7150839), `s0030` (7150730), `s0070` (7150417).
+   `kwestie_z_ujec`: gdy master milczy, dzieci w kolejności mastera.
+   Matcher 30161/30162, **bez** `NAPISY_BEZ_CINE`. Dopisane też 30134,
+   30147, 30188, 30208 (ten sam algorytm, pack 34 ze skanera).
+
+Nowej łatki i Czytanki nie składano.

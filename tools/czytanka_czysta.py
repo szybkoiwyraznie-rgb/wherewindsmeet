@@ -1445,20 +1445,19 @@ def _waga_pola(pole: PoleHasla) -> tuple:
 def _karta_hasla(nazwa: str, pola: list[PoleHasla]) -> list[str]:
     """Hasło wielolinijkowe: tytuł, potem każde pole osobno (bez ` · `)."""
     if not pola:
-        return [f"**{nazwa}**", ""]
+        return [f"**{nazwa}**"]
     kolumny = {p.kolumna for p in pola}
     # `extra_describe_1` bez lokalizacji to zwykle podpowiedź questa, nie treść hasła
     if "extra_describe_1" in kolumny and "locate_describe" not in kolumny:
         pola = [p for p in pola if p.kolumna != "extra_describe_1"]
     pola = sorted(pola, key=_waga_pola)
-    linie = [f"**{nazwa}**", ""]
+    linie = [f"**{nazwa}**"]
     widziane: set[str] = set()
     for pole in pola:
         if pole.tekst in widziane:
             continue
         widziane.add(pole.tekst)
         linie.append(pole.tekst)
-        linie.append("")
     return linie
 
 
@@ -1527,8 +1526,74 @@ def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
     return tekst.strip(" .!?…") == nazwa.strip(" .!?…") or tekst in nazwa
 
 
+def _wczytaj_bowu_story(katalog: str | Path) -> dict[str, list[str]]:
+    """`bowu_no_to_story_no` z wyciągu: numer hasła encyklopedii → akty regionalne."""
+    p = Path(katalog) / "bowu_story.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, list[str]] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            mapa[str(r["bowu"])] = [str(s) for s in r["story"]]
+    return mapa
+
+
+def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
+                             bowu_story: dict[str, list[str]] | None) -> None:
+    """Lokalizacja aktu regionalnego na kartę hasła (`bowu_no_to_story_no`).
+
+    `region_story_act_data.backing_area` wisi na aktywności (np. 901 →
+    `c26378213d93f8f7` Zawody łucznicze), nie na haśle encyklopedii.
+    Tabela `bowu_no_to_story_no` (832009 → 901) i `region_story_act_data.bowu_no`
+    to twarde mapowanie z gry: to samo miejsce trafia na kartę 白鸟射羿.
+    """
+    if bowu_story is None:
+        katalog = getattr(ix, "katalog", None)
+        bowu_story = _wczytaj_bowu_story(katalog) if katalog else {}
+    if not bowu_story:
+        return
+    story_do_bowu: dict[str, list[str]] = {}
+    for bowu, stories in bowu_story.items():
+        for s in stories:
+            story_do_bowu.setdefault(str(s), []).append(str(bowu))
+    bowu_do_klucza: dict[str, str] = {}
+    for name_key, wpis in hasla.items():
+        for p in wpis["pola"]:
+            if p.wiersz in bowu_story:
+                bowu_do_klucza[p.wiersz] = name_key
+    if not bowu_do_klucza:
+        return
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        if not zrodlo or zrodlo[1] != "backing_area":
+            continue
+        story = str(tekst.w[1])
+        tekst_pl = pl.get(klucz) or ""
+        if not tekst_pl:
+            surowe = _z_gry(ix, klucz)
+            if not surowe:
+                continue
+            tekst_pl = GWIAZDKA + surowe
+        for bowu in story_do_bowu.get(story, ()):
+            nk = bowu_do_klucza.get(bowu)
+            if not nk:
+                continue
+            wpis = hasla[nk]
+            if any(p.klucz == klucz for p in wpis["pola"]):
+                continue
+            wpis["pola"].append(PoleHasla(
+                tekst_pl, zrodlo[0], "backing_area", story, klucz))
+            wpis["etykiety"].add(_kategoria(zrodlo[0]))
+
+
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
-            krainy: list[dict] | None = None) -> list[str]:
+            krainy: list[dict] | None = None,
+            bowu_story: dict[str, list[str]] | None = None) -> list[str]:
     """Co nie trafiło do 01 — karty wielolinijkowe, pola w kolejności kolumn gry."""
     hasla: dict[str, dict] = {}   # klucz nazwy → {nazwa, pola, etykiety}
     bez_nazwy: dict[str, list[str]] = {}
@@ -1609,6 +1674,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         wpis["pola"].append(PoleHasla(GWIAZDKA + surowe, zrodlo[0], zrodlo[1],
                                       str(tekst.w[1]), klucz))
         wpis["etykiety"].add(_kategoria(zrodlo[0]))
+
+    _dolacz_lokalizacje_bowu(hasla, ix, pl, bowu_story)
 
     def _etykieta_hasla(wpis: dict) -> str:
         etykiety = wpis["etykiety"]
