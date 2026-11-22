@@ -3528,3 +3528,30 @@ Wydanie **`czytanka_v28.zip`**: 9 088 109 B, SHA-256
 id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`,
 [webViewLink](https://drive.google.com/file/d/1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn/view?usp=drivesdk).
 v27 zostaje.
+
+## 2026-11-20 (29) — łatka v0.8.0 i Czytanka v29 na Dysku
+
+Właściciel: zbudować łatkę i Czytanki po wciągnięciu opisów startu gry
+do magazynu (przedmioty gospodarstwa, choroby, quest łuczniczy).
+
+Wydanie **`WWM_Spolszczenie_PL_v0.8.0.zip`**: 12 707 838 B, SHA-256
+`ba81b8e7102f1d09a5d0a7c3e1a61d7620898016525ba9de83530e9fab3af8d1`,
+152 356 kluczy w planie (152 012 przekładów + 670 bliźniaków `__grey`;
+326 wariantów płci, 770 kolizji odłożonych, 141 997 wpisy `en_jednoznaczne`).
+Zbudowana `one_click_patch.py --tylko-magazyn --wydanie v0.8.0
+--wyj-zip dist/WWM_Spolszczenie_PL_v0.8.0.zip`, 12 plików w ZIP
+(patcher standalone + `plan_latki.json`, zero binarek gry).
+Wgrana na Dysk do folderu pakietów (`1-4nTF4G5ZbwjuHMNsQ6_fxFuhcyXNI9k`),
+id pliku `19D6Tkj8ujfcfAj0yf2JZ_C-vIP0lBUv5`,
+[webViewLink](https://drive.google.com/file/d/19D6Tkj8ujfcfAj0yf2JZ_C-vIP0lBUv5/view?usp=drivesdk).
+v0.7.0 zostaje na Dysku. Nie testowana w grze. Różnica względem v0.7.0:
++967 kluczy (opisy startu gry z `44b386a`).
+
+Wydanie **`czytanka_v29.zip`** z `tools/czytanka_czysta.py --wyj
+out/czytanka_v29 --wersja 29` (13 plików: `01` w 8 częściach, `02` w 4,
+`README.md`). 9 127 383 B, SHA-256
+`7eb3745c9730fe9e4599e9675cf45674eeaff9dbbe1bfd44587ab9e717eb1d8f`,
+id `1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm`,
+[webViewLink](https://drive.google.com/file/d/1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm/view?usp=drivesdk).
+75 278 jednostek, 50 752 linii, 112 611 reszta. v28 zostaje.
+Nie budowana `buduj_czytanki.py`.

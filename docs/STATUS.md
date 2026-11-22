@@ -40,24 +40,23 @@ a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
 `--slotki` zwraca pustkę („brak kwestii z pozycją”). Domknięta jest też
 **cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
 — w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
-Magazyn **151 045** (**30,85%**). Z magazynu zbudowano gotową łatkę
-**`WWM_Spolszczenie_PL_v0.7.0.zip`** (12 592 118 B, 151 389 kluczy:
-151 045 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
-odłożonych; SHA-256 `866ce6f33ee4cda0c0a237069f1961250996b19364783412e660fd073612c704`)
-— `one_click_patch.py --tylko-magazyn --wydanie v0.7.0`. Wgrana na Dysk
-właściciela (folder pakietów, id `1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`):
-https://drive.google.com/file/d/1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0/view
-v0.6.0 (`1Rb_OCqpCsIIS0n-FfGEerunxgZlsmuzu`) zostaje na Dysku.
-Uwaga na nazwę: wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip`
-(styl v0.5.0), nie `WWM_Latka_PL_*`. Nie testowana w grze.
-Obok leży **Czytanka v28** (`czytanka_v28.zip`, 9 088 109 B, SHA-256
-`18ee382386afa4ca66909fd74c4adce19267e2903d7925be1194af6d8228bdeb`,
-id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`) — `tools/czytanka_czysta.py`,
-`01` w 8 częściach, `02` w 4: karty listów bez pustych wierszy;
-15 listów przy scenach **z grafu** OpenUI `TaskEnvelopWindow` (w tym
-„Z Wei — do Jiang Wulanga” po 4700002). Treść Wei z chińskiego (poprawka
-AI: 凡赠 = dary, „chcesz się”). **Ostatnia czytanka przed nią to v27**
-(`czytanka_v27.zip`, id `1V3gJYZQ6DjHF5OP_GuVW9jSvdF5SFIYd`).
+Magazyn **152 012** (**31,05%**). Z magazynu zbudowano gotową łatkę
+**`WWM_Spolszczenie_PL_v0.8.0.zip`** (12 707 838 B, 152 356 kluczy:
+152 012 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
+odłożonych; SHA-256 `ba81b8e7102f1d09a5d0a7c3e1a61d7620898016525ba9de83530e9fab3af8d1`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.8.0`. Wgrana na Dysk
+właściciela (folder pakietów, id `19D6Tkj8ujfcfAj0yf2JZ_C-vIP0lBUv5`):
+https://drive.google.com/file/d/19D6Tkj8ujfcfAj0yf2JZ_C-vIP0lBUv5/view
+v0.7.0 (`1QOQixx8mqrWwN2gRt6pHptYFgX4sDXy0`) zostaje na Dysku (to była
+instalacja właściciela przed tym wydaniem). Uwaga na nazwę: wydania
+instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip` (styl v0.5.0), nie
+`WWM_Latka_PL_*`. Nie testowana w grze. Różnica v0.7.0→v0.8.0: +967
+kluczy (opisy przedmiotów gospodarstwa, choroby, quest łuczniczy).
+Obok leży **Czytanka v29** (`czytanka_v29.zip`, 9 127 383 B, SHA-256
+`7eb3745c9730fe9e4599e9675cf45674eeaff9dbbe1bfd44587ab9e717eb1d8f`,
+id `1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm`) — `tools/czytanka_czysta.py`,
+`01` w 8 częściach, `02` w 4. **Ostatnia czytanka przed nią to v28**
+(`czytanka_v28.zip`, id `1daA4eMnsoJB_pX-wWFJcFSKCXY8yLcZn`).
 Czytanki NIE buduje się
 `buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
 numer wersji ustalać z tego pliku, nie z pamięci sesji.
