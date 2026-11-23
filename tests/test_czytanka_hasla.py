@@ -262,5 +262,83 @@ class TestResztaBezZrodla(unittest.TestCase):
         self.assertTrue(nazwa)
 
 
+class TestManualUnlockStuff(unittest.TestCase):
+    """`manual_items.unlock_stuff` nazywa sierotę encyklopedii przedmiotem z gry."""
+
+    def _ix(self, wiersze):
+        class T:
+            def __init__(self, w, zh=""):
+                self.w = w
+                self.zrodlo = zh
+                self.en = ""
+
+        class Ix:
+            def __init__(self):
+                self.teksty = {k: T(*v) for k, v in wiersze.items()}
+                self.mapa = {}
+
+            def zrodlo(self, t):
+                return self.mapa.get(id(t))
+
+        return Ix()
+
+    def test_412006_dostaje_nazwe_strzaly(self):
+        ix = self._ix({
+            "strzala": ((445, "102025"), "mujian"),
+            "opis": ((2804, "412006"), "opis strzaly"),
+        })
+        ix.mapa = {
+            id(ix.teksty["strzala"]): ("arrows", "arrow_name", "102025"),
+            id(ix.teksty["opis"]): ("manual_items", "describe", "412006"),
+        }
+        linie = _reszta(ix, {
+            "strzala": "Drewniana strzała",
+            "opis": "Strzały strugane z drewna.",
+        }, set(), {"reszta": 0}, manual_unlock={"412006": "102025"})
+        self.assertEqual(linie.count("**Drewniana strzała**"), 1)
+        karta = linie[linie.index("**Drewniana strzała**"):]
+        koniec = next((i for i, l in enumerate(karta) if l.startswith("#")), len(karta))
+        karta = [l for l in karta[:koniec] if l]
+        self.assertIn("Strzały strugane z drewna.", karta)
+
+    def test_414049_dostaje_nazwe_sciagna(self):
+        ix = self._ix({
+            "sciagno": ((3283, "2200015"), "niubeijin"),
+            "krotki": ((3284, "2200015", "sciagno"), "krotki opis"),
+            "dlugi": ((2804, "414049"), "dlugi opis"),
+        })
+        ix.mapa = {
+            id(ix.teksty["sciagno"]): ("oversea_home_entry_bag_search", "name", "2200015"),
+            id(ix.teksty["krotki"]): ("oversea_home_entry_bag_search", "describe_str", "2200015"),
+            id(ix.teksty["dlugi"]): ("manual_items", "describe", "414049"),
+        }
+        linie = _reszta(ix, {
+            "sciagno": "Ścięgno wołowe",
+            "krotki": "Doskonałe ścięgno wołowe, służy do wytwarzania łuków.",
+            "dlugi": "Jeden z sześciu materiałów do wyrobu łuku.",
+        }, set(), {"reszta": 0}, manual_unlock={"414049": "2200015"})
+        self.assertGreaterEqual(linie.count("**Ścięgno wołowe**"), 1)
+        self.assertTrue(any(
+            "Jeden z sześciu materiałów do wyrobu łuku." in linie[i:i + 6]
+            for i, l in enumerate(linie) if l == "**Ścięgno wołowe**"
+        ))
+
+    def test_bez_mapy_nie_skleja(self):
+        ix = self._ix({
+            "strzala": ((445, "102025"), "mujian"),
+            "opis": ((2804, "412006"), "opis strzaly"),
+        })
+        ix.mapa = {
+            id(ix.teksty["strzala"]): ("arrows", "arrow_name", "102025"),
+            id(ix.teksty["opis"]): ("manual_items", "describe", "412006"),
+        }
+        linie = _reszta(ix, {
+            "strzala": "Drewniana strzała",
+            "opis": "Strzały strugane z drewna.",
+        }, set(), {"reszta": 0}, manual_unlock={})
+        self.assertNotIn("**Drewniana strzała**", linie)
+        self.assertIn("Strzały strugane z drewna.", linie)
+
+
 if __name__ == "__main__":
     unittest.main()

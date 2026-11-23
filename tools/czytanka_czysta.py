@@ -1620,6 +1620,51 @@ def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
     return tekst.strip(" .!?…") == nazwa.strip(" .!?…") or tekst in nazwa
 
 
+_TABELE_NAZWY_PRZEDMIOTU = (
+    "oversea_home_entry_bag_search",
+    "stuff_items",
+    "arrows",
+    "all_homeland_stuff_items",
+    "equip_items",
+)
+_KOLUMNY_NAZWY_PRZEDMIOTU = frozenset({"name", "arrow_name"})
+
+
+def _wczytaj_manual_unlock(katalog: str | Path) -> dict[str, str]:
+    """`manual_items.unlock_stuff`: numer hasła encyklopedii → id przedmiotu."""
+    p = Path(katalog) / "manual_unlock.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, str] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            mapa[str(r["bowu"])] = str(r["stuff"])
+    return mapa
+
+
+def _nazwy_przedmiotow(ix) -> dict[str, str]:
+    """Id przedmiotu (`stuff`/`arrows`/`bag`) → klucz tekstu-nazwy."""
+    waga = {nazwa: i for i, nazwa in enumerate(_TABELE_NAZWY_PRZEDMIOTU)}
+    najlepsze: dict[str, tuple[int, str]] = {}
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst) if tekst.w else None
+        if not zrodlo or zrodlo[1] not in _KOLUMNY_NAZWY_PRZEDMIOTU:
+            continue
+        tabela = zrodlo[0]
+        if tabela not in waga:
+            continue
+        sid = str(tekst.w[1])
+        priorytet = waga[tabela]
+        if sid not in najlepsze or priorytet < najlepsze[sid][0]:
+            najlepsze[sid] = (priorytet, klucz)
+    return {sid: klucz for sid, (_p, klucz) in najlepsze.items()}
+
+
 def _wczytaj_bowu_story(katalog: str | Path) -> dict[str, list[str]]:
     """`bowu_no_to_story_no` z wyciągu: numer hasła encyklopedii → akty regionalne."""
     p = Path(katalog) / "bowu_story.jsonl"
@@ -1687,11 +1732,16 @@ def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
 
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             krainy: list[dict] | None = None,
-            bowu_story: dict[str, list[str]] | None = None) -> list[str]:
+            bowu_story: dict[str, list[str]] | None = None,
+            manual_unlock: dict[str, str] | None = None) -> list[str]:
     """Co nie trafiło do 01 — karty wielolinijkowe, pola w kolejności kolumn gry."""
     hasla: dict[tuple, dict] = {}  # (name_key, wiersz|'') → {nazwa, pola, etykiety}
     bez_nazwy: dict[str, list[str]] = {}
     widziane_linie: dict[str, set[str]] = {}
+    if manual_unlock is None:
+        katalog = getattr(ix, "katalog", None)
+        manual_unlock = _wczytaj_manual_unlock(katalog) if katalog else {}
+    nazwy_rzeczy = _nazwy_przedmiotow(ix) if manual_unlock else {}
 
     def _klucz_grupy(name_key: str, tabela: str, kolumna: str, wiersz: str) -> tuple:
         """Questy i bossy: jedna karta na nazwę. Przedmioty-warianty: jeden wiersz."""
@@ -1735,6 +1785,10 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         if meta is None:
             continue
         _t, tabela, kolumna, wiersz, name_key = meta
+        if not name_key and tabela == "manual_items":
+            stuff = (manual_unlock or {}).get(wiersz)
+            if stuff:
+                name_key = nazwy_rzeczy.get(stuff)
         etykieta = _kategoria(tabela)
         statystyka["reszta"] += 1
         grupa = _klucz_grupy(name_key or "", tabela, kolumna, wiersz)
