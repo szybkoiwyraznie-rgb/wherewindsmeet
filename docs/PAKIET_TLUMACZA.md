@@ -473,6 +473,35 @@ python3 tools/buduj_paczke.py --indeks index --wyj dist --wersja 6 \
 Efekt: 36 932 klucze AI odfiltrowane, w pakiecie **114 067** przekładów
 tłumacza (v5: 114 053 + późniejsze zwrotki tłumacza).
 
+## Pakiet v7 — kontekst czytanki, nadal bez AI (2026-11-22)
+
+`tools/buduj_paczke.py` bierze ten sam kontekst co Czytanka, **bez zmiany
+formatu zwrotki** (import czyta wyłącznie `klucz:` / `PL:`):
+
+- napisy cutscen w kolejności osi `.cine` (`index/cutsceny_kolejnosc_kwestii.jsonl`)
+  — przeplot bloków puli; reszta puli zostaje po lukach ID;
+- listy `tasks_envelop_data` tuż po scenie z grafu Storyline
+  (`index/mpk/listy_w_grafie.jsonl`); w widokach odsyłacz „tłumaczysz raz”;
+- `- interakcja:` w nagłówku sceny z POI (`poi_storyline_sceny`);
+- `lokalizacja:` przy hasłach encyklopedii z `bowu_story.jsonl`.
+
+Ładowanie: `tools/kontekst_paczki.py`. Testy: `tests/test_kontekst_paczki.py`,
+`CzytankaContextPackageTests` w `tests/test_buduj_paczke.py`.
+
+Budowa (magazyn bez AI, `--tylko-z-en --wypelnij-pl`):
+
+```bash
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v7 \
+    --wersja 7 --data 2026-11-22 --tlumaczenie /tmp/mag_bez_ai \
+    --tylko-z-en --wypelnij-pl
+```
+
+Wydanie: `paczka_dla_tlumacza_wwm_v7.zip` (45 389 573 B, SHA-256
+`a1254c673b21c871f05e45a94f6dd833d3e063fb52c2cb8114488660581492f2`,
+Dysk `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`). 422 248 miejsc PL, **114 055**
+wypełnionych przekładem tłumacza, 37 899 kluczy AI jako puste `PL:`.
+Kontrola: 0 powtórzeń, 0 braków. v6 zostaje na Dysku.
+
 ## Pakiet „tylko AI” do weryfikacji (v6-AI)
 
 Odmiana pakietu dla tłumacza: **wyłącznie** wpisy tymczasowe AI, żeby dało się

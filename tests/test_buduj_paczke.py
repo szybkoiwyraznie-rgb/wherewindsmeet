@@ -654,3 +654,124 @@ class CinematicSceneSectionTests(unittest.TestCase):
         tekst = self.cutsceny["04_sceny_cinematiczne_01.md"]
         self.assertEqual(tekst.count("   PL:\n"), 3)
         self.assertIn("powtórzenie", tekst)
+
+
+T_CTX = T + 800
+
+
+def kontekst_czytanki_world() -> tuple[dict, dict, dict]:
+    data = tables()
+    zh = {
+        **ZH,
+        T_CTX: "月日，魏某白，江无浪足下",
+        T_CTX + 1: "魏某",
+        T_CTX + 2: "自足下隐神仙渡至于今。",
+        T_CTX + 3: "Ruby first",
+        T_CTX + 4: "Player second",
+        T_CTX + 5: "白鸟射羿",
+        T_CTX + 6: "opis białego ptaka",
+        T_CTX + 7: "Zielne Bezdroża, na północny zachód od Bambusowej Chaty",
+    }
+    en = {
+        **EN,
+        T_CTX: "From Wei to Jiang Wulang",
+        T_CTX + 1: "Wei",
+        T_CTX + 2: "Since you settled at Heaven's Pier.",
+        T_CTX + 3: "Ruby first",
+        T_CTX + 4: "Player second",
+        T_CTX + 5: "White Bird Archer",
+        T_CTX + 6: "white bird description",
+        T_CTX + 7: "Herbwild, northwest of Bamboo Hut",
+    }
+    data["tasks_envelop_data"] = [(5, {"to": T_CTX, "from": T_CTX + 1, "text": T_CTX + 2})]
+    data["text_msg"] = [
+        (591148, {"content": T_CTX + 3}),
+        (591170, {"content": T_CTX + 4}),
+    ]
+    data["bowu_entry"] = [(832009, {"name": T_CTX + 5, "describe": T_CTX + 6})]
+    data["region_story_act_data"] = [(901, {"backing_area": T_CTX + 7})]
+    return data, zh, en
+
+
+class CzytankaContextPackageTests(unittest.TestCase):
+    """Port kontekstu czytanki: `.cine`, list po scenie, POI, lokalizacja bowu — nadal importowalny."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory(prefix="wwm-paczka-ctx-")
+        root = Path(cls.temp.name)
+        data, zh, en = kontekst_czytanki_world()
+        wyciag.zbuduj(FakeBaza(data), zh, en, root / "index", {"opis": "kontekst czytanki"}, log=lambda _text: None)
+        idx = root / "index"
+        (idx / "mpk").mkdir()
+        (idx / "cutsceny_kolejnosc_kwestii.jsonl").write_text(
+            json.dumps({
+                "no": 30161,
+                "bloki": [[
+                    {"k": K("Player second"), "w": 591170, "t": 0.0},
+                    {"k": K("Ruby first"), "w": 591148, "t": 1.2},
+                ]],
+            }) + "\n",
+            encoding="utf-8",
+        )
+        (idx / "mpk" / "listy_w_grafie.jsonl").write_text(
+            json.dumps({"no": 5, "po": 100, "przed": 101}) + "\n",
+            encoding="utf-8",
+        )
+        (idx / "poi.jsonl").write_text(
+            json.dumps({"id": 200046001, "nazwa": "Dragon Pattern Mark"}) + "\n",
+            encoding="utf-8",
+        )
+        (idx / "mpk" / "poi_storyline_sceny.jsonl").write_text(
+            json.dumps({"poi": 200046001, "status": "sceny", "sceny": [100]}) + "\n",
+            encoding="utf-8",
+        )
+        (idx / "bowu_story.jsonl").write_text(
+            json.dumps({"bowu": 832009, "story": [901]}) + "\n",
+            encoding="utf-8",
+        )
+        cls.ix = indeks.wczytaj(idx)
+        cls.out = root / "paczka"
+        cls.manifest = buduj_paczke.zbuduj(cls.ix, cls.out, wersja="1", data="2026-01-01")
+        cls.sceny = "\n".join(p.read_text(encoding="utf-8") for p in (cls.out / "sceny").glob("*.md"))
+        cls.cutsceny = "\n".join(p.read_text(encoding="utf-8") for p in (cls.out / "cutsceny").glob("*.md"))
+        cls.widoki = "\n".join(p.read_text(encoding="utf-8") for p in (cls.out / "widoki").glob("*.md"))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp.cleanup()
+
+    def test_kontrola_zgodna(self):
+        self.assertTrue(self.manifest["kontrola"]["zgodne"])
+
+    def test_list_po_scenie_otwiera_pl_a_widok_ma_odsyłacz(self):
+        self.assertIn("#### List po tej scenie — tasks_envelop_data wiersz 5", self.sceny)
+        self.assertIn("[List — adresat / tytuł]", self.sceny)
+        self.assertIn("[List — treść]", self.sceny)
+        self.assertIn(f"klucz: {K('月日，魏某白，江无浪足下')}", self.sceny)
+        self.assertIn("月日，魏某白，江无浪足下", self.widoki)
+        self.assertIn("tłumaczysz raz: 01_watek-glowny_rozdzial-1_01.md, scena 1, element 7", self.widoki)
+
+    def test_poi_w_naglowku_sceny(self):
+        self.assertIn("- interakcja: Dragon Pattern Mark", self.sceny)
+
+    def test_cutscena_w_kolejnosci_cine_nie_id(self):
+        self.assertIn("kolejność z osi .cine", self.cutsceny)
+        i_player = self.cutsceny.find("Player second")
+        i_ruby = self.cutsceny.find("Ruby first")
+        self.assertGreater(i_player, 0)
+        self.assertGreater(i_ruby, 0)
+        self.assertLess(i_player, i_ruby)
+
+    def test_lokalizacja_bowu_przy_hasle(self):
+        self.assertIn("lokalizacja:", self.widoki)
+        self.assertIn("Bambusowej Chaty", self.widoki)
+
+    def test_import_zwrotki_czyta_tylko_klucz_pl(self):
+        magazyn = tlumaczenie.Magazyn()
+        sciezki = list((self.out / "sceny").glob("*.md"))
+        tresc = sciezki[0].read_text(encoding="utf-8")
+        tresc = tresc.replace("   PL:\n", "   PL: testowy przeklad\n", 1)
+        raport = import_zwrotki.importuj(self.ix, [("scena.md", tresc)], magazyn)
+        self.assertGreaterEqual(raport["liczby"]["nowe"], 1)
+        self.assertEqual(raport["odrzucone"], 0)

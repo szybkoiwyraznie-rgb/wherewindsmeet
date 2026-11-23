@@ -17,6 +17,9 @@ Zasady składania:
 - każdy tekst ma w całym pakiecie **jedno** miejsce z `PL:` — pierwsze wystąpienie
   w kolejności: sceny, potem widoki; dalsze wystąpienia są oznaczone jako powtórzenia;
 - kolejność scen wylicza `tools/uklad_scen.py` (zadania, następstwa, numeracja);
+- napisy cutscen idą w kolejności osi `.cine` (`index/cutsceny_kolejnosc_kwestii.jsonl`),
+  listy fabularne tuż po scenie, która je otwiera, POI i lokalizacja encyklopedii
+  z indeksów MPK — ten sam kontekst co Czytanka, nadal jeden `klucz:` / `PL:`;
 - widoki grupują teksty spoza scen według tabeli i pola gry, z którego pochodzą.
 
 Skrypt czyta wyłącznie katalog wyciągu i (opcjonalnie) magazyn przekładów —
@@ -40,6 +43,7 @@ try:
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import kontekst_paczki as kpak
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -48,6 +52,7 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import kontekst_paczki as kpak
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -403,6 +408,16 @@ class Generator:
 
         self._chronione_klucze = self._zbuduj_chronione_klucze()
         self._cutsceny_klucze = self._zbuduj_cutsceny_klucze()
+        self._zaladuj_kontekst_czytanki()
+
+    def _zaladuj_kontekst_czytanki(self) -> None:
+        """Indeksy MPK / czytanki: kolejność `.cine`, listy po scenie, POI, bowu."""
+        katalog = Path(self.ix.katalog)
+        self._kolejnosc_cine = kpak.kolejnosc_cine(katalog)
+        self._listy_przy = kpak.listy_przy_scenach(katalog)
+        self._listy = kpak.listy_envelop(self.ix) if self._listy_przy else {}
+        self._poi_scen = kpak.poi_przy_scenach(katalog)
+        self._lok_bowu = kpak.lokalizacje_bowu(self.ix, kpak.bowu_story(katalog))
 
     def _zbuduj_cutsceny_klucze(self) -> set[str]:
         ix = self.ix
@@ -618,6 +633,9 @@ class Generator:
                 if miejsce.moment == "nastepstwo":
                     moment += f" (dialog {miejsce.za})"
                 lines.append(f"- zadanie: {miejsce.zadanie} — {name}" + (f" — cel: {target}" if target else "") + f" — {moment}")
+        poi = self._poi_scen.get(scena["d"])
+        if poi:
+            lines.append(f"- interakcja: {poi}")
         places = scena.get("m") or []
         if places:
             shown = "; ".join(self._miejsce(number) for number in places[:3])
@@ -662,7 +680,47 @@ class Generator:
         slots = [self._slot_sceny(element) for element in scena["e"]]
         for row in self._wybory_po.get(scena["d"], ()):
             slots += [choice["tekst"] for choice in row["wybory"]]
+        slots += self._sloty_listow(scena["d"])
         return slots
+
+    def _sloty_listow(self, dialog: int) -> list[str]:
+        slots: list[str] = []
+        for no in self._listy_przy.get(dialog, ()):
+            wpis = self._listy.get(str(no))
+            if wpis:
+                slots.extend(wpis.get("klucze") or [])
+        return slots
+
+    POLA_LISTU = (
+        ("to", "List — adresat / tytuł"),
+        ("from", "List — nadawca"),
+        ("text", "List — treść"),
+        ("melody_solved_text", "List — zagadka (rozwiązana)"),
+        ("melody_puzzle_text", "List — zagadka"),
+    )
+
+    def _dopisz_listy(self, lines: list[str], nr: int, opened: int, w_bloku: dict, dialog: int, where: str) -> tuple[int, int]:
+        """Listy otwierane tuż po scenie — ten sam `PL:`, żeby widoki dostały odsyłacz."""
+        for no in self._listy_przy.get(dialog, ()):
+            wpis = self._listy.get(str(no))
+            if not wpis:
+                continue
+            klucze = [wpis[pole] for pole, _etykieta in self.POLA_LISTU if wpis.get(pole)]
+            if not klucze or not self._zawiera_nowe(klucze):
+                continue
+            lines.append(f"#### List po tej scenie — tasks_envelop_data wiersz {no}")
+            tytul = self.para(wpis.get("to"))
+            if tytul:
+                lines.append(f"- tytuł: {tytul}")
+            for pole, etykieta in self.POLA_LISTU:
+                klucz = wpis.get(pole)
+                if not klucz:
+                    continue
+                nr += 1
+                part, is_open = self._element(nr, etykieta, klucz, w_bloku, miejsce=where)
+                lines += part
+                opened += is_open
+        return nr, opened
 
     def _scena(self, pisarz: Pisarz, numer: int, miejsce) -> None:
         scena = self.ix.sceny[numer]
@@ -696,6 +754,7 @@ class Generator:
                 part, is_open = self._element(nr, f"Wybór gracza {choice['nr']}", choice["tekst"], w_bloku, dodatkowe=extra, miejsce=where)
                 lines += part
                 opened += is_open
+        nr, opened = self._dopisz_listy(lines, nr, opened, w_bloku, numer, where)
         plik = self._zapisz_blok(pisarz, lines, scen=1, elementow=nr, do_wpisania=opened)
         self.spis_scen.append((self.numer_sceny, numer, plik, miejsce.czesc, miejsce.zadanie, miejsce.moment, nr))
         self.liczby["scen"] += 1
@@ -976,6 +1035,56 @@ class Generator:
                 {"baza": "04_sceny_cinematiczne", "tytul": "Sceny przerywników (timeline, `ui_type` 10)", "opis": "cutsceny", "pliki": files}
             )
 
+    def _mowcy_wierszy_napisow(self, rows: list[dict], wygl_wiersze: set) -> tuple[dict[int, str], list[str]]:
+        mowcy_wiersza: dict[int, str] = {}
+        unikatowi: list[str] = []
+        widziani: set[str] = set()
+        for row in rows:
+            sp_lbl = self._mowca_cutsceny(
+                row,
+                self.ix.teksty[row["k"]],
+                ignoruj_audio=row["wiersz"] in wygl_wiersze,
+            )
+            mowcy_wiersza[row["wiersz"]] = sp_lbl
+            if sp_lbl and sp_lbl not in widziani:
+                widziani.add(sp_lbl)
+                unikatowi.append(sp_lbl)
+        return mowcy_wiersza, unikatowi
+
+    def _emit_wiersze_napisow(
+        self,
+        pisarz: Pisarz,
+        rows: list[dict],
+        plec_wiersza: dict,
+        wygl_wiersze: set,
+        mowcy_wiersza: dict[int, str],
+    ) -> None:
+        lines: list[str] = []
+        w_bloku: dict[str, int] = {}
+        nr = opened = 0
+        for row in rows:
+            nr += 1
+            ignoruj_a = row["wiersz"] in wygl_wiersze
+            speaker = mowcy_wiersza.get(row["wiersz"], "")
+            audio = row.get("audio") or ""
+            parts = [f"text_msg · {row['wiersz']}"]
+            if audio:
+                parts.append(audio)
+            if speaker:
+                parts.append(f"mówca: {speaker}")
+            extra: list[str] = []
+            if row["wiersz"] in plec_wiersza:
+                extra.append(f"wariant płci: {plec_wiersza[row['wiersz']]}")
+            if ignoruj_a and audio:
+                extra.append("uwaga: przypisane po tekście audio może pochodzić z innej sceny (kolizja sound_data)")
+            part, is_open = self._element(
+                nr, " · ".join(parts), row["k"], w_bloku, dodatkowe=extra,
+                miejsce=f"cutscena {row['wiersz']}, element {{nr}}",
+            )
+            lines += part
+            opened += is_open
+        self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+
     def cutsceny(self, katalog: Path) -> None:
         ix = self.ix
         self._aktualna_sekcja = "cutsceny"
@@ -1007,9 +1116,39 @@ class Generator:
         if napisy:
             katalog.mkdir(parents=True, exist_ok=True)
             pisarz = Pisarz(katalog, "01_napisy_cutscen", "Napisy cutscen (`text_msg` 590000–592694) — Where Winds Meet", wstep)
+            used_wiersze: set[int] = set()
+            if self._kolejnosc_cine:
+                by_w = {r["wiersz"]: r for r in napisy}
+                for no, bloki in sorted(self._kolejnosc_cine.items()):
+                    rows: list[dict] = []
+                    seen_local: set[int] = set()
+                    for blok in bloki:
+                        for item in blok:
+                            w = item.get("w")
+                            row = by_w.get(w) if w is not None else None
+                            if row is None or row["wiersz"] in seen_local:
+                                continue
+                            seen_local.add(row["wiersz"])
+                            rows.append(row)
+                    if not rows or not self._zawiera_nowe([r["k"] for r in rows]):
+                        continue
+                    used_wiersze.update(r["wiersz"] for r in rows)
+                    start_w, stop_w = min(r["wiersz"] for r in rows), max(r["wiersz"] for r in rows)
+                    is_prolog = any(ZAKRES_PROLOG_TM[0] <= r["wiersz"] <= ZAKRES_PROLOG_TM[1] for r in rows)
+                    nagl = f"## Cutscena {no}"
+                    if is_prolog:
+                        nagl += " — PROLOG"
+                    nagl += f" — kolejność z osi .cine ({len(rows)} linii, wiersze {start_w}–{stop_w})"
+                    mowcy, unikatowi = self._mowcy_wierszy_napisow(rows, set())
+                    head = [nagl, "- kolejność: oś audio `.cine` (przeplot bloków puli napisów)"]
+                    if unikatowi:
+                        head.append(f"- rozpoznani mówcy: {', '.join(unikatowi)}")
+                    pisarz.naglowek(2, head)
+                    self._emit_wiersze_napisow(pisarz, rows, plec_wiersza, set(), mowcy)
             nr_ciagu = 0
             for ciag in ciagi:
-                if not self._zawiera_nowe([r["k"] for r in ciag]):
+                ciag = [r for r in ciag if r["wiersz"] not in used_wiersze]
+                if not ciag or not self._zawiera_nowe([r["k"] for r in ciag]):
                     continue
                 nr_ciagu += 1
                 start_w, stop_w = ciag[0]["wiersz"], ciag[-1]["wiersz"]
@@ -1338,6 +1477,9 @@ class Generator:
                     named = ix.nazwa_wiersza(text)
                     if named:
                         extra.append(f"dotyczy: {self.para(named)}")
+                    lok_klucz = self._lok_bowu.get(str(row_name))
+                    if lok_klucz:
+                        extra.append(f"lokalizacja: {self.para(lok_klucz)}")
                     if text.n > 1:
                         extra.append(f"użycia w grze: {text.n} identyfikatorów")
                     if limity.get(origin):

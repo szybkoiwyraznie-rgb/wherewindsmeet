@@ -3638,3 +3638,14 @@ Na życzenie właściciela. Magazyn 152 014.
   `d595eade6663a7b95b4e65db5234aa15cc13bd1bd82beca093c2f5ec34bf0c5a`.
   Dysk `1aMpo1ddfJ74bpBwSh6wBtN8Hbxrf92MW`. v29 zostaje.
   75 278 jednostek, 50 752 linii, 112 908 reszta; `01`×8, `02`×4.
+
+## 2026-11-22 (34) — pakiet tłumacza v7: kontekst czytanki, bez AI
+
+Port z Czytanki do `buduj_paczke.py` (`tools/kontekst_paczki.py`): kolejność
+`.cine`, listy po scenie, POI, lokalizacja bowu. Format `klucz:`/`PL:` bez zmian.
+
+- **`paczka_dla_tlumacza_wwm_v7.zip`** 45 389 573 B, SHA-256
+  `a1254c673b21c871f05e45a94f6dd833d3e063fb52c2cb8114488660581492f2`.
+  Dysk `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`. 114 055 przekładów tłumacza,
+  37 899 kluczy AI pustych. 289 cutscen z osi `.cine`, 15 listów po scenie.
+  v6 zostaje.

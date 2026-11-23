@@ -387,6 +387,12 @@ def readme(generator, manifest: dict) -> str:
     )
     add(f"3. **`80_dialogi-wg-projektow_NN.md`** — {_l(uklad['scen_wg_projektow'])} scen bez żadnego wpisu zadania, według projektu (pliku roboczego twórców) i numeru.")
     add(f"4. **`90_rozmowy-tla_NN.md`** — {_l(uklad['scen_tla'])} scen wskazywanych tylko przez rozmieszczenie NPC w świecie: pogawędki, powitania, reakcje. Pogrupowane według miejsca.")
+    add(
+        "Po scenie, która w grafie Storyline otwiera list (`TaskEnvelopWindow`), stoi blok **`#### List po tej scenie`** "
+        "(adresat, nadawca, treść — jeden `PL:` na pole; w `widoki/06_encyklopedia_i_ksiegi` zostaje odsyłacz). "
+        "Gdy scenę odpala POI, nagłówek ma linię `- interakcja: …`. Hasła encyklopedii z mapowaniem `bowu_no` dostają "
+        "`lokalizacja:` z aktu regionalnego."
+    )
     add("")
     add(
         "**Kolejności nie sprawdzono w grze.** Łańcuch zadań pochodzi z danych i w wątku głównym jest spójny "
@@ -402,10 +408,10 @@ def readme(generator, manifest: dict) -> str:
         out.extend(_tabela_serii(cut_serie, sceny=False))
         add("")
         add(
-            "- `01_napisy_cutscen_NN.md` — napisy z zakresu `text_msg 590000–592694` podzielone na logiczne sceny fabularne i regiony "
-            "(m.in. **PROLOG**, Qinghe, Studnia Niebios, Kaifeng, Hexi), z nazwą wątku i powiązanymi cutscenami w dzienniku, "
-            "rozpoznanym mówcą (z nagrań, `mowca_en` oraz cytatów `world_view_person_voice`), adnotacjami o ewentualnych kolizjach `sound_data` "
-            "oraz parami bohater/bohaterka."
+            "- `01_napisy_cutscen_NN.md` — napisy z zakresu `text_msg 590000–592694`. Gdy jest oś `.cine`, kwestie idą "
+            "w kolejności gry (przeplot bloków puli, np. Ruby i gracz na przemian), z nagłówkiem `kolejność z osi .cine`; "
+            "reszta puli zostaje w podziale po lukach ID i regionach (m.in. **PROLOG**, Qinghe, Kaifeng, Hexi). "
+            "Mówca z nagrań, `mowca_en` i `world_view_person_voice`; pary bohater/bohaterka; kolizje `sound_data` oznaczone."
         )
         add(
             "- `02_intro_i_filmy_*.md` — sekwencja wprowadzająca (`wds_oneday_intro_cutscene_data`) z opisanym mówcą "
