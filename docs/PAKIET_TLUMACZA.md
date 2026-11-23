@@ -236,8 +236,12 @@ a po scenie — wybory gracza z dialogami, do których prowadzą.
 
 ### `widoki.zip`
 
-Teksty spoza scen, przy tabeli i polu, z którego pochodzą
-(`[tabela · pole · wiersz]`, `dotyczy:` = nazwa wiersza, `limit:`). Podział na
+Teksty spoza scen złożone w **hasła** (jak karty Czytanki): nazwa i wszystkie
+pola tego samego wiersza tabeli w jednym bloku `###`, żeby nie skakać między
+plikami. Zadania idą łańcuchem gry (rozdział → pre/post), nie numerem wiersza.
+Etykieta pola nadal `[tabela · pole · wiersz]`, `dotyczy:` = nazwa rekordu,
+`limit:`. Samouczki i tabele meta (`guider_*`) wchodzą do pakietu — priorytet
+ustala tłumacz (`--bez-meta` przywraca stare wykluczenia v2). Podział na
 11 serii wynika z nazw tabel (`REGULY` w `tools/buduj_paczke.py`): postacie,
 zadania, wybory i rozmowy, przedmioty, walka, świat, encyklopedia i księgi,
 komunikaty, interfejs, pozostałe (1 030 małych tabel) i teksty bez źródła

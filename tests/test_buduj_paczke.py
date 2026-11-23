@@ -95,13 +95,20 @@ class PackageTests(unittest.TestCase):
 
     def test_views_group_by_table_with_row_context_limits_and_tokens(self):
         items = self.files["03_przedmioty_01.md"]
-        self.assertIn("## stuff_items — przedmioty: nazwa, opis, opis fabularny", items)
+        self.assertIn("### Miecz (Sword)", items)
+        self.assertIn("[stuff_items · name · wiersz 1]", items)
         self.assertIn("[stuff_items · describe_str · wiersz 1] Opis miecza\n   klucz: " + K("Opis miecza") + "\n   dotyczy: Miecz (Sword)\n   limit: do 17 znaków\n   EN: Sword description", items)
         self.assertIn("użycia w grze: 2 identyfikatorów", items)
         effects = self.files["04_walka_i_umiejetnosci_01.md"]
         self.assertIn("Efekt #Y{0}#E\\nna dwie linie", effects)
         self.assertIn("   tokeny: zachowaj dokładnie: #Y, {0}, #E", effects)
         self.assertIn("EN: (to jest tekst źródłowy — chińskiej wersji nie ma w danych)", self.files["10_bez_zrodla_01.md"])
+        zadania = self.files["01_zadania_01.md"]
+        self.assertIn("### Pierwsze zadanie (First quest)", zadania)
+        i_nazwa = zadania.find("[tasks · task_name · wiersz 1]")
+        i_cel = zadania.find("[tasks · task_target_str · wiersz 1]")
+        self.assertGreater(i_nazwa, 0)
+        self.assertGreater(i_cel, i_nazwa)
 
     def test_readme_and_lists_report_real_numbers(self):
         readme = (self.out / "README.md").read_text(encoding="utf-8")
@@ -288,7 +295,7 @@ class V2CutscenesAndExclusionsTests(unittest.TestCase):
             ix = indeks.wczytaj(root / "index")
 
             # Domyślny tryb v2: cutsceny/ + wykluczenia śmieci
-            manifest = buduj_paczke.zbuduj(ix, root / "out_v2", wersja="2", data="2026-11-11", tylko_z_en=True)
+            manifest = buduj_paczke.zbuduj(ix, root / "out_v2", wersja="2", data="2026-11-11", tylko_z_en=True, wszystko=False)
             self.assertTrue(manifest["kontrola"]["zgodne"])
             self.assertEqual(
                 manifest["wykluczenia"],
@@ -326,6 +333,13 @@ class V2CutscenesAndExclusionsTests(unittest.TestCase):
             manifest_all = buduj_paczke.zbuduj(ix, root / "out_all", wersja="2", data="2026-11-11", wszystko=True, zip_=False)
             self.assertTrue(manifest_all["kontrola"]["zgodne"])
             self.assertEqual(manifest_all["wykluczenia"], {})
+
+            # Domyślnie meta/samouczki wchodzą — priorytet ustala tłumacz
+            manifest_def = buduj_paczke.zbuduj(ix, root / "out_def", wersja="2", data="2026-11-11", tylko_z_en=True, zip_=False)
+            self.assertEqual(manifest_def["wykluczenia"], {})
+            widoki_def = "\n".join(p.read_text(encoding="utf-8") for p in (root / "out_def" / "widoki").glob("*.md"))
+            self.assertIn("Debug programmer text", widoki_def)
+            self.assertIn("Press {} for tutorial", widoki_def)
 
             # tylko_sloty podane jako lista z Pythona nie może rzucać TypeError przy kontroli
             manifest_list = buduj_paczke.zbuduj(ix, root / "out_list", wersja="2", data="2026-11-11", tylko_sloty=[K("Osiągnięcie gracza")], zip_=False)
@@ -671,6 +685,8 @@ def kontekst_czytanki_world() -> tuple[dict, dict, dict]:
         T_CTX + 5: "白鸟射羿",
         T_CTX + 6: "opis białego ptaka",
         T_CTX + 7: "Zielne Bezdroża, na północny zachód od Bambusowej Chaty",
+        T_CTX + 8: "选择话术方式",
+        T_CTX + 9: "内容条目手册",
     }
     en = {
         **EN,
@@ -682,6 +698,8 @@ def kontekst_czytanki_world() -> tuple[dict, dict, dict]:
         T_CTX + 5: "White Bird Archer",
         T_CTX + 6: "white bird description",
         T_CTX + 7: "Herbwild, northwest of Bamboo Hut",
+        T_CTX + 8: "Select Gift of Gab Mode",
+        T_CTX + 9: "Compendium entry body",
     }
     data["tasks_envelop_data"] = [(5, {"to": T_CTX, "from": T_CTX + 1, "text": T_CTX + 2})]
     data["text_msg"] = [
@@ -690,6 +708,7 @@ def kontekst_czytanki_world() -> tuple[dict, dict, dict]:
     ]
     data["bowu_entry"] = [(832009, {"name": T_CTX + 5, "describe": T_CTX + 6})]
     data["region_story_act_data"] = [(901, {"backing_area": T_CTX + 7})]
+    data["guider_tujian_data"] = [(1110, {"talk_title": T_CTX + 8, "talk_content": T_CTX + 9})]
     return data, zh, en
 
 
@@ -766,6 +785,17 @@ class CzytankaContextPackageTests(unittest.TestCase):
     def test_lokalizacja_bowu_przy_hasle(self):
         self.assertIn("lokalizacja:", self.widoki)
         self.assertIn("Bambusowej Chaty", self.widoki)
+        i_nazwa = self.widoki.find("白鸟射羿")
+        i_opis = self.widoki.find("opis białego ptaka")
+        self.assertGreater(i_nazwa, 0)
+        self.assertGreater(i_opis, i_nazwa)
+
+    def test_kompendium_guider_wchodzi_tytul_z_trescia(self):
+        self.assertIn("选择话术方式", self.widoki)
+        self.assertIn("内容条目手册", self.widoki)
+        i_tytul = self.widoki.find("选择话术方式")
+        i_tresc = self.widoki.find("内容条目手册")
+        self.assertLess(abs(i_tresc - i_tytul), 800)
 
     def test_import_zwrotki_czyta_tylko_klucz_pl(self):
         magazyn = tlumaczenie.Magazyn()

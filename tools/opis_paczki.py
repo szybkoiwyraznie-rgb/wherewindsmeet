@@ -424,7 +424,13 @@ def readme(generator, manifest: dict) -> str:
         add("")
     add("## 9. Widoki")
     add("")
-    add("Każdy tekst spoza scen stoi przy tabeli i polu gry, z którego pochodzi (`[tabela · pole · wiersz]`). Podział na pliki:")
+    add(
+        "Teksty spoza scen są złożone w **hasła**: nazwa i wszystkie pola tego samego wiersza tabeli "
+        "stoją w jednym bloku `###` (przedmiot z opisem, zadanie z celem, kompendium z tytułem). "
+        "Zadania idą łańcuchem gry (rozdział → pre/post), nie numerem wiersza. "
+        "`dotyczy:` przy polu wskazuje nazwę rekordu. Samouczki i tabele meta (`guider_*`) są w pakiecie — "
+        "priorytet ustala tłumacz. Etykieta pola: `[tabela · pole · wiersz]`. Podział na pliki:"
+    )
     add("")
     out.extend(_tabela_serii(manifest["widoki"], sceny=False))
     add("")

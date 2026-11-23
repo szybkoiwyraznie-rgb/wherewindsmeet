@@ -9,6 +9,8 @@ się nie zmienia, więc zwrotka importuje się tak samo.
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -147,3 +149,155 @@ def lokalizacje_bowu(ix, bowu: dict[str, list[str]]) -> dict[str, str]:
         if klucze:
             wynik[numer] = klucze[0]
     return wynik
+
+
+# --- rekordy widoków (jak karty czytanki: nazwa + pola, nie rozsypka po tabelach) ---
+
+_NAZWA_KOL = re.compile(r"name|title|bowu|imie", re.I)
+_WAGA_KOL = {
+    "name": 0,
+    "task_name": 0,
+    "bowu_name": 0,
+    "manual_name": 0,
+    "group_name": 0,
+    "talk_title[]": 1,
+    "talk_title": 1,
+    "title": 1,
+    "locate_describe": 10,
+    "backing_area": 10,
+    "introduction_location": 10,
+    "describe_str": 20,
+    "describe": 20,
+    "brief_describe_str": 21,
+    "introduction": 22,
+    "description": 23,
+    "talk_content[]": 40,
+    "talk_content": 40,
+    "content": 41,
+    "task_target_str": 50,
+    "task_desc_str": 51,
+}
+
+
+def _nr_wiersza(wiersz: str) -> int:
+    tekst = str(wiersz).lstrip("-")
+    return int(tekst) if tekst.isdigit() else 0
+
+
+@dataclass
+class PoleRekordu:
+    klucz: str
+    tabela: str
+    kolumna: str
+    wiersz: str
+    origin: int
+    name_key: str | None = None
+
+    def waga(self) -> tuple:
+        return (_WAGA_KOL.get(self.kolumna, 70), _nr_wiersza(self.wiersz), self.kolumna, self.klucz)
+
+
+@dataclass
+class Rekord:
+    """Jedno hasło: nazwa + wszystkie pola tego samego wiersza tabeli."""
+
+    grupa: tuple
+    kategoria: str
+    nazwa_klucz: str | None
+    tabela_nazwy: str
+    pola: list[PoleRekordu] = field(default_factory=list)
+
+
+def _domknij_rekord(rec: Rekord, kategoria_fn) -> None:
+    rec.pola = list({p.klucz: p for p in rec.pola}.values())
+    rec.pola.sort(key=lambda p: p.waga())
+    for pole in rec.pola:
+        if _NAZWA_KOL.search(pole.kolumna):
+            rec.nazwa_klucz = pole.klucz
+            rec.tabela_nazwy = pole.tabela.removesuffix("__grey")
+            rec.kategoria = kategoria_fn(pole.tabela)
+            return
+    if rec.nazwa_klucz is None:
+        for pole in rec.pola:
+            if pole.name_key:
+                rec.nazwa_klucz = pole.name_key
+                break
+
+
+def pogrupuj_rekordy(pozycje: list[dict], kategoria_fn) -> dict[str, list[Rekord]]:
+    """Złóż wpisy widoków w rekordy.
+
+    `pozycja`: klucz, tabela, kolumna, wiersz, origin, name_key.
+    Wiersz tabeli zostaje razem (nazwa + pola tego rekordu). Homonimy
+    (ten sam napis, inny wiersz / inna tabela) zostają osobno — `dotyczy:`
+    i tak pokazuje nazwę. Nie spinamy bytów tylko dlatego, że dzielą string nazwy.
+    """
+    kubełki: dict[tuple, Rekord] = {}
+    for poz in pozycje:
+        tabela = str(poz["tabela"])
+        baza = tabela.removesuffix("__grey")
+        wiersz = str(poz["wiersz"])
+        if "#" in wiersz:
+            _, _, wiersz = wiersz.rpartition("#")
+        kolumna = str(poz["kolumna"] or "")
+        name_key = poz.get("name_key") or None
+        if not name_key and _NAZWA_KOL.search(kolumna):
+            name_key = poz["klucz"]
+        grupa = ("r", baza, wiersz)
+        rec = kubełki.get(grupa)
+        if rec is None:
+            rec = Rekord(grupa=grupa, kategoria=kategoria_fn(tabela), nazwa_klucz=None, tabela_nazwy=baza)
+            kubełki[grupa] = rec
+        rec.pola.append(
+            PoleRekordu(
+                klucz=poz["klucz"],
+                tabela=tabela,
+                kolumna=kolumna,
+                wiersz=wiersz,
+                origin=int(poz["origin"]),
+                name_key=name_key,
+            )
+        )
+    for rec in kubełki.values():
+        _domknij_rekord(rec, kategoria_fn)
+
+    po_widoku: dict[str, list[Rekord]] = {}
+    for rec in kubełki.values():
+        po_widoku.setdefault(rec.kategoria, []).append(rec)
+    for recs in po_widoku.values():
+        recs.sort(key=lambda r: (r.pola[0].waga() if r.pola else (99, 0, "", "")))
+    return po_widoku
+
+
+def bloki_zadan(ix, pl: dict[str, str] | None = None) -> list[tuple[str, list[str]]]:
+    """Tytuł bloku → klucze nazw zadań w kolejności łańcucha gry."""
+    try:
+        from tools import kolejnosc_zadan
+    except ImportError:  # pragma: no cover
+        import kolejnosc_zadan  # type: ignore[no-redef]
+    return [(blok.tytul, list(blok.klucze)) for blok in kolejnosc_zadan.plan(ix, pl or {})]
+
+
+def uszereguj_rekordy_zadan(rekordy: list[Rekord], bloki: list[tuple[str, list[str]]]) -> list[tuple[str | None, Rekord]]:
+    """Rekordy zadań z nagłówkiem bloku (łańcuch gry), potem reszta."""
+    po_nazwie: dict[str, list[Rekord]] = {}
+    for rec in rekordy:
+        if rec.nazwa_klucz:
+            po_nazwie.setdefault(rec.nazwa_klucz, []).append(rec)
+    uzyte: set[int] = set()
+    out: list[tuple[str | None, Rekord]] = []
+    for tytul, klucze in bloki:
+        pierwszy = True
+        for klucz in klucze:
+            for rec in po_nazwie.get(klucz, ()):
+                if id(rec) in uzyte:
+                    continue
+                uzyte.add(id(rec))
+                out.append((tytul if pierwszy else None, rec))
+                pierwszy = False
+    for rec in rekordy:
+        if id(rec) in uzyte:
+            continue
+        uzyte.add(id(rec))
+        out.append((None, rec))
+    return out
