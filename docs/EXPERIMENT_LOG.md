@@ -3649,3 +3649,14 @@ Port z Czytanki do `buduj_paczke.py` (`tools/kontekst_paczki.py`): kolejność
   Dysk `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`. 114 055 przekładów tłumacza,
   37 899 kluczy AI pustych. 289 cutscen z osi `.cine`, 15 listów po scenie.
   v6 zostaje.
+
+## 2026-11-23 (35) — pakiet tłumacza v8: hasła jak Czytanka, meta w pakiecie
+
+Widoki: jeden blok `###` = nazwa + pola tego samego wiersza tabeli; zadania
+łańcuchem rozdziału; `guider_*` i tabele meta wchodzą (tłumacz ustala priorytet).
+Format `klucz:`/`PL:` bez zmian. Magazyn bez 37 899 kluczy AI.
+
+- **`paczka_dla_tlumacza_wwm_v8.zip`** 51 056 749 B, SHA-256
+  `1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`.
+  Dysk `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`. 488 247 miejsc PL,
+  **114 771** przekładów tłumacza, kontrola zgodna. v7 zostaje.

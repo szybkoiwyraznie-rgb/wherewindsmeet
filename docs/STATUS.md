@@ -63,16 +63,16 @@ Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
 `buduj_czytanke_gry.py`, `powiazania_czytanek.py`) są oznaczone jako **PRZESTARZAŁE**
 — rejestr: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md), lista maszynowa
 `tools/przestarzale.txt`, pilnuje `tests/test_narzedzia_przestarzale.py`.
-Dla tłumacza leży **pakiet v7** (`paczka_dla_tlumacza_wwm_v7.zip`,
-45 389 573 B, SHA-256 `a1254c673b21c871f05e45a94f6dd833d3e063fb52c2cb8114488660581492f2`,
-id `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`):
-https://drive.google.com/file/d/1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS/view
-422 248 miejsc PL, **114 055** przekładów tłumacza (`PL: tekst`), **bez
+Dla tłumacza leży **pakiet v8** (`paczka_dla_tlumacza_wwm_v8.zip`,
+51 056 749 B, SHA-256 `1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`,
+id `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`):
+https://drive.google.com/file/d/1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe/view
+488 247 miejsc PL, **114 771** przekładów tłumacza (`PL: tekst`), **bez
 tymczasowych wpisów AI** (37 899 kluczy z `zwrotki/*ai_tymczasowe*` odfiltrowane
-— puste `PL:`, do zrobienia przez tłumacza). Kontekst z Czytanki: 289 cutscen
-w kolejności osi `.cine`, 15 listów tuż po scenie która je otwiera, POI
-w nagłówku, `lokalizacja:` na hasłach bowu. Format `klucz:` / `PL:` bez zmian
-(import jak dotychczas). v6 (`1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`) zostaje.
+— puste `PL:`). Hasła jak Czytanka: nazwa + pola wiersza w jednym bloku `###`,
+zadania łańcuchem rozdziału, `guider_*`/meta w pakiecie (priorytet tłumacza).
+Format `klucz:` / `PL:` bez zmian. v7 (`1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`)
+i v6 (`1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`) zostają.
 Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v8.zip`,
 6 116 837 B, id `1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`, pełny przegląd listów:
 207 przepisanych od chińskiego + 36 z v7): 36 577 miejsc `PL:`

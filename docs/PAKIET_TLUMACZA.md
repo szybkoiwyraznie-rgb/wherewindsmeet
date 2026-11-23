@@ -506,6 +506,25 @@ Dysk `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`). 422 248 miejsc PL, **114 055**
 wypełnionych przekładem tłumacza, 37 899 kluczy AI jako puste `PL:`.
 Kontrola: 0 powtórzeń, 0 braków. v6 zostaje na Dysku.
 
+## Pakiet v8 — hasła jak Czytanka, meta w pakiecie (2026-11-23)
+
+Widoki składają **rekord** (nazwa + pola tego samego wiersza) w jednym bloku
+`###`; zadania idą łańcuchem rozdziału (`kolejnosc_zadan.plan`). Samouczki
+i tabele meta (`guider_*`) wchodzą — priorytet ustala tłumacz (`--bez-meta`
+przywraca wykluczenia v2). Format `klucz:` / `PL:` bez zmian.
+
+```bash
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v8 \
+    --wersja 8 --data 2026-11-23 --tlumaczenie /tmp/mag_bez_ai \
+    --tylko-z-en --wypelnij-pl
+```
+
+Wydanie: `paczka_dla_tlumacza_wwm_v8.zip` (51 056 749 B, SHA-256
+`1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`,
+Dysk `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`). 488 247 miejsc PL, **114 771**
+wypełnionych przekładem tłumacza, 37 899 kluczy AI jako puste `PL:`.
+Kontrola: 0 powtórzeń, 0 braków. v7 zostaje na Dysku.
+
 ## Pakiet „tylko AI” do weryfikacji (v6-AI)
 
 Odmiana pakietu dla tłumacza: **wyłącznie** wpisy tymczasowe AI, żeby dało się
