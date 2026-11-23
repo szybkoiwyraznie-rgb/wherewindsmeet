@@ -21,8 +21,8 @@ class TestKartaHasla(unittest.TestCase):
         ])
         self.assertEqual(linie, [
             "**Ochłapy mięsa**",
-            "Soczyste ochłapy mięsa. Zastosowań wiele.",
             "Mięso drobnych zwierząt.",
+            "Soczyste ochłapy mięsa. Zastosowań wiele.",
         ])
         self.assertNotIn("", linie)
 
@@ -35,12 +35,35 @@ class TestKartaHasla(unittest.TestCase):
             pole("Użyj przedmiotu.", "task_target_str", "330003"),
         ])
         self.assertEqual([l for l in linie if l and not l.startswith("**")], [
-            "Znajdź łucznika.",
             "Wiadomo już, czemu ptaki spadają.",
+            "Znajdź łucznika.",
             "Użyj przedmiotu.",
-            "Potrenuj łucznictwo.",
             "Feng daruje sztukę.",
+            "Potrenuj łucznictwo.",
         ])
+
+    def test_quest_etapy_lancuchem_pre_post_nie_numerem(self):
+        class _Ix:
+            zadania = {
+                500003: {"pre": [500002], "post": [500004]},
+                500004: {"pre": [500003], "post": [500204]},
+                500204: {"pre": [500004], "post": [250130]},
+                250130: {"pre": [500204], "post": []},
+            }
+        linie = _karta_hasla("Niedźwiedzie zadanie", [
+            pole("Wskazówki ula włączone", "task_target_str", "250130"),
+            pole("Na pożegnanie Wędrowiec…", "task_desc_str", "250130"),
+            pole("Podejdź do dziwnego przybysza", "task_target_str", "500003"),
+            pole("Czerwona Nić już pomknęła naprzód…", "task_desc_str", "500003"),
+            pole("Odpowiedz nieznajomemu", "task_target_str", "500004"),
+            pole("Użyj tai chi i pokonaj niedźwiedzia", "task_target_str", "500204"),
+        ], ix=_Ix())
+        cialo = [l for l in linie if l and not l.startswith("**")]
+        self.assertEqual(cialo[0], "Czerwona Nić już pomknęła naprzód…")
+        self.assertEqual(cialo[1], "Podejdź do dziwnego przybysza")
+        self.assertLess(cialo.index("Odpowiedz nieznajomemu"),
+                        cialo.index("Użyj tai chi i pokonaj niedźwiedzia"))
+        self.assertEqual(cialo[-1], "Wskazówki ula włączone")
 
     def test_kompendium_pomija_podpowiedz_questa_bez_lokalizacji(self):
         linie = _karta_hasla("Biały Ptak Strzela do Yi", [
@@ -71,9 +94,14 @@ class TestKartaHasla(unittest.TestCase):
 
 
 class TestWagaPola(unittest.TestCase):
-    def test_target_przed_desc_tego_samego_zadania(self):
+    def test_desc_przed_target_tego_samego_zadania(self):
         a = pole("t", "task_target_str", "330002")
         b = pole("d", "task_desc_str", "330002")
+        self.assertLess(_waga_pola(b), _waga_pola(a))
+
+    def test_story_przed_describe(self):
+        a = pole("s", "story_describe_str")
+        b = pole("d", "describe_str")
         self.assertLess(_waga_pola(a), _waga_pola(b))
 
 
@@ -150,6 +178,43 @@ class TestResztaBezZrodla(unittest.TestCase):
         ix = _Ix({"feng": _Tekst(None)})
         linie = _reszta(ix, {"feng": "Feng mówi."}, set(), {"reszta": 0})
         self.assertIn("Feng mówi.", linie)
+
+    def test_dwa_wiersze_tej_samej_nazwy_to_dwie_karty(self):
+        class T:
+            def __init__(self, w):
+                self.w = w
+                self.zrodlo = ""
+                self.en = ""
+
+        class Ix:
+            teksty: dict
+            def __init__(self):
+                self.teksty = {
+                    "n": T((1, "10")),
+                    "a": T((2, "10", "n")),
+                    "b": T((2, "11", "n")),
+                }
+            def zrodlo(self, t):
+                if not t.w:
+                    return None
+                col = "name" if t.w[0] == 1 else "describe_str"
+                return ("stuff_items", col, t.w[1])
+
+        linie = _reszta(Ix(), {
+            "n": "Zioła",
+            "a": "Pospolite zioło lecznicze o wielu zastosowaniach.",
+            "b": "Leki z pospolitych roślin.",
+        }, set(), {"reszta": 0})
+        self.assertEqual(linie.count("**Zioła**"), 2)
+        i1 = linie.index("**Zioła**")
+        i2 = linie.index("**Zioła**", i1 + 1)
+        karta1 = linie[i1 + 1:i2]
+        karta2 = linie[i2 + 1:]
+        opisy = {karta1[0], next(l for l in karta2 if l and not l.startswith("#"))}
+        self.assertEqual(opisy, {
+            "Pospolite zioło lecznicze o wielu zastosowaniach.",
+            "Leki z pospolitych roślin.",
+        })
 
 
 if __name__ == "__main__":

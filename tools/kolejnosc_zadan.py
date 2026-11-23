@@ -31,6 +31,61 @@ except ImportError:  # uruchomienie jako skrypt
 WATEK_GLOWNY = uklad_scen.TYP_WATKU_GLOWNEGO
 BEZ_KOLEJNOSCI = 10**6
 PROG_LANCUCHA = 2  # grupa z tyloma zadaniami to już łańcuch, nie pojedyncze zadanie
+_KLOZ_MOBILNY = 10 ** 10  # 10000500003 = klon PC 500003
+
+
+def kolejnosc_etapow(ix, wiersze) -> dict[str, int]:
+    """Kolejność etapów jednej karty questa: łańcuch `pre`/`post`, nie numer id.
+
+    Klony mobilne (`10000…` + numer PC) odpadają, gdy jest wersja pecetowa —
+    ten sam tekst, tylko inny identyfikator. Zadania bez poprzednika na karcie
+    startują od najniższego numeru; dalej idziemy `post`, także gdy `pian` się
+    różni (np. 250130 po 500204).
+    """
+    nums: list[int] = []
+    for wiersz in wiersze:
+        try:
+            n = int(str(wiersz))
+        except (TypeError, ValueError):
+            continue
+        if n not in getattr(ix, "zadania", {}):
+            continue
+        if n >= _KLOZ_MOBILNY and (n - _KLOZ_MOBILNY) in ix.zadania:
+            continue
+        nums.append(n)
+    if not nums:
+        return {}
+    inside = set(nums)
+    after: dict[int, list[int]] = {n: [] for n in nums}
+    przed: dict[int, int] = {n: 0 for n in nums}
+    for n in nums:
+        row = ix.zadania[n]
+        for nxt in row.get("post") or ():
+            if nxt in inside and nxt not in after[n]:
+                after[n].append(nxt)
+                przed[nxt] += 1
+        for prv in row.get("pre") or ():
+            if prv in inside and n not in after[prv]:
+                after[prv].append(n)
+                przed[n] += 1
+    gotowe = sorted(n for n in nums if przed[n] == 0)
+    kolejnosc: list[int] = []
+    widziane: set[int] = set()
+    while gotowe:
+        n = gotowe.pop(0)
+        if n in widziane:
+            continue
+        widziane.add(n)
+        kolejnosc.append(n)
+        for nxt in sorted(after[n]):
+            przed[nxt] -= 1
+            if przed[nxt] <= 0:
+                gotowe.append(nxt)
+                gotowe.sort()
+    for n in sorted(nums):
+        if n not in widziane:
+            kolejnosc.append(n)
+    return {str(n): i for i, n in enumerate(kolejnosc)}
 
 
 @dataclass

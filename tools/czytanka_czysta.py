@@ -91,9 +91,9 @@ _NAZWA = re.compile(r"name|title|bowu|imie", re.I)
 # Kolumny z definicją hasła. Świadomie nie ma tu `content`, `story_*`, `page_*`,
 # `talk_content`, `tips` — to opowieści i streszczenia scen, nie opisy.
 _OPIS = re.compile(r"describe|description|intro|^des$|job_info|npc_desc", re.I)
-# Kolejność: najpierw zwięzła definicja, potem dłuższe warianty.
+# Kolejność: najpierw treść z ekranu przedmiotu (`story_describe_str`), potem krótki opis.
 _OPIS_KOLEJNOSC = (
-    "describe_str", "describe", "brief_describe_str", "introduction",
+    "story_describe_str", "describe_str", "describe", "brief_describe_str", "introduction",
     "introduction_long", "description", "jianghu_brief_description", "job_info",
     "npc_desc", "des", "introduction_location", "introduction_short",
     "extra_describe_1", "generation_description", "sidepage_boss_desc",
@@ -1404,16 +1404,16 @@ class PoleHasla:
     klucz: str
 
 
-# Kolejność pól na karcie (niżej = później). Questy: 50 + numer zadania.
+# Kolejność pól na karcie (niżej = później). Questy: 50 + etap łańcucha gry.
 _KOLUMNA_KOLEJNOSC = {
     "locate_describe": 10,
     "backing_area": 11,
-    "describe_str": 20,
-    "brief_describe_str": 21,
-    "describe": 22,
-    "introduction": 23,
-    "introduction_short": 24,
-    "story_describe_str": 30,
+    "story_describe_str": 20,
+    "describe_str": 21,
+    "brief_describe_str": 22,
+    "describe": 23,
+    "introduction": 24,
+    "introduction_short": 25,
     "description": 31,
     "introduction_long": 32,
     "shiyi_show_word": 40,
@@ -1433,16 +1433,24 @@ def _numer_wiersza(wiersz: str) -> int:
         return 0
 
 
-def _waga_pola(pole: PoleHasla) -> tuple:
-    """Kolejność na karcie: lokalizacja → definicja → treść; questy po id zadania."""
-    if pole.kolumna == "task_target_str":
-        return (50, _numer_wiersza(pole.wiersz), 0)
-    if pole.kolumna == "task_desc_str":
-        return (50, _numer_wiersza(pole.wiersz), 1)
+def _waga_pola(pole: PoleHasla, kolejnosc_wierszy: dict[str, int] | None = None) -> tuple:
+    """Kolejność na karcie: lokalizacja → treść z gry; questy łańcuchem pre/post.
+
+    W zadaniu najpierw opis dziennika (`task_desc_str`), potem cel na ekranie.
+    Etapy idą łańcuchem gry (`kolejnosc_wierszy`), nie numerem id (250130 < 500003
+    stawiało „Wskazówki ula” przed pierwszym etapem Niedźwiedziego zadania).
+    """
+    if pole.kolumna in ("task_desc_str", "task_target_str"):
+        if kolejnosc_wierszy and pole.wiersz in kolejnosc_wierszy:
+            etap = kolejnosc_wierszy[pole.wiersz]
+        else:
+            etap = _numer_wiersza(pole.wiersz)
+        pod = 0 if pole.kolumna == "task_desc_str" else 1
+        return (50, etap, pod)
     return (_KOLUMNA_KOLEJNOSC.get(pole.kolumna, 70), _numer_wiersza(pole.wiersz), 0)
 
 
-def _karta_hasla(nazwa: str, pola: list[PoleHasla]) -> list[str]:
+def _karta_hasla(nazwa: str, pola: list[PoleHasla], *, ix=None) -> list[str]:
     """Hasło wielolinijkowe: tytuł, potem każde pole osobno (bez ` · `)."""
     if not pola:
         return [f"**{nazwa}**"]
@@ -1450,7 +1458,10 @@ def _karta_hasla(nazwa: str, pola: list[PoleHasla]) -> list[str]:
     # `extra_describe_1` bez lokalizacji to zwykle podpowiedź questa, nie treść hasła
     if "extra_describe_1" in kolumny and "locate_describe" not in kolumny:
         pola = [p for p in pola if p.kolumna != "extra_describe_1"]
-    pola = sorted(pola, key=_waga_pola)
+    kolejnosc = None
+    if ix is not None and kolumny & {"task_desc_str", "task_target_str"}:
+        kolejnosc = kolejnosc_zadan.kolejnosc_etapow(ix, {p.wiersz for p in pola})
+    pola = sorted(pola, key=lambda p: _waga_pola(p, kolejnosc))
     linie = [f"**{nazwa}**"]
     widziane: set[str] = set()
     for pole in pola:
@@ -1488,7 +1499,7 @@ def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, 
             nazwa = z_klucza.get(klucz)
             if nazwa and nazwa not in wypisane and nazwa in opisy:
                 wypisane.add(nazwa)
-                linie.extend(_karta_z_opisow(nazwa, opisy[nazwa]))
+                linie.extend(_karta_z_opisow(nazwa, opisy[nazwa], ix=ix))
                 continue
             tekst = pl.get(klucz)
             if tekst and tekst in dostepne and tekst not in wypisane:
@@ -1503,15 +1514,15 @@ def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, 
     if reszta:
         out += ["## Pozostałe zadania i wątki", ""]
         for nazwa in reszta:
-            out.extend(_karta_z_opisow(nazwa, opisy[nazwa]))
+            out.extend(_karta_z_opisow(nazwa, opisy[nazwa], ix=ix))
         out.append("")
     return out
 
 
-def _karta_z_opisow(nazwa: str, opisy) -> list[str]:
+def _karta_z_opisow(nazwa: str, opisy, *, ix=None) -> list[str]:
     """Opisy to lista `PoleHasla` albo starych napisów."""
     if opisy and isinstance(opisy[0], PoleHasla):
-        return _karta_hasla(nazwa, list(opisy))
+        return _karta_hasla(nazwa, list(opisy), ix=ix)
     return _haslo(nazwa, list(opisy))
 
 
@@ -1559,12 +1570,12 @@ def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
     for bowu, stories in bowu_story.items():
         for s in stories:
             story_do_bowu.setdefault(str(s), []).append(str(bowu))
-    bowu_do_klucza: dict[str, str] = {}
-    for name_key, wpis in hasla.items():
+    bowu_do_grupy: dict[str, tuple] = {}
+    for grupa, wpis in hasla.items():
         for p in wpis["pola"]:
             if p.wiersz in bowu_story:
-                bowu_do_klucza[p.wiersz] = name_key
-    if not bowu_do_klucza:
+                bowu_do_grupy[p.wiersz] = grupa
+    if not bowu_do_grupy:
         return
     for klucz, tekst in ix.teksty.items():
         if not tekst.w or len(tekst.w) < 2:
@@ -1580,10 +1591,10 @@ def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
                 continue
             tekst_pl = GWIAZDKA + surowe
         for bowu in story_do_bowu.get(story, ()):
-            nk = bowu_do_klucza.get(bowu)
-            if not nk:
+            grupa = bowu_do_grupy.get(bowu)
+            if not grupa:
                 continue
-            wpis = hasla[nk]
+            wpis = hasla[grupa]
             if any(p.klucz == klucz for p in wpis["pola"]):
                 continue
             wpis["pola"].append(PoleHasla(
@@ -1595,9 +1606,15 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             krainy: list[dict] | None = None,
             bowu_story: dict[str, list[str]] | None = None) -> list[str]:
     """Co nie trafiło do 01 — karty wielolinijkowe, pola w kolejności kolumn gry."""
-    hasla: dict[str, dict] = {}   # klucz nazwy → {nazwa, pola, etykiety}
+    hasla: dict[tuple, dict] = {}  # (name_key, wiersz|'') → {nazwa, pola, etykiety}
     bez_nazwy: dict[str, list[str]] = {}
     widziane_linie: dict[str, set[str]] = {}
+
+    def _klucz_grupy(name_key: str, tabela: str, kolumna: str, wiersz: str) -> tuple:
+        """Questy: jedna karta na nazwę (etapy razem). Przedmioty: jeden wiersz tabeli."""
+        if kolumna in ("task_target_str", "task_desc_str") or (tabela or "").startswith("tasks"):
+            return (name_key, "")
+        return (name_key, wiersz)
 
     def _meta(klucz: str):
         tekst = ix.teksty.get(klucz)
@@ -1633,6 +1650,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         _t, tabela, kolumna, wiersz, name_key = meta
         etykieta = _kategoria(tabela)
         statystyka["reszta"] += 1
+        grupa = _klucz_grupy(name_key or "", tabela, kolumna, wiersz)
         if not name_key or _NAZWA.search(kolumna or ""):
             if not name_key:
                 zbior = widziane_linie.setdefault(etykieta, set())
@@ -1640,7 +1658,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
                     zbior.add(tekst_pl)
                     bez_nazwy.setdefault(etykieta, []).append(tekst_pl)
             else:
-                wpis = hasla.setdefault(name_key, {"nazwa": "", "pola": [], "etykiety": set()})
+                wpis = hasla.setdefault(grupa, {"nazwa": "", "pola": [], "etykiety": set()})
                 wpis["nazwa"] = wpis["nazwa"] or pinyin_slownik.romanizuj(
                     _nazwa_klucza(ix, name_key, pl))
                 wpis["etykiety"].add(etykieta)
@@ -1650,7 +1668,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         nazwa = pinyin_slownik.romanizuj(_nazwa_klucza(ix, name_key, pl))
         if not nazwa or _opis_powtarza_nazwe(tekst_pl, nazwa):
             continue
-        wpis = hasla.setdefault(name_key, {"nazwa": nazwa, "pola": [], "etykiety": set()})
+        wpis = hasla.setdefault(grupa, {"nazwa": nazwa, "pola": [], "etykiety": set()})
         wpis["nazwa"] = wpis["nazwa"] or nazwa
         wpis["etykiety"].add(etykieta)
         wpis["pola"].append(PoleHasla(tekst_pl, tabela, kolumna, wiersz, klucz))
@@ -1665,7 +1683,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         if len(tekst.w) < 3 or not isinstance(tekst.w[2], str):
             continue
         name_key = tekst.w[2]
-        wpis = hasla.get(name_key)
+        wiersz = str(tekst.w[1])
+        wpis = hasla.get((name_key, wiersz)) or hasla.get((name_key, ""))
         if not wpis:
             continue
         surowe = _z_gry(ix, klucz)
@@ -1690,15 +1709,15 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
 
     sekcje: dict[str, dict[str, list[PoleHasla]]] = {}
     klucze_nazw: dict[str, str] = {}
-    for name_key, wpis in hasla.items():
+    for (name_key, wiersz), wpis in hasla.items():
         nazwa = wpis["nazwa"]
-        if not nazwa:
+        if not nazwa or not wpis["pola"]:
             continue
         etykieta = _etykieta_hasla(wpis)
-        # homonimy (dwa „Łucznictwo”) zostają osobnymi kartami
+        # homonimy (dwa „Łucznictwo”, dwa „Zioła”) zostają osobnymi kartami
         etykieta_unikalna = nazwa
         if etykieta_unikalna in sekcje.get(etykieta, {}):
-            etykieta_unikalna = f"{nazwa}\u200b{name_key[:6]}"
+            etykieta_unikalna = f"{nazwa}\u200b{(wiersz or name_key)[:12]}"
         sekcje.setdefault(etykieta, {})[etykieta_unikalna] = wpis["pola"]
         klucze_nazw[etykieta + "\x00" + etykieta_unikalna] = name_key
 
@@ -1715,7 +1734,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             out.append("")
             continue
         for nazwa in sorted(sekcje.get(etykieta, {}), key=lambda n: n.rstrip("\u200b0123456789abcdef").lower()):
-            karta = _karta_hasla(nazwa.split("\u200b")[0], sekcje[etykieta][nazwa])
+            karta = _karta_hasla(nazwa.split("\u200b")[0], sekcje[etykieta][nazwa], ix=ix)
             out.extend(karta)
         out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
         out.append("")
