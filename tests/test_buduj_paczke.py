@@ -799,8 +799,14 @@ class CzytankaContextPackageTests(unittest.TestCase):
 
     def test_import_zwrotki_czyta_tylko_klucz_pl(self):
         magazyn = tlumaczenie.Magazyn()
-        sciezki = list((self.out / "sceny").glob("*.md"))
-        tresc = sciezki[0].read_text(encoding="utf-8")
+        tresc = None
+        # glob nie sortuje — na Ubuntu pierwszy plik bywa bez slotu PL: (CI od 39f4c84).
+        for sciezka in sorted((self.out / "sceny").glob("*.md")):
+            kandydat = sciezka.read_text(encoding="utf-8")
+            if "   PL:\n" in kandydat:
+                tresc = kandydat
+                break
+        self.assertIsNotNone(tresc)
         tresc = tresc.replace("   PL:\n", "   PL: testowy przeklad\n", 1)
         raport = import_zwrotki.importuj(self.ix, [("scena.md", tresc)], magazyn)
         self.assertGreaterEqual(raport["liczby"]["nowe"], 1)

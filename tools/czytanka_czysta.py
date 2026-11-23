@@ -260,7 +260,16 @@ def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
     if klucz in pl:
         return pl[klucz]
     tekst = ix.teksty.get(klucz)
-    return _czysty(tekst.en or tekst.zrodlo) if tekst is not None else ""
+    if tekst is None:
+        return ""
+    # bez PL: chiński w pinyin, nie angielski tytuł („Wooden Arrow” przy polskim opisie)
+    zh = tekst.zrodlo or ""
+    if re.search(r"[\u3400-\u9fff]", zh):
+        nazwa = pinyin_slownik.romanizuj(_czysty(zh))
+        nazwa = re.sub(r"[\u3400-\u9fff]", "", nazwa).strip(" ·,;/-")
+        if nazwa:
+            return nazwa
+    return _czysty(tekst.en or zh)
 
 
 def _cokolwiek_lacinskie(nazwa: str) -> str:
@@ -566,7 +575,12 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
         return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
 
     luzem = [k for k in sorted(pozycja, key=do_sortowania) if k not in pokryte]
-    bloki = bloki_chrono + (_podziel_na_bloki(luzem, wiersze) if luzem else [])
+    if bloki_chrono:
+        # `.cine` jest źródłem prawdy tej cutsceny. Sąsiednie wiersze puli
+        # (recytacja teatru cieni 591128–147 przy 30161) to inna scena, nie wariant.
+        bloki = bloki_chrono
+    else:
+        bloki = _podziel_na_bloki(luzem, wiersze) if luzem else []
     if not bloki_chrono and len(bloki) > 1:
         porzadek_blokow = sorted(range(len(bloki)),
                                  key=lambda i: _najwyzszy(bloki[i], wiersze), reverse=True)
@@ -715,6 +729,50 @@ def _wlasciciele_nagran(index: str | Path) -> dict[str, int]:
     return {rdzen: nums.pop() for rdzen, nums in rdzenie.items() if len(nums) == 1}
 
 
+def _filmy_cutscen(index: str | Path | None) -> dict[int, str]:
+    """Cutscena → nazwa filmu `.cine` (`index/cutsceny_meta.jsonl`)."""
+    if not index:
+        return {}
+    plik = Path(index) / "cutsceny_meta.jsonl"
+    if not plik.exists():
+        return {}
+    mapa: dict[int, str] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            wpis = json.loads(linia)
+            no, film = wpis.get("no"), wpis.get("film") or ""
+            if isinstance(no, int) and film:
+                mapa[int(no) % 10**8] = str(film)
+    return mapa
+
+
+def _faza_cine_walki(film: str) -> str | None:
+    """Faza walki world-bossa z nazwy `.cine`: śpiew (`cc`) / pole (`zc`).
+
+    `pyryw/sq001_pyscc` i `pys1/sq001_pys1cc` to pierwsza cutscena walki
+    (Mistrz Teatru Cieni faza I), `sq002_pyszc` / `pys1zc` — druga.
+    """
+    nazwa = (film or "").replace("\\", "/").rsplit("/", 1)[-1].lower()
+    nazwa = nazwa.rsplit(".", 1)[0]
+    if "pyscc" in nazwa or "pys1cc" in nazwa:
+        return "cc"
+    if "pyszc" in nazwa or "pys1zc" in nazwa:
+        return "zc"
+    return None
+
+
+def _podziel_osierocone_fazy(klucze: list[str], zh) -> dict[str, list[str]]:
+    """Recytacja przy 30161: do 擂鼓 — faza I (`cc`), od bębnów — faza II (`zc`)."""
+    if not klucze:
+        return {"cc": [], "zc": []}
+    split_i = next((i for i, k in enumerate(klucze) if "擂鼓" in (zh(k) or "")), None)
+    if split_i is None:
+        split_i = (len(klucze) + 1) // 2
+    return {"cc": klucze[:split_i], "zc": klucze[split_i:]}
+
+
 def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
     """Chronologia kwestii cutscen ze ścieżek audio `.cine` (gdy indeks istnieje).
 
@@ -752,11 +810,31 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                       if w.get("wiersz") and w.get("k")}
     kolejnosc_cutscen = _kolejnosc_kwestii_cutscen(index) if index else {}
     wlasciciele_nagran = _wlasciciele_nagran(index) if index else {}
+    filmy_cutscen = _filmy_cutscen(index)
     numery_cutscen = {int(w["n"]) for w in chronologia if w["t"] == "cutscena"}
     # wiersze przejęte przez chronologię cutscen znikają z „Napisów przerywnika"
     przejete = {r["k"] for numer, bloki in kolejnosc_cutscen.items()
                 if numer in numery_cutscen
                 for blok in bloki for r in blok if r.get("k")}
+    # kn cutsceny z `.cine` bywa nadziane sąsiadami puli (591128–147 przy 30161).
+    # Te klucze nie należą do osi — oddajemy je cutscenom walki (`pyscc`/`pyszc`).
+    osierocone: list[str] = []
+    widziane_osierocone: set[str] = set()
+    for wiersz_ch in chronologia:
+        if wiersz_ch.get("t") != "cutscena":
+            continue
+        numer = int(wiersz_ch["n"])
+        kol = kolejnosc_cutscen.get(numer) or kolejnosc_cutscen.get(numer % 10 ** 8)
+        if not kol:
+            continue
+        owned = {r["k"] for blok in kol for r in blok if r.get("k")}
+        for k in wiersz_ch.get("kn") or []:
+            if k and k not in owned and k not in widziane_osierocone:
+                widziane_osierocone.add(k)
+                osierocone.append(k)
+    osierocone.sort(key=lambda k: wiersze_napisow.get(k) or 0)
+    fazy_walki = _podziel_osierocone_fazy(osierocone, ix.zh)
+    przejete |= widziane_osierocone
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -826,6 +904,11 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             kolejnosc = kolejnosc_cutscen.get(numer)
+            faza = _faza_cine_walki(filmy_cutscen.get(numer % 10 ** 8, ""))
+            if faza and fazy_walki.get(faza) and not kolejnosc:
+                extra = [k for k in fazy_walki[faza] if k not in (wiersz.get("kn") or [])]
+                if extra:
+                    wiersz = {**wiersz, "kn": list(wiersz.get("kn") or []) + extra}
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
                                                             audio_napisow, kolejnosc,
                                                             zh=ix.zh,
@@ -1611,10 +1694,14 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
     widziane_linie: dict[str, set[str]] = {}
 
     def _klucz_grupy(name_key: str, tabela: str, kolumna: str, wiersz: str) -> tuple:
-        """Questy: jedna karta na nazwę (etapy razem). Przedmioty: jeden wiersz tabeli."""
+        """Questy i bossy: jedna karta na nazwę. Przedmioty-warianty: jeden wiersz."""
         if kolumna in ("task_target_str", "task_desc_str") or (tabela or "").startswith("tasks"):
             return (name_key, "")
-        return (name_key, wiersz)
+        t = tabela or ""
+        if t.startswith(("stuff", "bag", "arrows", "fashion", "equip", "weapon", "armor",
+                         "oversea_home", "compound", "all_homeland")):
+            return (name_key, wiersz)
+        return (name_key, "")
 
     def _meta(klucz: str):
         tekst = ix.teksty.get(klucz)
@@ -1678,7 +1765,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         if klucz in uzyte or klucz in pl:
             continue
         zrodlo = ix.zrodlo(tekst)
-        if not zrodlo or zrodlo[1] not in ("locate_describe", "backing_area"):
+        if not zrodlo or zrodlo[1] not in ("locate_describe", "backing_area",
+                                           "sidepage_boss_txt", "sidepage_boss_desc"):
             continue
         if len(tekst.w) < 3 or not isinstance(tekst.w[2], str):
             continue

@@ -216,6 +216,51 @@ class TestResztaBezZrodla(unittest.TestCase):
             "Leki z pospolitych roślin.",
         })
 
+    def test_boss_i_encyklopedia_jedna_karta(self):
+        class T:
+            def __init__(self, w, zh="", en=""):
+                self.w = w
+                self.zrodlo = zh
+                self.en = en
+
+        class Ix:
+            def __init__(self):
+                self.teksty = {
+                    "namek": T((478, "1"), zh="皮影·幕启", en="Puppeteer - Overture"),
+                    "opisk": T((2804, "842037", "namek"),
+                               zh="绳文绳武兄弟", en="The brothers Sheng Wen"),
+                }
+            def zrodlo(self, t):
+                if t.w[0] == 478:
+                    return ("baixiao_world_boss_data", "[].boss_name", t.w[1])
+                return ("manual_items", "describe", t.w[1])
+
+        linie = _reszta(Ix(), {
+            "namek": "Teatr cieni: kurtyna w górę",
+            "opisk": "Bracia Sheng Wen i Sheng Wu od dziecka utrzymywali się z teatru cieni.",
+        }, set(), {"reszta": 0})
+        self.assertEqual(linie.count("**Teatr cieni: kurtyna w górę**"), 1)
+        karta = linie[linie.index("**Teatr cieni: kurtyna w górę**"):]
+        koniec = next((i for i, l in enumerate(karta) if l.startswith("#")), len(karta))
+        karta = [l for l in karta[:koniec] if l]
+        self.assertIn("Bracia Sheng Wen i Sheng Wu od dziecka utrzymywali się z teatru cieni.", karta)
+
+    def test_nazwa_bez_pl_nie_jest_angielska(self):
+        from tools.czytanka_czysta import _nazwa_klucza
+
+        class T:
+            def __init__(self):
+                self.zrodlo = "木箭"
+                self.en = "Wooden Arrow"
+                self.w = (445, "102025")
+
+        class Ix:
+            teksty = {"k": T()}
+
+        nazwa = _nazwa_klucza(Ix(), "k", {})
+        self.assertNotEqual(nazwa, "Wooden Arrow")
+        self.assertTrue(nazwa)
+
 
 if __name__ == "__main__":
     unittest.main()
