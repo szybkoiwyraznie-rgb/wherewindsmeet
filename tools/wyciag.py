@@ -131,6 +131,7 @@ class Obserwator:
         self.filmy_napisy: list[dict] = []
         self.powtorki_cutscen: list[dict] = []
         self.manual_unlock: dict[int, int] = {}  # bowu_no -> unlock_stuff
+        self.manual_locate: dict[int, int] = {}  # bowu_no -> locate_describe text id
         # odwołania do dialogów
         self.pola: list[tuple[str, str]] = []
         self._numer_pola: dict[tuple[str, str], int] = {}
@@ -419,15 +420,23 @@ class Obserwator:
                 )
 
     def _t_manual_items(self, _name, key, row) -> None:
-        """Hasło encyklopedii bez `bowu_name` bywa odblokowywane przedmiotem (`unlock_stuff`)."""
+        """Hasło encyklopedii: `unlock_stuff` oraz `locate_describe` przy każdym wierszu.
+
+        `locate_describe` bywa tym samym tekstem w kilku hasłach (wrogowie Zielonego
+        Lasu). Wyciąg trzyma jeden `w` na hash, więc bez tej mapy lokalizacja
+        zostaje tylko przy pierwszym bowu.
+        """
         if not isinstance(row, dict):
             return
-        stuff = row.get("unlock_stuff")
-        if not isinstance(stuff, int) or isinstance(stuff, bool) or not stuff:
-            return
         bowu = row.get("bowu_no", key)
-        if isinstance(bowu, int) and not isinstance(bowu, bool):
+        if not isinstance(bowu, int) or isinstance(bowu, bool):
+            return
+        stuff = row.get("unlock_stuff")
+        if isinstance(stuff, int) and not isinstance(stuff, bool) and stuff:
             self.manual_unlock[bowu] = stuff
+        locate = row.get("locate_describe")
+        if isinstance(locate, int) and not isinstance(locate, bool) and locate > 0xFFFFFFFF:
+            self.manual_locate[bowu] = locate
 
     def _t_task_cutscene_replay(self, _name, key, row) -> None:
         if isinstance(row, dict):
@@ -821,6 +830,12 @@ def zbuduj(baza: baza_gry.Baza, zh: dict[int, str], en: dict[int, str], wyj: Pat
         wyj / "manual_unlock.jsonl",
         ({"bowu": bowu, "stuff": stuff}
          for bowu, stuff in sorted(obserwator.manual_unlock.items())),
+    )
+    pliki["manual_locate"] = zapisz_jsonl(
+        wyj / "manual_locate.jsonl",
+        ({"bowu": bowu, "k": k(tid)}
+         for bowu, tid in sorted(obserwator.manual_locate.items())
+         if k(tid)),
     )
 
     def postac(no: int) -> dict:

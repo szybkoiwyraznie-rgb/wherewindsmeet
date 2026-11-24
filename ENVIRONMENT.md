@@ -48,6 +48,15 @@ zależności i ostrzeżenia w [dzienniku](docs/EXPERIMENT_LOG.md); nie jest czę
 łatka (`tools/zbuduj_latke.py`, `tools/one_click_patch.py`) i instalator
 (`tools/build_installer_kit.py`) biorą wszystko z `index/`, `tlumaczenie/`
 i `zwrotki/` — **nie** z `google_drive/`, nie z `local/` i nie z Dysku.
+**Dysk Google, connector `download_file`:** zapisuje plik **na dysk sandboxa**
+(`google_drive/<nazwa>`, ścieżka w wyniku narzędzia). **Nie** wkleja bajtów
+do rozmowy i **nie** zwraca base64 do kontekstu. `curl`/`wget` na
+`drive.google.com` w sandboxie nie działa (sieć tylko GitHub/npm/PyPI).
+Potrzebny plik z Dysku → `download_file` → praca z `google_drive/…` → wynik
+indeksu/mapy do Gita; binarki gry zostają poza Git. Spis paczek:
+`index/paczki.json`, `docs/PLIKI_W_PACZKACH.md`. Rozpakowanie:
+`python3 tools/spis_paczek.py --zrodlo google_drive --rozpakuj local/dane`.
+
 Pliki z Dysku (baza gry, paczki aktualizacji) są **tylko** materiałem do
 inwestygacji: czytają je narzędzia `tools/szukaj_w_bazie.py`,
 `tools/cutsceny_z_bazy.py`, `tools/pamiatki_z_bazy.py`, `tools/poi_z_bazy.py`

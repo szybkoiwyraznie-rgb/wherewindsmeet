@@ -91,9 +91,9 @@ _NAZWA = re.compile(r"name|title|bowu|imie", re.I)
 # Kolumny z definicją hasła. Świadomie nie ma tu `content`, `story_*`, `page_*`,
 # `talk_content`, `tips` — to opowieści i streszczenia scen, nie opisy.
 _OPIS = re.compile(r"describe|description|intro|^des$|job_info|npc_desc", re.I)
-# Kolejność: najpierw treść z ekranu przedmiotu (`story_describe_str`), potem krótki opis.
+# Kolejność na karcie: lokalizacja → krótki opis → treść → cytat.
 _OPIS_KOLEJNOSC = (
-    "story_describe_str", "describe_str", "describe", "brief_describe_str", "introduction",
+    "describe_str", "brief_describe_str", "describe", "story_describe_str", "introduction",
     "introduction_long", "description", "jianghu_brief_description", "job_info",
     "npc_desc", "des", "introduction_location", "introduction_short",
     "extra_describe_1", "generation_description", "sidepage_boss_desc",
@@ -1488,17 +1488,18 @@ class PoleHasla:
 
 
 # Kolejność pól na karcie (niżej = później). Questy: 50 + etap łańcucha gry.
+# Lokalizacja → krótki opis (`describe_str` / `describe`) → treść (`story_describe_str`) → cytat.
 _KOLUMNA_KOLEJNOSC = {
     "locate_describe": 10,
     "backing_area": 11,
-    "story_describe_str": 20,
-    "describe_str": 21,
-    "brief_describe_str": 22,
-    "describe": 23,
-    "introduction": 24,
-    "introduction_short": 25,
-    "description": 31,
-    "introduction_long": 32,
+    "describe_str": 20,
+    "brief_describe_str": 21,
+    "describe": 22,
+    "story_describe_str": 30,
+    "introduction": 31,
+    "introduction_short": 32,
+    "description": 33,
+    "introduction_long": 34,
     "shiyi_show_word": 40,
     "extra_describe_1": 45,
     "shiyi_show_word_from": 80,
@@ -1645,24 +1646,61 @@ def _wczytaj_manual_unlock(katalog: str | Path) -> dict[str, str]:
     return mapa
 
 
+def _wczytaj_manual_locate(katalog: str | Path) -> dict[str, str]:
+    """`manual_items.locate_describe` przy KAŻDYM wierszu, także przy wspólnym hashu.
+
+    Wyciąg trzyma jeden `w` na tekst, więc przy tym samym chińskim lokalizacji
+    (n wrogów, jeden string) w `teksty` zostaje tylko pierwszy bowu. Ten plik
+    odtwarza pole z bazy dla każdego hasła.
+    """
+    p = Path(katalog) / "manual_locate.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, str] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            if r.get("k"):
+                mapa[str(r["bowu"])] = str(r["k"])
+    return mapa
+
+
 def _nazwy_przedmiotow(ix) -> dict[str, str]:
-    """Id przedmiotu (`stuff`/`arrows`/`bag`) → klucz tekstu-nazwy."""
+    """Id przedmiotu (`stuff`/`arrows`/`bag`) → klucz tekstu-nazwy.
+
+    Kolumna `name`/`arrow_name` bywa tym samym hashem co nazwa w innej tabeli
+    (`canteen_cook_ingredient`, `compound_recipe_data`, …), więc główne źródło
+    tekstu nie wskazuje przedmiotu. Wtedy nazwa siedzi w etykiecie wiersza
+    (`w[2]`, `indeks.nazwa_wiersza`) przy opisie z tabeli przedmiotu — to pole
+    `name` tego samego wiersza bazy, wybrane przez `etykieta_wiersza`.
+    """
     waga = {nazwa: i for i, nazwa in enumerate(_TABELE_NAZWY_PRZEDMIOTU)}
-    najlepsze: dict[str, tuple[int, str]] = {}
+    # (priorytet tabeli, 0=kolumna name, 1=etykieta wiersza)
+    najlepsze: dict[str, tuple[int, int, str]] = {}
     for klucz, tekst in ix.teksty.items():
         if not tekst.w or len(tekst.w) < 2:
             continue
         zrodlo = ix.zrodlo(tekst) if tekst.w else None
-        if not zrodlo or zrodlo[1] not in _KOLUMNY_NAZWY_PRZEDMIOTU:
+        if not zrodlo:
             continue
         tabela = zrodlo[0]
         if tabela not in waga:
             continue
         sid = str(tekst.w[1])
         priorytet = waga[tabela]
-        if sid not in najlepsze or priorytet < najlepsze[sid][0]:
-            najlepsze[sid] = (priorytet, klucz)
-    return {sid: klucz for sid, (_p, klucz) in najlepsze.items()}
+        if zrodlo[1] in _KOLUMNY_NAZWY_PRZEDMIOTU:
+            kandydat, skad = klucz, 0
+        else:
+            etykieta = tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str) else None
+            if not etykieta:
+                continue
+            kandydat, skad = etykieta, 1
+        teraz = (priorytet, skad, kandydat)
+        if sid not in najlepsze or teraz[:2] < najlepsze[sid][:2]:
+            najlepsze[sid] = teraz
+    return {sid: k for sid, (_p, _s, k) in najlepsze.items()}
 
 
 def _wczytaj_bowu_story(katalog: str | Path) -> dict[str, list[str]]:
@@ -1730,17 +1768,62 @@ def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
             wpis["etykiety"].add(_kategoria(zrodlo[0]))
 
 
+def _dolacz_locate_manual(hasla: dict, ix, pl: dict[str, str],
+                          manual_locate: dict[str, str] | None) -> None:
+    """`locate_describe` z każdego wiersza `manual_items`, nie tylko z głównego `w`.
+
+    Ten sam chiński (np. lokalizacja Zielnego Lasu) stoi w kilku hasłach wrogów.
+    Wyciąg zostawia jeden `w`, więc karta 841003 gubiłaby lokalizację 841001.
+    `manual_locate.jsonl` ma bowu → klucz tekstu dla każdego wiersza bazy.
+    """
+    if not manual_locate:
+        return
+    bowu_do_nazwy: dict[str, str] = {}
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        if not zrodlo or zrodlo[0] != "manual_items" or zrodlo[1] != "describe":
+            continue
+        nk = tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str) else None
+        if nk:
+            bowu_do_nazwy[str(tekst.w[1])] = nk
+    if not bowu_do_nazwy:
+        return
+    karty_po_nazwie: dict[str, list] = {}
+    for grupa, wpis in hasla.items():
+        karty_po_nazwie.setdefault(grupa[0], []).append(wpis)
+    for bowu, locate_k in manual_locate.items():
+        name_key = bowu_do_nazwy.get(bowu)
+        if not name_key:
+            continue
+        tekst_pl = pl.get(locate_k) or ""
+        if not tekst_pl:
+            surowe = _z_gry(ix, locate_k)
+            if not surowe:
+                continue
+            tekst_pl = GWIAZDKA + surowe
+        for wpis in karty_po_nazwie.get(name_key, ()):
+            if any(p.kolumna == "locate_describe" for p in wpis["pola"]):
+                continue
+            wpis["pola"].append(PoleHasla(
+                tekst_pl, "manual_items", "locate_describe", bowu, locate_k))
+
+
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             krainy: list[dict] | None = None,
             bowu_story: dict[str, list[str]] | None = None,
-            manual_unlock: dict[str, str] | None = None) -> list[str]:
+            manual_unlock: dict[str, str] | None = None,
+            manual_locate: dict[str, str] | None = None) -> list[str]:
     """Co nie trafiło do 01 — karty wielolinijkowe, pola w kolejności kolumn gry."""
     hasla: dict[tuple, dict] = {}  # (name_key, wiersz|'') → {nazwa, pola, etykiety}
     bez_nazwy: dict[str, list[str]] = {}
     widziane_linie: dict[str, set[str]] = {}
+    katalog = getattr(ix, "katalog", None)
     if manual_unlock is None:
-        katalog = getattr(ix, "katalog", None)
         manual_unlock = _wczytaj_manual_unlock(katalog) if katalog else {}
+    if manual_locate is None:
+        manual_locate = _wczytaj_manual_locate(katalog) if katalog else {}
     nazwy_rzeczy = _nazwy_przedmiotow(ix) if manual_unlock else {}
 
     def _klucz_grupy(name_key: str, tabela: str, kolumna: str, wiersz: str) -> tuple:
@@ -1785,13 +1868,16 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         if meta is None:
             continue
         _t, tabela, kolumna, wiersz, name_key = meta
-        if not name_key and tabela == "manual_items":
-            stuff = (manual_unlock or {}).get(wiersz)
-            if stuff:
-                name_key = nazwy_rzeczy.get(stuff)
+        stuff_id = None
+        if tabela == "manual_items":
+            stuff_id = (manual_unlock or {}).get(wiersz)
+            if not name_key and stuff_id:
+                name_key = nazwy_rzeczy.get(stuff_id)
         etykieta = _kategoria(tabela)
         statystyka["reszta"] += 1
         grupa = _klucz_grupy(name_key or "", tabela, kolumna, wiersz)
+        if name_key and stuff_id:
+            grupa = (name_key, stuff_id)
         if not name_key or _NAZWA.search(kolumna or ""):
             if not name_key:
                 zbior = widziane_linie.setdefault(etykieta, set())
@@ -1837,6 +1923,7 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
         wpis["etykiety"].add(_kategoria(zrodlo[0]))
 
     _dolacz_lokalizacje_bowu(hasla, ix, pl, bowu_story)
+    _dolacz_locate_manual(hasla, ix, pl, manual_locate)
 
     def _etykieta_hasla(wpis: dict) -> str:
         etykiety = wpis["etykiety"]

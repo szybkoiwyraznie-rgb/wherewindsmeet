@@ -21,8 +21,8 @@ class TestKartaHasla(unittest.TestCase):
         ])
         self.assertEqual(linie, [
             "**Ochłapy mięsa**",
-            "Mięso drobnych zwierząt.",
             "Soczyste ochłapy mięsa. Zastosowań wiele.",
+            "Mięso drobnych zwierząt.",
         ])
         self.assertNotIn("", linie)
 
@@ -99,10 +99,12 @@ class TestWagaPola(unittest.TestCase):
         b = pole("d", "task_desc_str", "330002")
         self.assertLess(_waga_pola(b), _waga_pola(a))
 
-    def test_story_przed_describe(self):
+    def test_krotki_opis_przed_tresc(self):
         a = pole("s", "story_describe_str")
         b = pole("d", "describe_str")
-        self.assertLess(_waga_pola(a), _waga_pola(b))
+        self.assertLess(_waga_pola(b), _waga_pola(a))
+        self.assertLess(_waga_pola(pole("e", "describe")), _waga_pola(a))
+        self.assertLess(_waga_pola(pole("l", "locate_describe")), _waga_pola(b))
 
 
 class _Tekst:
@@ -338,6 +340,80 @@ class TestManualUnlockStuff(unittest.TestCase):
         }, set(), {"reszta": 0}, manual_unlock={})
         self.assertNotIn("**Drewniana strzała**", linie)
         self.assertIn("Strzały strugane z drewna.", linie)
+
+    def test_nazwa_z_etykiety_wiersza_gdy_hash_w_innej_tabeli(self):
+        """540002: `bag_search.name` to ten sam hash co składnik kuchni — nazwa z w[2]."""
+        ix = self._ix({
+            "jajko": ((688, "2"), "dan"),
+            "opis_bag": ((3284, "540002", "jajko"), "ptasie jajo"),
+            "ency": ((2804, "122008"), "opis jajka"),
+        })
+        ix.mapa = {
+            id(ix.teksty["jajko"]): ("canteen_cook_ingredient", "ingredient_name", "2"),
+            id(ix.teksty["opis_bag"]): ("oversea_home_entry_bag_search", "describe_str", "540002"),
+            id(ix.teksty["ency"]): ("manual_items", "describe", "122008"),
+        }
+        linie = _reszta(ix, {
+            "jajko": "Jajko",
+            "opis_bag": "Jaja ptaków, żółwi lub węży.",
+            "ency": "Ptasie jajo o prostym wzorze.",
+        }, set(), {"reszta": 0}, manual_unlock={"122008": "540002"})
+        self.assertGreaterEqual(linie.count("**Jajko**"), 1)
+        self.assertTrue(any(
+            "Ptasie jajo o prostym wzorze." in linie[i:i + 8]
+            for i, l in enumerate(linie) if l == "**Jajko**"
+        ))
+
+    def test_encyklopedia_i_przedmiot_jedna_karta(self):
+        """414037 → 540012: krótki opis encyklopedii i story przedmiotu razem."""
+        ix = self._ix({
+            "skora": ((3283, "540012"), "cumaopi"),
+            "story": ((3286, "540012", "skora"), "story skory"),
+            "ency": ((2804, "414037"), "opis encyklopedii"),
+        })
+        ix.mapa = {
+            id(ix.teksty["skora"]): ("oversea_home_entry_bag_search", "name", "540012"),
+            id(ix.teksty["story"]): ("oversea_home_entry_bag_search", "story_describe_str", "540012"),
+            id(ix.teksty["ency"]): ("manual_items", "describe", "414037"),
+        }
+        linie = _reszta(ix, {
+            "skora": "Gruba skóra z sierścią",
+            "story": "Skóra z sierścią zwykłych dzikich zwierząt, szorstka; zdaje się mieć wiele zastosowań.",
+            "ency": "Futra zwykłych dzikich zwierząt, o szorstkiej skórze, nadają się na materiał.",
+        }, set(), {"reszta": 0}, manual_unlock={"414037": "540012"})
+        self.assertEqual(linie.count("**Gruba skóra z sierścią**"), 1)
+        i = linie.index("**Gruba skóra z sierścią**")
+        karta = [l for l in linie[i:i + 6] if l and not l.startswith("#")]
+        self.assertEqual(karta[:3], [
+            "**Gruba skóra z sierścią**",
+            "Futra zwykłych dzikich zwierząt, o szorstkiej skórze, nadają się na materiał.",
+            "Skóra z sierścią zwykłych dzikich zwierząt, szorstka; zdaje się mieć wiele zastosowań.",
+        ])
+
+    def test_locate_wroga_z_mapy_kazdego_wiersza(self):
+        """841003 dzieli locate z 841001 — mapa bowu→klucz, nie główne `w`."""
+        ix = self._ix({
+            "nazwa": ((1440, "96014"), "lulinmaozei"),
+            "opis": ((2804, "841003", "nazwa"), "opis wroga"),
+        })
+        ix.mapa = {
+            id(ix.teksty["nazwa"]): ("entity_billboard", "name", "96014"),
+            id(ix.teksty["opis"]): ("manual_items", "describe", "841003"),
+        }
+        ix.teksty["lok"] = type(ix.teksty["nazwa"])((2810, "841001"), "lokacja zh")
+        ix.mapa[id(ix.teksty["lok"])] = ("manual_items", "locate_describe", "841001")
+        linie = _reszta(ix, {
+            "nazwa": "Szkodnik z Zielonego Lasu",
+            "opis": "Zbój z Zielonego Lasu grasujący po okolicach Qinghe.",
+            "lok": "Zielne Bezdroża i Góra Ukrytego Księżyca, kryjówki i okolice",
+        }, set(), {"reszta": 0}, manual_locate={"841003": "lok"})
+        i = linie.index("**Szkodnik z Zielonego Lasu**")
+        karta = [l for l in linie[i:i + 6] if l and not l.startswith("#")]
+        self.assertEqual(karta[:3], [
+            "**Szkodnik z Zielonego Lasu**",
+            "Zielne Bezdroża i Góra Ukrytego Księżyca, kryjówki i okolice",
+            "Zbój z Zielonego Lasu grasujący po okolicach Qinghe.",
+        ])
 
 
 if __name__ == "__main__":

@@ -30,6 +30,15 @@ kod patchera.
    nie proś o hasła, tokeny ani kody 2FA. Jeśli push lub PR jest niemożliwy,
    powiedz o tym wprost i nie przedstawiaj pracy jako wypchniętej.
 
+## Dysk Google
+
+Connector `google_drive` / `download_file` **zapisuje plik w sandboxie**
+(`google_drive/<nazwa>`). Nie wrzuca treści do czatu, nie zwraca base64.
+Sandbox nie ma sieci do Dysku (`curl` padnie). Gdy zadanie wymaga bazy gry
+albo paczki z Dysku: pobierz `download_file`, pracuj na pliku, wynik indeksu
+zacommituj i wypchnij. Nie odkładaj tego na właściciela i nie tłumacz, że
+„plik jest za duży na rozmowę”.
+
 ## Zasady projektu
 
 - Pliki gry, ich zmodyfikowane kopie, archiwa, zapisy i prywatne dane zostają
