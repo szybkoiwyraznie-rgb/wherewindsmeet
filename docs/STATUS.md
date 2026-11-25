@@ -1,6 +1,6 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-20**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-25**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
 
 **Audyt zakresu tymczasowego AI (2026-11-20)** — pełne zestawienie:
@@ -40,22 +40,24 @@ a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
 `--slotki` zwraca pustkę („brak kwestii z pozycją”). Domknięta jest też
 **cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
 — w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
-Magazyn **152 014**. Z magazynu zbudowano gotową łatkę
-**`WWM_Spolszczenie_PL_v0.9.0.zip`** (12 707 909 B, 152 358 kluczy:
-152 014 przekłady + 670 bliźniaków `__grey`, 326 wariantów płci, 770 kolizji
-odłożonych; SHA-256 `3eb8094756b96c7bcc6ee0f58b996cbaef41a4ff162b72fed70d69a4f1fe941d`)
-— `one_click_patch.py --tylko-magazyn --wydanie v0.9.0`. Wgrana na Dysk
-właściciela (folder pakietów, id `1F5UhsXkTzL6AYA3K5v7ZVT6BtOyhLcTl`):
-https://drive.google.com/file/d/1F5UhsXkTzL6AYA3K5v7ZVT6BtOyhLcTl/view
-v0.8.0 (`19D6Tkj8ujfcfAj0yf2JZ_C-vIP0lBUv5`) zostaje na Dysku. Uwaga na nazwę:
+Magazyn **158 768** (32,43% z 489 544) po zwrotce tłumacza **`WWM_PL_v8.zip`**
+(123 642 wypełnione `PL:`: +6 751 nowych, 4 639 nadpisanych ze szkicu AI,
+112 250 bez zmian; 2 odrzuty tokenów `#E`/`#Y`). Raport:
+`zwrotki/raport_scalenia_WWM_PL_v8.json`. Łatka
+**`WWM_Spolszczenie_PL_v0.11.0.zip`** (13 472 353 B, 159 000 kluczy:
+158 768 przekłady + 666 bliźniaków `__grey`; SHA-256
+`1eb163013784c24072400c87a4ee3d092f7d0dc5fe1e9261ab7f127ba043db19`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.11.0`. Wgrana na Dysk
+(folder pakietów, id `13Eubegb9lu84N2CbKxCLmcZ2shadNpzU`):
+https://drive.google.com/file/d/13Eubegb9lu84N2CbKxCLmcZ2shadNpzU/view
+v0.10.0 (`1f-o0WHcRngYGQM74GTo1RUdRj_gyMfWs`) i v0.9.0 zostają. Uwaga na nazwę:
 wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip` (styl v0.5.0), nie
-`WWM_Latka_PL_*`. Nie testowana w grze. Różnica v0.8.0→v0.9.0: układ czytanki
-(karty 02, lokalizacja 832009, cutscena 30163); magazyn bez nowych kluczy.
-Obok leży **Czytanka v30** (`czytanka_v30.zip`, 9 010 834 B, SHA-256
-`d595eade6663a7b95b4e65db5234aa15cc13bd1bd82beca093c2f5ec34bf0c5a`,
-id `1aMpo1ddfJ74bpBwSh6wBtN8Hbxrf92MW`) — `tools/czytanka_czysta.py`,
-`01` w 8 częściach, `02` w 4. **Ostatnia czytanka przed nią to v29**
-(`czytanka_v29.zip`, id `1nhL9mL3qTP0xbIGV9kDwC3AarH5zOOnm`).
+`WWM_Latka_PL_*`. Nie testowana w grze.
+Obok leży **Czytanka v32** (`czytanka_v32.zip`, 8 872 582 B, SHA-256
+`389cfefe36eff3bcb58a137936290da8939bb578dd569101e5ea76c12709545f`,
+id `12ZQQGtliVMu9jhhxB9hdkfj2TjYpOv-q`) — `tools/czytanka_czysta.py --wersja 32`,
+75 279 jednostek, 53 989 linii, 117 589 reszta. **Ostatnia czytanka przed nią to v31**
+(`czytanka_v31.zip`, id `105JZyrq02bQeOkpkmWak2f1vujffgW9x`).
 Czytanki NIE buduje się
 `buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
 numer wersji ustalać z tego pliku, nie z pamięci sesji.

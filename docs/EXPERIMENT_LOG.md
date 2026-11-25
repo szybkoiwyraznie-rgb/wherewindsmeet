@@ -3660,3 +3660,19 @@ Format `klucz:`/`PL:` bez zmian. Magazyn bez 37 899 kluczy AI.
   `1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`.
   Dysk `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`. 488 247 miejsc PL,
   **114 771** przekładów tłumacza, kontrola zgodna. v7 zostaje.
+
+## 2026-11-25 (36) — zwrotka tłumacza WWM_PL_v8, łatka v0.11.0, Czytanka v32
+
+Import `WWM_PL_v8.zip` do magazynu: 137 plików, 123 642 wypełnione `PL:`,
++6 751 nowych, 4 639 zmienionych (szkic AI → tłumacz), 112 250 bez zmian;
+2 odrzuty tokenów (`#E`/`#Y` w `09_pozostale_01.md`). Magazyn **158 768**
+(32,43%). Raport: `zwrotki/raport_scalenia_WWM_PL_v8.json`.
+
+- **`WWM_Spolszczenie_PL_v0.11.0.zip`** 13 472 353 B, SHA-256
+  `1eb163013784c24072400c87a4ee3d092f7d0dc5fe1e9261ab7f127ba043db19`.
+  Dysk `13Eubegb9lu84N2CbKxCLmcZ2shadNpzU`. 159 000 kluczy z bliźniakami.
+  `one_click_patch.py --tylko-magazyn --wydanie v0.11.0`. v0.10.0 zostaje.
+- **`czytanka_v32.zip`** 8 872 582 B, SHA-256
+  `389cfefe36eff3bcb58a137936290da8939bb578dd569101e5ea76c12709545f`.
+  Dysk `12ZQQGtliVMu9jhhxB9hdkfj2TjYpOv-q`. `czytanka_czysta.py --wersja 32`.
+  v31 zostaje.

@@ -1,0 +1,64 @@
+{
+ "format": "wwm-import-v1",
+ "plikow": 137,
+ "liczby": {
+  "miejsc_pl": 461270,
+  "puste": 337628,
+  "nowe": 6751,
+  "zmienione": 4639,
+  "bez_zmian": 112250
+ },
+ "odrzucone": 2,
+ "problemy_wg_rodzaju": {
+  "tokeny": 2
+ },
+ "problemy": [
+  {
+   "rodzaj": "tokeny",
+   "plik": "WWM_PL_v8.zip!PL/widoki/09_pozostale_01.md",
+   "linia": 28369,
+   "klucz": "b1196aba0f5f6d1c",
+   "brakuje": [],
+   "nadmiar": [
+    "#E",
+    "#Y"
+   ]
+  },
+  {
+   "rodzaj": "tokeny",
+   "plik": "WWM_PL_v8.zip!PL/widoki/09_pozostale_01.md",
+   "linia": 30297,
+   "klucz": "9f844bb3748bcbb8",
+   "brakuje": [],
+   "nadmiar": [
+    "#E",
+    "#Y"
+   ]
+  }
+ ],
+ "problemow_pominietych_w_raporcie": 0,
+ "magazyn": {
+  "przekladow": 158768,
+  "miejsc_w_grze": 489544,
+  "procent": 32.43
+ },
+ "zapisane_pliki": [
+  "pl_0.jsonl",
+  "pl_1.jsonl",
+  "pl_2.jsonl",
+  "pl_3.jsonl",
+  "pl_4.jsonl",
+  "pl_5.jsonl",
+  "pl_6.jsonl",
+  "pl_7.jsonl",
+  "pl_8.jsonl",
+  "pl_9.jsonl",
+  "pl_a.jsonl",
+  "pl_b.jsonl",
+  "pl_c.jsonl",
+  "pl_d.jsonl",
+  "pl_e.jsonl",
+  "pl_f.jsonl",
+  "pl_warianty.jsonl"
+ ]
+}
