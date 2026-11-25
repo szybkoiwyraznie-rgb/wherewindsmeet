@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Pełna Czytanka WWM: trzy warstwy treści + chronologia z gry.
+"""⚠ PRZESTARZAŁE (OBSOLETE) — NIE UŻYWAĆ do budowy czytanek.
+
+Czytankę dla właściciela (`czytanka_v*.zip`, pliki `01 - …` / `02 - …` + README)
+buduje wyłącznie `tools/czytanka_czysta.py`. Ten skrypt zostaje w repozytorium
+jako narzędzie audytowe (zestaw techniczny: epizody / kontekst / reszta) —
+służy do weryfikacji danych, a nie do wydań. Rejestr: `docs/NARZEDZIA_PRZESTARZALE.md`,
+lista dla testu: `tools/przestarzale.txt`. Uruchomienie z linii poleceń wypisuje
+ostrzeżenie na stderr.
+
+Pełna Czytanka WWM: trzy warstwy treści + chronologia z gry.
 
 Układ pakietu (to jest ta „trójka”, o której mówi projekt):
 
@@ -24,6 +33,8 @@ Użycie:
         --zip dist/WWM_Czytanka_pelna_2026-11-14.zip
 """
 
+
+
 from __future__ import annotations
 
 import argparse
@@ -36,6 +47,10 @@ import sys
 import zipfile
 from pathlib import Path
 
+_OSTRZEZENIE_OBSOLETE = (
+    "UWAGA: narzędzie PRZESTARZAŁE (obsolete) — nie służy do budowy czytanek dla właściciela.\n"
+    "Wydania czytanek buduje tools/czytanka_czysta.py; szczegóły: docs/NARZEDZIA_PRZESTARZALE.md."
+)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools import buduj_czytanke_gry  # noqa: E402
@@ -200,4 +215,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    print(_OSTRZEZENIE_OBSOLETE, file=sys.stderr)
     raise SystemExit(main())

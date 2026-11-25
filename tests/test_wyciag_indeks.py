@@ -35,6 +35,9 @@ ZH = {
     T + 81: "Historia",
     T + 82: "Dawno temu…",
     T + 90: "Plansza przerywnika",
+    T + 100: "opis szkodnika",
+    T + 101: "Zielne Bezdroża i Góra Ukrytego Księżyca, kryjówki i okolice",
+    T + 103: "opis marudera",
 }
 EN = {
     T + 1: "smith line",
@@ -85,6 +88,10 @@ def tables() -> dict:
         "spaces.s7.entity": [(9001, {"npc_no": 700, "serial_id": 9001})],
         "space_info": [(7, {"name": T + 40, "fb_name": "kuznia_robocza"})],
         "stuff_items": [(1, {"name": T + 20, "describe_str": T + 21}), (2, {"name": T + 22})],
+        "manual_items": [
+            (841001, {"bowu_no": 841001, "describe": T + 103, "locate_describe": T + 101}),
+            (841003, {"bowu_no": 841003, "describe": T + 100, "locate_describe": T + 101}),
+        ],
         "entity_attr": [(55, {"id": 55, "introduction": T + 50})],
         "world_view_person_info": [(4, {"id": 4, "name": T + 80, "story": [41]})],
         "world_view_person_event": [(41, {"id": 41, "title": T + 81, "description": T + 82})],
@@ -244,6 +251,17 @@ class ExtractTests(unittest.TestCase):
         napisy = {row["wiersz"]: row for row in ix.cutsceny_kontekst["napis"]}
         self.assertEqual(napisy[590438]["k"], k_cut)
         self.assertEqual(napisy[590439]["audio"], "vo_sm_sxdm4_cs_yd_01")
+
+    def test_manual_locate_kazdy_wiersz_mimo_wspolnego_hasha(self):
+        sciezka = self.out / "manual_locate.jsonl"
+        self.assertTrue(sciezka.is_file())
+        wiersze = [json.loads(l) for l in sciezka.read_text(encoding="utf-8").splitlines() if l.strip()]
+        mapa = {r["bowu"]: r["k"] for r in wiersze}
+        self.assertEqual(mapa[841001], mapa[841003])
+        self.assertEqual(mapa[841001], K("Zielne Bezdroża i Góra Ukrytego Księżyca, kryjówki i okolice"))
+        lok = self.indeks.teksty[mapa[841001]]
+        self.assertEqual(lok.n, 1)
+        self.assertEqual(self.indeks.zrodlo(lok)[2], "841001")
 
 
 if __name__ == "__main__":

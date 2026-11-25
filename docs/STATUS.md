@@ -1,7 +1,91 @@
 # Stan projektu
 
-Aktualizacja: **2026-11-19**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
+Aktualizacja: **2026-11-25**. Punkt wejścia dla kolejnej sesji. Cel i kryteria
 akceptacji: [CEL.md](CEL.md). Historia prób: [dziennik](EXPERIMENT_LOG.md).
+
+**Audyt zakresu tymczasowego AI (2026-11-20)** — pełne zestawienie:
+[AUDYT_ZAKRESU_AI.md](AUDYT_ZAKRESU_AI.md), narzędzie `tools/audyt_zakresu.py`.
+Wszystkie **25 696** unikalnych kluczy z 328 plików zwrotek AI jest
+w magazynie (0 brakujących wpisów; magazyn **139 653** przekłady, 28,53%
+miejsc w grze). Kategorie właściciela: (1) hinty zadań **8 936/8 936 =
+100%**, (2) listy **1 063/1 063 = 100%**, (3) przedmioty fabularne
+**4 979/4 981** (2 cytaty klasyczne), (4) opisy przedmiotów `ccs_text_msg`
+**5 282/5 282**, (5) Compendium **330/1 524** — brakuje **486 nazw**
+(141 nazw działów, 334 tytuły haseł, 9 przycisków, 2 pozostałe), (6) kwestie
+w scenach pierwszej prowincji (燕南) **8 559/42 455 = 20,2%**; brakuje
+**33 896** kluczy, w tym przykład właściciela ze sceny `1026070`. To prawie
+wyłącznie **jednolinijkowe odzywki NPC** (mediana 19 znaków, 82% ≤30 znaków,
+8 103 scenki jednoelementowe, 8 788 kluczy z flagą `vo_amb*`), a nie dialog
+fabularny; podział: kity ambientowe **4 893**, wyzwalacze `spaces.*`
+**11 369** (tam trafia scena `1026070`), sceny zadań **6 198**, bez powiązania
+**11 436**.
+`programmer_text_msg` (4 128 braków) to etykiety UI, nie opisy przedmiotów —
+poza zakresem. **Zainstalowana łatka `v0.5.0` (112 405 przekładów) nie zawiera
+partii tymczasowych** — bez nowej łatki z bieżącego magazynu właściciel nadal
+widzi po angielsku treści, które już są przetłumaczone. Następny krok:
+zbudować łatkę `v0.6.0` z magazynu, potem domknąć nazwy Compendium (486)
+i wybrane sceny pierwszej prowincji. Geograficznie da się te kwestie zawęzić: **10 683 z 11 369** mają pozycję
+w świecie (`tools/barks_regiony.py`); pierścienie od startu gry: ≤200 m — 384,
+≤400 m — 1 372, ≤800 m — 3 596, ≤1 000 m — 4 523, ≤1 600 m — 5 952. Partie:
+60 najbliższych (`barks_start_aa`), 170 kolejnych (`ab`) i 21 partii po 200
+(`ac`–`aw`, z `aq` 203 i `aw` 97) — razem **4 330 kwestii** z pierścienia
+≤1 000 m, magazyn **143 983** (29,41%), 0 odrzuceń. **Pierścienie ≤200 m,
+≤400 m, ≤800 m i ≤1 000 m domknięte w 100%** — cały obowiązkowy promień
+(<400 m) i preferencyjny (<1 000 m) z polecenia właściciela ma przekład;
+pierścień ≤1 600 m domknięty w 100% (5 952/5 952, partie `ax`–`bd`),
+pierścień ≤3 200 m domknięty w 100% (6 832/6 832, partie `be`–`bj`);
+wszystkie progi do 6 400 m są **domknięte w 100%** (partie `bk`–`bu`).
+Pierścień 6 400–12 000 m domknięty partiami `bv`–`cb` (**1 824/1 824**),
+a **pierścień ≤12 000 m jest domknięty w 100% (10 940/10 940)** — lista
+`--slotki` zwraca pustkę („brak kwestii z pozycją”). Domknięta jest też
+**cała grupa kwestii wyzwalanych w świecie: 11 713 kluczy, 0 bez przekładu**
+— w tym 773 kwestie bez pozycji w świecie (partie `cc` 250 i `cd` 459).
+Magazyn **158 768** (32,43% z 489 544) po zwrotce tłumacza **`WWM_PL_v8.zip`**
+(123 642 wypełnione `PL:`: +6 751 nowych, 4 639 nadpisanych ze szkicu AI,
+112 250 bez zmian; 2 odrzuty tokenów `#E`/`#Y`). Raport:
+`zwrotki/raport_scalenia_WWM_PL_v8.json`. Łatka
+**`WWM_Spolszczenie_PL_v0.11.0.zip`** (13 472 353 B, 159 000 kluczy:
+158 768 przekłady + 666 bliźniaków `__grey`; SHA-256
+`1eb163013784c24072400c87a4ee3d092f7d0dc5fe1e9261ab7f127ba043db19`)
+— `one_click_patch.py --tylko-magazyn --wydanie v0.11.0`. Wgrana na Dysk
+(folder pakietów, id `13Eubegb9lu84N2CbKxCLmcZ2shadNpzU`):
+https://drive.google.com/file/d/13Eubegb9lu84N2CbKxCLmcZ2shadNpzU/view
+v0.10.0 (`1f-o0WHcRngYGQM74GTo1RUdRj_gyMfWs`) i v0.9.0 zostają. Uwaga na nazwę:
+wydania instalowalne mają wzór `WWM_Spolszczenie_PL_v*.zip` (styl v0.5.0), nie
+`WWM_Latka_PL_*`. Nie testowana w grze.
+Obok leży **Czytanka v32** (`czytanka_v32.zip`, 8 872 582 B, SHA-256
+`389cfefe36eff3bcb58a137936290da8939bb578dd569101e5ea76c12709545f`,
+id `12ZQQGtliVMu9jhhxB9hdkfj2TjYpOv-q`) — `tools/czytanka_czysta.py --wersja 32`,
+75 279 jednostek, 53 989 linii, 117 589 reszta. **Ostatnia czytanka przed nią to v31**
+(`czytanka_v31.zip`, id `105JZyrq02bQeOkpkmWak2f1vujffgW9x`).
+Czytanki NIE buduje się
+`buduj_czytanki.py` (to zestaw techniczny), tylko `czytanka_czysta.py`;
+numer wersji ustalać z tego pliku, nie z pamięci sesji.
+Narzędzia starych czytanek (`buduj_czytanki.py`, `zbuduj_czytanke_pelna.py`,
+`buduj_czytanke_gry.py`, `powiazania_czytanek.py`) są oznaczone jako **PRZESTARZAŁE**
+— rejestr: [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md), lista maszynowa
+`tools/przestarzale.txt`, pilnuje `tests/test_narzedzia_przestarzale.py`.
+Dla tłumacza leży **pakiet v8** (`paczka_dla_tlumacza_wwm_v8.zip`,
+51 056 749 B, SHA-256 `1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`,
+id `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`):
+https://drive.google.com/file/d/1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe/view
+488 247 miejsc PL, **114 771** przekładów tłumacza (`PL: tekst`), **bez
+tymczasowych wpisów AI** (37 899 kluczy z `zwrotki/*ai_tymczasowe*` odfiltrowane
+— puste `PL:`). Hasła jak Czytanka: nazwa + pola wiersza w jednym bloku `###`,
+zadania łańcuchem rozdziału, `guider_*`/meta w pakiecie (priorytet tłumacza).
+Format `klucz:` / `PL:` bez zmian. v7 (`1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`)
+i v6 (`1K4QfTpOhggfzHoqRlb_x4Epy0ehBJTt4`) zostają.
+Obok leży **pakiet tylko-AI** (`paczka_ai_weryfikacja_v8.zip`,
+6 116 837 B, id `1srdVwx3SM_ttLs_dOHFeYrGOlHQhJKbv`, pełny przegląd listów:
+207 przepisanych od chińskiego + 36 z v7): 36 577 miejsc `PL:`
+wypełnionych wyłącznie szkicem AI (36 932 klucze z plików
+`ai_tymczasowe`), do weryfikacji/przepisania przez tłumacza.
+v7 (`1CnJ5Z67uNRVjf21QczVPz_EFAUJpbF93`) zostaje na Dysku.
+Postęp pierścieni: [POSTEP_KREGI.md](POSTEP_KREGI.md).
+W tej sesji doszło też 79 opisów szkół sztuk
+walki (rozdział 91xx Compendium, poza literalnym zakresem nazw; plik
+`zwrotki/2026-11-20_ai_tymczasowe_compendium_ka.md`). **628 testów** i kontrola
+repozytorium OK (w tym 5 nowych testów `tools/audyt_zakresu.py`); przekład AI-tymczasowy, bez testu w grze.
 
 **Najnowsze — Compendium `ja` (2026-11-19):** 35 kolejnych instrukcji
 podróżowania, koni, sztuk osobliwych i odbić; `guider_tujian_data` ma teraz

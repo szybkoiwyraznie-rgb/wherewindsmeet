@@ -35,6 +35,16 @@ części mają wyłącznie opisowe nazwy plików (np. `01 - prolog, Yannan —
 część 1 z 8.md`); stary przyrostek `_NN` (`01_sceny_i_cutsceny_01.md`)
 zniknął. Treści plików — co do bajta — się nie zmieniły.
 
+Karty haseł w 02 są **wielolinijkowe**: `**Nazwa**` i każde pole osobno
+(bez sklejania ` · `, **bez pustych wierszy**). Kolejność kolumn:
+lokalizacja → krótki opis → treść → cytat; etapy questa po numerze
+zadania (`task_target` przed `task_desc` tego samego id). `manual_items`
+to encyklopedia, nie przedmiot. `extra_describe_1` bez `locate_describe`
+odpada (podpowiedź questa, nie treść hasła). Lokalizacja aktu
+regionalnego (`backing_area`) wchodzi na kartę hasła przez
+`bowu_no_to_story_no` (832009 → 901 → Bambusowa Chata). Cięcie części 02
+jest na tytule karty (`**…**`).
+
 ## Chronologia (`tools/chronologia.py` → `index/chronologia.jsonl`)
 
 Kolejność jest **raz policzona i zapisana w gicie**; czytanka tylko ją czyta.
@@ -91,11 +101,18 @@ Zasady kolejności:
      albo po prefiksie nagrania (`VO_DOMENY`) trafia do cutsceny tak jak dotąd,
    * pozostałe bloki stoją w sekcji `# Napisy przerywników — kolejność z pliku gry`,
      w kolejności wierszy, a nie alfabetycznie.
-   * **kolejność kwestii w cutscenie bierze się z numeru wiersza puli `text_msg`**
-     (`index/cutsceny_kontekst.jsonl`, wiersze typu `napis`), a nie z pola `kn`
-     w chronologii — to pole miesza napisy przypisane wprost z tabeli gry i bloki
-     puli, więc kwestie stawały w kolejności losowej (w `## Cutscena 30161`
-     „Jaki człowiek w czerni?” stało przed „Wstawaj! Wstawaj no!”).
+   * **kolejność kwestii w cutscenie** bierze się ze ścieżki audio `.cine`
+     (`index/cutsceny_kolejnosc_kwestii.jsonl`) — to przeplot bloków puli
+     `text_msg` w czasie nagrania. Bez osi `.cine` zostaje numer wiersza puli.
+     Pole `kn` w chronologii miesza napisy z tabeli i bloki puli, więc samo
+     nie rządzi kolejnością (w 30161 „Jaki człowiek w czerni?” stawało przed
+     „Wstawaj!”). Okrzyk trzymany w didaskaliach (`（啊）` w 30162) wchodzi
+     na oś w czasie nagrania — w grze jest to „Ach!” między „nie skacz”
+     a zawaleniem mostu. Gdy master `.cine` nie ma kwestii mówionych
+     (30163 `sq003_qhyt`: w masterze tylko muzyka, dialog w ujęciach
+     `s0010`/`s0030`/`s0070`), oś bierze się z dzieci w kolejności
+     mastera — ten sam algorytm co 30162, bez ręcznego matchera
+     chronologii gracza.
    * gdy w plikach gry leżą **dwa zestawy napisów tej samej cutsceny** (np. wiersze
      590153–590179 i 591125–591169 w cutscenie 30161, ta sama scena w dwóch
      wersjach), pierwszy zestaw jest treścią sceny, a pozostałe stoją pod
@@ -104,12 +121,10 @@ Zasady kolejności:
    * **streszczenie sceny** stoi zawsze na początku cutsceny, zaraz pod jej
      nagłówkiem — a po nim **pusta linia przerwy** przed kwestiami dialogu
      (od 2026-11-17; wcześniej kwestie szły od razu po streszczeniu).
-   * **kolejność z ekranu gry** nie jest odtwarzana: pliki gry nie mają osi czasu
-     cutscen (sprawdzone w `tools/cutsceny_z_bazy.py` — osie `.cine` nie są
-     w pakiecie, a `dialog_timelines.*` nie zawierają ani jednego napisu puli).
-     `index/cutsceny_ekran.jsonl` (przepisaną z ekranu kolejność) **usunięto**
-     decyzją właściciela 2026-11-14 — sceną rządzi najnowsza redakcja napisów
-     z danych (patrz `docs/WERSJE_CZYTANKI.md`, v9).
+   * ręczny spis z ekranu (`index/cutsceny_ekran.jsonl`) **usunięto** decyzją
+     właściciela 2026-11-14 — kolejność ma wychodzić z danych. Daje ją oś
+     `.cine` (`tools/cutsceny_kolejnosc_kwestii.py`); `dialog_timelines.*`
+     nadal nie zawierają napisów puli.
 7. **kraina cutsceny** bierze się najpierw ze sceny-kotwicy, a gdy ta nie ma mapy —
    z **własnej przestrzeni cutsceny** (`cutscenes.cutscene_space_no` →
    `index/cutsceny_meta.jsonl` → `index/prowincje.json`). Dzięki temu 100 z 101
@@ -159,6 +174,20 @@ Zasady kolejności:
    **wariant bohatera** (mężczyzna — decyzja właściciela), a gdy rodzina go nie
    ma, bierze drugi dostępny wariant. Bez tego cała kwestia gracza z wariantem
    wychodziła po angielsku mimo gotowego przekładu.
+12. **listy fabularne** (`tasks_envelop_data`) mają tytuł (`to`) i treść (`text`)
+    w jednej karcie `## List: …`, a `\\v` łamie linię (bez pustego wiersza). Miejsce w 01 wynika
+    **z grafu Storyline**, nie z cytatu tytułu w dialogu: węzeł
+    `OpenUINode` / `OpenUIWithInputNode` z `TaskEnvelopWindow` dostaje
+    `ui_kwargs.no` (identyfikator wiersza `tasks_envelop_data`) i stoi na
+    krawędzi `__out__` zaraz po `dialogs_no`. Indeks:
+    `index/mpk/listy_w_grafie.jsonl` (pole `po` = scena poprzedzająca,
+    `przed` = następna). Przykład: `sxd_xiaowushuxin.etsb` gra 4700002,
+    potem list `no=5` („Z Wei — do Jiang Wulanga”), potem 4700003.
+    List bez `po` w grafie stoi w 02 pod `# Listy` (też jako karty, nie osobny
+    tytuł i osobna treść).
+13. **znaki formatowania gry** (`\\v`, `\\n`, `#Y…#E`, `$T(…)`, `$N`, odnośniki
+    `<Tekst|…>`) znikają z całej czytanki — `_czysty` zdejmuje je przy wczytaniu
+    magazynu; w listach `\\v` zostaje zwykłym łamaniem linii, bez pustego wiersza.
 
 Plik ma po jednym JSON-ie na linię: `{"p": pozycja, "t": rodzaj, "n": numer,
 "s": sekcja, "k": [klucze tekstów], "g": grupa}`. 75 748 jednostek, 4,2 MB.
@@ -269,5 +298,7 @@ prologu w `zwrotki/`. Żadnych binariów gry ani plików z Dysku Google.
 
 `tools/zbuduj_czytanke_pelna.py` (trzy warstwy: chronologia, fabuła, kontekst)
 i `tools/buduj_czytanke_gry.py` (sceny w tabelach z chińskim i angielskim)
-zostają jako narzędzia robocze do weryfikacji i audytu — ale **nie są czytanką
-dla właściciela**. Czytanka to dwa pliki treści (01 i 02) plus README.
+są **PRZESTARZAŁE (obsolete)** i zostają wyłącznie jako narzędzia audytowe —
+**nie są czytanką dla właściciela i nie buduje się nimi wydań `czytanka_v*.zip`**.
+Pełny rejestr (wraz z `buduj_czytanki.py` i `powiazania_czytanek.py`, banerami
+w kodzie i ostrzeżeniem na stderr): [NARZEDZIA_PRZESTARZALE.md](NARZEDZIA_PRZESTARZALE.md). Czytanka to dwa pliki treści (01 i 02) plus README.

@@ -17,7 +17,12 @@ Zasady składania:
 - każdy tekst ma w całym pakiecie **jedno** miejsce z `PL:` — pierwsze wystąpienie
   w kolejności: sceny, potem widoki; dalsze wystąpienia są oznaczone jako powtórzenia;
 - kolejność scen wylicza `tools/uklad_scen.py` (zadania, następstwa, numeracja);
-- widoki grupują teksty spoza scen według tabeli i pola gry, z którego pochodzą.
+- napisy cutscen idą w kolejności osi `.cine` (`index/cutsceny_kolejnosc_kwestii.jsonl`),
+  listy fabularne tuż po scenie, która je otwiera, POI i lokalizacja encyklopedii
+  z indeksów MPK — ten sam kontekst co Czytanka, nadal jeden `klucz:` / `PL:`;
+- widoki składają hasła jak Czytanka: nazwa + pola tego samego wiersza w jednym bloku,
+  zadania w łańcuchu rozdziału; samouczki/meta (`guider_*`) wchodzą (priorytet tłumacza);
+  `klucz:` / `PL:` nadal jednolinijkowo.
 
 Skrypt czyta wyłącznie katalog wyciągu i (opcjonalnie) magazyn przekładów —
 nie potrzebuje plików gry.
@@ -40,6 +45,7 @@ try:
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import kontekst_paczki as kpak
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -48,6 +54,7 @@ except ImportError:  # uruchomienie jako skrypt
     from tools import format_paczki as fmt
     from tools import indeks as indeks_mod
     from tools import kontekst_cutscen as kc
+    from tools import kontekst_paczki as kpak
     from tools import tlumaczenie as magazyn_mod
     from tools import uklad_scen
     from tools import wypisz
@@ -227,6 +234,7 @@ OPIS_TABELI = {
     "region_game_config": "nazwy aktywności w regionach",
     "ac_raw": "osiągnięcia",
     "guider_task": "samouczki i podpowiedzi",
+    "guider_tujian_data": "kompendium (图鉴): tytuły i treści haseł",
 }
 
 
@@ -317,7 +325,7 @@ class Generator:
         tylko_sloty: Iterable[str] | None = None,
         *,
         tylko_z_en: bool = False,
-        wszystko: bool = False,
+        wszystko: bool = True,
         wypelnij_pl: bool = False,
     ):
         self.ix = ix
@@ -403,6 +411,16 @@ class Generator:
 
         self._chronione_klucze = self._zbuduj_chronione_klucze()
         self._cutsceny_klucze = self._zbuduj_cutsceny_klucze()
+        self._zaladuj_kontekst_czytanki()
+
+    def _zaladuj_kontekst_czytanki(self) -> None:
+        """Indeksy MPK / czytanki: kolejność `.cine`, listy po scenie, POI, bowu."""
+        katalog = Path(self.ix.katalog)
+        self._kolejnosc_cine = kpak.kolejnosc_cine(katalog)
+        self._listy_przy = kpak.listy_przy_scenach(katalog)
+        self._listy = kpak.listy_envelop(self.ix) if self._listy_przy else {}
+        self._poi_scen = kpak.poi_przy_scenach(katalog)
+        self._lok_bowu = kpak.lokalizacje_bowu(self.ix, kpak.bowu_story(katalog))
 
     def _zbuduj_cutsceny_klucze(self) -> set[str]:
         ix = self.ix
@@ -618,6 +636,9 @@ class Generator:
                 if miejsce.moment == "nastepstwo":
                     moment += f" (dialog {miejsce.za})"
                 lines.append(f"- zadanie: {miejsce.zadanie} — {name}" + (f" — cel: {target}" if target else "") + f" — {moment}")
+        poi = self._poi_scen.get(scena["d"])
+        if poi:
+            lines.append(f"- interakcja: {poi}")
         places = scena.get("m") or []
         if places:
             shown = "; ".join(self._miejsce(number) for number in places[:3])
@@ -662,7 +683,47 @@ class Generator:
         slots = [self._slot_sceny(element) for element in scena["e"]]
         for row in self._wybory_po.get(scena["d"], ()):
             slots += [choice["tekst"] for choice in row["wybory"]]
+        slots += self._sloty_listow(scena["d"])
         return slots
+
+    def _sloty_listow(self, dialog: int) -> list[str]:
+        slots: list[str] = []
+        for no in self._listy_przy.get(dialog, ()):
+            wpis = self._listy.get(str(no))
+            if wpis:
+                slots.extend(wpis.get("klucze") or [])
+        return slots
+
+    POLA_LISTU = (
+        ("to", "List — adresat / tytuł"),
+        ("from", "List — nadawca"),
+        ("text", "List — treść"),
+        ("melody_solved_text", "List — zagadka (rozwiązana)"),
+        ("melody_puzzle_text", "List — zagadka"),
+    )
+
+    def _dopisz_listy(self, lines: list[str], nr: int, opened: int, w_bloku: dict, dialog: int, where: str) -> tuple[int, int]:
+        """Listy otwierane tuż po scenie — ten sam `PL:`, żeby widoki dostały odsyłacz."""
+        for no in self._listy_przy.get(dialog, ()):
+            wpis = self._listy.get(str(no))
+            if not wpis:
+                continue
+            klucze = [wpis[pole] for pole, _etykieta in self.POLA_LISTU if wpis.get(pole)]
+            if not klucze or not self._zawiera_nowe(klucze):
+                continue
+            lines.append(f"#### List po tej scenie — tasks_envelop_data wiersz {no}")
+            tytul = self.para(wpis.get("to"))
+            if tytul:
+                lines.append(f"- tytuł: {tytul}")
+            for pole, etykieta in self.POLA_LISTU:
+                klucz = wpis.get(pole)
+                if not klucz:
+                    continue
+                nr += 1
+                part, is_open = self._element(nr, etykieta, klucz, w_bloku, miejsce=where)
+                lines += part
+                opened += is_open
+        return nr, opened
 
     def _scena(self, pisarz: Pisarz, numer: int, miejsce) -> None:
         scena = self.ix.sceny[numer]
@@ -696,6 +757,7 @@ class Generator:
                 part, is_open = self._element(nr, f"Wybór gracza {choice['nr']}", choice["tekst"], w_bloku, dodatkowe=extra, miejsce=where)
                 lines += part
                 opened += is_open
+        nr, opened = self._dopisz_listy(lines, nr, opened, w_bloku, numer, where)
         plik = self._zapisz_blok(pisarz, lines, scen=1, elementow=nr, do_wpisania=opened)
         self.spis_scen.append((self.numer_sceny, numer, plik, miejsce.czesc, miejsce.zadanie, miejsce.moment, nr))
         self.liczby["scen"] += 1
@@ -976,6 +1038,56 @@ class Generator:
                 {"baza": "04_sceny_cinematiczne", "tytul": "Sceny przerywników (timeline, `ui_type` 10)", "opis": "cutsceny", "pliki": files}
             )
 
+    def _mowcy_wierszy_napisow(self, rows: list[dict], wygl_wiersze: set) -> tuple[dict[int, str], list[str]]:
+        mowcy_wiersza: dict[int, str] = {}
+        unikatowi: list[str] = []
+        widziani: set[str] = set()
+        for row in rows:
+            sp_lbl = self._mowca_cutsceny(
+                row,
+                self.ix.teksty[row["k"]],
+                ignoruj_audio=row["wiersz"] in wygl_wiersze,
+            )
+            mowcy_wiersza[row["wiersz"]] = sp_lbl
+            if sp_lbl and sp_lbl not in widziani:
+                widziani.add(sp_lbl)
+                unikatowi.append(sp_lbl)
+        return mowcy_wiersza, unikatowi
+
+    def _emit_wiersze_napisow(
+        self,
+        pisarz: Pisarz,
+        rows: list[dict],
+        plec_wiersza: dict,
+        wygl_wiersze: set,
+        mowcy_wiersza: dict[int, str],
+    ) -> None:
+        lines: list[str] = []
+        w_bloku: dict[str, int] = {}
+        nr = opened = 0
+        for row in rows:
+            nr += 1
+            ignoruj_a = row["wiersz"] in wygl_wiersze
+            speaker = mowcy_wiersza.get(row["wiersz"], "")
+            audio = row.get("audio") or ""
+            parts = [f"text_msg · {row['wiersz']}"]
+            if audio:
+                parts.append(audio)
+            if speaker:
+                parts.append(f"mówca: {speaker}")
+            extra: list[str] = []
+            if row["wiersz"] in plec_wiersza:
+                extra.append(f"wariant płci: {plec_wiersza[row['wiersz']]}")
+            if ignoruj_a and audio:
+                extra.append("uwaga: przypisane po tekście audio może pochodzić z innej sceny (kolizja sound_data)")
+            part, is_open = self._element(
+                nr, " · ".join(parts), row["k"], w_bloku, dodatkowe=extra,
+                miejsce=f"cutscena {row['wiersz']}, element {{nr}}",
+            )
+            lines += part
+            opened += is_open
+        self._zapisz_blok(pisarz, lines, scen=0, elementow=nr, do_wpisania=opened)
+
     def cutsceny(self, katalog: Path) -> None:
         ix = self.ix
         self._aktualna_sekcja = "cutsceny"
@@ -1007,9 +1119,39 @@ class Generator:
         if napisy:
             katalog.mkdir(parents=True, exist_ok=True)
             pisarz = Pisarz(katalog, "01_napisy_cutscen", "Napisy cutscen (`text_msg` 590000–592694) — Where Winds Meet", wstep)
+            used_wiersze: set[int] = set()
+            if self._kolejnosc_cine:
+                by_w = {r["wiersz"]: r for r in napisy}
+                for no, bloki in sorted(self._kolejnosc_cine.items()):
+                    rows: list[dict] = []
+                    seen_local: set[int] = set()
+                    for blok in bloki:
+                        for item in blok:
+                            w = item.get("w")
+                            row = by_w.get(w) if w is not None else None
+                            if row is None or row["wiersz"] in seen_local:
+                                continue
+                            seen_local.add(row["wiersz"])
+                            rows.append(row)
+                    if not rows or not self._zawiera_nowe([r["k"] for r in rows]):
+                        continue
+                    used_wiersze.update(r["wiersz"] for r in rows)
+                    start_w, stop_w = min(r["wiersz"] for r in rows), max(r["wiersz"] for r in rows)
+                    is_prolog = any(ZAKRES_PROLOG_TM[0] <= r["wiersz"] <= ZAKRES_PROLOG_TM[1] for r in rows)
+                    nagl = f"## Cutscena {no}"
+                    if is_prolog:
+                        nagl += " — PROLOG"
+                    nagl += f" — kolejność z osi .cine ({len(rows)} linii, wiersze {start_w}–{stop_w})"
+                    mowcy, unikatowi = self._mowcy_wierszy_napisow(rows, set())
+                    head = [nagl, "- kolejność: oś audio `.cine` (przeplot bloków puli napisów)"]
+                    if unikatowi:
+                        head.append(f"- rozpoznani mówcy: {', '.join(unikatowi)}")
+                    pisarz.naglowek(2, head)
+                    self._emit_wiersze_napisow(pisarz, rows, plec_wiersza, set(), mowcy)
             nr_ciagu = 0
             for ciag in ciagi:
-                if not self._zawiera_nowe([r["k"] for r in ciag]):
+                ciag = [r for r in ciag if r["wiersz"] not in used_wiersze]
+                if not ciag or not self._zawiera_nowe([r["k"] for r in ciag]):
                     continue
                 nr_ciagu += 1
                 start_w, stop_w = ciag[0]["wiersz"], ciag[-1]["wiersz"]
@@ -1250,6 +1392,73 @@ class Generator:
 
     # ----------------------------------------------------------- widoki
 
+    def _pozycje_widokow(self) -> tuple[list[dict], list[str]]:
+        """Wpisy do rekordów widoków + klucze bez źródła. Cutsceny zostają w `cutsceny/`."""
+        ix = self.ix
+        pozycje: list[dict] = []
+        bez_zrodla: list[str] = []
+        for key, text in ix.teksty.items():
+            reason = self.powod_wykluczenia(key)
+            if reason is not None:
+                self.wykluczenia[reason] += 1
+                continue
+            if key in self._cutsceny_klucze:
+                continue
+            source = ix.zrodlo(text)
+            if source is None:
+                if key not in self.sloty:
+                    bez_zrodla.append(key)
+                continue
+            kind, path, row = source
+            base = kind.removesuffix("__grey")
+            if base in KOPIE_KWESTII and key in self.sloty:
+                continue
+            pozycje.append(
+                {
+                    "klucz": key,
+                    "tabela": kind,
+                    "kolumna": path,
+                    "wiersz": str(row),
+                    "origin": int(text.w[0]) if text.w else 0,
+                    "name_key": ix.nazwa_wiersza(text),
+                }
+            )
+        return pozycje, bez_zrodla
+
+    def _dopisz_pole_widoku(
+        self,
+        block: list[str],
+        nr: int,
+        key: str,
+        label: str,
+        extra: list[str],
+        w_bloku: dict,
+        view: str,
+        baza: str,
+    ) -> tuple[int, int]:
+        """Jedno pole rekordu. Zwraca (opened, count_delta_bez_ui)."""
+        text = self.ix.teksty[key]
+        opened = 0
+        bez_ui = 0
+        if key in self.sloty:
+            plik, where = self.sloty[key]
+            block.append(f"{nr}. [{label}] {fmt.zakoduj(text.zrodlo)}")
+            block.append(f"{WCIECIE}(powtórzenie — tłumaczysz raz: {plik}, {where})")
+            self.liczby["elementow"] += 1
+            self.liczby["powtorzen"] += 1
+            return 0, 0
+        before_done = self.liczby["juz_przetlumaczone"]
+        part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce="element {nr}")
+        block += part
+        opened += is_open
+        if not czy_ui_meta(view, baza):
+            if is_open:
+                self.liczby_widoki_bez_ui_meta["do_wpisania"] += 1
+                bez_ui = 1
+            elif self.liczby["juz_przetlumaczone"] > before_done:
+                self.liczby_widoki_bez_ui_meta["juz_przetlumaczone"] += 1
+        return opened, bez_ui
+
     def widoki(self, katalog: Path) -> None:
         ix = self.ix
         self._aktualna_sekcja = "widoki"
@@ -1261,42 +1470,40 @@ class Generator:
                 limity[text.w[0]] = max(limity[text.w[0]], len(fmt.zakoduj(text.en)))
         self.limity = limity
 
-        groups: dict[str, list[tuple]] = defaultdict(list)
-        for key, text in ix.teksty.items():
-            reason = self.powod_wykluczenia(key)
-            if reason is not None:
-                self.wykluczenia[reason] += 1
-                continue
-            if not self.wszystko and key in self._cutsceny_klucze:
-                continue
-            source = ix.zrodlo(text)
-            if source is None:
-                if key in self.sloty:
-                    continue  # tekst tylko ze scen albo cutscen
-                groups[BEZ_ZRODLA].append((("", 0, ""), (1, 0, text.zrodlo), 0, key))
-                continue
-            kind, _path, row = source
-            table, _, row_key = row.rpartition("#")
-            base = kind.removesuffix("__grey")
-            if base in KOPIE_KWESTII and key in self.sloty:
-                continue
-            groups[kategoria(kind)].append(((base, kind != base, table or kind), _naturalny(row_key), text.w[0], key))
+        pozycje, bez_zrodla_klucze = self._pozycje_widokow()
+        if self.tylko is not None:
+            pozycje = [p for p in pozycje if p["klucz"] in self.tylko]
+            bez_zrodla_klucze = [k for k in bez_zrodla_klucze if k in self.tylko]
+        if self.tylko_z_en:
+            pozycje = [p for p in pozycje if self._ma_en(p["klucz"])]
+            bez_zrodla_klucze = [k for k in bez_zrodla_klucze if self._ma_en(k)]
+
+        po_widoku = kpak.pogrupuj_rekordy(pozycje, kategoria)
+        if bez_zrodla_klucze:
+            rec = kpak.Rekord(grupa=("z",), kategoria=BEZ_ZRODLA, nazwa_klucz=None, tabela_nazwy="")
+            rec.pola = [
+                kpak.PoleRekordu(klucz=k, tabela="", kolumna="", wiersz="", origin=0) for k in bez_zrodla_klucze
+            ]
+            po_widoku.setdefault(BEZ_ZRODLA, []).append(rec)
+
+        pl_mag = self.magazyn.po_kluczu_pelny() if self.magazyn else {}
+        bloki_zadan = kpak.bloki_zadan(ix, pl_mag) if po_widoku.get("01_zadania") else []
 
         for view, title in WIDOKI:
-            rows = sorted(groups.get(view, ()))
-            if self.tylko is not None:
-                rows = [row for row in rows if row[3] in self.tylko]
-            if self.tylko_z_en:
-                rows = [row for row in rows if self._ma_en(row[3])]
-            if not rows:
+            rekordy = po_widoku.get(view) or []
+            if not rekordy:
                 continue
             wstep = [
-                "Kolejność: tabela gry, wiersz, pole. Polski wpisujesz w jednej linii po `PL:`.",
-                "`limit:` to długość najdłuższego tekstu angielskiego w tym samym polu gry (README, punkt 3).",
+                "Hasło trzyma nazwę i wszystkie pola tego wiersza tabeli w jednym bloku — bez skakania po plikach.",
+                "Kolejność zadań: łańcuch gry (rozdział → pre/post). Polski w jednej linii po `PL:`.",
+                "`dotyczy:` to nazwa rekordu; `limit:` to najdłuższy angielski w tym polu gry (README, punkt 3).",
             ]
             pisarz = Pisarz(katalog, view, f"{title} — Where Winds Meet", wstep)
-            totals = Counter((row[0][0], row[0][1]) for row in rows)
-            current = None
+            if view == "01_zadania":
+                sekwencja: list[tuple[str | None, object]] = kpak.uszereguj_rekordy_zadan(rekordy, bloki_zadan)
+            else:
+                sekwencja = [(None, rec) for rec in rekordy]
+
             block: list[str] = []
             w_bloku: dict[str, int] = {}
             nr = opened = count = 0
@@ -1307,57 +1514,58 @@ class Generator:
                     self._zapisz_blok(pisarz, block, scen=0, elementow=count, do_wpisania=opened)
                 block, opened, count, w_bloku = [], 0, 0, {}
 
-            last_row = None
-            for (base, grey, table), row_key, origin, key in rows:
-                text = ix.teksty[key]
-                heading = (base, grey)
-                if heading != current:
+            for naglowek_bloku, rec in sekwencja:
+                if naglowek_bloku:
                     flush()
-                    current = heading
-                    name = base + ("__grey" if grey else "")
-                    lines = [f"## {name or 'bez tabeli'}" + (f" — {OPIS_TABELI[base]}" if base in OPIS_TABELI else "")]
-                    if grey:
-                        lines.append("- tabela `__grey`: druga wersja tej samej tabeli w danych gry; tu są teksty, których nie ma w wersji podstawowej")
-                    lines.append(f"- elementów: {totals[heading]}")
-                    pisarz.naglowek(2, lines)
-                    last_row = None
-                # jeden blok = jeden wiersz tabeli, żeby plik nie dzielił nazwy od opisu
-                this_row = (table, row_key)
-                if this_row != last_row or count >= 200:
-                    flush()
-                    last_row = this_row
-                nr += 1
-                count += 1
-                if view == BEZ_ZRODLA:
-                    label, extra = "Tekst bez źródła", []
-                else:
-                    path = ix.zrodla[origin][1]
-                    row_name = row_key[2] if row_key[0] else str(row_key[1])
-                    label = f"{table} · {path or '(wartość)'} · wiersz {row_name}"
-                    extra = []
-                    named = ix.nazwa_wiersza(text)
-                    if named:
-                        extra.append(f"dotyczy: {self.para(named)}")
-                    if text.n > 1:
-                        extra.append(f"użycia w grze: {text.n} identyfikatorów")
-                    if limity.get(origin):
-                        extra.append(f"limit: do {limity[origin]} znaków")
-                if key in self.sloty:
-                    plik, where = self.sloty[key]
-                    block.append(f"{nr}. [{label}] {fmt.zakoduj(text.zrodlo)}")
-                    block.append(f"{WCIECIE}(powtórzenie — tłumaczysz raz: {plik}, {where})")
-                    self.liczby["elementow"] += 1
-                    self.liczby["powtorzen"] += 1
-                    continue
-                before_done = self.liczby["juz_przetlumaczone"]
-                part, is_open = self._element(nr, label, key, w_bloku, dodatkowe=extra, miejsce="element {nr}")
-                block += part
-                opened += is_open
-                if not czy_ui_meta(view, base):
-                    if is_open:
-                        self.liczby_widoki_bez_ui_meta["do_wpisania"] += 1
-                    elif self.liczby["juz_przetlumaczone"] > before_done:
-                        self.liczby_widoki_bez_ui_meta["juz_przetlumaczone"] += 1
+                    pisarz.naglowek(2, [f"## {naglowek_bloku}"])
+                flush()
+                pole0 = rec.pola[0] if rec.pola else None
+                fallback = (
+                    f"{pole0.tabela or 'bez tabeli'} · wiersz {pole0.wiersz or '?'}" if pole0 else "(puste hasło)"
+                )
+                tytul = (self.para(rec.nazwa_klucz) if rec.nazwa_klucz else "") or ""
+                if not str(tytul).strip():
+                    tytul = fallback
+                head = [f"### {tytul}"]
+                tabele = []
+                for p in rec.pola:
+                    if p.tabela and p.tabela not in tabele:
+                        tabele.append(p.tabela)
+                if tabele:
+                    head.append("- tabele: " + ", ".join(tabele))
+                wiersze = {p.wiersz for p in rec.pola if p.wiersz}
+                for wiersz in wiersze:
+                    lok = self._lok_bowu.get(str(wiersz))
+                    if lok:
+                        head.append(f"- lokalizacja: {self.para(lok)}")
+                        break
+                pisarz.naglowek(3, head)
+                for pole in rec.pola:
+                    if count >= 200:
+                        flush()
+                    nr += 1
+                    count += 1
+                    key = pole.klucz
+                    text = ix.teksty[key]
+                    if view == BEZ_ZRODLA:
+                        label, extra = "Tekst bez źródła", []
+                    else:
+                        label = f"{pole.tabela} · {pole.kolumna or '(wartość)'} · wiersz {pole.wiersz}"
+                        extra = []
+                        named = rec.nazwa_klucz or ix.nazwa_wiersza(text)
+                        if named and named != key:
+                            extra.append(f"dotyczy: {self.para(named)}")
+                        lok_klucz = self._lok_bowu.get(str(pole.wiersz))
+                        if lok_klucz:
+                            extra.append(f"lokalizacja: {self.para(lok_klucz)}")
+                        if text.n > 1:
+                            extra.append(f"użycia w grze: {text.n} identyfikatorów")
+                        if limity.get(pole.origin):
+                            extra.append(f"limit: do {limity[pole.origin]} znaków")
+                    d_open, _ = self._dopisz_pole_widoku(
+                        block, nr, key, label, extra, w_bloku, view, pole.tabela.removesuffix("__grey")
+                    )
+                    opened += d_open
             flush()
             files = pisarz.koniec()
             self.serie.append({"baza": view, "tytul": title, "opis": "widok", "pliki": files})
@@ -1428,7 +1636,7 @@ def zbuduj(
     magazyn=None,
     tylko_sloty: Iterable[str] | None = None,
     tylko_z_en: bool = False,
-    wszystko: bool = False,
+    wszystko: bool = True,
     wypelnij_pl: bool = False,
     dodatki: Iterable[Path | str] | None = None,
     zip_: bool = True,
@@ -1587,7 +1795,8 @@ def main(argv=None) -> int:
     parser.add_argument("--tlumaczenie", help="katalog magazynu przekładów; gotowe przekłady nie dostają `PL:`")
     parser.add_argument("--tylko-sloty", help="plik z listą kluczy (jeden na linię): pakiet uzupełniający")
     parser.add_argument("--tylko-z-en", action="store_true", help="pomiń wpisy bez wersji angielskiej w grze (tylko chińskie)")
-    parser.add_argument("--wszystko", action="store_true", help="nie stosuj wykluczeń v2 (uwzględnij też boty, programmer i tabele meta)")
+    parser.add_argument("--wszystko", action="store_true", help="uwzględnij tabele meta/samouczki (domyślne; tłumacz sam ustala priorytet)")
+    parser.add_argument("--bez-meta", action="store_true", help="stare wykluczenia v2: boty, programmer, guider/meta, placeholdery")
     parser.add_argument("--wypelnij-pl", action="store_true", help="istniejące przekłady z magazynu wpisz jako edytowalne `PL: <tekst>` zamiast `PL (już jest):`")
     parser.add_argument("--dodatek", action="append", default=[], help="dodatkowy plik (np. rewizje_en.jsonl, usuniete_klucze.jsonl) dołączony do głównego ZIP-a")
     parser.add_argument("--bez-zip", action="store_true")
@@ -1613,7 +1822,7 @@ def main(argv=None) -> int:
         magazyn=magazyn,
         tylko_sloty=only,
         tylko_z_en=arguments.tylko_z_en,
-        wszystko=arguments.wszystko,
+        wszystko=not arguments.bez_meta,
         wypelnij_pl=arguments.wypelnij_pl,
         dodatki=arguments.dodatek,
         zip_=not arguments.bez_zip,

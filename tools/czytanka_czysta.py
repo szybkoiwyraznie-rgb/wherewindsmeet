@@ -55,6 +55,9 @@ BEZ_MAPY = ":sceny-bez-mapy:"
 _KOLOR = re.compile(r"#[0-9a-fA-F]{6}|#[A-Z]")
 _ODNOSNIK = re.compile(r"<([^<>|]{1,80})(\|[^<>]*)?>")
 _SPACJE = re.compile(r"\s+")
+_DOLAR_T = re.compile(r"\$T\([^)]*\)")
+_DOLAR_N = re.compile(r"\$N")
+
 
 # W danych gracza ta sama postać bywa nazwana różnie; dla czytelnika to zawsze „Ty”.
 GRACZ = {nazwa.lower(): "Youxia" for nazwa in (
@@ -64,13 +67,13 @@ GRACZ = {nazwa.lower(): "Youxia" for nazwa in (
 TECHNICZNE = {"Entity轨道组", "轨道组", "entity", "Entity", "旁白占位"}
 
 KATEGORIE = (
+    (("encyclopedia", "manual", "ever_know", "book", "clue", "letter", "email",
+      "jianwen", "envelop", "poem", "kaoju"),
+     "Encyklopedia, księgi i poszlaki"),
     (("kongfu", "xinfa", "jianghu_skill", "qishu", "buff", "skill", "talent"),
      "Sztuki walki i umiejętności"),
     (("equip", "stuff", "fashion", "item", "bag", "weapon", "armor", "title"),
      "Przedmioty, stroje i tytuły"),
-    (("encyclopedia", "manual", "ever_know", "book", "clue", "letter", "email",
-      "jianwen", "envelop", "poem", "kaoju"),
-     "Encyklopedia, księgi i poszlaki"),
     (("task", "guider", "quest", "storyline", "expedition"),
      "Zadania i wątki"),
     (("fuben", "boss", "monster", "enemy", "combat"),
@@ -88,9 +91,9 @@ _NAZWA = re.compile(r"name|title|bowu|imie", re.I)
 # Kolumny z definicją hasła. Świadomie nie ma tu `content`, `story_*`, `page_*`,
 # `talk_content`, `tips` — to opowieści i streszczenia scen, nie opisy.
 _OPIS = re.compile(r"describe|description|intro|^des$|job_info|npc_desc", re.I)
-# Kolejność: najpierw zwięzła definicja, potem dłuższe warianty.
+# Kolejność na karcie: lokalizacja → krótki opis → treść → cytat.
 _OPIS_KOLEJNOSC = (
-    "describe_str", "describe", "brief_describe_str", "introduction",
+    "describe_str", "brief_describe_str", "describe", "story_describe_str", "introduction",
     "introduction_long", "description", "jianghu_brief_description", "job_info",
     "npc_desc", "des", "introduction_location", "introduction_short",
     "extra_describe_1", "generation_description", "sidepage_boss_desc",
@@ -108,15 +111,31 @@ _NARRACYJNE = {
 
 
 def _czysty(tekst: str) -> str:
-    """Zdejmij kody kolorów i odnośniki rich-text, złóż białe znaki.
+    """Zdejmij kody kolorów, placeholdery i odnośniki rich-text, złóż białe znaki.
 
-    W danych gry łamanie akapitu bywa zapisane dosłownie jako `\\n`, a kwestia
-    ma być jedną linią — zamieniamy to na spację.
+    W danych gry łamanie akapitu bywa zapisane dosłownie jako `\\n` albo `\\v`
+    (także pionowy tabulator). Kwestia w 01 ma być jedną linią — zamieniamy
+    to na spację. `$T(…)` to podstawienie imienia, `$N` — imię gracza.
     """
-    tekst = (tekst or "").replace("\\n", " ").replace("\\r", " ").replace("\\t", " ")
-    tekst = _ODNOSNIK.sub(lambda m: m.group(1), tekst or "")
+    tekst = tekst or ""
+    tekst = (tekst.replace("\\v", " ").replace("\v", " ")
+             .replace("\\n", " ").replace("\\r", " ").replace("\\t", " ")
+             .replace("\\P", " "))
+    tekst = _DOLAR_T.sub("", tekst)
+    tekst = _DOLAR_N.sub("Youxia", tekst)
+    tekst = _ODNOSNIK.sub(lambda m: m.group(1), tekst)
     tekst = _KOLOR.sub("", tekst)
     return _SPACJE.sub(" ", tekst).strip()
+
+
+def _akapity(tekst: str) -> list[str]:
+    """Treść listu: `\\v` / `\\n` łamie linię (bez pustego wiersza), reszta jak `_czysty`."""
+    if not tekst:
+        return []
+    rozbity = (tekst.replace("\\v", "\n").replace("\v", "\n")
+               .replace("\\n", "\n").replace("\\P", "\n"))
+    return [linia for kawałek in rozbity.split("\n")
+            if (linia := _czysty(kawałek))]
 
 
 def _kategoria(tabela: str) -> str:
@@ -127,7 +146,7 @@ def _kategoria(tabela: str) -> str:
     return "Pozostałe teksty"
 
 
-def _magazyn(katalog: Path, index: Path | str = "index") -> dict[str, str]:
+def _magazyn(katalog: Path, index: Path | str = "index", *, czysc: bool = True) -> dict[str, str]:
     """Przekłady po kluczu tekstu, razem z wariantami płci bohatera.
 
     Kwestie zależne od płci gracza mają w grze osobne identyfikatory (`@id`),
@@ -135,10 +154,14 @@ def _magazyn(katalog: Path, index: Path | str = "index") -> dict[str, str]:
     nie da się ich przypisać do klucza tekstu — i wtedy czytanka pokazywała
     angielski tekst mimo gotowego przekładu (np. „This symbol…” w scenie
     4700001). Czytamy wariant bohatera; gdy go nie ma, pierwszy dostępny.
+    `czysc=False` zostawia surowy tekst (akapity `\\v` w listach).
     """
     magazyn = tlumaczenie_mod.wczytaj(katalog, warianty=Path(index) / "warianty.jsonl")
-    return {klucz: _czysty(tekst) for klucz, tekst in magazyn.po_kluczu_pelny().items()
-            if tekst and tekst.strip()}
+    pelny = {klucz: tekst for klucz, tekst in magazyn.po_kluczu_pelny().items()
+             if tekst and tekst.strip()}
+    if not czysc:
+        return pelny
+    return {klucz: _czysty(tekst) for klucz, tekst in pelny.items()}
 
 
 # W danych gry gracz bywa zapisany różnie, także z literówkami (`mian_player`).
@@ -237,7 +260,16 @@ def _nazwa_klucza(ix, klucz: str | None, pl: dict[str, str]) -> str:
     if klucz in pl:
         return pl[klucz]
     tekst = ix.teksty.get(klucz)
-    return _czysty(tekst.en or tekst.zrodlo) if tekst is not None else ""
+    if tekst is None:
+        return ""
+    # bez PL: chiński w pinyin, nie angielski tytuł („Wooden Arrow” przy polskim opisie)
+    zh = tekst.zrodlo or ""
+    if re.search(r"[\u3400-\u9fff]", zh):
+        nazwa = pinyin_slownik.romanizuj(_czysty(zh))
+        nazwa = re.sub(r"[\u3400-\u9fff]", "", nazwa).strip(" ·,;/-")
+        if nazwa:
+            return nazwa
+    return _czysty(tekst.en or zh)
 
 
 def _cokolwiek_lacinskie(nazwa: str) -> str:
@@ -359,6 +391,7 @@ class Jednostka:
     zasloniete: tuple[str, ...] = ()                            # kwestie powtórzone w wariancie
     streszczenie: int = 0                                     # ile linii na początku to streszczenie
     wstep: str = ""                                           # wiersz nad nagłówkiem, np. „Interakcja: …”
+    numer: int | None = None                                  # numer sceny/cutsceny (do listów)
 
 
 def _wczytaj_porzadek(index: str) -> dict[str, list[dict]]:
@@ -542,7 +575,12 @@ def _napisy_cutsceny(wiersz: dict, wiersze: dict[str, int], pl: dict[str, str],
         return (0, numer, pozycja[klucz]) if numer is not None else (1, 0, pozycja[klucz])
 
     luzem = [k for k in sorted(pozycja, key=do_sortowania) if k not in pokryte]
-    bloki = bloki_chrono + (_podziel_na_bloki(luzem, wiersze) if luzem else [])
+    if bloki_chrono:
+        # `.cine` jest źródłem prawdy tej cutsceny. Sąsiednie wiersze puli
+        # (recytacja teatru cieni 591128–147 przy 30161) to inna scena, nie wariant.
+        bloki = bloki_chrono
+    else:
+        bloki = _podziel_na_bloki(luzem, wiersze) if luzem else []
     if not bloki_chrono and len(bloki) > 1:
         porzadek_blokow = sorted(range(len(bloki)),
                                  key=lambda i: _najwyzszy(bloki[i], wiersze), reverse=True)
@@ -691,6 +729,50 @@ def _wlasciciele_nagran(index: str | Path) -> dict[str, int]:
     return {rdzen: nums.pop() for rdzen, nums in rdzenie.items() if len(nums) == 1}
 
 
+def _filmy_cutscen(index: str | Path | None) -> dict[int, str]:
+    """Cutscena → nazwa filmu `.cine` (`index/cutsceny_meta.jsonl`)."""
+    if not index:
+        return {}
+    plik = Path(index) / "cutsceny_meta.jsonl"
+    if not plik.exists():
+        return {}
+    mapa: dict[int, str] = {}
+    with plik.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            wpis = json.loads(linia)
+            no, film = wpis.get("no"), wpis.get("film") or ""
+            if isinstance(no, int) and film:
+                mapa[int(no) % 10**8] = str(film)
+    return mapa
+
+
+def _faza_cine_walki(film: str) -> str | None:
+    """Faza walki world-bossa z nazwy `.cine`: śpiew (`cc`) / pole (`zc`).
+
+    `pyryw/sq001_pyscc` i `pys1/sq001_pys1cc` to pierwsza cutscena walki
+    (Mistrz Teatru Cieni faza I), `sq002_pyszc` / `pys1zc` — druga.
+    """
+    nazwa = (film or "").replace("\\", "/").rsplit("/", 1)[-1].lower()
+    nazwa = nazwa.rsplit(".", 1)[0]
+    if "pyscc" in nazwa or "pys1cc" in nazwa:
+        return "cc"
+    if "pyszc" in nazwa or "pys1zc" in nazwa:
+        return "zc"
+    return None
+
+
+def _podziel_osierocone_fazy(klucze: list[str], zh) -> dict[str, list[str]]:
+    """Recytacja przy 30161: do 擂鼓 — faza I (`cc`), od bębnów — faza II (`zc`)."""
+    if not klucze:
+        return {"cc": [], "zc": []}
+    split_i = next((i for i, k in enumerate(klucze) if "擂鼓" in (zh(k) or "")), None)
+    if split_i is None:
+        split_i = (len(klucze) + 1) // 2
+    return {"cc": klucze[:split_i], "zc": klucze[split_i:]}
+
+
 def _kolejnosc_kwestii_cutscen(index: str | Path) -> dict[int, list[list[dict]]]:
     """Chronologia kwestii cutscen ze ścieżek audio `.cine` (gdy indeks istnieje).
 
@@ -728,11 +810,31 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
                       if w.get("wiersz") and w.get("k")}
     kolejnosc_cutscen = _kolejnosc_kwestii_cutscen(index) if index else {}
     wlasciciele_nagran = _wlasciciele_nagran(index) if index else {}
+    filmy_cutscen = _filmy_cutscen(index)
     numery_cutscen = {int(w["n"]) for w in chronologia if w["t"] == "cutscena"}
     # wiersze przejęte przez chronologię cutscen znikają z „Napisów przerywnika"
     przejete = {r["k"] for numer, bloki in kolejnosc_cutscen.items()
                 if numer in numery_cutscen
                 for blok in bloki for r in blok if r.get("k")}
+    # kn cutsceny z `.cine` bywa nadziane sąsiadami puli (591128–147 przy 30161).
+    # Te klucze nie należą do osi — oddajemy je cutscenom walki (`pyscc`/`pyszc`).
+    osierocone: list[str] = []
+    widziane_osierocone: set[str] = set()
+    for wiersz_ch in chronologia:
+        if wiersz_ch.get("t") != "cutscena":
+            continue
+        numer = int(wiersz_ch["n"])
+        kol = kolejnosc_cutscen.get(numer) or kolejnosc_cutscen.get(numer % 10 ** 8)
+        if not kol:
+            continue
+        owned = {r["k"] for blok in kol for r in blok if r.get("k")}
+        for k in wiersz_ch.get("kn") or []:
+            if k and k not in owned and k not in widziane_osierocone:
+                widziane_osierocone.add(k)
+                osierocone.append(k)
+    osierocone.sort(key=lambda k: wiersze_napisow.get(k) or 0)
+    fazy_walki = _podziel_osierocone_fazy(osierocone, ix.zh)
+    przejete |= widziane_osierocone
 
     def klucze_filmu(numer: int) -> list[str]:
         wiersze = [w for klucz, wystapienia in porzadek.items() for w in wystapienia
@@ -797,19 +899,27 @@ def _jednostki_z_chronologii(ix, pl, porzadek, chronologia: list[dict],
             jednostki.append(Jednostka(
                 "scena", f"Scena {numer}", sekcja(wiersz["s"]), linie,
                 {int(m) for m in scena.get("m") or [] if str(m).isdigit()}, osoby,
-                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else "")))
+                wstep=(f"Interakcja: {poi_scen[numer]}" if numer in poi_scen else ""),
+                numer=numer))
         elif rodzaj == "cutscena":
             numer = int(wiersz["n"])
             kolejnosc = kolejnosc_cutscen.get(numer)
+            faza = _faza_cine_walki(filmy_cutscen.get(numer % 10 ** 8, ""))
+            if faza and fazy_walki.get(faza) and not kolejnosc:
+                extra = [k for k in fazy_walki[faza] if k not in (wiersz.get("kn") or [])]
+                if extra:
+                    wiersz = {**wiersz, "kn": list(wiersz.get("kn") or []) + extra}
             klucze, podtytuly, powtorzone = _napisy_cutsceny(wiersz, wiersze_napisow, pl,
                                                             audio_napisow, kolejnosc,
                                                             zh=ix.zh,
                                                             wlasciciele=wlasciciele_nagran)
             audio_kluczy = {r["k"]: r["a"] for blok in kolejnosc or []
                             for r in blok if r.get("k") and r.get("a")}
+            mowcy_osi = {r["k"]: r["m"] for blok in kolejnosc or []
+                         for r in blok if r.get("k") and r.get("m")}
             mowcy = _mowcy_cutsceny(klucze, ix, pl, porzadek,
                                     wiersze_napisow, audio_napisow, audio_kluczy)
-            linie = [(mowcy.get(klucz, ""), klucz) for klucz in klucze]
+            linie = [(mowcy_osi.get(klucz) or mowcy.get(klucz, ""), klucz) for klucz in klucze]
             osoby = [("", m) for m in dict.fromkeys(m for m, _k in linie if m)]
             liczba_streszczenia = sum(1 for k in wiersz.get("k") or [] if k)
             jednostki.append(Jednostka("cutscena", f"Cutscena {numer}", sekcja(wiersz["s"]),
@@ -1178,12 +1288,130 @@ def _linia(mowca: str, tekst: str) -> str:
     return f"**{mowca}:** {tekst}" if mowca else tekst
 
 
+def _kolumny_envelop(ix) -> dict[str, int]:
+    """Kolumna `tasks_envelop_data` → indeks źródła w `ix.zrodla`."""
+    out: dict[str, int] = {}
+    for i, wpis in enumerate(ix.zrodla or []):
+        if isinstance(wpis, (list, tuple)) and wpis and wpis[0] == "tasks_envelop_data":
+            out[str(wpis[1])] = i
+    return out
+
+
+def _wczytaj_listy(ix) -> dict[str, dict]:
+    """Listy fabularne: wiersz `tasks_envelop_data` → klucze kolumn to/from/text."""
+    kolumny = _kolumny_envelop(ix)
+    if not kolumny:
+        return {}
+    indeksy = set(kolumny.values())
+    wiersze: dict[str, dict] = {}
+    for klucz, tekst in ix.teksty.items():
+        w = tekst.w
+        if not w or not isinstance(w[0], int) or w[0] not in indeksy:
+            continue
+        pole = next((nazwa for nazwa, nr in kolumny.items() if nr == w[0]), None)
+        if not pole:
+            continue
+        rid = str(w[1])
+        wpis = wiersze.setdefault(rid, {"id": rid, "klucze": []})
+        wpis[pole] = klucz
+        wpis["klucze"].append(klucz)
+    return wiersze
+
+
+def _tytul_listu(wpis: dict, pl: dict[str, str], ix) -> str:
+    klucz = wpis.get("to")
+    if klucz and pl.get(klucz):
+        return pl[klucz].strip()
+    if klucz and ix is not None:
+        zrodlo = ix.teksty.get(klucz)
+        if zrodlo:
+            return _czysty(zrodlo.en or zrodlo.zrodlo or "") or f"List {wpis['id']}"
+    return f"List {wpis['id']}"
+
+
+def _karta_listu(wpis: dict, pl: dict[str, str], surowe: dict[str, str], ix) -> list[str]:
+    """Tytuł i treść listu razem; `\\v` to nowa linia, bez pustych wierszy."""
+    tytul = _tytul_listu(wpis, pl, ix)
+    linie = [f"## List: {tytul}"]
+    nadawca_klucz = wpis.get("from")
+    if nadawca_klucz:
+        nadawca = pl.get(nadawca_klucz) or _czysty(
+            (ix.teksty[nadawca_klucz].en if ix and nadawca_klucz in ix.teksty else "")
+            or (ix.teksty[nadawca_klucz].zrodlo if ix and nadawca_klucz in ix.teksty else "")
+            or "")
+        if nadawca and nadawca not in tytul:
+            linie.append(nadawca)
+    klucz_tresci = wpis.get("text")
+    surowy = (surowe.get(klucz_tresci) if klucz_tresci else "") or (
+        pl.get(klucz_tresci) if klucz_tresci else "") or ""
+    if not surowy and klucz_tresci and ix and klucz_tresci in ix.teksty:
+        t = ix.teksty[klucz_tresci]
+        surowy = t.en or t.zrodlo or ""
+    akapity = _akapity(surowy)
+    if not akapity and klucz_tresci and pl.get(klucz_tresci):
+        akapity = [pl[klucz_tresci]]
+    linie.extend(akapity)
+    for extra in ("melody_solved_text", "melody_puzzle_text"):
+        klucz = wpis.get(extra)
+        if not klucz:
+            continue
+        extra_txt = pl.get(klucz) or ""
+        if extra_txt and extra_txt not in akapity:
+            linie.append(extra_txt)
+    linie.append("")
+    return linie
+
+
+def _wczytaj_listy_w_grafie(index: str | Path | None) -> list[dict]:
+    """Wiersze `index/mpk/listy_w_grafie.jsonl` (OpenUI TaskEnvelopWindow → no)."""
+    if not index:
+        return []
+    plik = Path(index) / "mpk" / "listy_w_grafie.jsonl"
+    if not plik.is_file():
+        return []
+    wiersze: list[dict] = []
+    for linia in plik.read_text(encoding="utf-8").splitlines():
+        if not linia.strip():
+            continue
+        wiersze.append(json.loads(linia))
+    return wiersze
+
+
+def _przypisz_listy_do_scen(ix, listy: dict[str, dict],
+                            index: str | Path | None = None) -> dict[int, list[str]]:
+    """List po scenie, która w grafie Storyline otwiera `TaskEnvelopWindow`.
+
+    Źródło: `index/mpk/listy_w_grafie.jsonl` — węzeł OpenUI z `ui_kwargs.no`
+    stoi na krawędzi `__out__` zaraz po `dialogs_no` (pole `po`). Przykład:
+    `sxd_xiaowushuxin.etsb` gra 4700002, potem list `no=5`, potem 4700003.
+    Bez `po` list zostaje w 02. Nie porównujemy tytułu z kwestią.
+    """
+    przy: dict[int, list[str]] = {}
+    zajete: set[str] = set()
+    for wpis in _wczytaj_listy_w_grafie(index):
+        rid = str(wpis.get("no", ""))
+        if not rid or rid not in listy or rid in zajete:
+            continue
+        po = wpis.get("po")
+        if not isinstance(po, int):
+            continue
+        zajete.add(rid)
+        przy.setdefault(po, []).append(rid)
+    return przy
+
+
 def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
-               statystyka: dict, ix=None) -> tuple[list[str], set[str], set[str]]:
+               statystyka: dict, ix=None,
+               listy: dict[str, dict] | None = None,
+               listy_przy: dict[int, list[str]] | None = None,
+               surowe: dict[str, str] | None = None) -> tuple[list[str], set[str], set[str]]:
     out: list[str] = []
     uzyte: set[str] = set()
     zrobione: set[str] = set()
     ostatnia_sekcja = None
+    listy = listy or {}
+    listy_przy = listy_przy or {}
+    surowe = surowe or {}
     for jednostka in jednostki:
         linie = []
         widziane_linie: set[str] = set()
@@ -1238,12 +1466,100 @@ def _plik_scen(jednostki: list[Jednostka], pl: dict[str, str], zakres: str,
         out.extend(linie)
         out.append("")
         zrobione.add(jednostka.etykieta)
+        if jednostka.rodzaj == "scena" and jednostka.numer in listy_przy:
+            for rid in listy_przy[jednostka.numer]:
+                wpis = listy.get(rid)
+                if not wpis:
+                    continue
+                out.extend(_karta_listu(wpis, pl, surowe, ix))
+                uzyte.update(wpis.get("klucze") or [])
     return out, uzyte, zrobione
 
 
-def _haslo(nazwa: str, opisy: list[str]) -> str:
-    opis = " · ".join(opisy)
-    return f"**{nazwa}:** {opis}" if opis else f"**{nazwa}**"
+@dataclass
+class PoleHasla:
+    """Jedno pole hasła w 02: kolumna tabeli + tekst do wypisania."""
+
+    tekst: str
+    tabela: str
+    kolumna: str
+    wiersz: str
+    klucz: str
+
+
+# Kolejność pól na karcie (niżej = później). Questy: 50 + etap łańcucha gry.
+# Lokalizacja → krótki opis (`describe_str` / `describe`) → treść (`story_describe_str`) → cytat.
+_KOLUMNA_KOLEJNOSC = {
+    "locate_describe": 10,
+    "backing_area": 11,
+    "describe_str": 20,
+    "brief_describe_str": 21,
+    "describe": 22,
+    "story_describe_str": 30,
+    "introduction": 31,
+    "introduction_short": 32,
+    "description": 33,
+    "introduction_long": 34,
+    "shiyi_show_word": 40,
+    "extra_describe_1": 45,
+    "shiyi_show_word_from": 80,
+}
+_POMIJANE_KOLUMNY = frozenset({
+    "buff_detail", "unlock_dialog_new_word", "shiyi_discr_l", "shiyi_pic_from",
+    "bowu_father_name", "story_name",
+})
+
+
+def _numer_wiersza(wiersz: str) -> int:
+    try:
+        return int(str(wiersz))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _waga_pola(pole: PoleHasla, kolejnosc_wierszy: dict[str, int] | None = None) -> tuple:
+    """Kolejność na karcie: lokalizacja → treść z gry; questy łańcuchem pre/post.
+
+    W zadaniu najpierw opis dziennika (`task_desc_str`), potem cel na ekranie.
+    Etapy idą łańcuchem gry (`kolejnosc_wierszy`), nie numerem id (250130 < 500003
+    stawiało „Wskazówki ula” przed pierwszym etapem Niedźwiedziego zadania).
+    """
+    if pole.kolumna in ("task_desc_str", "task_target_str"):
+        if kolejnosc_wierszy and pole.wiersz in kolejnosc_wierszy:
+            etap = kolejnosc_wierszy[pole.wiersz]
+        else:
+            etap = _numer_wiersza(pole.wiersz)
+        pod = 0 if pole.kolumna == "task_desc_str" else 1
+        return (50, etap, pod)
+    return (_KOLUMNA_KOLEJNOSC.get(pole.kolumna, 70), _numer_wiersza(pole.wiersz), 0)
+
+
+def _karta_hasla(nazwa: str, pola: list[PoleHasla], *, ix=None) -> list[str]:
+    """Hasło wielolinijkowe: tytuł, potem każde pole osobno (bez ` · `)."""
+    if not pola:
+        return [f"**{nazwa}**"]
+    kolumny = {p.kolumna for p in pola}
+    # `extra_describe_1` bez lokalizacji to zwykle podpowiedź questa, nie treść hasła
+    if "extra_describe_1" in kolumny and "locate_describe" not in kolumny:
+        pola = [p for p in pola if p.kolumna != "extra_describe_1"]
+    kolejnosc = None
+    if ix is not None and kolumny & {"task_desc_str", "task_target_str"}:
+        kolejnosc = kolejnosc_zadan.kolejnosc_etapow(ix, {p.wiersz for p in pola})
+    pola = sorted(pola, key=lambda p: _waga_pola(p, kolejnosc))
+    linie = [f"**{nazwa}**"]
+    widziane: set[str] = set()
+    for pole in pola:
+        if pole.tekst in widziane:
+            continue
+        widziane.add(pole.tekst)
+        linie.append(pole.tekst)
+    return linie
+
+
+def _haslo(nazwa: str, opisy: list[str]) -> list[str]:
+    """Zostawione dla testów syntetycznych: opisy bez kolumn, w podanej kolejności."""
+    pola = [PoleHasla(tekst, "", f"_{i}", "", "") for i, tekst in enumerate(opisy)]
+    return _karta_hasla(nazwa, pola)
 
 
 def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, pl,
@@ -1267,7 +1583,7 @@ def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, 
             nazwa = z_klucza.get(klucz)
             if nazwa and nazwa not in wypisane and nazwa in opisy:
                 wypisane.add(nazwa)
-                linie.append(_haslo(nazwa, opisy[nazwa]))
+                linie.extend(_karta_z_opisow(nazwa, opisy[nazwa], ix=ix))
                 continue
             tekst = pl.get(klucz)
             if tekst and tekst in dostepne and tekst not in wypisane:
@@ -1281,9 +1597,17 @@ def _sekcja_zadan(opisy: dict[str, list[str]], klucze_nazw: dict[str, str], ix, 
     reszta = [nazwa for nazwa in sorted(opisy, key=str.lower) if nazwa not in wypisane]
     if reszta:
         out += ["## Pozostałe zadania i wątki", ""]
-        out += [_haslo(nazwa, opisy[nazwa]) for nazwa in reszta]
+        for nazwa in reszta:
+            out.extend(_karta_z_opisow(nazwa, opisy[nazwa], ix=ix))
         out.append("")
     return out
+
+
+def _karta_z_opisow(nazwa: str, opisy, *, ix=None) -> list[str]:
+    """Opisy to lista `PoleHasla` albo starych napisów."""
+    if opisy and isinstance(opisy[0], PoleHasla):
+        return _karta_hasla(nazwa, list(opisy), ix=ix)
+    return _haslo(nazwa, list(opisy))
 
 
 def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
@@ -1297,40 +1621,334 @@ def _opis_powtarza_nazwe(tekst: str, nazwa: str) -> bool:
     return tekst.strip(" .!?…") == nazwa.strip(" .!?…") or tekst in nazwa
 
 
+_TABELE_NAZWY_PRZEDMIOTU = (
+    "oversea_home_entry_bag_search",
+    "stuff_items",
+    "arrows",
+    "all_homeland_stuff_items",
+    "equip_items",
+)
+_KOLUMNY_NAZWY_PRZEDMIOTU = frozenset({"name", "arrow_name"})
+
+
+def _wczytaj_manual_unlock(katalog: str | Path) -> dict[str, str]:
+    """`manual_items.unlock_stuff`: numer hasła encyklopedii → id przedmiotu."""
+    p = Path(katalog) / "manual_unlock.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, str] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            mapa[str(r["bowu"])] = str(r["stuff"])
+    return mapa
+
+
+def _wczytaj_manual_locate(katalog: str | Path) -> dict[str, str]:
+    """`manual_items.locate_describe` przy KAŻDYM wierszu, także przy wspólnym hashu.
+
+    Wyciąg trzyma jeden `w` na tekst, więc przy tym samym chińskim lokalizacji
+    (n wrogów, jeden string) w `teksty` zostaje tylko pierwszy bowu. Ten plik
+    odtwarza pole z bazy dla każdego hasła.
+    """
+    p = Path(katalog) / "manual_locate.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, str] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            if r.get("k"):
+                mapa[str(r["bowu"])] = str(r["k"])
+    return mapa
+
+
+def _nazwy_przedmiotow(ix) -> dict[str, str]:
+    """Id przedmiotu (`stuff`/`arrows`/`bag`) → klucz tekstu-nazwy.
+
+    Kolumna `name`/`arrow_name` bywa tym samym hashem co nazwa w innej tabeli
+    (`canteen_cook_ingredient`, `compound_recipe_data`, …), więc główne źródło
+    tekstu nie wskazuje przedmiotu. Wtedy nazwa siedzi w etykiecie wiersza
+    (`w[2]`, `indeks.nazwa_wiersza`) przy opisie z tabeli przedmiotu — to pole
+    `name` tego samego wiersza bazy, wybrane przez `etykieta_wiersza`.
+    """
+    waga = {nazwa: i for i, nazwa in enumerate(_TABELE_NAZWY_PRZEDMIOTU)}
+    # (priorytet tabeli, 0=kolumna name, 1=etykieta wiersza)
+    najlepsze: dict[str, tuple[int, int, str]] = {}
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst) if tekst.w else None
+        if not zrodlo:
+            continue
+        tabela = zrodlo[0]
+        if tabela not in waga:
+            continue
+        sid = str(tekst.w[1])
+        priorytet = waga[tabela]
+        if zrodlo[1] in _KOLUMNY_NAZWY_PRZEDMIOTU:
+            kandydat, skad = klucz, 0
+        else:
+            etykieta = tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str) else None
+            if not etykieta:
+                continue
+            kandydat, skad = etykieta, 1
+        teraz = (priorytet, skad, kandydat)
+        if sid not in najlepsze or teraz[:2] < najlepsze[sid][:2]:
+            najlepsze[sid] = teraz
+    return {sid: k for sid, (_p, _s, k) in najlepsze.items()}
+
+
+def _wczytaj_bowu_story(katalog: str | Path) -> dict[str, list[str]]:
+    """`bowu_no_to_story_no` z wyciągu: numer hasła encyklopedii → akty regionalne."""
+    p = Path(katalog) / "bowu_story.jsonl"
+    if not p.exists():
+        return {}
+    mapa: dict[str, list[str]] = {}
+    with p.open(encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            r = json.loads(linia)
+            mapa[str(r["bowu"])] = [str(s) for s in r["story"]]
+    return mapa
+
+
+def _dolacz_lokalizacje_bowu(hasla: dict, ix, pl: dict[str, str],
+                             bowu_story: dict[str, list[str]] | None) -> None:
+    """Lokalizacja aktu regionalnego na kartę hasła (`bowu_no_to_story_no`).
+
+    `region_story_act_data.backing_area` wisi na aktywności (np. 901 →
+    `c26378213d93f8f7` Zawody łucznicze), nie na haśle encyklopedii.
+    Tabela `bowu_no_to_story_no` (832009 → 901) i `region_story_act_data.bowu_no`
+    to twarde mapowanie z gry: to samo miejsce trafia na kartę 白鸟射羿.
+    """
+    if bowu_story is None:
+        katalog = getattr(ix, "katalog", None)
+        bowu_story = _wczytaj_bowu_story(katalog) if katalog else {}
+    if not bowu_story:
+        return
+    story_do_bowu: dict[str, list[str]] = {}
+    for bowu, stories in bowu_story.items():
+        for s in stories:
+            story_do_bowu.setdefault(str(s), []).append(str(bowu))
+    bowu_do_grupy: dict[str, tuple] = {}
+    for grupa, wpis in hasla.items():
+        for p in wpis["pola"]:
+            if p.wiersz in bowu_story:
+                bowu_do_grupy[p.wiersz] = grupa
+    if not bowu_do_grupy:
+        return
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        if not zrodlo or zrodlo[1] != "backing_area":
+            continue
+        story = str(tekst.w[1])
+        tekst_pl = pl.get(klucz) or ""
+        if not tekst_pl:
+            surowe = _z_gry(ix, klucz)
+            if not surowe:
+                continue
+            tekst_pl = GWIAZDKA + surowe
+        for bowu in story_do_bowu.get(story, ()):
+            grupa = bowu_do_grupy.get(bowu)
+            if not grupa:
+                continue
+            wpis = hasla[grupa]
+            if any(p.klucz == klucz for p in wpis["pola"]):
+                continue
+            wpis["pola"].append(PoleHasla(
+                tekst_pl, zrodlo[0], "backing_area", story, klucz))
+            wpis["etykiety"].add(_kategoria(zrodlo[0]))
+
+
+def _dolacz_locate_manual(hasla: dict, ix, pl: dict[str, str],
+                          manual_locate: dict[str, str] | None) -> None:
+    """`locate_describe` z każdego wiersza `manual_items`, nie tylko z głównego `w`.
+
+    Ten sam chiński (np. lokalizacja Zielnego Lasu) stoi w kilku hasłach wrogów.
+    Wyciąg zostawia jeden `w`, więc karta 841003 gubiłaby lokalizację 841001.
+    `manual_locate.jsonl` ma bowu → klucz tekstu dla każdego wiersza bazy.
+    """
+    if not manual_locate:
+        return
+    bowu_do_nazwy: dict[str, str] = {}
+    for klucz, tekst in ix.teksty.items():
+        if not tekst.w or len(tekst.w) < 2:
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        if not zrodlo or zrodlo[0] != "manual_items" or zrodlo[1] != "describe":
+            continue
+        nk = tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str) else None
+        if nk:
+            bowu_do_nazwy[str(tekst.w[1])] = nk
+    if not bowu_do_nazwy:
+        return
+    karty_po_nazwie: dict[str, list] = {}
+    for grupa, wpis in hasla.items():
+        karty_po_nazwie.setdefault(grupa[0], []).append(wpis)
+    for bowu, locate_k in manual_locate.items():
+        name_key = bowu_do_nazwy.get(bowu)
+        if not name_key:
+            continue
+        tekst_pl = pl.get(locate_k) or ""
+        if not tekst_pl:
+            surowe = _z_gry(ix, locate_k)
+            if not surowe:
+                continue
+            tekst_pl = GWIAZDKA + surowe
+        for wpis in karty_po_nazwie.get(name_key, ()):
+            if any(p.kolumna == "locate_describe" for p in wpis["pola"]):
+                continue
+            wpis["pola"].append(PoleHasla(
+                tekst_pl, "manual_items", "locate_describe", bowu, locate_k))
+
+
 def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
-            krainy: list[dict] | None = None) -> list[str]:
-    """Co nie trafiło do 01 — pogrupowane rodzajem: „nazwa — opis”."""
-    sekcje: dict[str, dict[str, list[str]]] = {}
+            krainy: list[dict] | None = None,
+            bowu_story: dict[str, list[str]] | None = None,
+            manual_unlock: dict[str, str] | None = None,
+            manual_locate: dict[str, str] | None = None) -> list[str]:
+    """Co nie trafiło do 01 — karty wielolinijkowe, pola w kolejności kolumn gry."""
+    hasla: dict[tuple, dict] = {}  # (name_key, wiersz|'') → {nazwa, pola, etykiety}
     bez_nazwy: dict[str, list[str]] = {}
-    widziane: dict[str, set[tuple[str, str]]] = {}
-    klucze_nazw: dict[str, str] = {}   # „etykieta\x00nazwa” → klucz nazwy w indeksie
-    for klucz, tekst in pl.items():
+    widziane_linie: dict[str, set[str]] = {}
+    katalog = getattr(ix, "katalog", None)
+    if manual_unlock is None:
+        manual_unlock = _wczytaj_manual_unlock(katalog) if katalog else {}
+    if manual_locate is None:
+        manual_locate = _wczytaj_manual_locate(katalog) if katalog else {}
+    nazwy_rzeczy = _nazwy_przedmiotow(ix) if manual_unlock else {}
+
+    def _klucz_grupy(name_key: str, tabela: str, kolumna: str, wiersz: str) -> tuple:
+        """Questy i bossy: jedna karta na nazwę. Przedmioty-warianty: jeden wiersz."""
+        if kolumna in ("task_target_str", "task_desc_str") or (tabela or "").startswith("tasks"):
+            return (name_key, "")
+        t = tabela or ""
+        if t.startswith(("stuff", "bag", "arrows", "fashion", "equip", "weapon", "armor",
+                         "oversea_home", "compound", "all_homeland")):
+            return (name_key, wiersz)
+        return (name_key, "")
+
+    def _meta(klucz: str):
+        tekst = ix.teksty.get(klucz)
+        if tekst is None:
+            return None
+        zrodlo = ix.zrodlo(tekst) if tekst.w else None
+        if zrodlo:
+            tabela, kolumna = zrodlo[0], zrodlo[1]
+            wiersz = str(tekst.w[1]) if len(tekst.w) > 1 else ""
+            name_key = tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str) else None
+            if name_key is None and _NAZWA.search(kolumna or ""):
+                name_key = klucz
+            return tekst, tabela, kolumna, wiersz, name_key
+        # fixture'y bez `zrodla.json`; kwestie z `w=None` (Feng 52264b…)
+        if tekst.w:
+            numer = tekst.w[0]
+            try:
+                tabela = ix.zrodla[numer][0]
+            except (KeyError, IndexError, TypeError):
+                tabela = str(numer)
+            wiersz = str(tekst.w[1]) if len(tekst.w) > 1 else ""
+            name_key = (tekst.w[2] if len(tekst.w) > 2 and isinstance(tekst.w[2], str)
+                        else None)
+            return tekst, tabela, "", wiersz, name_key
+        return tekst, "", "", "", None
+
+    for klucz, tekst_pl in pl.items():
         if klucz in uzyte:
             continue
-        zrodlo = ix.teksty.get(klucz)
-        if zrodlo is None or not zrodlo.w:
+        meta = _meta(klucz)
+        if meta is None:
             continue
-        numer = zrodlo.w[0]
-        nazwa_tabeli = ix.zrodla[numer][0] if isinstance(numer, int) and numer < len(ix.zrodla) else str(numer)
-        etykieta = _kategoria(nazwa_tabeli)
-        nazwa = _nazwa_klucza(ix, zrodlo.w[2], pl) if len(zrodlo.w) > 2 else ""
-        nazwa = pinyin_slownik.romanizuj(nazwa) if nazwa else nazwa
-        zbior = widziane.setdefault(etykieta, set())
-        if nazwa:
-            if ("nazwa", nazwa) not in zbior:
-                sekcje.setdefault(etykieta, {})[nazwa] = []
-                zbior.add(("nazwa", nazwa))
-                if len(zrodlo.w) > 2 and isinstance(zrodlo.w[2], str):
-                    klucze_nazw[etykieta + "\x00" + nazwa] = zrodlo.w[2]
-            if not _opis_powtarza_nazwe(tekst, nazwa):
-                if tekst not in sekcje[etykieta][nazwa]:
-                    sekcje[etykieta][nazwa].append(tekst)
-        else:
-            linia = tekst
-            if len(linia) >= 4 and ("linia", linia) not in zbior:
-                zbior.add(("linia", linia))
-                bez_nazwy.setdefault(etykieta, []).append(linia)
+        _t, tabela, kolumna, wiersz, name_key = meta
+        stuff_id = None
+        if tabela == "manual_items":
+            stuff_id = (manual_unlock or {}).get(wiersz)
+            if not name_key and stuff_id:
+                name_key = nazwy_rzeczy.get(stuff_id)
+        etykieta = _kategoria(tabela)
         statystyka["reszta"] += 1
+        grupa = _klucz_grupy(name_key or "", tabela, kolumna, wiersz)
+        if name_key and stuff_id:
+            grupa = (name_key, stuff_id)
+        if not name_key or _NAZWA.search(kolumna or ""):
+            if not name_key:
+                zbior = widziane_linie.setdefault(etykieta, set())
+                if len(tekst_pl) >= 4 and tekst_pl not in zbior:
+                    zbior.add(tekst_pl)
+                    bez_nazwy.setdefault(etykieta, []).append(tekst_pl)
+            else:
+                wpis = hasla.setdefault(grupa, {"nazwa": "", "pola": [], "etykiety": set()})
+                wpis["nazwa"] = wpis["nazwa"] or pinyin_slownik.romanizuj(
+                    _nazwa_klucza(ix, name_key, pl))
+                wpis["etykiety"].add(etykieta)
+            continue
+        if kolumna in _POMIJANE_KOLUMNY:
+            continue
+        nazwa = pinyin_slownik.romanizuj(_nazwa_klucza(ix, name_key, pl))
+        if not nazwa or _opis_powtarza_nazwe(tekst_pl, nazwa):
+            continue
+        wpis = hasla.setdefault(grupa, {"nazwa": nazwa, "pola": [], "etykiety": set()})
+        wpis["nazwa"] = wpis["nazwa"] or nazwa
+        wpis["etykiety"].add(etykieta)
+        wpis["pola"].append(PoleHasla(tekst_pl, tabela, kolumna, wiersz, klucz))
+
+    # lokalizacja bywa nieprzetłumaczona — i tak wchodzi na kartę (z gwiazdką)
+    for klucz, tekst in ix.teksty.items():
+        if klucz in uzyte or klucz in pl:
+            continue
+        zrodlo = ix.zrodlo(tekst)
+        if not zrodlo or zrodlo[1] not in ("locate_describe", "backing_area",
+                                           "sidepage_boss_txt", "sidepage_boss_desc"):
+            continue
+        if len(tekst.w) < 3 or not isinstance(tekst.w[2], str):
+            continue
+        name_key = tekst.w[2]
+        wiersz = str(tekst.w[1])
+        wpis = hasla.get((name_key, wiersz)) or hasla.get((name_key, ""))
+        if not wpis:
+            continue
+        surowe = _z_gry(ix, klucz)
+        if not surowe:
+            continue
+        wpis["pola"].append(PoleHasla(GWIAZDKA + surowe, zrodlo[0], zrodlo[1],
+                                      str(tekst.w[1]), klucz))
+        wpis["etykiety"].add(_kategoria(zrodlo[0]))
+
+    _dolacz_lokalizacje_bowu(hasla, ix, pl, bowu_story)
+    _dolacz_locate_manual(hasla, ix, pl, manual_locate)
+
+    def _etykieta_hasla(wpis: dict) -> str:
+        etykiety = wpis["etykiety"]
+        kolumny = {p.kolumna for p in wpis["pola"]}
+        if kolumny & {"task_target_str", "task_desc_str"}:
+            return "Zadania i wątki"
+        if "Encyklopedia, księgi i poszlaki" in etykiety:
+            return "Encyklopedia, księgi i poszlaki"
+        if "Przedmioty, stroje i tytuły" in etykiety:
+            return "Przedmioty, stroje i tytuły"
+        return next(iter(sorted(etykiety))) if etykiety else "Pozostałe teksty"
+
+    sekcje: dict[str, dict[str, list[PoleHasla]]] = {}
+    klucze_nazw: dict[str, str] = {}
+    for (name_key, wiersz), wpis in hasla.items():
+        nazwa = wpis["nazwa"]
+        if not nazwa or not wpis["pola"]:
+            continue
+        etykieta = _etykieta_hasla(wpis)
+        # homonimy (dwa „Łucznictwo”, dwa „Zioła”) zostają osobnymi kartami
+        etykieta_unikalna = nazwa
+        if etykieta_unikalna in sekcje.get(etykieta, {}):
+            etykieta_unikalna = f"{nazwa}\u200b{(wiersz or name_key)[:12]}"
+        sekcje.setdefault(etykieta, {})[etykieta_unikalna] = wpis["pola"]
+        klucze_nazw[etykieta + "\x00" + etykieta_unikalna] = name_key
 
     out: list[str] = []
     for etykieta in sorted(set(sekcje) | set(bez_nazwy)):
@@ -1344,8 +1962,9 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
             out.extend(luzne)
             out.append("")
             continue
-        for nazwa in sorted(sekcje.get(etykieta, {}), key=str.lower):
-            out.append(_haslo(nazwa, sekcje[etykieta][nazwa]))
+        for nazwa in sorted(sekcje.get(etykieta, {}), key=lambda n: n.rstrip("\u200b0123456789abcdef").lower()):
+            karta = _karta_hasla(nazwa.split("\u200b")[0], sekcje[etykieta][nazwa], ix=ix)
+            out.extend(karta)
         out.extend(sorted(bez_nazwy.get(etykieta, []), key=str.lower))
         out.append("")
     return out
@@ -1353,7 +1972,8 @@ def _reszta(ix, pl, uzyte: set[str], statystyka: dict,
 
 def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     ix = indeks_mod.wczytaj(index, teksty=True, sceny=True)
-    pl = _magazyn(Path(magazyn), Path(index))
+    surowe = _magazyn(Path(magazyn), Path(index), czysc=False)
+    pl = {klucz: _czysty(tekst) for klucz, tekst in surowe.items()}
     porzadek = _wczytaj_porzadek(index)
     chronologia = chronologia_mod.wczytaj(index)
     krainy = json.loads((Path(index) / "prowincje.json").read_text(encoding="utf-8"))
@@ -1362,8 +1982,12 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
     statystyka = {"jednostek": 0, "linii": 0, "pominiete": 0, "reszta": 0, "plikow": 0,
                   "bez_przekladu": 0}
 
+    listy = _wczytaj_listy(ix)
+    listy_przy = _przypisz_listy_do_scen(ix, listy, index)
     jednostki = _jednostki_z_chronologii(ix, pl, porzadek, chronologia, krainy, index)
-    tresc, uzyte, _zrobione = _plik_scen(jednostki, pl, zakres, statystyka, ix)
+    tresc, uzyte, _zrobione = _plik_scen(
+        jednostki, pl, zakres, statystyka, ix,
+        listy=listy, listy_przy=listy_przy, surowe=surowe)
     pliki_scen, opisy_scen = _zapisz_czesci(
         wyj, "01_sceny_i_cutsceny", "Sceny i cutsceny",
         "Prolog i krainy po kolei (sceny i cutsceny przemieszane), "
@@ -1371,7 +1995,18 @@ def zbuduj(*, index: str, magazyn: str, wyj: Path, zakres: str) -> dict:
         "sceny i cutsceny przemieszane w kolejności występowania.",
         tresc, statystyka)
 
-    tresc_reszty = _reszta(ix, pl, uzyte, statystyka, krainy)
+    # Wszystkie klucze listów wychodzą z „encyklopedii”: albo przy scenie, albo w # Listy.
+    for wpis in listy.values():
+        uzyte.update(wpis.get("klucze") or [])
+    nieprzypisane = [rid for rid in sorted(listy, key=lambda r: _tytul_listu(listy[r], pl, ix).lower())
+                     if rid not in {x for grupa in listy_przy.values() for x in grupa}]
+    tresc_reszty: list[str] = []
+    if nieprzypisane:
+        tresc_reszty += ["# Listy", ""]
+        for rid in nieprzypisane:
+            tresc_reszty += _karta_listu(listy[rid], pl, surowe, ix)
+        statystyka["reszta"] += len(nieprzypisane)
+    tresc_reszty += _reszta(ix, pl, uzyte, statystyka, krainy)
     tresc_reszty += _zbiory(ix, pl, uzyte, statystyka)
     tresc_reszty += _pamiatki(ix, pl, uzyte, statystyka, index)
     tresc_reszty += _poi(ix, pl, uzyte, statystyka, index)
@@ -1404,6 +2039,7 @@ _KROTKIE_SEKCJE = {
     "Napisy przerywników — kolejność z pliku gry (bez numeru cutsceny)": "napisy przerywników",
     "Zadania i wątki": "zadania",
     "Encyklopedia, księgi i poszlaki": "kompendium",
+    "Listy": "listy",
     "Przedmioty, stroje i tytuły": "przedmioty",
     "Sztuki walki i umiejętności": "sztuki walki",
     "Walka i przeciwnicy": "walka",
@@ -1484,7 +2120,8 @@ def _czesci(linie: list[str], budzet: int = _CZESC_BUDZET) -> list[list[str]]:
         if linia.startswith("# "):
             sekcja = linia
         naglowek = linia.startswith("# ") or linia.startswith("## ")
-        luzna = linia.startswith("**") or poprzednia == ""
+        # Cięcie na haśle (`**Tytuł**`), nie na akapicie karty po pustej linii.
+        luzna = linia.startswith("**")
         tnij = biezaca and bajty > budzet and (
             naglowek
             or (bajty > budzet + zapas and luzna)

@@ -8,7 +8,8 @@
   * pulę napisów `text_msg` z wyciągu `index/` — wiersze wyświetlane
     w grze (zwykle drobniejsze segmenty jednej kwestii scenariusza).
 
-Algorytm (benchmark: ręczny zapis gracza cutsceny 30161):
+Algorytm (benchmark: ręczny zapis gracza cutsceny 30161; 30162:
+Ruby → Ach! → most → „co teraz”):
   1. segmentacja zachłanna tekstów scenariusza na teksty puli
      (najdłuższe dopasowanie od lewej, tolerancja wariantów 啦/了 itd.),
   2. okno pokolenia: klastry jednoznacznych dopasowań (te same zdania
@@ -16,7 +17,11 @@ Algorytm (benchmark: ręczny zapis gracza cutsceny 30161):
   3. emisja kwestii w porządku czasu `.cine`; w obrębie jednej kwestii
      wiersze idą po numerach; każdy wiersz użyty raz,
   4. dopasowanie rozmyte dla wierszy w lukach numeracji (scenariusz
-     i napisy różnią się czasem szykiem lub partykułami).
+     i napisy różnią się czasem szykiem lub partykułami),
+  5. okrzyk z didaskaliów (`（啊）` w 30162) — gdy po zdjęciu nawiasów
+     nie zostaje tekst, a w nawiasie stoi sam wykrzyknik, wstawiamy
+     krótki napis `啊`/`Ach!` w czasie nagrania; westchnienia i oddechy
+     bez okrzyku nadal pomijamy.
 
 Wyjście: `index/cutsceny_kolejnosc_kwestii.jsonl`
   {"no": 30161, "wiersze": [{"w": 591148, "k": "7c35…", "t": 0.359}, …]}
@@ -28,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -50,6 +56,15 @@ WARIANTY = str.maketrans({
 # oddechy, gwar tłumu, odgłosy walki opisane poza nawiasami didaskaliów
 OPISY_SCENICZNE = ("气息", "群杂", "音效", "视频", "呼吸", "干音", "垫乐", "哭腔")
 
+# Okrzyki, które gra pokazuje jako napis, nawet gdy scenariusz trzyma je
+# w didaskaliach (`（啊）` w 30162 → „Ach!”). Bez wydłużonych wrzasków
+# (`啊————`) i bez westchnień (`（轻轻叹气）`).
+WYKRZYKNIKI = frozenset({
+    "啊", "哎", "诶", "欸", "呀", "哦", "呃", "嘿", "呜", "哇", "嘿呀", "哎呀",
+})
+_RE_DIDASKALIA = re.compile(r"[（(]([^）)]+)[）)]")
+MAKS_ZRODLO_WYKRZYKNIKA = 4   # „啊！” mieści się; „啊————！” nie
+
 LUKA_KLASTRA = 25      # maks. przerwa numeracji w klastrze jednoznacznych trafień
 MARGINES_OKNA = 10     # zapas okna wokół klastra
 MIN_KLASTER = 2        # tyle jednoznacznych trafień uwiarygadnia klaster
@@ -67,9 +82,77 @@ def _norm(tekst: str) -> str:
     """
     global _RE_NIE_SLOWO
     if _RE_NIE_SLOWO is None:
-        import re
         _RE_NIE_SLOWO = re.compile(r"[^0-9A-Za-z\u4e00-\u9fff\u3400-\u4dbf]+")
     return _RE_NIE_SLOWO.sub("", tekst).translate(WARIANTY)
+
+
+def _norm_lite(tekst: str) -> str:
+    """Jak `_norm`, bez zamiany partykuł (呀≠啊) — do rozpoznania okrzyku."""
+    global _RE_NIE_SLOWO
+    if _RE_NIE_SLOWO is None:
+        _norm("")
+    return _RE_NIE_SLOWO.sub("", tekst)
+
+
+def _wykrzyknik_z_didaskaliow(zh: str) -> str:
+    """Sam okrzyk z nawiasów, gdy reszta kwestii to didaskalia.
+
+    `（啊）（稍微惊吓的气声）…` → `啊`. Westchnienie `（轻轻叹气）` → `\"\"`.
+    """
+    for m in _RE_DIDASKALIA.finditer(zh or ""):
+        s = _norm_lite(m.group(1))
+        if s in WYKRZYKNIKI:
+            return s
+    return ""
+
+
+def mapa_wykrzyknikow(teksty) -> dict[str, str]:
+    """Okrzyk (`啊`) → jeden krótki klucz wyciągu (nie wrzask `啊————`).
+
+    Przy równej długości źródła bierzemy mniejszy klucz — deterministycznie.
+    """
+    najlepszy: dict[str, tuple] = {}
+    for klucz, tekst in teksty.items():
+        surowe = tekst.zrodlo or ""
+        zrodlo = surowe.strip()
+        if len(zrodlo) > MAKS_ZRODLO_WYKRZYKNIKA:
+            continue
+        n = _norm_lite(zrodlo)
+        if n not in WYKRZYKNIKI:
+            continue
+        # najpierw samo `啊`, potem `啊！`; spacje w szarej warstwie odpadają
+        ocena = (len(zrodlo), 0 if surowe == n else 1, len(surowe), klucz)
+        if n not in najlepszy or ocena < najlepszy[n]:
+            najlepszy[n] = ocena
+    return {n: para[-1] for n, para in najlepszy.items()}
+
+
+def wstaw_wykrzykniki(blok: list[dict], kwestie: list[dict],
+                      wykrzykniki: dict[str, str]) -> None:
+    """Wstaw `（啊）` z osi `.cine` w czasie nagrania, gdy brak wiersza puli."""
+    if not wykrzykniki or not blok:
+        return
+    obecne = {(r.get("a") or "", round(float(r["t"]), 3)) for r in blok}
+    nowe: list[dict] = []
+    for kw in kwestie:
+        if _norm(_bez_didaskaliow(kw.get("zh") or "")):
+            continue
+        nz = _wykrzyknik_z_didaskaliow(kw.get("zh") or "")
+        klucz = wykrzykniki.get(nz) if nz else None
+        if not klucz:
+            continue
+        t, audio = round(float(kw["t"]), 3), kw.get("audio") or ""
+        if (audio, t) in obecne:
+            continue
+        wpis = {"k": klucz, "t": t}
+        if audio:
+            wpis["a"] = audio
+        nowe.append(wpis)
+        obecne.add((audio, t))
+    if not nowe:
+        return
+    blok.extend(nowe)
+    blok.sort(key=lambda r: (float(r["t"]), r.get("w") or 0, r.get("k") or ""))
 
 
 def _bez_didaskaliow(tekst: str) -> str:
@@ -143,7 +226,9 @@ def _okno(jednoznaczne: list[int]) -> set[range]:
 
 
 def kolejnosc_kwestii(kwestie: list[dict],
-                      pula_norm: dict[str, list[tuple[int, str]]]) -> list[list[dict]]:
+                      pula_norm: dict[str, list[tuple[int, str]]],
+                      wykrzykniki: dict[str, str] | None = None
+                      ) -> list[list[dict]]:
     """Bloki wariantów cutsceny; w każdym wiersze puli wg chronologii `.cine`.
 
     Te same zdania żyją w kilku rozłącznych blokach puli (stare/nowe
@@ -163,6 +248,8 @@ def kolejnosc_kwestii(kwestie: list[dict],
     audio_kwestii = {float(k["t"]): k.get("audio") or "" for k in kwestie}
     bloki = [blok for o in sorted(okna, key=lambda o: o.start)
              if (blok := _blok_okna(znorm, pula_norm, o, audio_kwestii))]
+    for blok in bloki:
+        wstaw_wykrzykniki(blok, kwestie, wykrzykniki or {})
     return bloki
 
 
@@ -341,6 +428,7 @@ def zbuduj(index: str | Path = "index",
         if nz:
             glob_norm.setdefault(nz, []).append(klucz)
     poczatki = indeks_poczatkow(glob_norm, pula_norm)
+    wykrzykniki = mapa_wykrzyknikow(wyciag.teksty)
 
     wynik: list[dict] = []
     zapasowych = 0
@@ -348,10 +436,11 @@ def zbuduj(index: str | Path = "index",
         for linia in f:
             wpis = json.loads(linia)
             kwestie = wpis.get("kwestie") or []
-            bloki = kolejnosc_kwestii(kwestie, pula_norm)
+            bloki = kolejnosc_kwestii(kwestie, pula_norm, wykrzykniki)
             if not bloki:
                 zapas = kwestie_zapasowe(kwestie, glob_norm, pula_norm, poczatki)
                 if zapas:
+                    wstaw_wykrzykniki(zapas, kwestie, wykrzykniki)
                     bloki = [zapas]
                     zapasowych += 1
             if bloki:

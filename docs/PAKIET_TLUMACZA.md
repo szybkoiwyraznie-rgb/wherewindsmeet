@@ -236,8 +236,12 @@ a po scenie — wybory gracza z dialogami, do których prowadzą.
 
 ### `widoki.zip`
 
-Teksty spoza scen, przy tabeli i polu, z którego pochodzą
-(`[tabela · pole · wiersz]`, `dotyczy:` = nazwa wiersza, `limit:`). Podział na
+Teksty spoza scen złożone w **hasła** (jak karty Czytanki): nazwa i wszystkie
+pola tego samego wiersza tabeli w jednym bloku `###`, żeby nie skakać między
+plikami. Zadania idą łańcuchem gry (rozdział → pre/post), nie numerem wiersza.
+Etykieta pola nadal `[tabela · pole · wiersz]`, `dotyczy:` = nazwa rekordu,
+`limit:`. Samouczki i tabele meta (`guider_*`) wchodzą do pakietu — priorytet
+ustala tłumacz (`--bez-meta` przywraca stare wykluczenia v2). Podział na
 11 serii wynika z nazw tabel (`REGULY` w `tools/buduj_paczke.py`): postacie,
 zadania, wybory i rozmowy, przedmioty, walka, świat, encyklopedia i księgi,
 komunikaty, interfejs, pozostałe (1 030 małych tabel) i teksty bez źródła
@@ -439,3 +443,103 @@ Sprawdzone na prawdziwych danych aktualizacji:
 | tabele `__grey` to druga wersja tej samej tabeli | **hipoteza** z nazwy; ich teksty są w pakiecie |
 | mała łatka (`latka_testowa.py` UI + prolog) przyjmowana przez grę, polskie znaki się wyświetlają | **fakt — potwierdzone w uruchomionej grze Steam (Windows)** |
 | pełna łatka fabularna (`WWM_Spolszczenie_PL_v0.4.0.zip`, zwrotka `WWM_PL2.zip`, `86 282` przekłady) w oknie gry | **fakt — przetestowana w grze 2026-11-17: działa, przetłumaczone treści pojawiają się w grze** (zgłoszenie właściciela) |
+
+## Pakiet „czysty” — bez tymczasowych wpisów AI (od v6)
+
+Magazyn zawiera dwa rodzaje przekładów: **tłumacza** (zwrotki `.zip`/`.md`,
+autorytatywne) i **tymczasowe AI** (pliki `zwrotki/*ai_tymczasowe*.md`,
+importowane tym samym obiegiem). Pakiet dla tłumacza pokazuje dotychczasowe
+przekłady po `PL:`, więc wpisy AI nie mogą do niego trafić — inaczej tłumacz
+zobaczyłby cudzy tekst jako własny.
+
+Obieg budowy pakietu czystego (użyty dla v6, 2026-11-20):
+
+```bash
+python3 - <<'EOF'
+import json
+from pathlib import Path
+ai=set()
+for p in Path('zwrotki').glob('*ai_tymczasowe*.md'):
+    for l in p.read_text(encoding='utf-8').splitlines():
+        s=l.strip()
+        if s.startswith('klucz:'):
+            ai.add(s.split(':',1)[1].strip())
+out_dir=Path('/tmp/mag_bez_ai'); out_dir.mkdir(exist_ok=True)
+for p in sorted(Path('tlumaczenie').glob('*.jsonl')):
+    keep=[l for l in p.read_text(encoding='utf-8').splitlines()
+          if l.strip() and json.loads(l).get('k','').lstrip('@') not in ai]
+    (out_dir/p.name).write_text(("\n".join(keep)+"\n") if keep else "", encoding='utf-8')
+EOF
+python3 tools/buduj_paczke.py --indeks index --wyj dist --wersja 6 \
+    --data 2026-11-20 --tlumaczenie /tmp/mag_bez_ai --wypelnij-pl
+```
+
+Efekt: 36 932 klucze AI odfiltrowane, w pakiecie **114 067** przekładów
+tłumacza (v5: 114 053 + późniejsze zwrotki tłumacza).
+
+## Pakiet v7 — kontekst czytanki, nadal bez AI (2026-11-22)
+
+`tools/buduj_paczke.py` bierze ten sam kontekst co Czytanka, **bez zmiany
+formatu zwrotki** (import czyta wyłącznie `klucz:` / `PL:`):
+
+- napisy cutscen w kolejności osi `.cine` (`index/cutsceny_kolejnosc_kwestii.jsonl`)
+  — przeplot bloków puli; reszta puli zostaje po lukach ID;
+- listy `tasks_envelop_data` tuż po scenie z grafu Storyline
+  (`index/mpk/listy_w_grafie.jsonl`); w widokach odsyłacz „tłumaczysz raz”;
+- `- interakcja:` w nagłówku sceny z POI (`poi_storyline_sceny`);
+- `lokalizacja:` przy hasłach encyklopedii z `bowu_story.jsonl`.
+
+Ładowanie: `tools/kontekst_paczki.py`. Testy: `tests/test_kontekst_paczki.py`,
+`CzytankaContextPackageTests` w `tests/test_buduj_paczke.py`.
+
+Budowa (magazyn bez AI, `--tylko-z-en --wypelnij-pl`):
+
+```bash
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v7 \
+    --wersja 7 --data 2026-11-22 --tlumaczenie /tmp/mag_bez_ai \
+    --tylko-z-en --wypelnij-pl
+```
+
+Wydanie: `paczka_dla_tlumacza_wwm_v7.zip` (45 389 573 B, SHA-256
+`a1254c673b21c871f05e45a94f6dd833d3e063fb52c2cb8114488660581492f2`,
+Dysk `1jtE02MkeSdU95VrxhtHze7MyQtTJ4wBS`). 422 248 miejsc PL, **114 055**
+wypełnionych przekładem tłumacza, 37 899 kluczy AI jako puste `PL:`.
+Kontrola: 0 powtórzeń, 0 braków. v6 zostaje na Dysku.
+
+## Pakiet v8 — hasła jak Czytanka, meta w pakiecie (2026-11-23)
+
+Widoki składają **rekord** (nazwa + pola tego samego wiersza) w jednym bloku
+`###`; zadania idą łańcuchem rozdziału (`kolejnosc_zadan.plan`). Samouczki
+i tabele meta (`guider_*`) wchodzą — priorytet ustala tłumacz (`--bez-meta`
+przywraca wykluczenia v2). Format `klucz:` / `PL:` bez zmian.
+
+```bash
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_wwm_v8 \
+    --wersja 8 --data 2026-11-23 --tlumaczenie /tmp/mag_bez_ai \
+    --tylko-z-en --wypelnij-pl
+```
+
+Wydanie: `paczka_dla_tlumacza_wwm_v8.zip` (51 056 749 B, SHA-256
+`1c9be5c460920dae458049a5497edd1fca844ff30065f5a8d43b46f3db882795`,
+Dysk `1yC0KUEQ80vLTs0fLJGcl07_LTE-xMUhe`). 488 247 miejsc PL, **114 771**
+wypełnionych przekładem tłumacza, 37 899 kluczy AI jako puste `PL:`.
+Kontrola: 0 powtórzeń, 0 braków. v7 zostaje na Dysku.
+
+## Pakiet „tylko AI” do weryfikacji (v6-AI)
+
+Odmiana pakietu dla tłumacza: **wyłącznie** wpisy tymczasowe AI, żeby dało się
+je przejrzeć/przepisać bez przewijania 77 tys. przekładów tłumacza.
+
+```bash
+# 1. magazyn tylko z kluczami AI (analogicznie jak filtr „czysty”, odwrotnie)
+# 2. lista slotów: dist/ai_slots.txt (36 932 klucze)
+python3 tools/buduj_paczke.py --indeks index --wyj dist/paczka_ai --wersja 1 \
+    --data 2026-11-20 --tlumaczenie /tmp/mag_ai --tylko-sloty dist/ai_slots.txt \
+    --wypelnij-pl --bez-zip
+# 3. własny README + złożenie ZIP-a (README.md + sceny.zip + cutsceny.zip + widoki.zip)
+```
+
+Wydanie: `paczka_ai_weryfikacja_v6.zip` (6 114 134 B, 36 577 miejsc `PL:`).
+Uwaga: README z `--tylko-sloty` opisuje „pakiet uzupełniający po aktualizacji”
+— dla tego wydania trzeba je **zastąpić własnym**, inaczej tłumacz dostanie
+instrukcję „do wpisania: 0 linii”.

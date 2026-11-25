@@ -258,6 +258,34 @@ class TestChronologiaCine(unittest.TestCase):
                 wpis = json.loads(linia)
                 cls.kolejnosc[int(wpis["no"])] = wpis.get("bloki") or []
 
+    def test_30163_kolejnosc_z_ujec(self):
+        """30163: master milczy, oś z ujęć s0010/s0030/s0070 (nie z zapisu gracza)."""
+        bloki = self.kolejnosc.get(30163)
+        self.assertTrue(bloki, "brak cutsceny 30163 w indeksie kolejności")
+        self.assertEqual([r["k"] for r in bloki[0]], [
+            "99aa1305b14cab9d", "686292d5404f99dc",
+            "18b0e586d1f98026", "ef40bf4720988a61", "571634c537f273b9",
+            "c8ae650aef035fe1", "614fbe2f5b73ac93",
+            "aa44a6097c51e9dd",
+        ])
+        self.assertEqual(bloki[0][0]["a"], "vo_sm_sxdm7_npc_33")
+        self.assertEqual(bloki[0][2]["a"], "vo_sm_sxdm5_npc_39")
+        self.assertEqual(bloki[0][-1]["a"], "vo_sm_sxdm4_npc_03")
+
+    def test_30162_kolejnosc_z_gry(self):
+        """Most Ruby: „nie skacz” → Ach! → most → „co teraz” (oś `.cine`)."""
+        bloki = self.kolejnosc.get(30162)
+        self.assertTrue(bloki, "brak cutsceny 30162 w indeksie kolejności")
+        audio = [r.get("a") for r in bloki[0]]
+        self.assertEqual(audio, [
+            "vo_sm_sxdm9_pma_25",
+            "vo_sm_sxdm9_pma_26",
+            "vo_sm_sxdm9_npc_44",
+            "vo_sm_sxdm9_npc_44",
+        ])
+        self.assertEqual(bloki[0][1]["t"], 11.104)
+        self.assertNotIn("w", bloki[0][1])
+
     def test_indeks_odtwarza_zapis_gracza_30161(self):
         """Nowszy blok 30161 w indeksie = pełny ręczny zapis rozgrywki."""
         bloki = self.kolejnosc.get(30161)
@@ -298,8 +326,10 @@ class TestChronologiaCine(unittest.TestCase):
                   {"w": 110, "k": "g1", "t": 1.0},
                   {"w": 101, "k": "r2", "t": 2.0}]]
         klucze, podtytuly, powtorzone = cz._napisy_cutsceny(wiersz, wiersze, pl, None, bloki)
-        self.assertEqual(klucze, ["r1", "g1", "r2", "stare"])
-        self.assertEqual(podtytuly, {3: "Inny wariant napisów tej cutsceny (wiersz 50)"})
+        # oś `.cine` jest pełna — „stare” z puli obok to nie wariant tej cutsceny
+        self.assertEqual(klucze, ["r1", "g1", "r2"])
+        self.assertNotIn("stare", klucze)
+        self.assertEqual(podtytuly, {})
         self.assertEqual(powtorzone, [])
 
 
@@ -324,6 +354,52 @@ class TestMowcaZAudio(unittest.TestCase):
         from tools import kontekst_cutscen as kc
         self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_17"), "Ruby")
         self.assertEqual(kc.mowca_z_audio("vo_sm_sxdm4_cs_zlxl_hx_02"), "Ruby")
+
+
+class TestWykrzyknikDidaskaliow(unittest.TestCase):
+    """Okrzyk `（啊）` z didaskaliów wchodzi na oś czasu; westchnienie nie."""
+
+    def setUp(self):
+        from tools import cutsceny_kolejnosc_kwestii as ck
+        self.ck = ck
+
+    def test_ah_z_nawiasu_nie_westchnienie(self):
+        zh = "（啊）（稍微惊吓的气声）（看见桥断了）（放心下来）"
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow(zh), "啊")
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow("（轻轻叹气）"), "")
+        self.assertEqual(self.ck._wykrzyknik_z_didaskaliow("（跳桥前气息）+（跳）嘿呀。"), "")
+
+    def test_wstawia_ach_miedzy_kwestie_30162(self):
+        """Kolejność z gry: Ruby → Ach! → most → co teraz."""
+        blok = [
+            {"w": 591186, "k": "ruby", "t": 7.091, "a": "vo_sm_sxdm9_pma_25"},
+            {"w": 591184, "k": "most", "t": 15.266, "a": "vo_sm_sxdm9_npc_44"},
+            {"w": 591185, "k": "co", "t": 15.266, "a": "vo_sm_sxdm9_npc_44"},
+        ]
+        kwestie = [
+            {"t": 2.052, "audio": "vo_sm_sxdm9_npc_43", "zh": "（跳桥前气息）+（跳）嘿呀。"},
+            {"t": 7.091, "audio": "vo_sm_sxdm9_pma_25", "zh": "红线你好好走，别蹦！"},
+            {"t": 11.104, "audio": "vo_sm_sxdm9_pma_26",
+             "zh": "（啊）（稍微惊吓的气声）（看见桥断了）（放心下来）"},
+            {"t": 15.266, "audio": "vo_sm_sxdm9_npc_44",
+             "zh": "（反应过来）啊桥、桥被我压断了。老大你要怎么办？"},
+        ]
+        self.ck.wstaw_wykrzykniki(blok, kwestie, {"啊": "k-ach"})
+        self.assertEqual([r["k"] for r in blok], ["ruby", "k-ach", "most", "co"])
+        self.assertEqual(blok[1]["t"], 11.104)
+        self.assertEqual(blok[1]["a"], "vo_sm_sxdm9_pma_26")
+        self.assertNotIn("w", blok[1])
+
+    def test_mapa_bierze_krotkie_ah_nie_wrzask(self):
+        from collections import namedtuple
+        Tekst = namedtuple("Tekst", "zrodlo")
+        teksty = {
+            "k-wrzask": Tekst("啊————————！"),
+            "0aaa-szara": Tekst("啊      "),
+            "k-ah": Tekst("啊"),
+            "k-ah-wykrz": Tekst("啊！"),
+        }
+        self.assertEqual(self.ck.mapa_wykrzyknikow(teksty), {"啊": "k-ah"})
 
 
 class TestKwestieZapasowe(unittest.TestCase):
@@ -405,32 +481,33 @@ class TestMowcyCutsceny(unittest.TestCase):
 
 
 class TestNaglowekSasiadow(unittest.TestCase):
-    """Bloki puli bez pokrycia treścią bloku głównego to nie „warianty"."""
+    """Oś `.cine` jest źródłem prawdy: sąsiedzi puli nie wchodzą na tę cutscenę."""
 
     def setUp(self):
         self.zh_map = {"a1": "不是说好一起去将军祠吗", "a2": "怎么睡着了呀",
-                       "w1": "不是说好一起去将军祠吗怎么睡着了",     # prawdziwy wariant
-                       "o1": "歌罢人散尽", "o2": "物是人非事事休"}   # recytacja obok
-        self.wiersz = {"n": 1, "kn": ["a1", "a2", "w1", "o1", "o2"], "k": []}
+                       "w1": "不是说好一起去将军祠吗怎么睡着了",
+                       "o1": "我兄弟集八俊护黎庶", "o2": "擂鼓三声调兵遣将"}
+        self.wiersz = {"n": 30161, "kn": ["a1", "a2", "w1", "o1", "o2"], "k": []}
         self.wiersze = {"a1": 591148, "a2": 591149, "w1": 590157,
-                        "o1": 591125, "o2": 591126}
+                        "o1": 591128, "o2": 591139}
         self.pl = {k: f"PL {k}" for k in self.zh_map}
         self.kolejnosc = [[{"w": 591148, "k": "a1", "t": 1.0},
                            {"w": 591149, "k": "a2", "t": 2.0}]]
 
-    def test_wariant_zostaje_sasiad_dostaje_uczciwy_naglowek(self):
-        _, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
-                                              kolejnosc=self.kolejnosc,
-                                              zh=self.zh_map.get)
-        naglowki = list(podtytuly.values())
-        self.assertTrue(any(n.startswith("Inny wariant") for n in naglowki), naglowki)
-        self.assertTrue(any(n.startswith("Napisy sąsiadujące") for n in naglowki), naglowki)
+    def test_cine_nie_lknie_recytacji_sasiada(self):
+        klucze, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
+                                                   kolejnosc=self.kolejnosc,
+                                                   zh=self.zh_map.get)
+        self.assertEqual(klucze, ["a1", "a2"])
+        self.assertNotIn("o1", klucze)
+        self.assertNotIn("o2", klucze)
+        self.assertFalse(podtytuly)
 
-    def test_bez_zh_naglowki_jak_dawniej(self):
-        _, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
-                                              kolejnosc=self.kolejnosc)
-        self.assertFalse([n for n in podtytuly.values()
-                          if n.startswith("Napisy sąsiadujące")])
+    def test_bez_osi_cine_pula_nadal_sie_dzieli(self):
+        klucze, podtytuly, _ = cz._napisy_cutsceny(self.wiersz, self.wiersze, self.pl,
+                                                   zh=self.zh_map.get)
+        self.assertIn("o1", klucze)
+        self.assertTrue(podtytuly)
 
 
 class TestWlascicieleNagran(unittest.TestCase):
@@ -447,15 +524,31 @@ class TestWlascicieleNagran(unittest.TestCase):
         self.assertNotIn("vo_sm_sxdm7_npc", self.mapa)
 
     def test_naglowek_wskazuje_wlasciciela(self):
+        # bez osi `.cine` sąsiad z nagraniem 30435 dostaje jawny nagłówek
         zh_map = {"a1": "不是说好一起去将军祠吗", "o1": "像你这样的人哪怕多救一人",
                   "o2": "只怕南北之势多救一人便多伤一人"}
         wiersz = {"n": 30161, "kn": ["a1", "o1", "o2"], "k": []}
-        wiersze = {"a1": 591148, "o1": 591126, "o2": 591127}
+        wiersze = {"a1": 591148, "o1": 590050, "o2": 590051}
         pl = {k: f"PL {k}" for k in zh_map}
-        audio = {591126: "vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz"}
-        kolejnosc = [[{"w": 591148, "k": "a1", "t": 1.0}]]
-        _, podtytuly, _ = cz._napisy_cutsceny(wiersz, wiersze, pl, audio, kolejnosc,
+        audio = {590050: "vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz"}
+        _, podtytuly, _ = cz._napisy_cutsceny(wiersz, wiersze, pl, audio, None,
                                               zh=zh_map.get,
                                               wlasciciele={"vo_ss_axnzgzgcm9_cs_nzgzcj_dqgz": 30435})
         self.assertTrue(any("nagrania cutsceny 30435" in n for n in podtytuly.values()),
                         list(podtytuly.values()))
+
+
+class TestCineWalkiWorldBossa(unittest.TestCase):
+    """`pyryw/sq001_pyscc` i `sq002_pyszc` to fazy walki, nie wariant 30161."""
+
+    def test_faza_z_nazwy_filmu(self):
+        self.assertEqual(cz._faza_cine_walki("Char/e_01_cutscene/pyryw/sq001_pyscc/sq001_pyscc.cine"), "cc")
+        self.assertEqual(cz._faza_cine_walki("Char/e_01_cutscene/pyryw/sq002_pyszc/sq002_pyszc.cine"), "zc")
+        self.assertEqual(cz._faza_cine_walki("Char/e_01_cutscene/pys1/sq001_pys1cc/sq001_pys1cc.cine"), "cc")
+        self.assertIsNone(cz._faza_cine_walki("Char/e_01_cutscene/cehua_xinshoucun/sq001_zlxl.cine"))
+
+    def test_split_recytacji_na_leigu(self):
+        zh = {"a": "我兄弟集八俊", "b": "贼子", "c": "擂鼓三声调兵遣将", "d": "行不得也哥哥"}
+        fazy = cz._podziel_osierocone_fazy(["a", "b", "c", "d"], zh.get)
+        self.assertEqual(fazy["cc"], ["a", "b"])
+        self.assertEqual(fazy["zc"], ["c", "d"])
